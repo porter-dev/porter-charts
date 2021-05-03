@@ -1,0 +1,51 @@
+# Default values for docker-template.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+terminationGracePeriodSeconds: 30
+
+image:
+  repository: alexwhen/docker-2048
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+container:
+  port: 80
+  command:
+  env:
+    normal:
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+  targetMemoryUtilizationPercentage: 50
+
+pvc:
+  enabled: false
+  storage: 20Gi
+  mountPath: /mypath
+
+cloudsql:
+  enabled: false
+  connectionName: ""
+  dbPort: 5432
+  serviceAccountJSON: ""

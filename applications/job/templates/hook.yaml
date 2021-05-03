@@ -1,0 +1,51 @@
+{{- if not .Values.schedule.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-{{ randAlphaNum 10 | lower }}"
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    helm.sh/revision: "{{ .Release.Revision }}"
+    meta.helm.sh/release-name: "{{ .Release.Name }}"
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/resource-policy": keep
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        {{- if and .Values.container.command (not (eq .Values.image.repository "porterdev/hello-porter")) }}
+        command: 
+        {{- range $command := trim .Values.container.command | split " " }}
+        - {{ $command | quote }}
+        {{- end }}
+        {{- end }}
+        env:
+          {{- range $key, $val := .Values.container.env.normal }}
+          - name: {{ $key }}
+          {{- $splVal := split "_" $val -}}
+          {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ $splVal._1 }}
+                key: {{ $key }}
+          {{- else }}
+            value: {{ quote $val }}
+          {{- end }}
+          {{- end }}
+{{ end }}

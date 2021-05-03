@@ -1,0 +1,55 @@
+name: Job
+hasSource: true
+tabs:
+- name: main
+  label: Main
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: Container Settings
+    - type: subtitle
+      name: command_description
+      label: TESTING (Optional) Set a command to run as a job.
+    - type: string-input
+      label: Command
+      variable: container.command
+  - name: cron_toggle
+    contents:
+    - type: heading
+      label: Cron Job
+    - type: checkbox
+      variable: schedule.enabled
+      label: Enable cron schedule
+      settings:
+        default: false
+  - name: cron_job
+    show_if: schedule.enabled
+    contents:
+    - type: heading
+      label: Cron Job Schedule
+    - type: subtitle
+      label: Run a job periodically on a schedule specified as a cron expression.
+    - type: string-input
+      label: Schedule
+      variable: repeat.schedule
+      settings:
+        default: "*/5 * * * *"
+  - name: env_vars
+    contents:
+    - type: heading
+      label: Environment Variables
+    - type: subtitle
+      label: Set environment variables for your secrets and environment-specific configuration.
+    - type: env-key-value-array
+      label: 
+      variable: container.env.normal
+  - name: webhook
+    contents:
+    - type: heading
+      label: Deploy Webhook
+    - type: checkbox
+      variable: auto_deploy
+      label: Auto-deploy when webhook is called.
+      settings:
+        default: true

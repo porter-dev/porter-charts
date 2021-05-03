@@ -1,0 +1,216 @@
+name: Web
+hasSource: true
+tabs:
+- name: main
+  label: Main
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: Container Settings
+    - type: subtitle
+      name: command_description
+      label: (Optional) Set a custom start command for this service.
+    - type: string-input
+      label: Start Command
+      variable: container.command
+    - type: subtitle
+      label: Specify the port your application is running on.
+    - type: number-input
+      variable: container.port
+      label: Container Port
+      settings:
+        default: 80
+    - type: heading
+      label: Deploy Webhook
+    - type: checkbox
+      variable: auto_deploy
+      label: Auto-deploy when webhook is called.
+      settings:
+        default: true
+  - name: network
+    contents:
+    - type: heading
+      label: Network Settings
+    - type: subtitle
+      label: For containers that you do not want to expose to external traffic (e.g. databases and add-on's), you may make them accessible only to other internal services running within the same cluster. 
+    - type: checkbox
+      variable: ingress.enabled
+      label: Expose to external traffic
+      settings:
+        default: true
+  - name: domain_toggle
+    show_if: ingress.enabled
+    contents:
+    - type: subtitle
+      label: Assign custom domain to your deployment. You must first create an A record in your domain provider that points to your cluster load balancer's IP address for this.
+    - type: checkbox
+      variable: ingress.custom_domain
+      label: Configure Custom Domain
+      settings:
+        default: false 
+  - name: domain_name
+    show_if: ingress.custom_domain
+    contents:
+    - type: array-input
+      variable: ingress.hosts
+      label: Domain Name
+- name: resources
+  label: Resources
+  sections:
+  - name: main_section
+    contents:
+    - type: heading
+      label: Resources
+    - type: subtitle
+      label: Configure resources assigned to this container.
+    - type: number-input
+      label: RAM
+      variable: resources.requests.memory
+      settings:
+        unit: Mi
+        default: 256
+    - type: number-input
+      label: CPU
+      variable: resources.requests.cpu
+      settings:
+        unit: m
+        default: 100
+    - type: number-input
+      label: Replicas
+      variable: replicaCount
+      settings:
+        default: 1
+    - type: checkbox
+      variable: autoscaling.enabled
+      label: Enable autoscaling
+      settings:
+        default: false
+  - name: autoscaler
+    show_if: autoscaling.enabled
+    contents:
+    - type: number-input
+      label: Minimum Replicas
+      variable: autoscaling.minReplicas
+      settings:
+        default: 1
+    - type: number-input
+      label: Maximum Replicas
+      variable: autoscaling.maxReplicas
+      settings:
+        default: 10
+    - type: number-input
+      label: Target CPU Utilization
+      variable: autoscaling.targetCPUUtilizationPercentage
+      settings:
+        unit: "%"
+        default: 50
+    - type: number-input
+      label: Target RAM Utilization
+      variable: autoscaling.targetMemoryUtilizationPercentage
+      settings:
+        unit: "%"
+        default: 50
+- name: env
+  label: Environment
+  sections:
+  - name: env_vars
+    contents:
+    - type: heading
+      label: Environment Variables
+    - type: subtitle
+      label: Set environment variables for your secrets and environment-specific configuration.
+    - type: env-key-value-array
+      label: 
+      variable: container.env.normal
+- name: advanced
+  label: Advanced
+  sections:
+  - name: ingress_annotations
+    contents:
+    - type: heading
+      label: Ingress Custom Annotations
+    - type: subtitle
+      label: Assign custom annotations to Ingress. These annotations will overwrite the annotations Porter assigns by default.
+    - type: key-value-array
+      variable: ingress.annotations
+      settings:
+        default: {}
+  - name: health_check
+    contents:
+    - type: heading
+      label: Custom Health Checks
+    - type: subtitle
+      label: Define custom health check endpoints to ensure zero down-time deployments.
+    - type: checkbox
+      variable: health.enabled
+      label: Enable Custom Health Checks
+      settings:
+        default: false
+  - name: health_check_endpoint
+    show_if: health.enabled
+    contents:
+    - type: string-input
+      label: Health Check Endpoint
+      variable: health.path
+      settings:
+        default: /healthz
+  - name: persistence_toggle
+    contents:
+    - type: heading
+      label: Persistent Disks
+    - type: subtitle
+      label: Attach persistent disks to your deployment to retain data across releases.
+    - type: checkbox
+      label: Enable Persistence
+      variable: pvc.enabled
+  - name: persistent_storage
+    show_if: pvc.enabled
+    contents:
+    - type: number-input
+      label: Persistent Storage
+      variable: pvc.storage
+      settings:
+        unit: Gi
+        default: 20
+    - type: string-input
+      label: Mount Path
+      variable: pvc.mountPath
+      settings:
+        default: /mypath
+  - name: termination_grace_period
+    contents:
+    - type: heading
+      label: Termination Grace Period
+    - type: subtitle
+      label: Specify how much time app processes have to gracefully shut down on SIGTERM.
+    - type: number-input
+      label: Termination Grace Period (seconds)
+      variable: terminationGracePeriodSeconds
+      settings:
+        default: 30
+  - name: cloud_sql_toggle
+    contents:
+    - type: heading
+      label: Google Cloud SQL
+    - type: subtitle
+      label: Securely connect to Google Cloud SQL (GKE only).
+    - type: checkbox
+      variable: cloudsql.enabled
+      label: Enable Google Cloud SQL Proxy
+      settings:
+        default: false
+  - name: cloud_sql_contents
+    show_if: cloudsql.enabled
+    contents:
+    - type: string-input
+      label: Instance Connection Name
+      variable: cloudsql.connectionName
+    - type: number-input
+      label: DB Port
+      variable: cloudsql.dbPort
+      settings:
+        default: 5432
+    - type: string-input
+      label: Service Account JSON
+      variable: cloudsql.serviceAccountJSON

@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "docker-template.fullname" . }}
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{ end }}
+  selector:
+    matchLabels:
+      {{- include "docker-template.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "docker-template.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if and .Values.container.command (not (eq .Values.image.repository "porterdev/hello-porter")) }}
+          command: 
+          {{- range $command := trim .Values.container.command | split " " }}
+          - {{ $command | quote }}
+          {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.container.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{- range $key, $val := .Values.container.env.normal }}
+            - name: {{ $key }}
+            {{- $splVal := split "_" $val -}}
+            {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $splVal._1 }}
+                  key: {{ $key }}
+            {{- else }}
+              value: {{ quote $val }}
+            {{- end }}
+            {{- end }}
+          {{ if .Values.pvc.enabled }}
+          volumeMounts:
+            - name: "{{ include "docker-template.fullname" . }}-storage"
+              mountPath: {{ .Values.pvc.mountPath }}
+          {{ end }}
+        {{- if .Values.cloudsql.enabled }}
+        - name: cloud-sql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.17
+          command:
+            - "/cloud_sql_proxy"
+            - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
+            - "-credential_file=/secrets/service_account.json"
+          securityContext:
+            runAsNonRoot: true
+          volumeMounts:
+          - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+            mountPath: /secrets/
+            readOnly: true
+        {{ end }}
+      tolerations:
+        - key: "removable"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled }}
+      volumes:
+        {{ if .Values.cloudsql.enabled }}
+        - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+          secret:
+            secretName: "cloudsql-secret-{{ include "docker-template.fullname" . }}"
+        {{ end }}
+        {{ if .Values.pvc.enabled }}
+        - name: "{{ include "docker-template.fullname" . }}-storage"
+          persistentVolumeClaim:
+            claimName: "{{ include "docker-template.fullname" . }}-pvc"
+        {{ end }}
+      {{ end }}

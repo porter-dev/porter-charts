@@ -1,0 +1,25 @@
+# Default values for docker-template.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+auto_deploy: true
+
+replicaCount: 1
+
+image:
+  repository: alexwhen/docker-2048
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest
+
+container:
+  port: 80
+  command:
+  env:
+    normal:
+
+schedule: 
+  enabled: false 
+  value: "*/1 * * * *"
+  
+paused: false

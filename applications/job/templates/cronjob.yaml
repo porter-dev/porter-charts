@@ -1,0 +1,47 @@
+{{- if .Values.schedule.enabled }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "docker-template.fullname" . }}
+spec:
+  successfulJobsHistoryLimit: 20
+  concurrencyPolicy: Replace
+  schedule: "{{ .Values.schedule.value }}"
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        app.kubernetes.io/version: {{ .Chart.AppVersion }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        helm.sh/revision: "{{ .Release.Revision }}"
+        meta.helm.sh/release-name: "{{ .Release.Name }}"
+    spec:
+      template:
+        spec:
+          containers:
+          - name: {{ .Chart.Name }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- if and .Values.container.command (not (eq .Values.image.repository "porterdev/hello-porter")) }}
+            command: 
+            {{- range $command := trim .Values.container.command | split " " }}
+            - {{ $command | quote }}
+            {{- end }}
+            {{- end }}
+            env:
+              {{- range $key, $val := .Values.container.env.normal }}
+              - name: {{ $key }}
+              {{- $splVal := split "_" $val -}}
+              {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ $splVal._1 }}
+                    key: {{ $key }}
+              {{- else }}
+                value: {{ quote $val }}
+              {{- end }}
+              {{- end }}
+          restartPolicy: Never
+      backoffLimit: 1
+{{ end }}
