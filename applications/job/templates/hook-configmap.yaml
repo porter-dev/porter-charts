@@ -1,0 +1,67 @@
+{{- if not .Values.schedule.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "docker-template.fullname" . }}
+  labels:
+    getporter.dev/manifest: "true"
+data:
+  manifest: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: "{{ .Release.Name }}-{{ randAlphaNum 10 | lower }}"
+      namespace: {{ .Release.Namespace | quote }}
+      labels:
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        helm.sh/revision: "{{ .Release.Revision }}"
+        meta.helm.sh/release-name: "{{ .Release.Name }}"
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          name: "{{ .Release.Name }}"
+          labels:
+            app.kubernetes.io/instance: {{ .Release.Name | quote }}
+            helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+            helm.sh/revision: "{{ .Release.Revision }}"
+            meta.helm.sh/release-name: "{{ .Release.Name }}"
+        spec:
+          restartPolicy: Never
+          shareProcessNamespace: true
+          containers:
+          - name: {{ .Chart.Name }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+            {{- if and .Values.container.command (not (eq .Values.image.repository "porterdev/hello-porter")) }}
+            command: 
+            {{- range $command := trim .Values.container.command | split " " }}
+            - {{ $command | quote }}
+            {{- end }}
+            {{- end }}
+            env:
+            {{- range $key, $val := .Values.container.env.normal }}
+            - name: {{ $key }}
+            {{- $splVal := split "_" $val -}}
+            {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $splVal._1 }}
+                  key: {{ $key }}
+            {{- else }}
+              value: {{ quote $val }}
+            {{- end }}
+            {{- end }}
+          - name: sidecar
+            image: porterdev/job-sidecar:latest
+            imagePullPolicy: Always
+            command:
+            - "./job_killer.sh"
+            {{- if (.Values.sidecar.signalChildProcesses) }}
+            - "-c"
+            {{- end }}
+            - {{ .Values.terminationGracePeriodSeconds | quote }}
+            {{- $cmdSpl := trim .Values.container.command | split " " }}
+            - {{ $cmdSpl._0 | quote }}
+{{- end }}

@@ -6,6 +6,8 @@ auto_deploy: true
 
 replicaCount: 1
 
+terminationGracePeriodSeconds: 30
+
 image:
   repository: alexwhen/docker-2048
   pullPolicy: Always
@@ -14,7 +16,7 @@ image:
 
 container:
   port: 80
-  command:
+  command: sleep 300
   env:
     normal:
 
@@ -23,3 +25,6 @@ schedule:
   value: "*/1 * * * *"
   
 paused: false
+
+sidecar:
+  signalChildProcesses: true

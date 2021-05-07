@@ -10,10 +10,11 @@ tabs:
       label: Container Settings
     - type: subtitle
       name: command_description
-      label: TESTING (Optional) Set a command to run as a job.
+      label: Set the command to run as a job.
     - type: string-input
       label: Command
       variable: container.command
+      required: true
   - name: cron_toggle
     contents:
     - type: heading
@@ -51,5 +52,26 @@ tabs:
     - type: checkbox
       variable: auto_deploy
       label: Auto-deploy when webhook is called.
+      settings:
+        default: true
+- name: advanced
+  label: Advanced
+  sections:
+  - name: termination_grace_period
+    contents:
+    - type: heading
+      label: Termination Settings
+    - type: subtitle
+      label: Specify how much time jobs have to gracefully shut down on SIGTERM.
+    - type: number-input
+      label: Termination Grace Period (seconds)
+      variable: terminationGracePeriodSeconds
+      settings:
+        default: 30
+    - type: subtitle
+      label: Specify whether SIGTERM should be propagated to child processes.
+    - type: checkbox
+      variable: sidecar.signalChildProcesses
+      label: Propagate SIGTERM to child processes.
       settings:
         default: true

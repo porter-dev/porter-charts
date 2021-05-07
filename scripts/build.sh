@@ -18,7 +18,6 @@ increment_version () {
 
     version=$1
 
-
     # Build array from version string.
 
     a=( ${version//./ } )
