@@ -29,7 +29,7 @@ tabs:
     - type: heading
       label: Cron Job Schedule
     - type: subtitle
-      label: Run a job periodically on a schedule specified as a cron expression.
+      label: Run a job periodically on a schedule specified as a cron expression. You can use https://crontab.guru/ to confirm your schedule.
     - type: string-input
       label: Schedule
       variable: repeat.schedule
