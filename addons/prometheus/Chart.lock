@@ -1,0 +1,6 @@
+dependencies:
+- name: kube-state-metrics
+  repository: https://kubernetes.github.io/kube-state-metrics
+  version: 2.9.8
+digest: sha256:dd0f729b19124e2aa8f102eee80524ab2d8389d2e1206fa85852a454bb7f6ece
+generated: "2021-02-10T19:11:52.367893112Z"

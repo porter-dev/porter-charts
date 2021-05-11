@@ -1,0 +1,46 @@
+name: https-issuer
+tabs:
+- name: main
+  label: Main Settings
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: Email
+    - type: subtitle
+      label: Specify the email you'd like to be notified at for events like certificate expiry, renewal, etc..
+    - type: string-input
+      variable: email
+      label: Email Address
+      settings:
+        default: contact@getporter.dev
+  - name: gce
+    contents:
+    - type: heading
+      label: GCE Ingress (for Google Cloud only)
+    - type: checkbox
+      label: Create GCE ingress
+      variable: gce.enabled
+      settings:
+        default: false
+  - name: wildcard_domain
+    contents:
+    - type: heading
+      label: Wildcard Domains (for Digital Ocean only)
+    - type: checkbox
+      label: Enable wildcard domains
+      variable: wildcard.enabled
+      settings:
+        default: false
+  - name: wildcard_settings
+    show_if: wildcard.enabled
+    contents:
+    - type: subtitle
+      label: Input your DigitalOcean personal access token to validate your wildcard domains.
+    - type: base-64-password
+      label: Digital Ocean Access Token
+      variable: wildcard.do_access_token
+    - type: string-input
+      label: Wildcard Domain
+      variable: wildcard.domain
+      placeholder: 'ex: *.getporter.dev'

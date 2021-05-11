@@ -1,0 +1,35 @@
+name: MongoDB
+tabs:
+- name: main
+  label: Config
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: Admin Settings
+    - type: string-input
+      variable: auth.rootPassword
+      label: Password
+      required: true
+      settings:
+        default: mongopassword
+- name: resource
+  label: Resources
+  sections:
+  - name: section_two
+    contents:
+    - type: heading
+      label: Resource Allocation
+    - type: number-input
+      variable: replicaCount
+      required: true
+      label: Number of Replicasets
+      settings:
+        default: 2
+    - type: number-input
+      variable: persistence.size
+      required: true
+      label: Storage (Gi)
+      settings:
+        default: 8
+        unit: Gi
