@@ -83,7 +83,7 @@ package_helm() {
   helm package $helm_dir
 }
 
-for d in */$1/Chart.yaml ; do
+for d in $1/*/Chart.yaml ; do
   helm_dir=$(echo "$d" | sed 's|\(.*\)/.*|\1|')
 
   echo "Checking diffs for $helm_dir"
