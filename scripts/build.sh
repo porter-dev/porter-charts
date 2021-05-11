@@ -75,9 +75,11 @@ for d in */*/Chart.yaml ; do
   git diff --quiet $1 $2 -- $helm_dir || package_helm $helm_dir $d
 done
 
-for file in *.tgz ; do
-  curl -u $CHARTMUSEUM_USERNAME:$CHARTMUSEUM_PASSWORD --data-binary "@$file" "$CHARTMUSEUM_URL/api/charts"
-done
+if ls *.tgz 1> /dev/null 2>&1; then
+  for file in *.tgz ; do
+    curl -u $CHARTMUSEUM_USERNAME:$CHARTMUSEUM_PASSWORD --data-binary "@$file" "$CHARTMUSEUM_URL/api/charts"
+  done
 
-# cleanup files 
-rm *.tgz
+  # cleanup files 
+  rm *.tgz
+fi
