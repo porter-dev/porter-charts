@@ -1,4 +1,4 @@
-{{- if not .Values.schedule.enabled -}}
+{{- if and (not .Values.schedule.enabled) (ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job") -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -34,7 +34,7 @@ data:
           - name: {{ .Chart.Name }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: "{{ .Values.image.pullPolicy }}"
-            {{- if and .Values.container.command (not (eq .Values.image.repository "porterdev/hello-porter")) }}
+            {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job"))) }}
             command: 
             {{- range $command := trim .Values.container.command | split " " }}
             - {{ $command | quote }}
@@ -54,7 +54,7 @@ data:
             {{- end }}
             {{- end }}
           - name: sidecar
-            image: porterdev/job-sidecar:latest
+            image: public.ecr.aws/o1j4x7p4/job-sidecar:latest
             imagePullPolicy: Always
             command:
             - "./job_killer.sh"

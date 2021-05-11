@@ -4,7 +4,14 @@ tabs:
 - name: main
   label: Main
   sections:
+  - name: pre
+    contents:
+    - type: variable
+      variable: showStartCommand
+      settings:
+        default: true
   - name: section_one
+    show_if: showStartCommand
     contents: 
     - type: heading
       label: Container Settings
@@ -14,6 +21,9 @@ tabs:
     - type: string-input
       label: Start Command
       variable: container.command
+      placeholder: "ex: sh ./script.sh"
+  - name: section_one_cont
+    contents:
     - type: heading
       label: Deploy Webhook
     - type: checkbox
@@ -33,18 +43,21 @@ tabs:
     - type: number-input
       label: RAM
       variable: resources.requests.memory
+      placeholder: "ex: 256"
       settings:
         unit: Mi
         default: 256
     - type: number-input
       label: CPU
       variable: resources.requests.cpu
+      placeholder: "ex: 100"
       settings:
         unit: m
         default: 100
     - type: number-input
       label: Replicas
       variable: replicaCount
+      placeholder: "ex: 1"
       settings:
         default: 1
     - type: checkbox
@@ -58,23 +71,28 @@ tabs:
     - type: number-input
       label: Minimum Replicas
       variable: autoscaling.minReplicas
+      placeholder: "ex: 1"
       settings:
         default: 1
     - type: number-input
       label: Maximum Replicas
       variable: autoscaling.maxReplicas
+      placeholder: "ex: 10"
       settings:
         default: 10
     - type: number-input
       label: Target CPU Utilization
       variable: autoscaling.targetCPUUtilizationPercentage
+      placeholder: "ex: 50"
       settings:
+        omitUnitFromValue: true
         unit: "%"
         default: 50
     - type: number-input
       label: Target RAM Utilization
       variable: autoscaling.targetMemoryUtilizationPercentage
       settings:
+        omitUnitFromValue: true
         unit: "%"
         default: 50
 - name: env
@@ -107,12 +125,14 @@ tabs:
     - type: number-input
       label: Persistent Storage
       variable: pvc.storage
+      placeholder: "ex: 20"
       settings:
         unit: Gi
         default: 20
     - type: string-input
       label: Mount Path
       variable: pvc.mountPath
+      placeholder: "ex: /mypath"
       settings:
         default: /mypath
   - name: termination_grace_period
@@ -124,6 +144,7 @@ tabs:
     - type: number-input
       label: Termination Grace Period (seconds)
       variable: terminationGracePeriodSeconds
+      placeholder: "ex: 30"
       settings:
         default: 30
   - name: cloud_sql_toggle
@@ -143,11 +164,14 @@ tabs:
     - type: string-input
       label: Instance Connection Name
       variable: cloudsql.connectionName
+      placeholder: "ex: project-123:us-east1:pachyderm"
     - type: number-input
       label: DB Port
       variable: cloudsql.dbPort
+      placeholder: "ex: 5432"
       settings:
         default: 5432
     - type: string-input
       label: Service Account JSON
       variable: cloudsql.serviceAccountJSON
+      placeholder: "ex: { <SERVICE_ACCOUNT_JSON> }"

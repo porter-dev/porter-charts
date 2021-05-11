@@ -1,4 +1,4 @@
-{{- if not .Values.schedule.enabled }}
+{{- if and (not .Values.schedule.enabled) (ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job") -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -21,13 +21,17 @@ spec:
       restartPolicy: Never
       containers:
       - name: job-manager
-        image: porterdev/job-manager:latest
+        image: public.ecr.aws/o1j4x7p4/job-manager:latest
         imagePullPolicy: Always
         args:
         - "create"
         env:
         - name: JOB_TEMPLATE_PATH
           value: /porter/manifest/manifest.yaml
+        - name: LABEL_SELECTOR
+          value: {{ printf "%s=%s" "meta.helm.sh/release-name" .Release.Name  }}
+        - name: ALLOW_CONCURRENCY
+          value: {{ .Values.allowConcurrency | quote }}
         volumeMounts:
         - name: manifest-data
           mountPath: /porter/manifest

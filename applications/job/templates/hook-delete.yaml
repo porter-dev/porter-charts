@@ -1,4 +1,4 @@
-{{- if not .Values.schedule.enabled }}
+{{- if ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job" -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -21,7 +21,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: job-manager
-        image: porterdev/job-manager:latest
+        image: public.ecr.aws/o1j4x7p4/job-manager:latest
         imagePullPolicy: Always
         args:
         - "remove-all"
@@ -32,14 +32,4 @@ spec:
           value: {{ printf "%s=%s" "meta.helm.sh/release-name" .Release.Name  }}
         - name: JOB_NAMESPACE
           value: {{ .Release.Namespace | quote }}
-        volumeMounts:
-        - name: manifest-data
-          mountPath: /porter/manifest
-      volumes:
-      - name: manifest-data
-        configMap:
-          name: {{ include "docker-template.fullname" . }}
-          items:
-            - key: manifest
-              path: manifest.yaml
 {{ end }}

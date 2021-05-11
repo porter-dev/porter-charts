@@ -1,11 +1,14 @@
-{{- if .Values.schedule.enabled }}
+{{- if ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job" }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: {{ include "docker-template.fullname" . }}
 spec:
   successfulJobsHistoryLimit: 20
-  concurrencyPolicy: Replace
+  failedJobsHistoryLimit: 20
+  concurrencyPolicy: {{ ternary "Allow" "Forbid" .Values.allowConcurrency }}
+  startingDeadlineSeconds: 20
+  suspend: {{ not .Values.schedule.enabled }}
   schedule: "{{ .Values.schedule.value }}"
   jobTemplate:
     metadata:
@@ -23,7 +26,7 @@ spec:
           - name: {{ .Chart.Name }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
-            {{- if and .Values.container.command (not (eq .Values.image.repository "porterdev/hello-porter")) }}
+            {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job"))) }}
             command: 
             {{- range $command := trim .Values.container.command | split " " }}
             - {{ $command | quote }}
@@ -42,6 +45,18 @@ spec:
                 value: {{ quote $val }}
               {{- end }}
               {{- end }}
+          - name: sidecar
+            image: public.ecr.aws/o1j4x7p4/job-sidecar:latest
+            imagePullPolicy: Always
+            command:
+            - "./job_killer.sh"
+            {{- if (.Values.sidecar.signalChildProcesses) }}
+            - "-c"
+            {{- end }}
+            - {{ .Values.terminationGracePeriodSeconds | quote }}
+            {{- $cmdSpl := trim .Values.container.command | split " " }}
+            - {{ $cmdSpl._0 | quote }}
           restartPolicy: Never
+          shareProcessNamespace: true
       backoffLimit: 0
 {{ end }}

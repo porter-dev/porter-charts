@@ -4,9 +4,9 @@ description: Background worker applications that are not exposed to external tra
 home: https://getporter.dev/
 icon: https://user-images.githubusercontent.com/65516095/111255250-1b7f4100-85ed-11eb-8bd1-7b17be3e0e06.png
 keywords:
-  - application
-  - porter
-  - worker
+- application
+- porter
+- worker
 name: worker
 type: application
-version: 0.3.0
+version: 0.1.0

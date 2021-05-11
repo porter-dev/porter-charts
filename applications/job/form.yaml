@@ -4,7 +4,18 @@ tabs:
 - name: main
   label: Main
   sections:
+  - name: pre
+    contents:
+    - type: variable
+      variable: showStartCommand 
+      settings:
+        default: true
+    - type: variable
+      variable: showCronToggle 
+      settings:
+        default: true
   - name: section_one
+    show_if: showStartCommand
     contents: 
     - type: heading
       label: Container Settings
@@ -14,8 +25,10 @@ tabs:
     - type: string-input
       label: Command
       variable: container.command
+      placeholder: "ex: sh ./script.sh"
       required: true
   - name: cron_toggle
+    show_if: showCronToggle
     contents:
     - type: heading
       label: Cron Job
@@ -30,10 +43,11 @@ tabs:
     - type: heading
       label: Cron Job Schedule
     - type: subtitle
-      label: Run a job periodically on a schedule specified as a cron expression.
+      label: Run a job periodically on a schedule specified as a cron expression. You can use https://crontab.guru/ to confirm your schedule. For example, */5 * * * * is every 5 minutes.
     - type: string-input
       label: Schedule
-      variable: repeat.schedule
+      variable: schedule.value
+      placeholder: "ex: */5 * * * *"
       settings:
         default: "*/5 * * * *"
   - name: env_vars
@@ -57,6 +71,17 @@ tabs:
 - name: advanced
   label: Advanced
   sections:
+  - name: Concurrency Settings
+    contents:
+    - type: heading
+      label: Termination Settings
+    - type: subtitle
+      label: Specify whether jobs should be allowed to execute concurrently.
+    - type: checkbox
+      variable: allowConcurrency
+      label: Allow jobs to execute concurrently.
+      settings:
+        default: true
   - name: termination_grace_period
     contents:
     - type: heading

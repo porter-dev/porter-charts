@@ -31,7 +31,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if and .Values.container.command (not (eq .Values.image.repository "porterdev/hello-porter")) }}
+          {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) }}
           command: 
           {{- range $command := trim .Values.container.command | split " " }}
           - {{ $command | quote }}
@@ -46,10 +46,13 @@ spec:
             httpGet:
               path: {{ .Values.health.path }}
               port: http
+            periodSeconds: {{ .Values.health.periodSeconds }}
+            failureThreshold: {{ .Values.health.failureThreshold }}
           readinessProbe:
             httpGet:
               path: {{ .Values.health.path }}
               port: http
+            periodSeconds: {{ .Values.health.periodSeconds }}
           {{ end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -66,7 +69,7 @@ spec:
               value: {{ quote $val }}
             {{- end }}
             {{- end }}
-            {{- if eq .Values.image.repository "porterdev/hello-porter" }}
+            {{- if or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter") }}
             - name: PORT
               value: {{ .Values.container.port | quote }}
             {{- end }}

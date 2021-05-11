@@ -30,7 +30,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if and .Values.container.command (not (eq .Values.image.repository "porterdev/hello-porter")) }}
+          {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) }}
           command: 
           {{- range $command := trim .Values.container.command | split " " }}
           - {{ $command | quote }}
