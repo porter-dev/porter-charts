@@ -11,8 +11,8 @@ jobs:
       - uses: azure/setup-helm@v1
         with:
           version: 'v3.3.4'
-      - name: Install yq
-        run: brew install yq
+      - name: Install yq 
+        uses: mikefarah/yq@v4.8.0
       - name: Build modified charts
         run: |
           ./scripts/build.sh ${{ github.sha }} ${{ github.event.before }}
