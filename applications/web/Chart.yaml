@@ -4,9 +4,9 @@ description: Web application that is exposed to external traffic.
 home: https://getporter.dev/
 icon: https://user-images.githubusercontent.com/65516095/111255214-07d3da80-85ed-11eb-99e2-fddcbdb99bdb.png
 keywords:
-- porter
-- application
-- web
+  - porter
+  - application
+  - web
 name: web
 type: application
-version: 0.1.0
+version: 0.2.0
