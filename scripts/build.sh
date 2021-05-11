@@ -85,6 +85,8 @@ package_helm() {
 
 for d in */$1/Chart.yaml ; do
   helm_dir=$(echo "$d" | sed 's|\(.*\)/.*|\1|')
+
+  echo "Checking diffs for $helm_dir"
   
   git diff --quiet $2 $3 -- $helm_dir || package_helm $helm_dir $d
 done
