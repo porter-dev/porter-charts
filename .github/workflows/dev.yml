@@ -20,6 +20,8 @@ jobs:
           sudo mv ./yq /usr/local/bin/yq
       - name: Build modified charts
         run: |
+          git fetch
+          git log
           ./scripts/build.sh ${{ github.sha }} ${{ github.event.before }}
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
