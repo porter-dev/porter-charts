@@ -53,22 +53,30 @@ increment_version () {
     echo "${a[0]}.${a[1]}.${a[2]}"
 }
 
-for d in */Chart.yaml ; do
-  helm_dir=$(echo "$d" | sed 's|\(.*\)/.*|\1|')
+package_helm() {
+  local helm_dir=$1
 
   # parse chart.yaml and increment version
-  version=$(yq e '.version' $d)
+  version=$(yq e '.version' $2)
 
   # increment version
   new_version=$(increment_version -m $version)
 
-  yq e '.version = "'"$new_version"'"' -i $d
+  yq e '.version = "'"$new_version"'"' -i $2
 
   helm package $helm_dir
+}
+
+for d in */*/Chart.yaml ; do
+  helm_dir=$(echo "$d" | sed 's|\(.*\)/.*|\1|')
+  
+  echo $helm_dir $d
+
+  git diff --quiet $1 $2 -- $helm_dir || package_helm $helm_dir $d
 done
 
 for file in *.tgz ; do
-  curl -u $CHARTMUSEUM_USERNAME:$CHARTMUSEUM_PASSWORD --data-binary "@$file" $CHARTMUSEUM_URL
+  curl -u $CHARTMUSEUM_USERNAME:$CHARTMUSEUM_PASSWORD --data-binary "@$file" "$CHARTMUSEUM_URL/api/charts"
 done
 
 # cleanup files 
