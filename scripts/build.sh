@@ -77,7 +77,7 @@ done
 
 if ls *.tgz 1> /dev/null 2>&1; then
   for file in *.tgz ; do
-    echo "Uploading package: $file"
+    echo "Uploading package: $file to url $CHARTMUSEUM_URL/api/charts"
     curl -u $CHARTMUSEUM_USERNAME:$CHARTMUSEUM_PASSWORD --data-binary "@$file" "$CHARTMUSEUM_URL/api/charts"
   done
 
