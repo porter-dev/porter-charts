@@ -1,0 +1,20 @@
+name: Push to Dev Helm chart repo
+on:
+  push:
+    branches: [ dev ]
+jobs:
+  build:
+    environment: dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build modified charts
+        run: |
+          ./scripts/build.sh ${{ github.sha }} ${{ github.event.before }}
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update Chart.yaml versions
+          commit_options: '--allow-empty'
+          file_pattern: "*/*/Chart.yaml"
+          commit_user_name: Porter Bot
+          commit_user_email: contact@getporter.dev
