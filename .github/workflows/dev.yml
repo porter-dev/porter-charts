@@ -21,6 +21,10 @@ jobs:
       - name: Build modified charts
         run: |
           ./scripts/build.sh ${{ github.sha }} ${{ github.event.before }}
+        env:
+          CHARTMUSEUM_USERNAME: ${{ secrets.CHARTMUSEUM_USERNAME }}
+          CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
+          CHARTMUSEUM_URL: ${{ secrets.CHARTMUSEUM_URL }}
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update Chart.yaml versions
