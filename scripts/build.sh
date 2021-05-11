@@ -77,9 +77,12 @@ done
 
 if ls *.tgz 1> /dev/null 2>&1; then
   for file in *.tgz ; do
+    echo "Uploading package: $file"
     curl -u $CHARTMUSEUM_USERNAME:$CHARTMUSEUM_PASSWORD --data-binary "@$file" "$CHARTMUSEUM_URL/api/charts"
   done
 
   # cleanup files 
   rm *.tgz
+else
+  echo "No tgz files found"
 fi
