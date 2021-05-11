@@ -13,8 +13,9 @@ jobs:
           version: 'v3.3.4'
       - name: Install yq
         run: |
-          wget https://github.com/mikefarah/yq/releases/download/v4.2.0/yq_linux_amd64 -O /usr/local/bin/yq &&\
-          chmod +x /usr/local/bin/yq
+          wget https://github.com/mikefarah/yq/releases/download/v4.2.0/yq_linux_amd64 -O ./yq
+          chmod +x ./yq
+          sudo mv ./yq /usr/local/bin/yq
       - name: Build modified charts
         run: |
           ./scripts/build.sh ${{ github.sha }} ${{ github.event.before }}
