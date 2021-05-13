@@ -1,0 +1,41 @@
+name: Push to Staging Helm chart repo
+on:
+  push:
+    branches: [ staging ]
+jobs:
+  build:
+    environment: staging
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: azure/setup-helm@v1
+        with:
+          version: 'v3.3.4'
+      - name: Install yq
+        run: |
+          wget https://github.com/mikefarah/yq/releases/download/v4.2.0/yq_linux_amd64 -O ./yq
+          chmod +x ./yq
+          sudo mv ./yq /usr/local/bin/yq
+      - name: Build modified application charts
+        run: |
+          ./scripts/build.sh applications ${{ github.sha }} ${{ github.event.before }}
+        env:
+          CHARTMUSEUM_USERNAME: ${{ secrets.CHARTMUSEUM_USERNAME }}
+          CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
+          CHARTMUSEUM_URL: ${{ secrets.CHARTMUSEUM_URL }}
+      - name: Build modified addon charts
+        run: |
+          ./scripts/build.sh addons ${{ github.sha }} ${{ github.event.before }}
+        env:
+          CHARTMUSEUM_USERNAME: ${{ secrets.CHARTMUSEUM_ADDON_USERNAME }}
+          CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_ADDON_PASSWORD }}
+          CHARTMUSEUM_URL: ${{ secrets.CHARTMUSEUM_ADDON_URL }}
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update Chart.yaml versions
+          commit_options: '--allow-empty'
+          file_pattern: "*/*/Chart.yaml"
+          commit_user_name: Porter Bot
+          commit_user_email: contact@getporter.dev
