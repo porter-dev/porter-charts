@@ -21,3 +21,5 @@ sources:
 - https://github.com/bitnami/bitnami-docker-redis
 - http://redis.io/
 version: 12.1.1
+
+

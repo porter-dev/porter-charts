@@ -53,6 +53,12 @@ spec:
               path: {{ .Values.health.path }}
               port: http
             periodSeconds: {{ .Values.health.periodSeconds }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.health.path }}
+              port: http
+            periodSeconds: {{ .Values.health.periodSeconds }}
+            failureThreshold: {{ .Values.health.failureThreshold }}
           {{ end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
