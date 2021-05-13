@@ -14,7 +14,7 @@ tabs:
     show_if: showStartCommand
     contents: 
     - type: heading
-      label: Container Settings (TESTING)
+      label: Container Settings
     - type: subtitle
       name: command_description
       label: (Optional) Set a custom start command for this service.
