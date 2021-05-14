@@ -19,8 +19,6 @@ To get a better sense of the `form.yaml` file, please see the [reference documen
 
 To develop the Helm chart itself, please consult the [Helm documentation](https://helm.sh/docs/chart_template_guide/). We recommend frequently running `helm install --dry-run testing .` to ensure the manifests are rendering as expected. 
 
-Next, create a `form.yaml` file for the chart
-
 Once you are ready to develop the `form.yaml` file and test the chart from the Porter dashboard, ensure that you have the Porter server running in development mode ([instructions](https://github.com/porter-dev/porter/blob/master/CONTRIBUTING.md#getting-started)) with the following `.env` set:
 
 First, in `/dashboard/.env`:
@@ -58,6 +56,8 @@ curl --data-binary "@[porterchart]-[version].tgz" http://localhost:5000/api/char
 ```
 
 If you navigate to the Porter dashboard, and click "Launch," you should see your chart in the list of charts. 
+
+> **Note:** To delete versions and re-apply, see the full [ChartMuseum API](https://github.com/helm/chartmuseum#api). 
 
 ## Making the PR
 
