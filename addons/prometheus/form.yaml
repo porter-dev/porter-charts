@@ -1,0 +1,11 @@
+name: Prometheus
+tabs:
+- name: main
+  label: Main
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: "Prometheus"
+    - type: subtitle
+      label: "This will install Prometheus into your cluster."

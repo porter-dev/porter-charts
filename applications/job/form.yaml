@@ -4,17 +4,31 @@ tabs:
 - name: main
   label: Main
   sections:
+  - name: pre
+    contents:
+    - type: variable
+      variable: showStartCommand 
+      settings:
+        default: true
+    - type: variable
+      variable: showCronToggle 
+      settings:
+        default: true
   - name: section_one
+    show_if: showStartCommand
     contents: 
     - type: heading
       label: Container Settings
     - type: subtitle
       name: command_description
-      label: TESTING (Optional) Set a command to run as a job.
+      label: Set the command to run as a job.
     - type: string-input
       label: Command
       variable: container.command
+      placeholder: "ex: sh ./script.sh"
+      required: true
   - name: cron_toggle
+    show_if: showCronToggle
     contents:
     - type: heading
       label: Cron Job
@@ -29,10 +43,12 @@ tabs:
     - type: heading
       label: Cron Job Schedule
     - type: subtitle
-      label: Run a job periodically on a schedule specified as a cron expression. You can use https://crontab.guru/ to confirm your schedule.
+      label: Run a job periodically on a schedule specified as a cron expression. You can use https://crontab.guru/ to confirm your schedule. For example, */5 * * * * is every 5 minutes.
+      label: Run a job periodically on a schedule specified as a cron expression. You can use https://crontab.guru/ to confirm your schedule. 
     - type: string-input
       label: Schedule
-      variable: repeat.schedule
+      variable: schedule.value
+      placeholder: "ex: */5 * * * *"
       settings:
         default: "*/5 * * * *"
   - name: env_vars
@@ -51,5 +67,37 @@ tabs:
     - type: checkbox
       variable: auto_deploy
       label: Auto-deploy when webhook is called.
+      settings:
+        default: true
+- name: advanced
+  label: Advanced
+  sections:
+  - name: Concurrency Settings
+    contents:
+    - type: heading
+      label: Termination Settings
+    - type: subtitle
+      label: Specify whether jobs should be allowed to execute concurrently.
+    - type: checkbox
+      variable: allowConcurrency
+      label: Allow jobs to execute concurrently.
+      settings:
+        default: true
+  - name: termination_grace_period
+    contents:
+    - type: heading
+      label: Termination Settings
+    - type: subtitle
+      label: Specify how much time jobs have to gracefully shut down on SIGTERM.
+    - type: number-input
+      label: Termination Grace Period (seconds)
+      variable: terminationGracePeriodSeconds
+      settings:
+        default: 30
+    - type: subtitle
+      label: Specify whether SIGTERM should be propagated to child processes.
+    - type: checkbox
+      variable: sidecar.signalChildProcesses
+      label: Propagate SIGTERM to child processes.
       settings:
         default: true

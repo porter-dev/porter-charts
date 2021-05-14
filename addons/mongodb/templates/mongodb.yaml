@@ -1,0 +1,80 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "mongodb.fullname" . }}
+type: Opaque
+data:
+  MONGO_ROOT_USERNAME: {{ .Values.auth.username }}
+  MONGO_ROOT_PASSWORD: {{ .Values.auth.password }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "mongodb.fullname" . }}
+spec:
+  serviceName: mongodb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+        selector: mongodb-standalone
+    spec:
+      containers:
+      - name: mongodb-standalone
+        image: seenry/public-porter-templates:mongo
+        env:
+          - name: MONGO_INITDB_ROOT_USERNAME_FILE
+            value: /etc/mongo-secret/admin/MONGO_ROOT_USERNAME
+          - name: MONGO_INITDB_ROOT_PASSWORD_FILE
+            value: /etc/mongo-secret/admin/MONGO_ROOT_PASSWORD
+        volumeMounts:
+        - name: mongo-secret
+          mountPath: /etc/mongo-secret
+          readOnly: true
+        - name: mongo-store
+          mountPath: /data/db
+      volumes:
+      - name: mongo-secret
+        secret:
+          secretName: {{ include "mongodb.fullname" . }}
+          items:
+          - key: MONGO_ROOT_USERNAME
+            path: admin/MONGO_ROOT_USERNAME
+            mode: 0444
+          - key: MONGO_ROOT_PASSWORD
+            path: admin/MONGO_ROOT_PASSWORD
+            mode: 0444
+      - name: mongo-store
+        persistentVolumeClaim:
+          claimName: {{ include "mongodb.fullname" . }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "mongodb.fullname" . }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.resources.storage }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mongodb.fullname" . }}
+  labels:
+    app: mongodb
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+  selector:
+    app: mongodb

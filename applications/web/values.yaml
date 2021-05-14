@@ -9,7 +9,7 @@ replicaCount: 1
 terminationGracePeriodSeconds: 30
 
 image:
-  repository: alexwhen/docker-2048
+  repository: public.ecr.aws/o1j4x7p4/hello-porter
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
@@ -36,6 +36,7 @@ ingress:
   provider: aws
   custom_domain: false
   annotations: {}
+  wildcard: false
 
 container:
   port: 80
@@ -58,6 +59,8 @@ autoscaling:
 health:
   enabled: false
   path: "/healthz"
+  periodSeconds: 5
+  failureThreshold: 3
 
 pvc:
   enabled: false

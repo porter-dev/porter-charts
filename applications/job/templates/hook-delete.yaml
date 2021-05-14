@@ -1,0 +1,35 @@
+{{- if ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job" -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-{{ randAlphaNum 10 | lower }}"
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      serviceAccountName: {{ include "docker-template.fullname" . }}
+      restartPolicy: Never
+      containers:
+      - name: job-manager
+        image: public.ecr.aws/o1j4x7p4/job-manager:latest
+        imagePullPolicy: Always
+        args:
+        - "remove-all"
+        env:
+        - name: JOB_TEMPLATE_PATH
+          value: /porter/manifest/manifest.yaml
+        - name: LABEL_SELECTOR
+          value: {{ printf "%s=%s" "meta.helm.sh/release-name" .Release.Name  }}
+        - name: JOB_NAMESPACE
+          value: {{ .Release.Namespace | quote }}
+{{ end }}

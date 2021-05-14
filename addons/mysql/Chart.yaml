@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: 1.16.0
+description: Template for deploying a MySQL databse.
+icon: https://www.mysql.com/common/logos/logo-mysql-170x115.png
+name: mysql
+type: application
+version: 0.1.0

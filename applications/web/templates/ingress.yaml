@@ -22,7 +22,12 @@ metadata:
     {{ if gt (len .Values.ingress.annotations) 0}}
     {{- toYaml .Values.ingress.annotations | nindent 4 }}
     {{ end }}
+
+    {{ if .Values.ingress.wildcard }}
+    cert-manager.io/cluster-issuer: letsencrypt-prod-wildcard
+    {{ else }}
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{ end }}
 spec:
   tls:
     - hosts:
@@ -32,7 +37,11 @@ spec:
         {{- range .Values.ingress.porter_hosts }}
         - {{ . }}
         {{- end }}
+      {{ if .Values.ingress.wildcard }}
+      secretName: wildcard-cert-tls
+      {{ else }}
       secretName: {{ include "docker-template.fullname" . }}  
+      {{ end }}
 
   rules:
     {{- range .Values.ingress.hosts }}

@@ -1,0 +1,15 @@
+{{- if .Values.wildcard.enabled -}}
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: wildcard-cert
+  namespace: default
+spec:
+  secretName: wildcard-cert-tls
+  issuerRef:
+    # The issuer created previously
+    name: letsencrypt-prod-wildcard
+    kind: ClusterIssuer
+  dnsNames:
+  - '{{ .Values.wildcard.domain }}'
+{{- end }}

@@ -6,20 +6,26 @@ auto_deploy: true
 
 replicaCount: 1
 
+terminationGracePeriodSeconds: 30
+allowConcurrency: true
+
 image:
-  repository: alexwhen/docker-2048
-  pullPolicy: Always
+  repository: public.ecr.aws/o1j4x7p4/hello-porter-job
+  pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
 
 container:
   port: 80
-  command:
+  command: ""
   env:
     normal:
 
 schedule: 
   enabled: false 
-  value: "*/1 * * * *"
+  value: "*/5 * * * *"
   
 paused: false
+
+sidecar:
+  signalChildProcesses: true
