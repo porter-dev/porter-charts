@@ -24,15 +24,15 @@ Once you are ready to develop the `form.yaml` file and test the chart from the P
 First, in `/dashboard/.env`:
 
 ```
-HELM_APP_REPO_URL=http://chartmuseum:8080
-HELM_ADD_ON_REPO_URL=http://chartmuseum:8080
+APPLICATION_CHART_REPO_URL=http://chartmuseum:8080
+ADDON_CHART_REPO_URL=http://chartmuseum:8080
 ```
 
 Next, in `/docker/.env`:
 
 ```
-APPLICATION_CHART_REPO_URL=http://chartmuseum:8080
-ADDON_CHART_REPO_URL=http://chartmuseum:8080
+HELM_APP_REPO_URL=http://chartmuseum:8080
+HELM_ADD_ON_REPO_URL=http://chartmuseum:8080
 ```
 
 You will need to restart `docker-compose` for these changes to take effect. 
