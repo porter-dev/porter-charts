@@ -1,0 +1,14 @@
+name: cert-manager
+tabs:
+- name: main
+  label: Info
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: Deploy LogDNA
+    - type: subtitle
+      label: This installs the LogDNA agent, which forwards all logs from Porter to LogDNA for ingestion. It may take around 30 minutes for the logs to arrive in your LogDNA instance.
+    - type: string-input
+      label: LogDNA Ingestion Key
+      variable: logdna.key
