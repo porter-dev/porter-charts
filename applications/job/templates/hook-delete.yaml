@@ -32,4 +32,10 @@ spec:
           value: {{ printf "%s=%s" "meta.helm.sh/release-name" .Release.Name  }}
         - name: JOB_NAMESPACE
           value: {{ .Release.Namespace | quote }}
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 32Mi
 {{ end }}

@@ -24,6 +24,11 @@ container:
 schedule: 
   enabled: false 
   value: "*/5 * * * *"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
   
 paused: false
 
