@@ -41,7 +41,11 @@ spec:
               containerPort: {{ .Values.container.port }}
               protocol: TCP
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              memory: {{ .Values.resources.requests.memory }}
           env:
             {{- range $key, $val := .Values.container.env.normal }}
             - name: {{ $key }}
