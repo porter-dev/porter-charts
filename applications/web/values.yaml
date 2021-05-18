@@ -43,6 +43,9 @@ container:
   command:
   env:
     normal:
+  lifecycle:
+    postStart:
+    preStop:
 
 resources:
   requests:

@@ -37,6 +37,25 @@ spec:
           - {{ $command | quote }}
           {{- end }}
           {{- end }}
+          {{- if or (.Values.container.lifecycle.postStart) (.Values.container.lifecycle.preStop) }}
+          lifecycle:
+            {{- if .Values.container.lifecycle.postStart }}
+            postStart:
+              exec:
+                command: 
+                {{- range $command := trim .Values.container.lifecycle.postStart | split " " }}
+                - {{ $command | quote }}
+                {{- end }}
+            {{- end }}
+            {{- if .Values.container.lifecycle.preStop }}
+            preStop:
+              exec:
+                command: 
+                {{- range $command := trim .Values.container.lifecycle.preStop | split " " }}
+                - {{ $command | quote }}
+                {{- end }}
+            {{- end }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.container.port }}
