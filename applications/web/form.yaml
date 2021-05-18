@@ -232,24 +232,16 @@ tabs:
       placeholder: "ex: 30"
       settings:
         default: 30
-  - name: lifecycle_post_start_command
+  - name: container_hooks
     contents:
     - type: heading
-      label: Container post start command
+      label: Container hooks
     - type: subtitle
-      name: post_start_command_description
-      label: (Optional) Set a post start command for this service.
+      label: (Optional) Set post start or pre stop commands for this service.
     - type: string-input
       label: Post start command
       placeholder: "ex: /bin/sh -c sleep 5"
       variable: container.lifecycle.postStart
-  - name: lifecycle_pre_stop_command
-    contents:
-    - type: heading
-      label: Container pre stop command
-    - type: subtitle
-      name: pre_stop_command_description
-      label: (Optional) Set a pre stop command for this service.
     - type: string-input
       label: Pre stop command
       placeholder: "ex: /bin/sh -c sleep 5"
