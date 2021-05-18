@@ -32,6 +32,12 @@ spec:
           value: {{ printf "%s=%s" "meta.helm.sh/release-name" .Release.Name  }}
         - name: ALLOW_CONCURRENCY
           value: {{ .Values.allowConcurrency | quote }}
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 32Mi
         volumeMounts:
         - name: manifest-data
           mountPath: /porter/manifest
