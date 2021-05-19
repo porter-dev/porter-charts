@@ -32,10 +32,3 @@ jobs:
           CHARTMUSEUM_USERNAME: ${{ secrets.CHARTMUSEUM_ADDON_USERNAME }}
           CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_ADDON_PASSWORD }}
           CHARTMUSEUM_URL: ${{ secrets.CHARTMUSEUM_ADDON_URL }}
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Update Chart.yaml versions
-          commit_options: '--allow-empty'
-          file_pattern: "*/*/Chart.yaml"
-          commit_user_name: Porter Bot
-          commit_user_email: contact@getporter.dev
