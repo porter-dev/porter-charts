@@ -232,6 +232,20 @@ tabs:
       placeholder: "ex: 30"
       settings:
         default: 30
+  - name: container_hooks
+    contents:
+    - type: heading
+      label: Container hooks
+    - type: subtitle
+      label: (Optional) Set post start or pre stop commands for this service.
+    - type: string-input
+      label: Post start command
+      placeholder: "ex: /bin/sh -c sleep 5"
+      variable: container.lifecycle.postStart
+    - type: string-input
+      label: Pre stop command
+      placeholder: "ex: /bin/sh -c sleep 5"
+      variable: container.lifecycle.preStop
   - name: cloud_sql_toggle
     contents:
     - type: heading

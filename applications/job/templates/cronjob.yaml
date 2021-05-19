@@ -45,9 +45,21 @@ spec:
                 value: {{ quote $val }}
               {{- end }}
               {{- end }}
+            resources:
+              requests:
+                cpu: {{ .Values.resources.requests.cpu }}
+                memory: {{ .Values.resources.requests.memory }}
+              limits:
+                memory: {{ .Values.resources.requests.memory }}
           - name: sidecar
             image: public.ecr.aws/o1j4x7p4/job-sidecar:latest
             imagePullPolicy: Always
+            resources:
+              requests:
+                cpu: 10m
+                memory: 10Mi
+              limits:
+                memory: 10Mi
             command:
             - "./job_killer.sh"
             {{- if (.Values.sidecar.signalChildProcesses) }}

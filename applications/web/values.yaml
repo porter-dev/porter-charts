@@ -35,6 +35,7 @@ ingress:
   porter_hosts: []
   provider: aws
   custom_domain: false
+  custom_paths: []
   annotations: {}
   wildcard: false
 
@@ -43,6 +44,9 @@ container:
   command:
   env:
     normal:
+  lifecycle:
+    postStart:
+    preStop:
 
 resources:
   requests:
