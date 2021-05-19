@@ -23,6 +23,11 @@ metadata:
     {{- toYaml .Values.ingress.annotations | nindent 4 }}
     {{ end }}
 
+    {{ if gt (len .Values.ingress.custom_paths) 0 }}
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    {{ end }}
+
+
     {{ if .Values.ingress.wildcard }}
     cert-manager.io/cluster-issuer: letsencrypt-prod-wildcard
     {{ else }}
@@ -48,9 +53,18 @@ spec:
       - host: {{ . }}
         http:
           paths:
+            {{ if gt (len .Values.ingress.custom_paths) 0 }}
+            {{- range $index, $custom_path := .Values.ingress.custom_paths }}
+            - path: {{ $custom_path.path }}
+              backend:
+                serviceName: {{ $custom_path.serviceName }}
+                servicePort: {{ $custom_path.servicePort }}
+            {{- end }}
+            {{ else }}
             - backend:
                 serviceName: {{ $fullName }}
                 servicePort: {{ $svcPort }}
+            {{ end }}
     {{- end }}
     {{- range .Values.ingress.porter_hosts }}
       - host: {{ . }}
