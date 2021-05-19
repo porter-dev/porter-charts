@@ -1,6 +1,7 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "docker-template.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
+{{- $customPaths := .Values.ingress.custom_paths -}}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
@@ -23,7 +24,7 @@ metadata:
     {{- toYaml .Values.ingress.annotations | nindent 4 }}
     {{ end }}
 
-    {{ if gt (len .Values.ingress.custom_paths) 0 }}
+    {{ if gt (len $customPaths) 0 }}
     nginx.ingress.kubernetes.io/rewrite-target: /
     {{ end }}
 
@@ -53,12 +54,12 @@ spec:
       - host: {{ . }}
         http:
           paths:
-            {{ if gt (len .Values.ingress.custom_paths) 0 }}
-            {{- range $index, $custom_path := .Values.ingress.custom_paths }}
-            - path: {{ $custom_path.path }}
+            {{ if gt (len $customPaths) 0 }}
+            {{- range $customPaths }}
+            - path: {{ .path }}
               backend:
-                serviceName: {{ $custom_path.serviceName }}
-                servicePort: {{ $custom_path.servicePort }}
+                serviceName: {{ .serviceName }}
+                servicePort: {{ .servicePort }}
             {{- end }}
             {{ else }}
             - backend:
@@ -70,8 +71,8 @@ spec:
       - host: {{ . }}
         http:
           paths:
-            {{ if gt (len .Values.ingress.custom_paths) 0 }}
-            {{- range .Values.ingress.custom_paths }}
+            {{ if gt (len $customPaths) 0 }}
+            {{- range $customPaths }}
             - path: {{ .path }}
               backend:
                 serviceName: {{ .serviceName }}
