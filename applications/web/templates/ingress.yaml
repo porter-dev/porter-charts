@@ -71,11 +71,11 @@ spec:
         http:
           paths:
             {{ if gt (len .Values.ingress.custom_paths) 0 }}
-            {{- range $index, $custom_path := .Values.ingress.custom_paths }}
-            - path: {{ $custom_path.path }}
+            {{- range .Values.ingress.custom_paths }}
+            - path: {{ .path }}
               backend:
-                serviceName: {{ $custom_path.serviceName }}
-                servicePort: {{ $custom_path.servicePort }}
+                serviceName: {{ .serviceName }}
+                servicePort: {{ .servicePort }}
             {{- end }}
             {{ else }}
             - backend:
