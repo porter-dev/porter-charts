@@ -1,7 +1,6 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "docker-template.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
-{{- $customPaths := .Values.ingress.custom_paths -}}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
@@ -23,11 +22,6 @@ metadata:
     {{ if gt (len .Values.ingress.annotations) 0}}
     {{- toYaml .Values.ingress.annotations | nindent 4 }}
     {{ end }}
-
-    {{ if gt (len $customPaths) 0 }}
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    {{ end }}
-
 
     {{ if .Values.ingress.wildcard }}
     cert-manager.io/cluster-issuer: letsencrypt-prod-wildcard
@@ -54,34 +48,16 @@ spec:
       - host: {{ . }}
         http:
           paths:
-            {{ if gt (len $customPaths) 0 }}
-            {{- range $customPaths }}
-            - path: {{ .path }}
-              backend:
-                serviceName: {{ .serviceName }}
-                servicePort: {{ .servicePort }}
-            {{- end }}
-            {{ else }}
             - backend:
                 serviceName: {{ $fullName }}
                 servicePort: {{ $svcPort }}
-            {{ end }}
     {{- end }}
     {{- range .Values.ingress.porter_hosts }}
       - host: {{ . }}
         http:
           paths:
-            {{ if gt (len $customPaths) 0 }}
-            {{- range $customPaths }}
-            - path: {{ .path }}
-              backend:
-                serviceName: {{ .serviceName }}
-                servicePort: {{ .servicePort }}
-            {{- end }}
-            {{ else }}
             - backend:
                 serviceName: {{ $fullName }}
                 servicePort: {{ $svcPort }}
-            {{ end }}
     {{- end }}
 {{- end }}
