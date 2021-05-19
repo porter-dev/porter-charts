@@ -54,7 +54,7 @@ spec:
         http:
           paths:
             {{ if gt (len .Values.ingress.custom_paths) 0 }}
-            {{- range $index $custom_path := .Values.ingress.custom_paths }}
+            {{- range $index, $custom_path := .Values.ingress.custom_paths }}
             - path: {{ $custom_path.path }}
               backend:
                 serviceName: {{ $custom_path.serviceName }}
@@ -70,8 +70,17 @@ spec:
       - host: {{ . }}
         http:
           paths:
+            {{ if gt (len .Values.ingress.custom_paths) 0 }}
+            {{- range $index, $custom_path := .Values.ingress.custom_paths }}
+            - path: {{ $custom_path.path }}
+              backend:
+                serviceName: {{ $custom_path.serviceName }}
+                servicePort: {{ $custom_path.servicePort }}
+            {{- end }}
+            {{ else }}
             - backend:
                 serviceName: {{ $fullName }}
                 servicePort: {{ $svcPort }}
+            {{ end }}
     {{- end }}
 {{- end }}
