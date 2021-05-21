@@ -37,6 +37,7 @@ ingress:
   custom_domain: false
   annotations: {}
   wildcard: false
+  custom_paths: []
 
 container:
   port: 80
