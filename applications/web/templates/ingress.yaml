@@ -25,7 +25,6 @@ metadata:
     {{ end }}
 
     {{ if gt (len $customPaths) 0 }}
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
     {{ end }}
 
 
