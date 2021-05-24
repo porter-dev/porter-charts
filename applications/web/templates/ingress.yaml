@@ -51,7 +51,7 @@ spec:
 
   rules:
     {{- range .Values.ingress.hosts }}
-      - host: {{ printf "http://%s" . }}
+      - host: {{ . }}
         http:
           paths:
             {{ if gt (len $customPaths) 0 }}
@@ -68,7 +68,7 @@ spec:
             {{ end }}
     {{- end }}
     {{- range .Values.ingress.porter_hosts }}
-      - host: {{ printf "http://%s" . }}
+      - host: {{ . }}
         http:
           paths:
             {{ if gt (len $customPaths) 0 }}
