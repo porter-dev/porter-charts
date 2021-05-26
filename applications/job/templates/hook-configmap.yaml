@@ -30,6 +30,11 @@ data:
         spec:
           restartPolicy: Never
           shareProcessNamespace: true
+          tolerations:
+          - key: "removable"
+            operator: "Equal"
+            value: "true"
+            effect: "NoSchedule"
           containers:
           - name: {{ .Chart.Name }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
