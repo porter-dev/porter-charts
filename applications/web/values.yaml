@@ -35,6 +35,7 @@ ingress:
   porter_hosts: []
   provider: aws
   custom_domain: false
+  custom_paths: []
   annotations: {}
   wildcard: false
   custom_paths: []
