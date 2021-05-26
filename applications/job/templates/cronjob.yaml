@@ -70,5 +70,10 @@ spec:
             - {{ $cmdSpl._0 | quote }}
           restartPolicy: Never
           shareProcessNamespace: true
+          tolerations:
+          - key: "removable"
+            operator: "Equal"
+            value: "true"
+            effect: "NoSchedule"
       backoffLimit: 0
 {{ end }}
