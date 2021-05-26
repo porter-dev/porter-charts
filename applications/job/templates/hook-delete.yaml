@@ -38,4 +38,9 @@ spec:
             memory: 32Mi
           limits:
             memory: 32Mi
+      tolerations:
+        - key: "removable"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
 {{ end }}
