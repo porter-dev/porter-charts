@@ -123,3 +123,16 @@ tabs:
       label: Propagate SIGTERM to child processes.
       settings:
         default: true
+    - type: heading
+      label: Image Settings
+    - type: subtitle
+      label: To always pull the image with the specified tag even if the image has been pulled in before (e.g. latest), set the pull policy to Always. Please note that each image pull may incur additional cost based on the pricing of your image registry.
+    - type: select
+      label: Image Pull Policy
+      variable: image.pullPolicy
+      settings:
+        options:
+        - label: IfNotPresent
+          value: IfNotPresent
+        - label: Always
+          value: Always
