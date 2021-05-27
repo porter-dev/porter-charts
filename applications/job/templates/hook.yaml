@@ -41,6 +41,11 @@ spec:
         volumeMounts:
         - name: manifest-data
           mountPath: /porter/manifest
+      tolerations:
+        - key: "removable"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
       volumes:
       - name: manifest-data
         configMap:
