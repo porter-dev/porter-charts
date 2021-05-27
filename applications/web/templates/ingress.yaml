@@ -18,22 +18,20 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "86400"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "86400"
-
-    # provider-agnostic default annotations
-    {{ if gt (len .Values.ingress.annotations) 0}}
-    {{- toYaml .Values.ingress.annotations | nindent 4 }}
-    {{ end }}
-
-    {{ if gt (len $customPaths) 0 }}
+    {{- if gt (len $customPaths) 0 }}
     nginx.ingress.kubernetes.io/rewrite-target: /
-    {{ end }}
-
-
-    {{ if .Values.ingress.wildcard }}
+    {{- end }}
+    {{- if not (hasKey .Values.ingress.annotations "cert-manager.io/cluster-issuer")}}
+    {{- if .Values.ingress.wildcard }}
     cert-manager.io/cluster-issuer: letsencrypt-prod-wildcard
-    {{ else }}
+    {{- else }}
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    {{ end }}
+    {{- end }}
+    {{- end }}
+    # provider-agnostic default annotations
+    {{- if gt (len .Values.ingress.annotations) 0}}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- end }}    
 spec:
   tls:
     - hosts:
