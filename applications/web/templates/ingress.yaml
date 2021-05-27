@@ -29,9 +29,16 @@ metadata:
     {{- end }}
     {{- end }}
     # provider-agnostic default annotations
+    # if value is provided as "null" or null, it is unset 
     {{- if gt (len .Values.ingress.annotations) 0}}
-    {{- toYaml .Values.ingress.annotations | nindent 4 }}
-    {{- end }}    
+    {{- range $k, $v := .Values.ingress.annotations }}
+    {{- if $v}}
+    {{- if and (not (eq $v "null")) $v}}
+    {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
 spec:
   tls:
     - hosts:
