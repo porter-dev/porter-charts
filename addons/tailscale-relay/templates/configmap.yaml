@@ -9,4 +9,5 @@ metadata:
     helm.sh/chart: {{ include "app.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-data: {{ toYaml .Values.config.variables | nindent 2 }}
+data: 
+  TAILSCALE_ADVERTISE_ROUTES: {{ .Values.config.ipRange }}

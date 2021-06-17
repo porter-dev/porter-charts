@@ -67,6 +67,7 @@ securityContext:
 config:
   # Authorization key to connect onto tailscale (required)
   authKey: ""
+  ipRange: ""
 
   # Other variables to use during the tailscale up command
   variables: {}
