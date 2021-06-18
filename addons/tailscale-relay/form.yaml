@@ -1,5 +1,21 @@
 name: Tailscale
 tabs:
+- name: services
+  context:
+    type: cluster
+    config:
+      group: core
+      version: v1
+      resource: services
+  label: Services
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: 💾 Velero Backups
+    - type: resource-list
+      value: |
+        .items[]
 - name: tailscale
   label: Tailscale Settings
   sections:
@@ -13,8 +29,6 @@ tabs:
       required: true
       variable: config.authKey
       placeholder: "ex: tskey-0a1b2c3d4e5f6g7h8i9j"
-      settings:
-        disableAfterLaunch: true
     - type: heading
       label: Subnet routes
     - type: subtitle
@@ -23,5 +37,3 @@ tabs:
       required: true
       variable: config.ipRange
       placeholder: "ex: 10.123.456.0/20"
-      settings:
-        disableAfterLaunch: true
