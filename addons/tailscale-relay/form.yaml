@@ -15,7 +15,7 @@ tabs:
       label: Available Services
     - type: subtitle
       label: Connect to any of the services shown below through your VPN.
-    - type: serviceIP-list
+    - type: service-ip-list
       value: |
         .items[] | {
           name: .metadata.labels["app.kubernetes.io/instance"],
