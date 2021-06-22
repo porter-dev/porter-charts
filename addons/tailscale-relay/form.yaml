@@ -1,21 +1,30 @@
 name: Tailscale
 tabs:
-- name: services
+- name: main
   context:
     type: cluster
     config:
       group: core
       version: v1
       resource: services
-  label: Services
+  label: Backups
   sections:
   - name: section_one
     contents: 
     - type: heading
       label: 💾 Velero Backups
-    - type: resource-list
+    - type: serviceIP-list
       value: |
-        .items[]
+        .items[] | {
+          name: .metadata.labels["app.kubernetes.io/instance"],
+          managedBy: .metadata.labels["app.kubernetes.io/managed-by"],
+          namespace: .metadata.namespace,
+          clusterIP: .spec.clusterIP,
+        } | select(.clusterIP!="None" and .managedBy=="Helm") | {
+          name: .name,
+          namespace: .namespace,
+          clusterIP: .clusterIP,
+        }
 - name: tailscale
   label: Tailscale Settings
   sections:
