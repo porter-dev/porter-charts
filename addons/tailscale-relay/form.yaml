@@ -1,6 +1,6 @@
 name: Tailscale
 tabs:
-- name: main
+- name: services
   context:
     type: cluster
     config:
@@ -8,6 +8,8 @@ tabs:
       version: v1
       resource: services
   label: Services
+  settings:
+    omitFromLaunch: true
   sections:
   - name: section_one
     contents: 
