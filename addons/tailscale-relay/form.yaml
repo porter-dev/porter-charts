@@ -7,12 +7,14 @@ tabs:
       group: core
       version: v1
       resource: services
-  label: Backups
+  label: Services
   sections:
   - name: section_one
     contents: 
     - type: heading
-      label: 💾 Velero Backups
+      label: Available Services
+    - type: subtitle
+      label: Connect to any of the services shown below through your VPN.
     - type: serviceIP-list
       value: |
         .items[] | {
