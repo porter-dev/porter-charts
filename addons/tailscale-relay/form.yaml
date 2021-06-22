@@ -14,16 +14,18 @@ tabs:
     - type: heading
       label: Available Services
     - type: subtitle
-      label: Connect to any of the services shown below through your VPN.
+      label: The services below can be reached through your Tailscale VPN.
     - type: service-ip-list
       value: |
         .items[] | {
           name: .metadata.labels["app.kubernetes.io/instance"],
+          type: .metadata.labels["app.kubernetes.io/name"],
           managedBy: .metadata.labels["app.kubernetes.io/managed-by"],
           namespace: .metadata.namespace,
           clusterIP: .spec.clusterIP,
         } | select(.clusterIP!="None" and .managedBy=="Helm") | {
           name: .name,
+          type: .type,
           namespace: .namespace,
           clusterIP: .clusterIP,
         }
