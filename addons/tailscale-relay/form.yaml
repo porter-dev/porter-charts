@@ -44,15 +44,17 @@ tabs:
       label: Tailscale Auth Key
     - type: subtitle
       label: Provide a Tailscale auth key for this relay node to use. You can generate an auth key from the Tailscale dashboard by going to "Settings" -> "Auth Keys" and generating a one-off key. Auth keys will expire after 90 days by default. To disable key expiry consult the Tailscale docs.
-    - type: string-input
+    - type: string-input-password
       required: true
       variable: config.authKey
       placeholder: "ex: tskey-0a1b2c3d4e5f6g7h8i9j"
     - type: heading
       label: Subnet routes
+      settings:
+        docs: docs.getporter.dev
     - type: subtitle
-      label: Specify the IP range of the subnet you would like to advertise.
+      label: Specify the IP range of the subnet you would like to advertise. If you don't know your cluster IP range you can set this after launch.
     - type: string-input
-      required: true
+      required: false
       variable: config.ipRange
       placeholder: "ex: 10.123.456.0/20"
