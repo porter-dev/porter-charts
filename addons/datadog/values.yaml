@@ -21,7 +21,7 @@ registry: gcr.io/datadoghq
 datadog:
   # datadog.apiKey -- Your Datadog API key
   # ref: https://app.datadoghq.com/account/settings#agent/kubernetes
-  apiKey: <DATADOG_API_KEY>
+  apiKey: ''
 
   # datadog.apiKeyExistingSecret -- Use existing Secret which stores API key instead of creating a new one
   ## If set, this parameter takes precedence over "apiKey".
