@@ -12,9 +12,12 @@ tabs:
     - type: string-input
       label: DataDog Site
       variable: datadog.site
+      required: true
       settings:
         default: 'datadoghq.com'
     - type: string-input
       label: DataDog API Key
       variable: datadog.apiKey
       required: true
+      settings:
+        default: ''
