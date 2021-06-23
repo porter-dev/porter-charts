@@ -61,10 +61,7 @@ tabs:
       settings:
         default: false 
   - name: domain_name
-    show_if: 
-      and:
-      - ingress.custom_domain
-      - currentCluster.service.is_do
+    show_if: ingress.custom_domain
     contents:
     - type: array-input
       variable: ingress.hosts
