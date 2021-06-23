@@ -8,14 +8,33 @@ tabs:
       version: v1
       resource: services
   label: Services
+  settings:
+    omitFromLaunch: true
   sections:
   - name: section_one
     contents: 
     - type: heading
-      label: 💾 Velero Backups
-    - type: resource-list
+      label: Available Services
+    - type: subtitle
+      label: The services below can be reached through your Tailscale VPN by IP.
+    - type: service-ip-list
       value: |
-        .items[]
+        .items[] | {
+          name: .metadata.labels["app.kubernetes.io/instance"],
+          release: .metadata.labels["release"],
+          type: .metadata.labels["app.kubernetes.io/name"],
+          app: .metadata.labels["app"],
+          managedBy: .metadata.labels["app.kubernetes.io/managed-by"],
+          namespace: .metadata.namespace,
+          clusterIP: .spec.clusterIP,
+        } | select(.clusterIP!="None" and .managedBy=="Helm") | {
+          name: .name,
+          release: .release,
+          type: .type,
+          app: .app,
+          namespace: .namespace,
+          clusterIP: .clusterIP,
+        }
 - name: tailscale
   label: Tailscale Settings
   sections:
