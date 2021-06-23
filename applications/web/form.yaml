@@ -66,8 +66,14 @@ tabs:
     - type: array-input
       variable: ingress.hosts
       label: Domain Name
+  - name: do_wildcard
+    show_if: 
+      and:
+      - ingress.custom_domain
+      - currentCluster.service.is_do
+    contents:
     - type: subtitle
-      label: If you're hosting on Digital Ocean and have enabled the wilcard domains from the 'HTTPS Issuer', you can use a wildcard certificate.
+      label: If you're hosting on Digital Ocean and have enabled the wildcard domains from the 'HTTPS Issuer', you can use a wildcard certificate.
     - type: checkbox
       variable: ingress.wildcard
       label: Use Wildcard Certificate
@@ -247,6 +253,7 @@ tabs:
       placeholder: "ex: /bin/sh ./myscript.sh"
       variable: container.lifecycle.preStop
   - name: cloud_sql_toggle
+    show_if: currentCluster.service.is_gcp
     contents:
     - type: heading
       label: Google Cloud SQL
