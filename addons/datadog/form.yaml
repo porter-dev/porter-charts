@@ -1,0 +1,20 @@
+name: datadog
+tabs:
+- name: main
+  label: Info
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: Deploy DataDog Agent
+    - type: subtitle
+      label: This installs the DataDog agent, which forwards all logs from Porter to DataDog for ingestion. It may take around 30 minutes for the logs to arrive in your DataDog instance.
+    - type: string-input
+      label: DataDog Site
+      variable: datadog.site
+      settings:
+        default: 'datadoghq.com'
+    - type: string-input
+      label: DataDog API Key
+      variable: datadog.apiKey
+      required: true
