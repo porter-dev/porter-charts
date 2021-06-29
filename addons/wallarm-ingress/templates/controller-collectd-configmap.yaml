@@ -1,0 +1,166 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: {{ template "nginx-ingress.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: "{{ .Values.controller.name }}"
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "nginx-ingress.controller.fullname" . }}-collectd
+data:
+  collectd.conf: |
+    FQDNLookup true
+    Interval 10
+    MaxReadInterval 600
+    BaseDir "/var/lib/collectd"
+    PluginDir "/usr/lib/collectd"
+
+    AutoLoadPlugin true
+
+    LoadPlugin logfile
+
+    <LoadPlugin python>
+      Globals true
+    </LoadPlugin>
+
+    <Plugin logfile>
+    File stdout
+    </Plugin>
+
+    <Plugin curl_json>
+      <URL "http://127.0.0.1:18080/wallarm-status?id=1">
+        Instance "wallarm_nginx"
+        <Key "requests">
+          Type gauge
+        </Key>
+        <Key "attacks">
+          Type gauge
+        </Key>
+        <Key "blocked">
+          Type gauge
+        </Key>
+        <Key "abnormal">
+          Type gauge
+        </Key>
+        <Key "tnt_errors">
+          Type gauge
+        </Key>
+        <Key "api_errors">
+          Type gauge
+        </Key>
+        <Key "requests_lost">
+          Type gauge
+        </Key>
+        <Key "overlimits_time">
+          Type gauge
+        </Key>
+        <Key "segfaults">
+          Type gauge
+        </Key>
+        <Key "memfaults">
+          Type gauge
+        </Key>
+        <Key "softmemfaults">
+          Type gauge
+        </Key>
+        <Key "proton_errors">
+          Type gauge
+        </Key>
+        <Key "stalled_workers">
+          Type gauge
+        </Key>
+        <Key "time_detect">
+          Type gauge
+        </Key>
+        <Key "db_id">
+          Type gauge
+        </Key>
+        <Key "lom_id">
+          Type gauge
+        </Key>
+        <Key "db_apply_time">
+          Type gauge
+        </Key>
+        <Key "lom_apply_time">
+          Type gauge
+        </Key>
+        <Key "proton_instances/total">
+          Type gauge
+        </Key>
+        <Key "proton_instances/success">
+          Type gauge
+        </Key>
+        <Key "proton_instances/fallback">
+          Type gauge
+        </Key>
+        <Key "proton_instances/failed">
+          Type gauge
+        </Key>
+        <Key "startid">
+          Type gauge
+        </Key>
+      </URL>
+      <URL "http://127.0.0.1:18080/wallarm-status?id=2">
+        Instance "wallarm_nginx"
+        <Key "requests">
+          Type derive
+        </Key>
+        <Key "attacks">
+          Type derive
+        </Key>
+        <Key "blocked">
+          Type derive
+        </Key>
+        <Key "abnormal">
+          Type derive
+        </Key>
+        <Key "tnt_errors">
+          Type derive
+        </Key>
+        <Key "api_errors">
+          Type derive
+        </Key>
+        <Key "requests_lost">
+          Type derive
+        </Key>
+        <Key "overlimits_time">
+          Type derive
+        </Key>
+        <Key "segfaults">
+          Type derive
+        </Key>
+        <Key "memfaults">
+          Type derive
+        </Key>
+        <Key "softmemfaults">
+          Type derive
+        </Key>
+        <Key "proton_errors">
+          Type derive
+        </Key>
+        <Key "stalled_workers">
+          Type derive
+        </Key>
+        <Key "time_detect">
+          Type derive
+        </Key>
+      </URL>
+    </Plugin>
+
+    <Plugin threshold>
+      <Plugin "curl_json">
+        Instance "wallarm_nginx"
+        <Type "derive">
+          Instance "tnt_errors"
+          FailureMax 0.00
+          Persist true
+        </Type>
+      </Plugin>
+    </Plugin>
+
+    <Plugin python>
+      ModulePath "/usr/lib/wallarm-collectd/python"
+
+      Import WallarmAPIWriter
+    </Plugin>

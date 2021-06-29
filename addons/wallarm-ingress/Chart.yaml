@@ -1,0 +1,17 @@
+apiVersion: v1
+name: wallarm-ingress
+version: 2.18.1-8
+home: https://github.com/wallarm/ingress
+description: An Wallarm Ingress controller that uses ConfigMap to store the nginx configuration.
+icon: https://assets.website-files.com/5fe3434623c64c793987363d/6006cb97f71f76f8a5e85a32_Frame%201923.png
+keywords:
+  - ingress
+  - nginx
+  - wallarm
+sources:
+  - https://github.com/wallarm/ingress-chart
+maintainers:
+  - name: Wallarm Support Team
+    email: support@wallarm.com
+engine: gotpl
+kubeVersion: ">=1.10.0-0"
