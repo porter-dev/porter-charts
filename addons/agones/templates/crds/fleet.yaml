@@ -1,0 +1,137 @@
+# Copyright 2018 Google LLC All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- if .Values.agones.crds.install }}
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: fleets.agones.dev
+  labels:
+    component: crd
+    app: {{ template "agones.name" . }}
+    chart: {{ template "agones.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  group: agones.dev
+  names:
+    kind: Fleet
+    plural: fleets
+    shortNames:
+      - flt
+    singular: fleet
+  scope: Namespaced
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - jsonPath: .spec.scheduling
+          name: Scheduling
+          type: string
+        - jsonPath: .spec.replicas
+          name: Desired
+          type: integer
+        - jsonPath: .status.replicas
+          name: Current
+          type: integer
+        - jsonPath: .status.allocatedReplicas
+          name: Allocated
+          type: integer
+        - jsonPath: .status.readyReplicas
+          name: Ready
+          type: integer
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - template
+              properties:
+                replicas:
+                  type: integer
+                  minimum: 0
+                scheduling:
+                  type: string
+                  enum:
+                    - Packed
+                    - Distributed
+                strategy:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - Recreate
+                        - RollingUpdate
+                    rollingUpdate:
+                      type: object
+                      nullable: true
+                      properties:
+                        maxSurge:
+                          x-kubernetes-int-or-string: true
+                          anyOf:
+                            - type: integer
+                            - type: string
+                        maxUnavailable:
+                          x-kubernetes-int-or-string: true
+                          anyOf:
+                            - type: integer
+                            - type: string
+                template:
+                  {{- $data := dict "metadata" true "podPreserveUnknownFields" .Values.gameservers.podPreserveUnknownFields }}
+                  {{- include "gameserver.schema" $data | indent 17 }}
+            status:
+              type: object
+              properties:
+                replicas:
+                  type: integer
+                  minimum: 0
+                readyReplicas:
+                  type: integer
+                  minimum: 0
+                reservedReplicas:
+                  type: integer
+                  minimum: 0
+                allocatedReplicas:
+                  type: integer
+                  minimum: 0
+                players:
+                  type: object
+                  nullable: true
+                  properties:
+                    count:
+                      type: integer
+                      minimum: 0
+                    capacity:
+                      type: integer
+                      minimum: 0
+      subresources:
+        # status enables the status subresource.
+        status: { }
+        # scale enables the scale subresource.
+        scale:
+          # specReplicasPath defines the JSONPath inside of a custom resource that corresponds to Scale.Spec.Replicas.
+          specReplicasPath: .spec.replicas
+          # statusReplicasPath defines the JSONPath inside of a custom resource that corresponds to Scale.Status.Replicas.
+          statusReplicasPath: .status.replicas
+          # labelSelectorPath defines the JSONPath inside of a custom resource that corresponds to Scale.Status.Selector.
+          labelSelectorPath: .status.labelSelector
+{{- end }}
