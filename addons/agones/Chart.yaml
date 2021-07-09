@@ -4,16 +4,16 @@ description: a library for hosting, running and scaling dedicated game servers o
 home: https://agones.dev
 icon: https://avatars.githubusercontent.com/u/36940055?v=4
 keywords:
-- go
-- golang
-- dedicated-gameservers
-- multiplayer
-- game-development
+  - go
+  - golang
+  - dedicated-gameservers
+  - multiplayer
+  - game-development
 maintainers:
-- email: agones-discuss@googlegroups.com
-  name: agones
-  url: https://groups.google.com/forum/#!forum/agones-discuss
+  - email: agones-discuss@googlegroups.com
+    name: agones
+    url: https://groups.google.com/forum/#!forum/agones-discuss
 name: agones
 sources:
-- https://github.com/googleforgames/agones
-version: 1.15.0
+  - https://github.com/googleforgames/agones
+version: 0.1.0
