@@ -15,18 +15,20 @@ tabs:
       settings:
         default: contact@getporter.dev
   - name: gce
+    show_if: currentCluster.service.is_gcp
     contents:
     - type: heading
-      label: GCE Ingress (for Google Cloud only)
+      label: Google Cloud Engine Ingress
     - type: checkbox
       label: Create GCE ingress
       variable: gce.enabled
       settings:
         default: false
   - name: wildcard_domain
+    show_if: currentCluster.service.is_do
     contents:
     - type: heading
-      label: Wildcard Domains (for Digital Ocean only)
+      label: Digital Ocean Wildcard Domains
     - type: checkbox
       label: Enable wildcard domains
       variable: wildcard.enabled
