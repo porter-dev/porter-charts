@@ -4,15 +4,15 @@ description: A controller object that can be used to spawn pre-warmed Agones Gam
 home: https://agones.dev
 icon: https://avatars.githubusercontent.com/u/36940055?v=4
 keywords:
-- go
-- dedicated-gameservers
-- multiplayer
-- game-development
+  - go
+  - dedicated-gameservers
+  - multiplayer
+  - game-development
 maintainers:
-- email: contact@getporter.dev
-  name: agones
-  url: https://groups.google.com/forum/#!forum/agones-discuss
+  - email: contact@getporter.dev
+    name: agones
+    url: https://groups.google.com/forum/#!forum/agones-discuss
 name: agones
 sources:
-- https://github.com/googleforgames/agones
-version: 1.15.0
+  - https://github.com/googleforgames/agones
+version: 0.1.0

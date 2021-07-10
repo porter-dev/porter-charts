@@ -4,10 +4,10 @@ description: A library for hosting, running and scaling dedicated game servers o
 home: https://agones.dev
 icon: https://avatars.githubusercontent.com/u/36940055?v=4
 keywords:
-- go
-- dedicated-gameservers
-- multiplayer
-- game-development
+  - go
+  - dedicated-gameservers
+  - multiplayer
+  - game-development
 maintainers:
   - email: agones-discuss@googlegroups.com
     name: agones

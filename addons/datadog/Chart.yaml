@@ -4,10 +4,10 @@ version: 0.1.0
 appVersion: "7"
 description: Datadog Agent
 keywords:
-- monitoring
-- alerting
-- metric
-- metrics
+  - monitoring
+  - alerting
+  - metric
+  - metrics
 home: https://www.datadoghq.com
 icon: https://datadog-live.imgix.net/img/dd_logo_70x75.png
 sources:
