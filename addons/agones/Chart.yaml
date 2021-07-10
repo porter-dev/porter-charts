@@ -9,10 +9,10 @@ keywords:
 - multiplayer
 - game-development
 maintainers:
-- email: agones-discuss@googlegroups.com
-  name: agones
-  url: https://groups.google.com/forum/#!forum/agones-discuss
+  - email: agones-discuss@googlegroups.com
+    name: agones
+    url: https://groups.google.com/forum/#!forum/agones-discuss
 name: agones
 sources:
-- https://github.com/googleforgames/agones
-version: 1.15.0
+  - https://github.com/googleforgames/agones
+version: 0.1.0
