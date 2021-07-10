@@ -1,0 +1,55 @@
+apiVersion: "agones.dev/v1"
+kind: Fleet
+# Fleet Metadata
+# https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta
+metadata:
+  name: {{ .Chart.Name }}
+spec:
+  # the number of GameServers to keep Ready or Allocated in this Fleet
+  replicas: {{ .Values.replicas }}
+  # defines how GameServers are organised across the cluster.
+  # Options include:
+  # "Packed" (default) is aimed at dynamic Kubernetes clusters, such as cloud providers, wherein we want to bin pack
+  # resources
+  # "Distributed" is aimed at static Kubernetes clusters, wherein we want to distribute resources across the entire
+  # cluster
+  scheduling: {{ .Values.scheduling }}
+  # a GameServer template - see:
+  # https://agones.dev/site/docs/reference/gameserver/ for all the options
+  strategy:
+    # The replacement strategy for when the GameServer template is changed. Default option is "RollingUpdate",
+    # "RollingUpdate" will increment by maxSurge value on each iteration, while decrementing by maxUnavailable on each
+    # iteration, until all GameServers have been switched from one version to another.
+    # "Recreate" terminates all non-allocated GameServers, and starts up a new set with the new details to replace them.
+    type: {{ .Values.strategy.type }}
+    # Only relevant when `type: RollingUpdate`
+    rollingUpdate:
+      # the amount to increment the new GameServers by. Defaults to 25%
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+      # the amount to decrements GameServers by. Defaults to 25%
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+  template:
+    # GameServer metadata
+    metadata:
+      labels:
+        foo: bar
+    # GameServer specification
+    spec:
+      ports:
+      - name: default
+        portPolicy: Dynamic
+        containerPort: 26000
+      health:
+        initialDelaySeconds: 30
+        periodSeconds: 60
+      # Parameters for game server sidecar
+      sdkServer:
+        logLevel: Info
+        grpcPort: 9357
+        httpPort: 9358
+      # The GameServer's Pod template
+      template:
+        spec:
+          containers:
+          - name: {{ .Chart.Name }}
+            image: {{ .Values.containerImage }}

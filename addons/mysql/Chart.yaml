@@ -1,6 +1,6 @@
 apiVersion: v2
 appVersion: 1.16.0
-description: Template for deploying a MySQL databse.
+description: Template for deploying a MySQL database.
 icon: https://www.mysql.com/common/logos/logo-mysql-170x115.png
 name: mysql
 type: application
