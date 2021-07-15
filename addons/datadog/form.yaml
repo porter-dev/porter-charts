@@ -22,6 +22,20 @@ tabs:
       placeholder: 'ex: abcd1234efgh5678ijkl9012kmno3456pqrs7890tuvw'
       settings:
         default: ''
+    - type: heading
+      label: Logging
+    - type: subtitle
+      label: Forward logs from all containers to DataDog. Be aware that this may incur additional cost based on your retention settings.
+    - type: checkbox
+      label: Enable Logging
+      variable: datadog.logs.enabled
+    - type: heading
+      label: DogStatsD
+    - type: subtitle
+      label: Gather custom application metrics with DogStatsD. This automatically injects DD_AGENT_HOST as an environment variable to your pods to use in the code.
+    - type: checkbox
+      label: Enable DogStatsD
+      variable: clusterAgent.admissionController.enabled
 - name: resources
   label: Resources
   sections:

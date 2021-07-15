@@ -8,7 +8,7 @@ tabs:
     - type: heading
       label: Deploy LogDNA
     - type: subtitle
-      label: This installs the LogDNA agent, which forwards all logs from Porter to LogDNA for ingestion. It may take around 30 minutes for the logs to arrive in your LogDNA instance.
+      label: This installs the LogDNA agent, which forwards all logs from Porter to LogDNA for ingestion. It may take around 30 minutes for the logs to arrive in your LogDNA instance. Be aware that this incurs additional cost based on your retention settings. By default, all logs are ingested - to reduce costs, you can filter out the logs from LogDNA.
     - type: string-input
       label: LogDNA Ingestion Key
       variable: logdna.key
