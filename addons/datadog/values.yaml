@@ -816,13 +816,13 @@ agents:
       logLevel:  # INFO
 
       # agents.containers.agent.resources -- Resource requests and limits for the agent container.
-      resources: {}
-      #  requests:
-      #    cpu: 200m
-      #    memory: 256Mi
-      #  limits:
-      #    cpu: 200m
-      #    memory: 256Mi
+      resources:
+        requests:
+          cpu: 200m
+          memory: 256Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
 
       # agents.containers.agent.healthPort -- Port number to use in the node agent for the healthz endpoint
       healthPort: 5555

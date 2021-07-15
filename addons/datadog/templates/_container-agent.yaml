@@ -8,7 +8,12 @@
     {{ toYaml .Values.agents.containers.agent.securityContext | nindent 4 }}
   {{- end }}
   resources:
-{{ toYaml .Values.agents.containers.agent.resources | indent 4 }}
+    requests:
+      cpu: {{ .Values.agents.containers.agent.resources.requests.cpu }}
+      memory: {{ .Values.agents.containers.agent.resources.requests.memory }}
+    limits:
+      cpu: {{ .Values.agents.containers.agent.resources.requests.cpu }}
+      memory: {{ .Values.agents.containers.agent.resources.requests.memory }}
   ports:
   - containerPort: {{ .Values.datadog.dogstatsd.port }}
     {{- if .Values.datadog.dogstatsd.useHostPort }}
