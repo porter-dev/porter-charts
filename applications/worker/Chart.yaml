@@ -6,7 +6,8 @@ icon: https://user-images.githubusercontent.com/65516095/111255250-1b7f4100-85ed
 keywords:
   - application
   - porter
+  - background-worker
   - worker
 name: worker
 type: application
-version: 0.3.0
+version: 0.1.0

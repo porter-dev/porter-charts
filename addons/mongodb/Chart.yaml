@@ -14,6 +14,7 @@ icon: https://bitnami.com/assets/stacks/mongodb/img/mongodb-stack-220x234.png
 keywords:
   - mongodb
   - database
+  - mongo
   - nosql
   - cluster
   - replicaset
@@ -25,4 +26,4 @@ name: mongodb
 sources:
   - https://github.com/bitnami/bitnami-docker-mongodb
   - https://mongodb.org
-version: 0.2.0
+version: 0.1.0

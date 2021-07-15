@@ -5,7 +5,7 @@ home: https://github.com/elastic/helm-charts
 icon: https://ria.gallerycdn.vsassets.io/extensions/ria/elastic/0.13.3/1530754501320/Microsoft.VisualStudio.Services.Icons.Default
 maintainers:
   - email: helm-charts@elastic.co
-    name: Elastic
+    name: elastic
 name: elasticsearch
 sources:
   - https://github.com/elastic/elasticsearch

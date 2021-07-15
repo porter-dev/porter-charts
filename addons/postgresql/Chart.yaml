@@ -12,6 +12,7 @@ icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-110x117.
 keywords:
   - postgresql
   - postgres
+  - db
   - database
   - sql
   - replication

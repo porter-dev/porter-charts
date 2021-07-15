@@ -5,8 +5,9 @@ home: https://getporter.dev/
 icon: https://user-images.githubusercontent.com/65516095/111258413-4e2c3800-85f3-11eb-8a6a-88e03460f8fe.png
 keywords:
   - porter
+  - cronjob
   - application
   - job
 name: job
 type: application
-version: 0.6.0
+version: 0.1.0
