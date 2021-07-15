@@ -9,6 +9,6 @@ During traffic spikes and heavy loads, CoreDNS (responsible for DNS resolution o
 
 ## Implementation
 
-The DNS cache addon is installed as a daemonset in every node of the cluster. Instead of directly making a request to coredns at all times, pods will send a request to the DNS cache pod that is running on the same node first to decrease lookup times.
+The DNS cache addon is installed as a daemonset in every node of the cluster. Instead of directly making a request to coredns at all times, pods will send requests to the DNS cache pod that is running on the same node first to decrease lookup times. Listens on internal IP: `169.254.20.10`.
 
 Support on GKE and DOKS is coming soon.
