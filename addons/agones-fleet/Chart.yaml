@@ -1,6 +1,6 @@
 apiVersion: v1
 appVersion: 1.15.0
-description: A library for hosting, running and scaling dedicated game servers on Kubernetes.
+description: A controller object that can be used to spawn pre-warmed Agones Game Servers.
 home: https://agones.dev
 icon: https://avatars.githubusercontent.com/u/36940055?v=4
 keywords:
@@ -9,7 +9,7 @@ keywords:
 - multiplayer
 - game-development
 maintainers:
-- email: agones-discuss@googlegroups.com
+- email: contact@getporter.dev
   name: agones
   url: https://groups.google.com/forum/#!forum/agones-discuss
 name: agones

@@ -6,6 +6,7 @@ icon: https://raw.githubusercontent.com/jetstack/cert-manager/master/logo/logo.p
 keywords:
   - cert-manager
   - kube-lego
+  - kube
   - letsencrypt
   - tls
 maintainers:

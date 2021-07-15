@@ -201,11 +201,11 @@ datadog:
   logs:
     # datadog.logs.enabled -- Enables this to activate Datadog Agent log collection
     ## ref: https://docs.datadoghq.com/agent/basic_agent_usage/kubernetes/#log-collection-setup
-    enabled: true
+    enabled: false
 
     # datadog.logs.containerCollectAll -- Enable this to allow log collection for all containers
     ## ref: https://docs.datadoghq.com/agent/basic_agent_usage/kubernetes/#log-collection-setup
-    containerCollectAll: true
+    containerCollectAll: false
 
     # datadog.logs.containerCollectUsingFiles -- Collect logs from files in /var/log/pods instead of using container runtime API
     ## It's usually the most efficient way of collecting logs.
@@ -816,13 +816,13 @@ agents:
       logLevel:  # INFO
 
       # agents.containers.agent.resources -- Resource requests and limits for the agent container.
-      resources: {}
-      #  requests:
-      #    cpu: 200m
-      #    memory: 256Mi
-      #  limits:
-      #    cpu: 200m
-      #    memory: 256Mi
+      resources:
+        requests:
+          cpu: 200m
+          memory: 256Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
 
       # agents.containers.agent.healthPort -- Port number to use in the node agent for the healthz endpoint
       healthPort: 5555
