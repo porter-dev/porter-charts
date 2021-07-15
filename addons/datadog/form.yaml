@@ -19,5 +19,117 @@ tabs:
       label: DataDog API Key
       variable: datadog.apiKey
       required: true
+      placeholder: 'ex: abcd1234efgh5678ijkl9012kmno3456pqrs7890tuvw'
       settings:
         default: ''
+- name: resources
+  label: Resources
+  sections:
+  - name: main_section
+    contents:
+    - type: heading
+      label: Resources
+    - type: subtitle
+      label: Configure resources assigned to the Datadog agent.
+    - type: number-input
+      label: Datadog agent RAM
+      variable: agents.containers.agent.resources.requests.memory
+      placeholder: "ex: 256"
+      settings:
+        unit: Mi
+        default: 256
+    - type: number-input
+      label: Datadog agent CPU
+      variable: agents.containers.agent.resources.requests.cpu
+      placeholder: "ex: 100"
+      settings:
+        unit: m
+        default: 100
+    - type: checkbox
+      variable: advancedResourceConfig
+      label: Enable advanced resource configuration
+      settings:
+        default: false
+  - name: advancedResources
+    show_if: advancedResourceConfig
+    contents:
+    - type: subtitle
+      label: Configure resources assigned to the Datadog process agent.
+    - type: number-input
+      label: Process agent RAM
+      variable: agents.containers.processAgent.resources.requests.memory
+      placeholder: "ex: 200"
+      settings:
+        unit: Mi
+        default: 200
+    - type: number-input
+      label: Process agent CPU
+      variable: agents.containers.processAgent.resources.requests.cpu
+      placeholder: "ex: 100"
+      settings:
+        unit: m
+        default: 100
+    - type: subtitle
+      label: Configure resources assigned to the Datadog trace agent.
+    - type: number-input
+      label: Trace agent RAM
+      variable: agents.containers.traceAgent.resources.requests.memory
+      placeholder: "ex: 200"
+      settings:
+        unit: Mi
+        default: 200
+    - type: number-input
+      label: Trace agent CPU
+      variable: agents.containers.traceAgent.resources.requests.cpu
+      placeholder: "ex: 100"
+      settings:
+        unit: m
+        default: 100
+    - type: subtitle
+      label: Configure resources assigned to the Datadog system probe.
+    - type: number-input
+      label: System probe RAM
+      variable: agents.containers.systemProbe.resources.requests.memory
+      placeholder: "ex: 200"
+      settings:
+        unit: Mi
+        default: 200
+    - type: number-input
+      label: System probe CPU
+      variable: agents.containers.systemProbe.resources.requests.cpu
+      placeholder: "ex: 100"
+      settings:
+        unit: m
+        default: 100
+    - type: subtitle
+      label: Configure resources assigned to the Datadog security agent.
+    - type: number-input
+      label: Security agent RAM
+      variable: agents.containers.securityAgent.resources.requests.memory
+      placeholder: "ex: 200"
+      settings:
+        unit: Mi
+        default: 200
+    - type: number-input
+      label: Security agent CPU
+      variable: agents.containers.securityAgent.resources.requests.cpu
+      placeholder: "ex: 100"
+      settings:
+        unit: m
+        default: 100
+    - type: subtitle
+      label: Configure resources assigned to the Datadog init containers.
+    - type: number-input
+      label: Init containers RAM
+      variable: agents.containers.initContainers.resources.requests.memory
+      placeholder: "ex: 200"
+      settings:
+        unit: Mi
+        default: 200
+    - type: number-input
+      label: Init containers CPU
+      variable: agents.containers.initContainers.resources.requests.cpu
+      placeholder: "ex: 100"
+      settings:
+        unit: m
+        default: 100
