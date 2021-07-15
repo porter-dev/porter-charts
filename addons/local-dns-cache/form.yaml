@@ -1,0 +1,11 @@
+name: local-dns-cache
+tabs:
+- name: main
+  label: Main
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: Node Local DNS Cache (EKS only)
+    - type: subtitle
+      label: This will install a node local DNS cache in your cluster as a daemonset for faster DNS lookups. Currently supported only for EKS.

@@ -21,4 +21,4 @@ name: logdna
 sources:
   - https://github.com/logdna/logdna-agent-v2
 type: application
-version: 0.3.0
+version: 0.2.0
