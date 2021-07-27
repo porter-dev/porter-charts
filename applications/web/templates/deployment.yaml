@@ -121,12 +121,12 @@ spec:
             mountPath: /secrets/
             readOnly: true
         {{ end }}
+      {{- if gt (len .Values.nodeSelector) 0}}
       nodeSelector:
-        {{- if gt (len .Values.nodeSelector) 0}}
         {{- range $k, $v := .Values.nodeSelector }}
         {{ $k }}: {{ $v }}
         {{- end }}
-        {{- end }}
+      {{- end }}
       tolerations:
         - key: "removable"
           operator: "Equal"
