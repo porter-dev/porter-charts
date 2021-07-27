@@ -49,3 +49,5 @@ cloudsql:
   connectionName: ""
   dbPort: 5432
   serviceAccountJSON: ""
+
+nodeSelector: {}
