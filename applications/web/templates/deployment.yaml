@@ -124,11 +124,7 @@ spec:
       nodeSelector:
         {{- if gt (len .Values.nodeSelector) 0}}
         {{- range $k, $v := .Values.nodeSelector }}
-        {{- if $v}}
-        {{- if and (not (eq $v "null")) $v}}
         {{ $k }}: {{ $v }}
-        {{- end }}
-        {{- end }}
         {{- end }}
         {{- end }}
       tolerations:
