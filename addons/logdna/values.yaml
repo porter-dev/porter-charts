@@ -14,7 +14,11 @@ resources:
     memory: 75Mi
 
 daemonset:
-  tolerations: []
+  tolerations:
+    - effect: NoSchedule
+      key: removable
+      operator: Equal
+      value: 'true'
 
 priorityClassName: ""
 extraEnv: {}
