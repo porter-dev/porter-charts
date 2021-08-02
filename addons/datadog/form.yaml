@@ -19,7 +19,6 @@ tabs:
       label: DataDog API Key
       variable: datadog.apiKey
       required: true
-      placeholder: 'ex: abcd1234efgh5678ijkl9012kmno3456pqrs7890tuvw'
       settings:
         default: ''
     - type: heading
