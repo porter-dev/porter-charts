@@ -1,5 +1,6 @@
 name: Web
 hasSource: true
+includeHiddenFields: true
 tabs:
 - name: main
   label: Main
@@ -184,8 +185,9 @@ tabs:
     - type: string-input
       label: Health Check Endpoint
       variable: health.path
-      placeholder: "ex: /healthz"
+      placeholder: "ex: /healthzz"
       settings:
+        required: true
         default: /healthz
     - type: heading
       label: Custom Health Check Rules
@@ -225,6 +227,7 @@ tabs:
       variable: pvc.mountPath
       placeholder: "ex: /mypath"
       settings:
+        required: true
         default: /mypath
   - name: termination_grace_period
     contents:
