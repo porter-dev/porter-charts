@@ -67,11 +67,19 @@ spec:
               port: http
             periodSeconds: {{ .Values.health.periodSeconds }}
             failureThreshold: {{ .Values.health.failureThreshold }}
+          {{ if not .Values.health.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
               path: {{ .Values.health.path }}
               port: http
             periodSeconds: {{ .Values.health.periodSeconds }}
+          {{ else }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.health.readinessProbe.path }}
+              port: http
+            periodSeconds: {{ .Values.health.periodSeconds }}          
+          {{ end }}
           startupProbe:
             httpGet:
               path: {{ .Values.health.path }}
@@ -86,6 +94,21 @@ spec:
             limits:
               memory: {{ .Values.resources.requests.memory }}
           env:
+            # Porter default environment variables
+            - name: PORTER_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: PORTER_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: PORTER_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: PORTER_POD_IMAGE_TAG
+              value: {{ .Values.image.tag }}
             {{- range $key, $val := .Values.container.env.normal }}
             - name: {{ $key }}
             {{- $splVal := split "_" $val -}}
