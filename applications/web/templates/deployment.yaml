@@ -99,10 +99,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-            - name: PORTER_POD_IMAGE
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.template.spec.containers[0].image
+            - name: PORTER_POD_IMAGE_TAG
+              value: {{ .Values.image.tag }}
             {{- range $key, $val := .Values.container.env.normal }}
             - name: {{ $key }}
             {{- $splVal := split "_" $val -}}
