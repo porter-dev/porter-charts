@@ -204,9 +204,9 @@ tabs:
             placeholder: "ex: 30"
           - type: checkbox
             label: Enable Readiness Probe
-            variable: readinessProbe.enabled
+            variable: health.readinessProbe.enabled
       - name: readiness_probe
-        show_if: readinessProbe.enabled
+        show_if: health.readinessProbe.enabled
         contents:
           - type: heading
             label: Readiness Probe
@@ -214,6 +214,7 @@ tabs:
             label: Configure readiness probe to decide whether traffic should be directed to a pod.
           - type: string-input
             label: Readiness Probe Endpoint
+            variable: health.readinessProbe.path
             settings:
               default: /ready
       - name: persistence_toggle
