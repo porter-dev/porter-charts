@@ -214,6 +214,8 @@ tabs:
             label: Configure readiness probe to decide whether traffic should be directed to a pod.
           - type: string-input
             label: Readiness Probe Endpoint
+            settings:
+              default: /ready
       - name: persistence_toggle
         contents:
           - type: heading
