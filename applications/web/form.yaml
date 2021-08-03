@@ -1,6 +1,5 @@
 name: Web
 hasSource: true
-includeHiddenFields: true
 tabs:
 - name: main
   label: Main
@@ -185,7 +184,7 @@ tabs:
     - type: string-input
       label: Health Check Endpoint
       variable: health.path
-      placeholder: "ex: /healthzz"
+      placeholder: "ex: /healthz"
       settings:
         required: true
         default: /healthz
