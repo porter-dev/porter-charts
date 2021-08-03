@@ -102,7 +102,7 @@ spec:
             - name: PORTER_POD_IMAGE
               valueFrom:
                 fieldRef:
-                  fieldPath: spec.containers[0].image
+                  fieldPath: spec.template.spec.containers[0].image
             {{- range $key, $val := .Values.container.env.normal }}
             - name: {{ $key }}
             {{- $splVal := split "_" $val -}}
