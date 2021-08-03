@@ -66,6 +66,9 @@ health:
   path: "/healthz"
   periodSeconds: 5
   failureThreshold: 3
+  readinessProbe:
+    enabled: false
+    path: "/ready"
 
 pvc:
   enabled: false
