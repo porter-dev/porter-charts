@@ -1,0 +1,5 @@
+upgrade_notes:
+- previous: v0.1.0
+  target: v0.5.0
+  note: |
+    These are custom notes!
