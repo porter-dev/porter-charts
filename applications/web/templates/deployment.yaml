@@ -67,11 +67,19 @@ spec:
               port: http
             periodSeconds: {{ .Values.health.periodSeconds }}
             failureThreshold: {{ .Values.health.failureThreshold }}
+          {{ if not .Values.health.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
               path: {{ .Values.health.path }}
               port: http
             periodSeconds: {{ .Values.health.periodSeconds }}
+          {{ else }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.health.readinessProbe.path }}
+              port: http
+            periodSeconds: {{ .Values.health.periodSeconds }}          
+          {{ end }}
           startupProbe:
             httpGet:
               path: {{ .Values.health.path }}
