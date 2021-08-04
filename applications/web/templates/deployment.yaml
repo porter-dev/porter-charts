@@ -15,7 +15,7 @@ spec:
   template:
     metadata:
       annotations:
-        helm.sh/revision: {{ .Release.Revision }}
+        helm.sh/revision: {{ .Release.Revision | quote }}
         {{- with .Values.podAnnotations }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
