@@ -14,10 +14,11 @@ spec:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-    {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+        helm.sh/revision: {{ .Release.Revision }}
+        {{- with .Values.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
       labels:
         {{- include "docker-template.selectorLabels" . | nindent 8 }}
     spec:
