@@ -69,6 +69,7 @@ health:
   readinessProbe:
     enabled: false
     path: "/ready"
+    periodSeconds: 5
 
 pvc:
   enabled: false
