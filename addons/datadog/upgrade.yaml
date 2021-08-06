@@ -1,0 +1,9 @@
+upgrade_notes:
+  - previous: 0.10.0
+    target: 0.11.0
+    note: |
+      These are custom notes!
+  - previous: 0.11.0
+    target: 0.12.0
+    note: |
+      This adds APM
