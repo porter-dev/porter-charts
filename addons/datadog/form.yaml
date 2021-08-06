@@ -1,60 +1,67 @@
 name: datadog
 tabs:
-- name: main
-  label: Info
-  sections:
-  - name: section_one
-    contents: 
-    - type: heading
-      label: Deploy DataDog Agent
-    - type: subtitle
-      label: This installs the DataDog agent, which forwards all logs from Porter to DataDog for ingestion. It may take around 30 minutes for the logs to arrive in your DataDog instance.
-    - type: string-input
-      label: DataDog Site
-      variable: datadog.site
-      required: true
-      settings:
-        default: 'datadoghq.com'
-    - type: string-input
-      label: DataDog API Key
-      variable: datadog.apiKey
-      required: true
-      settings:
-        default: ''
-    - type: heading
-      label: Logging
-    - type: subtitle
-      label: Forward logs from all containers to DataDog. Be aware that this may incur additional cost based on your retention settings.
-    - type: checkbox
-      label: Enable Logging
-      variable: datadog.logs.enabled
-    - type: heading
-      label: DogStatsD
-    - type: subtitle
-      label: Gather custom application metrics with DogStatsD. This automatically injects DD_AGENT_HOST as an environment variable to your pods to use in the code.
-    - type: checkbox
-      label: Enable DogStatsD
-      variable: clusterAgent.admissionController.enabled
-- name: resources
-  label: Resources
-  sections:
-  - name: main_section
-    contents:
-    - type: heading
-      label: Resources
-    - type: subtitle
-      label: Configure resources assigned to the Datadog agent.
-    - type: number-input
-      label: Datadog agent RAM
-      variable: agents.containers.agent.resources.requests.memory
-      placeholder: "ex: 256"
-      settings:
-        unit: Mi
-        default: 256
-    - type: number-input
-      label: Datadog agent CPU
-      variable: agents.containers.agent.resources.requests.cpu
-      placeholder: "ex: 100"
-      settings:
-        unit: m
-        default: 100
+  - name: main
+    label: Info
+    sections:
+      - name: section_one
+        contents:
+          - type: heading
+            label: Deploy DataDog Agent
+          - type: subtitle
+            label: This installs the DataDog agent, which forwards all logs from Porter to DataDog for ingestion. It may take around 30 minutes for the logs to arrive in your DataDog instance.
+          - type: string-input
+            label: DataDog Site
+            variable: datadog.site
+            required: true
+            settings:
+              default: "datadoghq.com"
+          - type: string-input
+            label: DataDog API Key
+            variable: datadog.apiKey
+            required: true
+            settings:
+              default: ""
+          - type: heading
+            label: Logging
+          - type: subtitle
+            label: Forward logs from all containers to DataDog. Be aware that this may incur additional cost based on your retention settings.
+          - type: checkbox
+            label: Enable Logging
+            variable: datadog.logs.enabled
+          - type: heading
+            label: DogStatsD
+          - type: subtitle
+            label: Gather custom application metrics with DogStatsD. This automatically injects DD_AGENT_HOST as an environment variable to your pods to use in the code.
+          - type: checkbox
+            label: Enable DogStatsD
+            variable: clusterAgent.admissionController.enabled
+          - type: heading
+            label: APM
+          - type: subtitle
+            label: Use APM to trace your applications. This automatically injects environment variables to be used by standard datadog tracing libraries.
+          - type: checkbox
+            label: Enable APM
+            variable: datadog.apm.enabled
+  - name: resources
+    label: Resources
+    sections:
+      - name: main_section
+        contents:
+          - type: heading
+            label: Resources
+          - type: subtitle
+            label: Configure resources assigned to the Datadog agent.
+          - type: number-input
+            label: Datadog agent RAM
+            variable: agents.containers.agent.resources.requests.memory
+            placeholder: "ex: 256"
+            settings:
+              unit: Mi
+              default: 256
+          - type: number-input
+            label: Datadog agent CPU
+            variable: agents.containers.agent.resources.requests.cpu
+            placeholder: "ex: 100"
+            settings:
+              unit: m
+              default: 100
