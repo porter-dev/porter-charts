@@ -1,5 +1,5 @@
 upgrade_notes:
-- previous: v0.1.0
-  target: v0.5.0
+- previous: v0.19.0
+  target: v0.20.0
   note: |
-    These are custom notes!
+    `v0.20.0` added support for configuring the time interval of the readiness probe. This sets the period between successive readiness probe queries on the health check endpoint.
