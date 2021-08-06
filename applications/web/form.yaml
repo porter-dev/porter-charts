@@ -217,6 +217,12 @@ tabs:
             variable: health.readinessProbe.path
             settings:
               default: /ready
+          - type: number-input
+            label: Repeat Interval
+            variable: health.readinessProbe.periodSeconds
+            placeholder: "ex: 30"
+            settings:
+              default: 5
       - name: persistence_toggle
         contents:
           - type: heading
