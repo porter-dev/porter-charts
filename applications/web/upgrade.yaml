@@ -1,5 +1,9 @@
 upgrade_notes:
-- previous: v0.19.0
-  target: v0.20.0
+- previous: v0.11.0
+  target: v0.12.0
   note: |
-    `v0.20.0` added support for configuring the time interval of the readiness probe. This sets the period between successive readiness probe queries on the health check endpoint.
+    `v0.11.0` added support for configuring the time interval of the readiness probe. This sets the period between successive readiness probe queries on the health check endpoint. This update is backwards-compatible.
+- previous: v0.12.0
+  target: v0.13.0
+  note: |
+    `v0.13.0` added support for displaying the revision numbers attached to each pod in the Porter dashboard, by passing the revision number to the pod metadata. This update is backwards-compatible.
