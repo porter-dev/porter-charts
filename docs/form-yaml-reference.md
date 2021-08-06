@@ -145,51 +145,60 @@ tabs:
   ...
 ```
 
-A section's `contents` contains a list of form units which can display information or accept user inputs to `values.yaml`. The different form units are catalogued below:
+A section's `contents` contains a list of form units which can display information or accept user inputs to `values.yaml`. The different form units and their options are catalogued below:
 
 ### `heading`
 
-Required fields:
 - `label` - Label to render (string)
 
 ### `subtitle`
 
-Required fields:
 - `label` - Label to render (string)
 
-### `number-input`
+### `input`
 
-Required fields: 
 - `variable` - Target variable in `values.yaml` (string)
 - `label` - Label to render (string) 
+- `placeholder` - Placeholder to render (string)
+- `info` - Info tooltip to render (string)
 - `settings`
-  - `default` - Default value (number)
+  - `default` - Default value (number or string)
   - `unit` - Input unit (string)
-
-### `string-input`
-
-Required fields: 
-- variable - Target variable in values.yaml (string)
-- label - Label to render (string)
-- settings
-   - default - Default value (string)
-   - unit - Input unit (string)
+  - `omitUnitFromValue` - Whether or not to append the unit to the value on submission (boolean)
+  - `type` - Type of input ("string", "password", or "number")
+  - `requited` - Wether or not this field is required
 
 ### `checkbox`
 
-- variable - Target variable in values.yaml (string)
-- label - Label to render (string)
-- settings
-   - default - Default value (boolean)
+- `variable` - Target variable in `values.yaml` (string)
+- `label` - Label to render (string) 
+- `settings`
+  - `default` - Default value (boolean)
+  - `requited` - Wether or not this field is required
+  
+### `key-value-array`
+
+- `variable` - Target variable in `values.yaml` (string)
+- `label` - Label to render (string) 
+- `secretOption` - Whether or not secrets should be obfuscated on frontend (boolean)
+- `envLoader` - Wether or not the environment loader should be present.
+- `fileUpload` - Whether or not the file loader should be present.
+- `settings`
+  - `type` - Type of key value array ("env" or "normal")
+
+### `array-input`
+
+- `label` - Label to render (string) 
 
 ### `select`
 
-Required fields: 
-- variable - Target variable in values.yaml (string)
-- label - Label to render (string)
-- settings
-   - default - Default value (string)
-   - options - A list of options containing a value and label field
+- `variable` - Target variable in `values.yaml` (string)
+- `label` - Label to render (string) 
+- `settings`
+  - `default` - Default value (string)
+  - `type` - ("normal" or "provider", "provider" just provides some preset options)
+  - `options` - list {value: string, label: string} options to show in the select field
+
 
 ## Conditional Rendering
 
