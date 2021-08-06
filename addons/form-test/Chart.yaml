@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: 1.16.0
+description: Template for testing Porter form behavior.
+icon: https://ownacademy.co/wp-content/uploads/2018/10/Tick_Mark_Dark-512.png
+name: form-test
+type: application
+version: 0.1.0

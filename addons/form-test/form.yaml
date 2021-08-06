@@ -1,0 +1,56 @@
+name: Form Test
+tabs:
+- name: input
+  label: Input
+  sections:
+  - name: inputs
+    contents: 
+    - type: heading
+      label: Inputs
+    - type: input
+      label: Input One
+      variable: inputOne
+      required: true
+      settings:
+        default: "default 1"
+    - type: input
+      label: Input Two
+      variable: inputTwo
+      required: true
+      settings:
+        default: "default 2"
+- name: checkbox
+  label: Checkbox
+  sections:
+  - name: checkboxes
+    contents: 
+    - type: heading
+      label: Checkboxes
+    - type: checkbox
+      label: Checkbox One
+      variable: checkboxOne
+      settings:
+        default: true
+    - type: checkbox
+      label: Checkbox Two
+      variable: checkboxTwo
+      settings:
+        default: false
+- name: arrayInput
+  label: Array Input
+  sections:
+  - name: arrayInput
+    contents: 
+    - type: heading
+      label: Array Input
+    - type: array-input
+      variable: arrayInput
+- name: keyValueArray
+  label: Key Value Array
+  sections:
+  - name: keyValueArray
+    contents: 
+    - type: heading
+      label: Key Value Array
+    - type: key-value-array
+      variable: keyValueArray
