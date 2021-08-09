@@ -9,4 +9,5 @@ upgrade_notes:
       `v0.13.0` added support for displaying the revision numbers attached to each pod in the Porter dashboard, by passing the revision number to the pod metadata. This update is backwards-compatible.
   - previous: v0.13.0
     target: v0.14.0
+    note: |
       `v0.14.0` fixed the parsing issue on the `PORTER_POD_IMAGE_TAG` variable that's injected into the container.
