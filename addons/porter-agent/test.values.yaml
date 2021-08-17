@@ -1,0 +1,8 @@
+agent:
+  porterHost: "https://dashboard.dev.getporter.dev"
+  porterPort: "443"
+  porterToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOiIxNjI4ODczMzQ1IiwiaWJ5IjoxMCwicHJvamVjdF9pZCI6MCwic3ViIjoiMTAiLCJzdWJfa2luZCI6InVzZXIifQ.2iT4XXOnU8TqJJfjvLvkyMkPqW9IjxTf1py7NFDxCOI"
+  privateRegister:
+    enabled: false
+  clusterID: "8"
+  projectID: "10"
