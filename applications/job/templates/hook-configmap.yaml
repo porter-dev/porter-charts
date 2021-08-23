@@ -13,6 +13,7 @@ data:
       name: "{{ .Release.Name }}-{{ randAlphaNum 10 | lower }}"
       namespace: {{ .Release.Namespace | quote }}
       labels:
+        app.kubernetes.io/name: {{ .Chart.Name | quote }}
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         helm.sh/revision: "{{ .Release.Revision }}"
@@ -23,6 +24,7 @@ data:
         metadata:
           name: "{{ .Release.Name }}"
           labels:
+            app.kubernetes.io/name: {{ .Chart.Name | quote }}
             app.kubernetes.io/instance: {{ .Release.Name | quote }}
             helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
             helm.sh/revision: "{{ .Release.Revision }}"
@@ -40,7 +42,7 @@ data:
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: "{{ .Values.image.pullPolicy }}"
             {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job"))) }}
-            command: 
+            command:
             {{- range $command := trim .Values.container.command | split " " }}
             - {{ $command | quote }}
             {{- end }}
