@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "docker-template.fullname" . }}-config
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+data:
+  agent.yaml: {{ toYaml (required ".Values.agent_config is required"  .Values.agent_config) | indent 2 }}

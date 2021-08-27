@@ -1,0 +1,11 @@
+name: grafana-agent
+tabs:
+  - name: main
+    label: Main
+    sections:
+      - name: section_one
+        contents:
+          - type: heading
+            label: Grafana Agent
+          - type: subtitle
+            label: This will install Grafana Agent into your cluster
