@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "docker-template.fullname" . }}-config
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+data:
+  {{- $config := (tpl .Values.agent_config .) | fromYaml }}
+  {{- $remoteWriteConfig := .Values.prometheus_remote_write | toYaml | fromYaml }}
+  {{- $prometheusConfig := dig "prometheus" (dict) $config }}
+  {{- $globalPrometheusConfig := dig "global" (dict) $prometheusConfig }}
+  {{- $updatedGlobalPrometheusConfig := mergeOverwrite $globalPrometheusConfig (dict "remote_write" (list $remoteWriteConfig)) }}
+  {{- $updatedPrometheusConfig := mergeOverwrite $prometheusConfig (dict "global" $updatedGlobalPrometheusConfig) }}
+  {{- $updatedConfig := mergeOverwrite $config (dict "prometheus" $updatedPrometheusConfig) }}
+  agent.yaml: |
+    {{- $updatedConfig | toYaml | nindent 4 }}
