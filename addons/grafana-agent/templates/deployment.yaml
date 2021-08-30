@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "docker-template.fullname" . }}
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "docker-template.selectorLabels" . | nindent 6 }}
+  replicas: {{ .Values.replicaCount }}
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        {{- include "docker-template.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - -config.file=/etc/agent/agent.yaml
+          command:
+            - /bin/agent
+          env:
+            {{- range .Values.container.env }}
+            - name: {{ .name }}
+              value: {{ .value }}
+            {{- end }}
+          ports:
+            - name: http-metrics
+              containerPort: {{ .Values.container.port }}
+          volumeMounts:
+            - name: configuration
+              mountPath: /etc/agent
+      serviceAccount: {{ include "docker-template.serviceAccountName" . }}
+      volumes:
+        - name: configuration
+          configMap:
+            name: {{ include "docker-template.fullname" . }}-config
