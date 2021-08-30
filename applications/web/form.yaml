@@ -10,6 +10,8 @@ tabs:
             label: Container Settings
           - type: variable
             variable: showStartCommand
+            settings:
+                default: true
       - name: command
         show_if: showStartCommand
         contents:
