@@ -24,19 +24,21 @@ tabs:
     - type: checkbox
       variable: ingress.custom_domain
       label: Configure Custom Domain
-  - name: provider
-    show_if: ingress.custom_domain
+  - name: provider_domain_name
+    show_if: 
+        and:
+        - ingress.enabled
+        - ingress.custom_domain
     contents:
     - type: input
       variable: ingress.provider
       label: Provider Type (aws, gcp, or digitalocean)
+      required: true
       settings:
         type: string
-  - name: domain_name
-    show_if: ingress.custom_domain
-    contents:
     - type: array-input
       variable: ingress.hosts
+      required: true
       label: Domain Name
 - name: resources
   label: Computing resources

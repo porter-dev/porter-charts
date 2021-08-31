@@ -94,9 +94,7 @@ tabs:
           - type: checkbox
             variable: autoscaling.enabled
             label: Enable autoscaling
-      - name: main_section
-        show_if:
-            not: autoscaling.enabled
+      - name: resource_section'
         contents:
           - type: input
             label: RAM
@@ -112,6 +110,10 @@ tabs:
             settings:
                 unit: m
                 type: number
+      - name: main_section
+        show_if:
+            not: autoscaling.enabled
+        contents:
           - type: input
             label: Replicas
             variable: replicaCount
@@ -125,18 +127,21 @@ tabs:
             label: Minimum Replicas
             variable: autoscaling.minReplicas
             placeholder: 'ex: 1'
+            required: true
             settings:
                 type: number
           - type: input
             label: Maximum Replicas
             variable: autoscaling.maxReplicas
             placeholder: 'ex: 10'
+            required: true
             settings:
                 type: number
           - type: input
             label: Target CPU Utilization
             variable: autoscaling.targetCPUUtilizationPercentage
             placeholder: 'ex: 50'
+            required: true
             settings:
                 omitUnitFromValue: true
                 unit: '%'
@@ -145,6 +150,7 @@ tabs:
             label: Target RAM Utilization
             variable: autoscaling.targetMemoryUtilizationPercentage
             placeholder: 'ex: 50'
+            required: true
             settings:
                 omitUnitFromValue: true
                 unit: '%'
