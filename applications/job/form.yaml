@@ -50,6 +50,7 @@ tabs:
       label: Schedule
       variable: schedule.value
       placeholder: 'ex: */5 * * * *'
+      required: true
       settings:
         type: string
   - name: webhook
