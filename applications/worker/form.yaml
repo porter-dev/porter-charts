@@ -12,16 +12,18 @@ tabs:
         default: true
   - name: section_one
     show_if: showStartCommand
-    contents: 
+    contents:
     - type: heading
       label: Container Settings
     - type: subtitle
       name: command_description
       label: (Optional) Set a custom start command for this service.
-    - type: string-input
+    - type: input
       label: Start Command
       variable: container.command
-      placeholder: "ex: sh ./script.sh"
+      placeholder: 'ex: sh ./script.sh'
+      settings:
+        type: string
   - name: section_one_cont
     contents:
     - type: heading
@@ -29,8 +31,6 @@ tabs:
     - type: checkbox
       variable: auto_deploy
       label: Auto-deploy when webhook is called.
-      settings:
-        default: true
 - name: resources
   label: Resources
   sections:
@@ -40,61 +40,59 @@ tabs:
       label: Resources
     - type: subtitle
       label: Configure resources assigned to this container.
-    - type: number-input
+    - type: input
       label: RAM
       variable: resources.requests.memory
-      placeholder: "ex: 256"
+      placeholder: 'ex: 256'
       settings:
         unit: Mi
-        default: 256
-    - type: number-input
+        type: number
+    - type: input
       label: CPU
       variable: resources.requests.cpu
-      placeholder: "ex: 100"
+      placeholder: 'ex: 100'
       settings:
         unit: m
-        default: 100
-    - type: number-input
+        type: number
+    - type: input
       label: Replicas
       variable: replicaCount
-      placeholder: "ex: 1"
+      placeholder: 'ex: 1'
       settings:
-        default: 1
+        type: number
     - type: checkbox
       variable: autoscaling.enabled
       label: Enable autoscaling
-      settings:
-        default: false
   - name: autoscaler
     show_if: autoscaling.enabled
     contents:
-    - type: number-input
+    - type: input
       label: Minimum Replicas
       variable: autoscaling.minReplicas
-      placeholder: "ex: 1"
+      placeholder: 'ex: 1'
       settings:
-        default: 1
-    - type: number-input
+        type: number
+    - type: input
       label: Maximum Replicas
       variable: autoscaling.maxReplicas
-      placeholder: "ex: 10"
+      placeholder: 'ex: 10'
       settings:
-        default: 10
-    - type: number-input
+        type: number
+    - type: input
       label: Target CPU Utilization
       variable: autoscaling.targetCPUUtilizationPercentage
-      placeholder: "ex: 50"
+      placeholder: 'ex: 50'
       settings:
         omitUnitFromValue: true
-        unit: "%"
-        default: 50
-    - type: number-input
+        unit: '%'
+        type: number
+    - type: input
       label: Target RAM Utilization
       variable: autoscaling.targetMemoryUtilizationPercentage
       settings:
         omitUnitFromValue: true
-        unit: "%"
-        default: 50
+        unit: '%'
+        type: number
 - name: env
   label: Environment
   sections:
@@ -104,9 +102,11 @@ tabs:
       label: Environment Variables
     - type: subtitle
       label: Set environment variables for your secrets and environment-specific configuration.
-    - type: env-key-value-array
-      label: 
+    - type: key-value-array
+      label:
       variable: container.env.normal
+      settings:
+        type: env
 - name: advanced
   label: Advanced
   sections:
@@ -122,31 +122,31 @@ tabs:
   - name: persistent_storage
     show_if: pvc.enabled
     contents:
-    - type: number-input
+    - type: input
       label: Persistent Storage
       variable: pvc.storage
-      placeholder: "ex: 20"
+      placeholder: 'ex: 20'
       settings:
         unit: Gi
-        default: 20
-    - type: string-input
+        type: number
+    - type: input
       label: Mount Path
       variable: pvc.mountPath
-      placeholder: "ex: /mypath"
+      placeholder: 'ex: /mypath'
       settings:
-        default: /mypath
+        type: string
   - name: termination_grace_period
     contents:
     - type: heading
       label: Termination Grace Period
     - type: subtitle
       label: Specify how much time app processes have to gracefully shut down on SIGTERM.
-    - type: number-input
+    - type: input
       label: Termination Grace Period (seconds)
       variable: terminationGracePeriodSeconds
-      placeholder: "ex: 30"
+      placeholder: 'ex: 30'
       settings:
-        default: 30
+        type: number
   - name: cloud_sql_toggle
     show_if: currentCluster.service.is_gcp
     contents:
@@ -157,22 +157,24 @@ tabs:
     - type: checkbox
       variable: cloudsql.enabled
       label: Enable Google Cloud SQL Proxy
-      settings:
-        default: false
   - name: cloud_sql_contents
     show_if: cloudsql.enabled
     contents:
-    - type: string-input
+    - type: input
       label: Instance Connection Name
       variable: cloudsql.connectionName
-      placeholder: "ex: project-123:us-east1:pachyderm"
-    - type: number-input
+      placeholder: 'ex: project-123:us-east1:pachyderm'
+      settings:
+        type: string
+    - type: input
       label: DB Port
       variable: cloudsql.dbPort
-      placeholder: "ex: 5432"
+      placeholder: 'ex: 5432'
       settings:
-        default: 5432
-    - type: string-input
+        type: number
+    - type: input
       label: Service Account JSON
       variable: cloudsql.serviceAccountJSON
-      placeholder: "ex: { <SERVICE_ACCOUNT_JSON> }"
+      placeholder: 'ex: { <SERVICE_ACCOUNT_JSON> }'
+      settings:
+        type: string

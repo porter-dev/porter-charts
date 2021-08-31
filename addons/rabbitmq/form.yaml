@@ -4,32 +4,35 @@ tabs:
   label: Info
   sections:
   - name: section_one
-    contents: 
+    contents:
     - type: heading
-      label: "Important Note: Internal Traffic Only"
+      label: 'Important Note: Internal Traffic Only'
     - type: subtitle
-      label: "This instance of RabbitMQ is only exposed to internal traffic and can only be reached from other services running on Porter. A connection string for this database will be shown after the template is deployed."
+      label: This instance of RabbitMQ is only exposed to internal traffic and can
+        only be reached from other services running on Porter. A connection string
+        for this database will be shown after the template is deployed.
     - type: heading
       label: RabbitMQ version
     - type: subtitle
-      label: Set the RabbitMQ version you would like to use. You may choose any tag from the bitnami/rabbitmq docker image.
-    - type: string-input
+      label: Set the RabbitMQ version you would like to use. You may choose any tag
+        from the bitnami/rabbitmq docker image.
+    - type: input
       label: Image Tag
       variable: image.tag
       settings:
-        default: 3.8.9-debian-10-r37        
+        type: string
     - type: heading
       label: Authentication
-    - type: string-input
+    - type: input
       label: Username
       variable: auth.username
       settings:
-        default: username
-    - type: string-input
+        type: string
+    - type: input
       label: Password
       variable: auth.password
       settings:
-        default: password
+        type: string
 - name: resources
   label: Resources
   sections:
@@ -39,23 +42,23 @@ tabs:
       label: Resources
     - type: subtitle
       label: Configure resources assigned to this RabbitMQ instance.
-    - type: number-input
+    - type: input
       label: Number of Replicas
       variable: replicaCount
       settings:
-        default: 1
-    - type: number-input
+        type: number
+    - type: input
       label: RAM
       variable: resources.requests.memory
       settings:
         unit: Mi
-        default: 1024
-    - type: number-input
+        type: number
+    - type: input
       label: CPU
       variable: resources.requests.cpu
       settings:
         unit: m
-        default: 1000
+        type: number
   - name: persistence_enabled
     contents:
     - type: checkbox
@@ -64,9 +67,9 @@ tabs:
   - name: persistence
     show_if: persistence.enabled
     contents:
-    - type: number-input
+    - type: input
       label: Persistent Disk Size
       variable: persistence.size
       settings:
         unit: Gi
-        default: 8
+        type: number
