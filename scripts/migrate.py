@@ -46,7 +46,6 @@ def fix_field(c):
             c['settings'] = {}
         c['settings']['type'] = 'env'
     
-    print(c)
     return c
 
 def migrate(path):
@@ -59,6 +58,12 @@ def migrate(path):
     ruamel.yaml.round_trip_dump(form, open(f"{path}/form.yaml", "w+"), indent=indent,
                             block_seq_indent=block_seq_indent)
 
+
+
 migrate("applications/web")
-DIRS = ['applications/']
+DIRS = ['applications/', 'addons/']
+for d in DIRS:
+    for i in os.listdir(d):
+        migrate(d + i)
+        print(d + i)
 
