@@ -17,14 +17,14 @@ tabs:
       label: Credentials
     - type: checkbox
       label: Use Password
-      variable: usePassword
+      variable: auth.enabled
   - name: password
-    show_if: usePassword
+    show_if: auth.enabled
     contents:
     - type: input
       label: Password
-      variable: password
       required: true
+      variable: auth.password
       settings:
         type: string
 - name: resources
@@ -38,13 +38,13 @@ tabs:
       label: Configure resources assigned to this Redis instance.
     - type: input
       label: RAM
-      variable: resources.requests.memory
+      variable: master.resources.requests.memory
       settings:
         unit: Mi
         type: number
     - type: input
       label: CPU
-      variable: resources.requests.cpu
+      variable: master.resources.requests.cpu
       settings:
         unit: m
         type: number
