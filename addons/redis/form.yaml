@@ -36,13 +36,11 @@ tabs:
       variable: master.resources.requests.memory
       settings:
         unit: Mi
-        default: 256
     - type: number-input
       label: CPU
       variable: master.resources.requests.cpu
       settings:
         unit: m
-        default: 100
     sections:
     - name: persistence
       contents:
