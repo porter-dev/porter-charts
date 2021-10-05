@@ -166,7 +166,11 @@ spec:
         {{ if .Values.pvc.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-storage"
           persistentVolumeClaim:
+        {{ if (not eq .Values.pvc.existingVolume "")}}
+            claimName: {{ .Values.pvc.existingVolume }}
+        {{ else }}
             claimName: "{{ include "docker-template.fullname" . }}-pvc"
+        {{ end }}
         {{ end }}
       {{ end }}
 {{- end }}
