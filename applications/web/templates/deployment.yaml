@@ -65,6 +65,10 @@ spec:
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           {{ end }}
+          {{ if and (not .Values.health.enabled) (.Values.livenessProbe) }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          {{ end }}
           {{ if .Values.health.enabled }}
           livenessProbe:
             httpGet:
