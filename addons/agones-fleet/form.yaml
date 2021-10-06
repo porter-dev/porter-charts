@@ -4,8 +4,10 @@ tabs:
   label: Main
   sections:
   - name: section_one
-    contents: 
+    contents:
     - type: heading
       label: Agones Fleet
     - type: subtitle
-      label: This chart launches an Agones Fleet that can be used to spawn pre-warmed game servers. Agones is an open source, batteries-included, multiplayer dedicated game server that runs on Kubernetes.
+      label: This chart launches an Agones Fleet that can be used to spawn pre-warmed
+        game servers. Agones is an open source, batteries-included, multiplayer dedicated
+        game server that runs on Kubernetes.

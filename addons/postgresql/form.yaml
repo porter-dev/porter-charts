@@ -4,27 +4,29 @@ tabs:
   label: Credentials
   sections:
   - name: section_one
-    contents: 
+    contents:
     - type: heading
-      label: "Important Note: Internal Traffic Only"
+      label: 'Important Note: Internal Traffic Only'
     - type: subtitle
-      label: "This instance of PostgreSQL is only exposed to internal traffic and can only be reached from other services running on Porter. A connection string for this database will be shown after the template is deployed."
+      label: This instance of PostgreSQL is only exposed to internal traffic and can
+        only be reached from other services running on Porter. A connection string
+        for this database will be shown after the template is deployed.
   - name: credentials
     contents:
     - type: heading
       label: Credentials
-    - type: string-input
+    - type: input
       variable: postgresqlUsername
       required: true
       label: Username
       settings:
-        default: postgres
-    - type: string-input
+        type: string
+    - type: input
       variable: postgresqlPassword
       label: Password (default = postgres)
       required: true
       settings:
-        default: postgres
+        type: string
 - name: resources
   label: Resources
   sections:
@@ -34,24 +36,24 @@ tabs:
       label: Resources
     - type: subtitle
       label: Configure resources assigned to this container.
-    - type: number-input
+    - type: input
       label: RAM
       variable: resources.requests.memory
       settings:
         unit: Mi
-        default: 256
-    - type: number-input
+        type: number
+    - type: input
       label: CPU
       variable: resources.requests.cpu
       settings:
         unit: m
-        default: 250
-    - type: number-input
+        type: number
+    - type: input
       label: Storage Size
       variable: persistence.size
       settings:
         unit: Gi
-        default: 8
+        type: number
 - name: advanced
   label: Advanced
   sections:
@@ -60,9 +62,10 @@ tabs:
     - type: heading
       label: PostgreSQL version
     - type: subtitle
-      label: Specify a version of PostgreSQL you'd like to use. Check Docker Hub for the image tags of supported versions.
-    - type: string-input
+      label: Specify a version of PostgreSQL you'd like to use. Check Docker Hub for
+        the image tags of supported versions.
+    - type: input
       label: Version tag
       variable: image.tag
       settings:
-        default: 11.10.0-debian-10-r21
+        type: string
