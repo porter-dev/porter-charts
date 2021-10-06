@@ -61,6 +61,10 @@ spec:
             - name: http
               containerPort: {{ .Values.container.port }}
               protocol: TCP
+          {{ if and (not .Values.health.enabled) (.Values.readinessProbe) }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          {{ end }}
           {{ if .Values.health.enabled }}
           livenessProbe:
             httpGet:

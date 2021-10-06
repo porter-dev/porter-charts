@@ -4,23 +4,23 @@ tabs:
   label: Config
   sections:
   - name: section_one
-    contents: 
+    contents:
     - type: heading
       label: Root Settings
-    - type: base-64-password
+    - type: input
       variable: auth.password
       label: Password (default = mysqlftw)
       required: true
       settings:
-        default: bXlzcWxmdHc=
+        type: password
   - name: resource
     contents:
     - type: heading
       label: Resource Allocation
-    - type: number-input
+    - type: input
       variable: resources.storage
       required: true
       label: Storage (Gi)
       settings:
-        default: 1
         unit: Gi
+        type: number

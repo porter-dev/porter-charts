@@ -76,6 +76,7 @@ pvc:
   existingVolume: ""
   storage: 20Gi
   mountPath: /mypath
+  existingVolume: ""
 
 cloudsql:
   enabled: false

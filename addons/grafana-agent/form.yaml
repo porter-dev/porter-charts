@@ -9,22 +9,28 @@ tabs:
             label: Prometheus Remote Write Configuration
       - name: remote_write_url
         contents:
-          - type: string-input
+          - type: input
             label: URL
             required: true
-            placeholder: "e.g. https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push"
+            placeholder: e.g. https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push
             variable: prometheus_remote_write.url
+            settings:
+                type: string
       - name: remote_write_username
         contents:
-          - type: string-input
+          - type: input
             label: Username / Instance ID
             required: true
-            placeholder: "Your Grafana Cloud Prometheus username"
+            placeholder: Your Grafana Cloud Prometheus username
             variable: prometheus_remote_write.basic_auth.username
+            settings:
+                type: string
       - name: remote_write_password
         contents:
-          - type: string-input-password
+          - type: input
             label: Password / API Key
             required: true
-            placeholder: "Your Grafana Cloud API Key"
+            placeholder: Your Grafana Cloud API Key
             variable: prometheus_remote_write.basic_auth.password
+            settings:
+                type: password

@@ -1,0 +1,16 @@
+agent:
+  image: ""
+  porterHost: "dashboard.getporter.dev"
+  porterPort: "80"
+  porterToken: ""
+  privateRegistry:
+    enabled: true
+    url: ""
+  clusterID: ""
+  projectID: ""
+
+redis:
+  fullnameOverride: porter-redis
+  architecture: standalone
+  auth:
+    enabled: false
