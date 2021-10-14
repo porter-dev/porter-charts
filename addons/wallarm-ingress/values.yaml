@@ -83,21 +83,21 @@ controller:
   ##
   scope:
     enabled: false
-    namespace: ""   # defaults to .Release.Namespace
+    namespace: "" # defaults to .Release.Namespace
 
   ## Allows customization of the configmap / nginx-configmap namespace
   ##
-  configMapNamespace: ""   # defaults to .Release.Namespace
+  configMapNamespace: "" # defaults to .Release.Namespace
 
   ## Allows customization of the tcp-services-configmap namespace
   ##
   tcp:
-    configMapNamespace: ""   # defaults to .Release.Namespace
+    configMapNamespace: "" # defaults to .Release.Namespace
 
   ## Allows customization of the udp-services-configmap namespace
   ##
   udp:
-    configMapNamespace: ""   # defaults to .Release.Namespace
+    configMapNamespace: "" # defaults to .Release.Namespace
 
   ## Additional command line arguments to pass to nginx-ingress-controller
   ## E.g. to specify the default SSL certificate you can use
@@ -129,7 +129,6 @@ controller:
   ##
   minReadySeconds: 0
 
-
   ## Node tolerations for server scheduling to nodes with taints
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
@@ -142,19 +141,16 @@ controller:
   ## Affinity and anti-affinity
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   ##
-  affinity: {}
-    # # An example of preferred pod anti-affinity, weight is in the range 1-100
-    # podAntiAffinity:
-    #   preferredDuringSchedulingIgnoredDuringExecution:
-    #   - weight: 100
-    #     podAffinityTerm:
-    #       labelSelector:
-    #         matchExpressions:
-    #         - key: app
-    #           operator: In
-    #           values:
-    #           - nginx-ingress
-    #       topologyKey: kubernetes.io/hostname
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+          matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - nginx-ingress
+      topologyKey: "kubernetes.io/hostname"
 
     # # An example of required pod anti-affinity
     # podAntiAffinity:
@@ -174,7 +170,9 @@ controller:
   ## Node labels for controller pod assignment
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
   ##
-  nodeSelector: {}
+  nodeSelector:
+    kubernetes.io/os: linux
+    porter.run/system: "true"
 
   ## Liveness and readiness probe values
   ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
@@ -198,7 +196,7 @@ controller:
   ##
   podAnnotations: {}
 
-  replicaCount: 1
+  replicaCount: 2
 
   minAvailable: 1
 
@@ -337,7 +335,9 @@ controller:
       ##
       priorityClassName: ""
       podAnnotations: {}
-      nodeSelector: {}
+      nodeSelector:
+        kubernetes.io/os: linux
+        porter.run/system: "true"
 
   stats:
     enabled: false
@@ -389,7 +389,8 @@ controller:
       enabled: false
       additionalLabels: {}
       namespace: ""
-      rules: []
+      rules:
+        []
         # # These are just examples rules, please adapt them to your needs
         # - alert: TooMany500s
         #   expr: 100 * ( sum( nginx_ingress_controller_requests{status=~"5.+"} ) / sum(nginx_ingress_controller_requests) ) > 5
@@ -407,7 +408,6 @@ controller:
         #   annotations:
         #     description: Too many 4XXs
         #     summary: More than 5% of the all requests did return 4XX, this require your attention
-
 
   lifecycle: {}
   priorityClassName: ""
@@ -488,7 +488,6 @@ revisionHistoryLimit: 10
 ## Default 404 backend
 ##
 defaultBackend:
-
   ## If false, controller.defaultBackendService must be provided
   ##
   enabled: true
@@ -504,7 +503,7 @@ defaultBackend:
   extraArgs: {}
 
   serviceAccount:
-#    create: true
+    #    create: true
     create: false
     name:
   ## Additional environment variables to set for defaultBackend pods
@@ -552,7 +551,8 @@ defaultBackend:
   ## Node labels for default backend pod assignment
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
   ##
-  nodeSelector: {}
+  nodeSelector:
+    porter.run/system: "true"
 
   ## Annotations to be added to default backend pods
   ##
