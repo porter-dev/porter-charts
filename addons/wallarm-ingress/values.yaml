@@ -5,7 +5,7 @@ controller:
   name: controller
   image:
     repository: wallarm/nginx-ingress-controller
-    tag: "2.18.1-6"
+    tag: "3.2.1-1"
     pullPolicy: IfNotPresent
     # www-data -> uid 33
     runAsUser: 33
@@ -143,14 +143,26 @@ controller:
   ##
   affinity:
     podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-          matchExpressions:
-            - key: app
-              operator: In
-              values:
-                - nginx-ingress
-      topologyKey: "kubernetes.io/hostname"
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+        matchExpressions:
+          - key: app
+            operator: In
+            values:
+              - nginx-ingress
+    topologyKey: "kubernetes.io/hostname"
+    # # An example of preferred pod anti-affinity, weight is in the range 1-100
+    # podAntiAffinity:
+    #   preferredDuringSchedulingIgnoredDuringExecution:
+    #   - weight: 100
+    #     podAffinityTerm:
+    #       labelSelector:
+    #         matchExpressions:
+    #         - key: app
+    #           operator: In
+    #           values:
+    #           - nginx-ingress
+    #       topologyKey: kubernetes.io/hostname
 
     # # An example of required pod anti-affinity
     # podAntiAffinity:
@@ -413,12 +425,12 @@ controller:
   priorityClassName: ""
 
   wallarm:
-    enabled: true
-    apiHost: us1.api.wallarm.com
+    enabled: false
+    apiHost: api.wallarm.com
     apiPort: 444
     apiSSL: true
     token: ""
-    fallback: "off"
+    fallback: "on"
     tarantool:
       kind: Deployment
       service:
@@ -450,10 +462,6 @@ controller:
       resources: {}
     exportenv:
       resources: {}
-    add-blacklist:
-      resources: {}
-    add-aclurl:
-      resources: {}
     metrics:
       enabled: false
 
@@ -478,7 +486,10 @@ controller:
     collectd:
       resources: {}
     acl:
-      enabled: false
+      resources: {}
+    mmdb:
+      resources: {}
+    wallarm-appstructure:
       resources: {}
 
 ## Rollback limit
