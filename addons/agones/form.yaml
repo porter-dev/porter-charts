@@ -4,11 +4,8 @@ tabs:
   label: Main
   sections:
   - name: section_one
-    contents:
+    contents: 
     - type: heading
       label: Agones System
     - type: subtitle
-      label: This chart enables Agones by installing the Agones system components
-        on your cluster. After installation, you can start deploying workloads using
-        the Agones Fleet template. Agones is an open source, batteries-included, multiplayer
-        dedicated game server that runs on Kubernetes.
+      label: This chart enables Agones by installing the Agones system components on your cluster. After installation, you can start deploying workloads using the Agones Fleet template. Agones is an open source, batteries-included, multiplayer dedicated game server that runs on Kubernetes.

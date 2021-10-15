@@ -8,37 +8,35 @@ tabs:
     - type: heading
       label: Network Settings
     - type: subtitle
-      label: For containers that you do not want to expose to external traffic (e.g.
-        databases and add-on's), you may make them accessible only to other internal
-        services running within the same cluster.
+      label: For containers that you do not want to expose to external traffic (e.g. databases and add-on's), you may make them accessible only to other internal services running within the same cluster. 
     - type: checkbox
       variable: ingress.enabled
       label: Expose to external traffic
+      settings:
+        default: false
   - name: domain_toggle
     show_if: ingress.enabled
     contents:
     - type: subtitle
-      label: Assign custom domain to your deployment. You must first create an A record
-        in your domain provider that points to your cluster load balancer's IP address
-        for this.
+      label: Assign custom domain to your deployment. You must first create an A record in your domain provider that points to your cluster load balancer's IP address for this.
     - type: checkbox
       variable: ingress.custom_domain
       label: Configure Custom Domain
-  - name: provider_domain_name
-    show_if: 
-        and:
-        - ingress.enabled
-        - ingress.custom_domain
+      settings:
+        default: false
+  - name: provider
+    show_if: ingress.custom_domain
     contents:
-    - type: input
+    - type: string-input
       variable: ingress.provider
       label: Provider Type (aws, gcp, or digitalocean)
-      required: true
       settings:
-        type: string
+        default: aws   
+  - name: domain_name
+    show_if: ingress.custom_domain
+    contents:
     - type: array-input
       variable: ingress.hosts
-      required: true
       label: Domain Name
 - name: resources
   label: Computing resources
@@ -49,15 +47,15 @@ tabs:
       label: Resources
     - type: subtitle
       label: Configure resources assigned to this container.
-    - type: input
+    - type: number-input
       label: RAM
       variable: resources.requests.memory
       settings:
         unit: Mi
-        type: number
-    - type: input
+        default: 256
+    - type: number-input
       label: CPU
       variable: resources.requests.cpu
       settings:
         unit: m
-        type: number
+        default: 100

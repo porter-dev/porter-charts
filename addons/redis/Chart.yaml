@@ -1,19 +1,13 @@
 annotations:
   category: Database
 apiVersion: v2
-appVersion: 6.2.5
-dependencies:
-  - name: common
-    repository: https://charts.bitnami.com/bitnami
-    tags:
-      - bitnami-common
-    version: 1.x.x
+appVersion: 6.0.9
 description: Open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
-engine: gotpl
 home: https://github.com/bitnami/charts/tree/master/bitnami/redis
-icon: https://bitnami.com/assets/stacks/redis/img/redis-stack-220x234.png
+icon: https://cdn4.iconfinder.com/data/icons/redis-2/1451/Untitled-2-512.png
 keywords:
   - redis
+  - cache
   - keyvalue
   - database
 maintainers:
@@ -25,4 +19,4 @@ name: redis
 sources:
   - https://github.com/bitnami/bitnami-docker-redis
   - http://redis.io/
-version: 0.4.0
+version: 0.2.0
