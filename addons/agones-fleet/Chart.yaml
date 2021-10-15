@@ -15,4 +15,4 @@ maintainers:
 name: agones
 sources:
   - https://github.com/googleforgames/agones
-version: 0.3.0
+version: 0.5.0
