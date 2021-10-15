@@ -143,13 +143,13 @@ controller:
   ##
   affinity:
     podAntiAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-        matchExpressions:
-          - key: app
-            operator: In
-            values:
-              - nginx-ingress
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+          matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - nginx-ingress
       topologyKey: "kubernetes.io/hostname"
     # # An example of preferred pod anti-affinity, weight is in the range 1-100
     # podAntiAffinity:
