@@ -2,31 +2,39 @@
   "$schema": "http://json-schema.org/schema#",
   "type": "object",
   "properties": {
-    "architecture": {
-      "type": "string",
-      "title": "Redis architecture",
-      "form": true,
-      "description": "Allowed values: `standalone` or `replication`",
-      "enum": ["standalone", "replication"]
+    "usePassword": {
+      "type": "boolean",
+      "title": "Use password authentication",
+      "form": true
     },
-    "auth": {
+    "password": {
+      "type": "string",
+      "title": "Password",
+      "form": true,
+      "description": "Defaults to a random 10-character alphanumeric string if not set",
+      "hidden": {
+        "value": false,
+        "path": "usePassword"
+      }
+    },
+    "cluster": {
       "type": "object",
-      "title": "Authentication configuration",
+      "title": "Cluster Settings",
       "form": true,
       "properties": {
         "enabled": {
           "type": "boolean",
           "form": true,
-          "title": "Use password authentication"
+          "title": "Enable master-slave",
+          "description": "Enable master-slave architecture"
         },
-        "password": {
-          "type": "string",
-          "title": "Redis password",
+        "slaveCount": {
+          "type": "integer",
+          "title": "Slave Replicas",
           "form": true,
-          "description": "Defaults to a random 10-character alphanumeric string if not set",
           "hidden": {
             "value": false,
-            "path": "auth/enabled"
+            "path": "cluster/enabled"
           }
         }
       }
@@ -59,28 +67,31 @@
                 "value": false,
                 "path": "master/persistence/enabled"
               }
+            },
+            "matchLabels": {
+              "type": "object",
+              "title": "Persistent Match Labels Selector"
+            },
+            "matchExpressions": {
+              "type": "object",
+              "title": "Persistent Match Expressions Selector"
             }
           }
         }
       }
     },
-    "replica": {
+    "slave": {
       "type": "object",
-      "title": "Redis replicas settings",
+      "title": "Slave replicas settings",
       "form": true,
       "hidden": {
-        "value": "standalone",
-        "path": "architecture"
+        "value": false,
+        "path": "cluster/enabled"
       },
       "properties": {
-        "replicaCount": {
-          "type": "integer",
-          "form": true,
-          "title": "Number of Redis replicas"
-        },
         "persistence": {
           "type": "object",
-          "title": "Persistence for Redis replicas",
+          "title": "Persistence for slave replicas",
           "form": true,
           "properties": {
             "enabled": {
@@ -99,8 +110,16 @@
               "sliderUnit": "Gi",
               "hidden": {
                 "value": false,
-                "path": "replica/persistence/enabled"
+                "path": "slave/persistence/enabled"
               }
+            },
+            "matchLabels": {
+              "type": "object",
+              "title": "Persistent Match Labels Selector"
+            },
+            "matchExpressions": {
+              "type": "object",
+              "title": "Persistent Match Expressions Selector"
             }
           }
         }

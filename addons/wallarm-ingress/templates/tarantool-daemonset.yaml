@@ -28,12 +28,12 @@ spec:
       {{- end }}
       initContainers:
 {{ include "nginx-ingress.wallarmInitContainer" . | indent 8 }}
-{{ include "nginx-ingress.wallarmExportEnvInitContainer" . | indent 8 }}
       containers:
+{{ include "nginx-ingress.wallarmExportEnvContainer" . | indent 8 }}
         - name: tarantool
           image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
           imagePullPolicy: "{{ .Values.controller.image.pullPolicy }}"
-          args: ["/usr/bin/tarantool", "/usr/share/wallarm-tarantool/init.lua"]
+          args: ["/usr/bin/wtarantool", "/usr/share/wallarm-tarantool/init.lua"]
           env:
             - name: LOGFILE
               value: /dev/stdout
@@ -68,6 +68,14 @@ spec:
           env:
           - name: WALLARM_API_HOST
             value: {{ .Values.controller.wallarm.apiHost | default "api.wallarm.com" }}
+          - name: WALLARM_API_PORT
+            value: {{ .Values.controller.wallarm.apiPort | default "444" | quote }}
+          - name: WALLARM_API_USE_SSL
+            {{- if or (.Values.controller.wallarm.apiSSL) (eq (.Values.controller.wallarm.apiSSL | toString) "<nil>") }}
+            value: "true"
+            {{- else }}
+            value: "false"
+            {{- end }}
           - name: WALLARM_API_TOKEN
             valueFrom:
               secretKeyRef:
@@ -120,30 +128,6 @@ spec:
             name: wallarm
           resources:
 {{ toYaml (index .Values "controller" "wallarm" "export-counters" "resources") | indent 12 }}
-        - name: export-clusterization-data
-          image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
-          command: ["sh", "-c", "while true; do timeout -k 15s 11m /usr/share/wallarm-common/export-clusterization-data -l STDOUT || true; sleep 60; done"]
-          {{- if .Values.podSecurityPolicy.enabled }}
-          securityContext:
-            runAsUser: {{ .Values.controller.image.runAsUser | default 65534 }}
-          {{- end }}
-          volumeMounts:
-          - mountPath: /etc/wallarm
-            name: wallarm
-          resources:
-{{ toYaml (index .Values "controller" "wallarm" "export-clusterization-data" "resources") | indent 12 }}
-        - name: sync-brute-clusters
-          image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
-          command: ["sh", "-c", "while true; do timeout -k 15s 11m /usr/share/wallarm-common/sync-brute-clusters -l STDOUT || true; sleep 60; done"]
-          {{- if .Values.podSecurityPolicy.enabled }}
-          securityContext:
-            runAsUser: {{ .Values.controller.image.runAsUser | default 65534 }}
-          {{- end }}
-          volumeMounts:
-          - mountPath: /etc/wallarm
-            name: wallarm
-          resources:
-{{ toYaml (index .Values "controller" "wallarm" "sync-brute-clusters" "resources") | indent 12 }}
         - name: brute-detect
           image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
           command: ["sh", "-c", "while true; do timeout -k 15s 6m /usr/share/wallarm-common/brute-detect -l STDOUT || true; sleep 60; done"]
@@ -156,6 +140,18 @@ spec:
             name: wallarm
           resources:
 {{ toYaml (index .Values "controller" "wallarm" "brute-detect" "resources") | indent 12 }}
+        - name: wallarm-appstructure
+          image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
+          command: ["/usr/bin/wallarm-appstructure-client", "--config-file", "/etc/wallarm/node.yaml"]
+          volumeMounts:
+          - mountPath: /etc/wallarm
+            name: wallarm
+          {{- if .Values.podSecurityPolicy.enabled }}
+          securityContext:
+            runAsUser: {{ .Values.controller.image.runAsUser | default 65534 }}
+          {{- end }}
+          resources:
+{{ toYaml (index .Values "controller" "wallarm" "wallarm-appstructure" "resources") | indent 12 }}
     {{- if .Values.controller.wallarm.tarantool.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.controller.wallarm.tarantool.nodeSelector | indent 8 }}

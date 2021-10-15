@@ -2,56 +2,55 @@
 kind: NetworkPolicy
 apiVersion: {{ template "networkPolicy.apiVersion" . }}
 metadata:
-  name: {{ template "common.names.fullname" . }}
+  name: {{ template "redis.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
-    {{- end }}
-  {{- if .Values.commonAnnotations }}
-  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
-  {{- end }}
+  labels:
+    app: {{ template "redis.name" . }}
+    chart: {{ template "redis.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   podSelector:
-    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+    matchLabels:
+      app: {{ template "redis.name" . }}
+      release: {{ .Release.Name }}
+  {{- if .Values.cluster.enabled }}
   policyTypes:
     - Ingress
-  {{- if or (eq .Values.architecture "replication") .Values.networkPolicy.extraEgress }}
     - Egress
   egress:
-    {{- if eq .Values.architecture "replication" }}
     # Allow dns resolution
     - ports:
         - port: 53
           protocol: UDP
     # Allow outbound connections to other cluster pods
     - ports:
-        - port: {{ .Values.master.containerPort }}
+        - port: {{ .Values.redisPort }}
         {{- if .Values.sentinel.enabled }}
-        - port: {{ .Values.sentinel.containerPort }}
+        - port: {{ .Values.sentinel.port }}
         {{- end }}
       to:
         - podSelector:
-            matchLabels: {{- include "common.labels.matchLabels" . | nindent 14 }}
-    {{- end }}
-    {{- if .Values.networkPolicy.extraEgress }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.networkPolicy.extraEgress "context" $ ) | nindent 4 }}
-    {{- end }}
+            matchLabels:
+              app: {{ template "redis.name" . }}
+              release: {{ .Release.Name }}
   {{- end }}
   ingress:
     # Allow inbound connections
     - ports:
-        - port: {{ .Values.master.containerPort }}
+        - port: {{ .Values.redisPort }}
         {{- if .Values.sentinel.enabled }}
-        - port: {{ .Values.sentinel.containerPort }}
+        - port: {{ .Values.sentinel.port }}
         {{- end }}
       {{- if not .Values.networkPolicy.allowExternal }}
       from:
         - podSelector:
             matchLabels:
-              {{ template "common.names.fullname" . }}-client: "true"
+              {{ template "redis.fullname" . }}-client: "true"
         - podSelector:
-            matchLabels: {{- include "common.labels.matchLabels" . | nindent 14 }}
+            matchLabels:
+              app: {{ template "redis.name" . }}
+              release: {{ .Release.Name }}
         {{- if .Values.networkPolicy.ingressNSMatchLabels }}
         - namespaceSelector:
             matchLabels:
@@ -66,13 +65,10 @@ spec:
               {{- end }}
           {{- end }}
         {{- end }}
-      {{- end }}
+        {{- end }}
     {{- if .Values.metrics.enabled }}
     # Allow prometheus scrapes for metrics
     - ports:
         - port: 9121
-    {{- end }}
-    {{- if .Values.networkPolicy.extraIngress }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.networkPolicy.extraIngress "context" $ ) | nindent 4 }}
     {{- end }}
 {{- end }}

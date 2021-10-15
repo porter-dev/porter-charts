@@ -83,9 +83,9 @@ Create the name of the service account to use
   - sh
   - -c
 {{- if eq .Values.controller.wallarm.fallback "on"}}
-{{ print  "- /usr/share/wallarm-common/synccloud --one-time && chmod 0644 /etc/wallarm/* || true" | indent 2}}
+{{ print  "- /usr/share/wallarm-common/synccloud --one-time && /usr/share/wallarm-common/sync-ip-lists --one-time -l STDOUT && /usr/share/wallarm-common/sync-ip-lists-source --one-time -l STDOUT && chmod 0644 /etc/wallarm/* || true" | indent 2}}
 {{- else }}
-{{ print  "- /usr/share/wallarm-common/synccloud --one-time && chmod 0644 /etc/wallarm/*" | indent 2}}
+{{ print  "- /usr/share/wallarm-common/synccloud --one-time && /usr/share/wallarm-common/sync-ip-lists --one-time -l STDOUT && /usr/share/wallarm-common/sync-ip-lists-source --one-time -l STDOUT && chmod 0644 /etc/wallarm/*" | indent 2}}
 {{- end}}
   env:
   - name: WALLARM_API_HOST
@@ -93,7 +93,11 @@ Create the name of the service account to use
   - name: WALLARM_API_PORT
     value: {{ .Values.controller.wallarm.apiPort | default "444" | quote }}
   - name: WALLARM_API_USE_SSL
-    value: {{ .Values.controller.wallarm.apiSSL | default "true" | quote }}
+    {{- if or (.Values.controller.wallarm.apiSSL) (eq (.Values.controller.wallarm.apiSSL | toString) "<nil>") }}
+    value: "true"
+    {{- else }}
+    value: "false"
+    {{- end }}
   - name: WALLARM_API_TOKEN
     valueFrom:
       secretKeyRef:
@@ -106,6 +110,8 @@ Create the name of the service account to use
   volumeMounts:
   - mountPath: /etc/wallarm
     name: wallarm
+  - mountPath: /var/lib/wallarm-acl
+    name: wallarm-acl
   securityContext:
     {{- if .Values.podSecurityPolicy.enabled }}
     runAsUser: {{ .Values.controller.image.runAsUser | default 65534 }}
@@ -116,18 +122,11 @@ Create the name of the service account to use
 {{ toYaml .Values.controller.wallarm.addnode.resources | indent 4 }}
 {{- end -}}
 
-{{- define "nginx-ingress.wallarmExportEnvInitContainer" -}}
+{{- define "nginx-ingress.wallarmExportEnvContainer" -}}
 - name: exportenv
   image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
   imagePullPolicy: "{{ .Values.controller.image.pullPolicy }}"
-  command:
-  - sh
-  - -c
-{{- if eq .Values.controller.wallarm.fallback "on"}}
-{{ print  "- cd /usr/share/wallarm-common/ && /usr/share/wallarm-common/export-environment -l /dev/stdout || true" | indent 2}}
-{{- else }}
-{{ print  "- cd /usr/share/wallarm-common/ && /usr/share/wallarm-common/export-environment -l /dev/stdout" | indent 2}}
-{{- end}}
+  command: ["sh", "-c", "while true; do timeout -k 15s 10m /usr/share/wallarm-common/export-environment -l STDOUT || true; sleep 3600; done"]
   volumeMounts:
   - mountPath: /etc/wallarm
     name: wallarm
@@ -139,49 +138,6 @@ Create the name of the service account to use
     {{- end }}
   resources:
 {{ toYaml .Values.controller.wallarm.exportenv.resources | indent 4 }}
-{{- end -}}
-
-{{- define "nginx-ingress.wallarmInitContainerAcl" -}}
-- name: add-aclurl
-  image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
-  imagePullPolicy: "{{ .Values.controller.image.pullPolicy }}"
-  command: ["/bin/sh", "-c"]
-  args: ["/usr/bin/printf 'sync_blacklist:\n    nginx_url: http://127.0.0.1:18080/wallarm-acl' >> /etc/wallarm/node.yaml"]
-  volumeMounts:
-  - mountPath: /etc/wallarm
-    name: wallarm
-  securityContext:
-    {{- if .Values.podSecurityPolicy.enabled }}
-    runAsUser: {{ .Values.controller.image.runAsUser | default 65534 }}
-    {{- else }}
-    runAsUser: 0
-    {{- end }}
-  resources:
-{{ toYaml (index .Values "controller" "wallarm" "add-aclurl" "resources") | indent 4 }}
-- name: add-blacklist
-  image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
-  imagePullPolicy: "{{ .Values.controller.image.pullPolicy }}"
-  command:
-  - sh
-  - -c
-{{- if eq .Values.controller.wallarm.fallback "on"}}
-{{ print  "- /usr/local/openresty/nginx/sbin/nginx -c /etc/nginx/nginx-blacklistonly.conf && /usr/share/wallarm-common/sync-blacklist --one-time -l STDOUT || true" | indent 2}}
-{{- else }}
-{{ print  "- /usr/local/openresty/nginx/sbin/nginx -c /etc/nginx/nginx-blacklistonly.conf && /usr/share/wallarm-common/sync-blacklist --one-time -l STDOUT" | indent 2}}
-{{- end}}
-  volumeMounts:
-  - mountPath: /etc/wallarm
-    name: wallarm
-  - mountPath: /usr/local/openresty/nginx/wallarm_acl_default
-    name: wallarm-acl
-  resources:
-{{ toYaml (index .Values "controller" "wallarm" "add-blacklist" "resources") | indent 4 }}
-  securityContext:
-    {{- if .Values.podSecurityPolicy.enabled }}
-    runAsUser: {{ .Values.controller.image.runAsUser | default 65534 }}
-    {{- else }}
-    runAsUser: 0
-    {{- end }}
 {{- end -}}
 
 {{- define "nginx-ingress.wallarmSyncnodeContainer" -}}
@@ -198,7 +154,11 @@ Create the name of the service account to use
   - name: WALLARM_API_PORT
     value: {{ .Values.controller.wallarm.apiPort | default "444" | quote }}
   - name: WALLARM_API_USE_SSL
-    value: {{ .Values.controller.wallarm.apiSSL | default "true" | quote }}
+    {{- if or (.Values.controller.wallarm.apiSSL) (eq (.Values.controller.wallarm.apiSSL | toString) "<nil>") }}
+    value: "true"
+    {{- else }}
+    value: "false"
+    {{- end }}
   - name: WALLARM_API_TOKEN
     valueFrom:
       secretKeyRef:
@@ -224,16 +184,32 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "nginx-ingress.wallarmSyncAclContainer" -}}
-- name: sync-blacklist
+- name: sync-ip-lists
   image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
-  command: ["sh", "-c", "while true; do timeout -k 15s 3h /usr/share/wallarm-common/sync-blacklist -l STDOUT || true; sleep 60; done"]
+  command: ["sh", "-c", "while true; do timeout -k 15s 3h /usr/share/wallarm-common/sync-ip-lists -l STDOUT || true; sleep 60; done"]
   volumeMounts:
   - mountPath: /etc/wallarm
     name: wallarm
-  - mountPath: /usr/local/openresty/nginx/wallarm_acl_default
+  - mountPath: /var/lib/wallarm-acl
     name: wallarm-acl
   resources:
 {{ toYaml .Values.controller.wallarm.acl.resources | indent 4 }}
+  securityContext:
+    {{- if .Values.podSecurityPolicy.enabled }}
+    runAsUser: {{ .Values.controller.image.runAsUser | default 65534 }}
+    {{- else }}
+    runAsUser: 0
+    {{- end }}
+- name: sync-ip-lists-source
+  image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
+  command: ["sh", "-c", "while true; do timeout -k 15s 3h /usr/share/wallarm-common/sync-ip-lists-source -l STDOUT || true; sleep 300; done"]
+  volumeMounts:
+  - mountPath: /etc/wallarm
+    name: wallarm
+  - mountPath: /var/lib/wallarm-acl
+    name: wallarm-acl
+  resources:
+{{ toYaml .Values.controller.wallarm.mmdb.resources | indent 4 }}
   securityContext:
     {{- if .Values.podSecurityPolicy.enabled }}
     runAsUser: {{ .Values.controller.image.runAsUser | default 65534 }}

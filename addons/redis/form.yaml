@@ -4,7 +4,7 @@ tabs:
   label: Info
   sections:
   - name: section_one
-    contents:
+    contents: 
     - type: heading
       label: "Important Note: Internal Traffic Only"
     - type: subtitle
@@ -15,13 +15,13 @@ tabs:
       label: Credentials
     - type: checkbox
       label: Use Password
-      variable: auth.enabled
+      variable: usePassword
   - name: password
-    show_if: auth.enabled
+    show_if: usePassword
     contents:
     - type: string-input
       label: Password
-      variable: auth.password
+      variable: password
 - name: resources
   label: Resources
   sections:
@@ -33,14 +33,16 @@ tabs:
       label: Configure resources assigned to this Redis instance.
     - type: number-input
       label: RAM
-      variable: master.resources.requests.memory
+      variable: resources.requests.memory
       settings:
         unit: Mi
+        default: 256
     - type: number-input
       label: CPU
-      variable: master.resources.requests.cpu
+      variable: resources.requests.cpu
       settings:
         unit: m
+        default: 100
     sections:
     - name: persistence
       contents:
