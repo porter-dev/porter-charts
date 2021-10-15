@@ -4,24 +4,29 @@ tabs:
   label: Info
   sections:
   - name: section_one
-    contents: 
+    contents:
     - type: heading
-      label: "Important Note: Internal Traffic Only"
+      label: 'Important Note: Internal Traffic Only'
     - type: subtitle
-      label: "This instance of Redis is only exposed to internal traffic and can only be reached from other services running on Porter. A connection string for this database will be shown after the template is deployed."
+      label: This instance of Redis is only exposed to internal traffic and can only
+        be reached from other services running on Porter. A connection string for
+        this database will be shown after the template is deployed.
   - name: enable_password
     contents:
     - type: heading
       label: Credentials
     - type: checkbox
       label: Use Password
-      variable: usePassword
+      variable: auth.enabled
   - name: password
-    show_if: usePassword
+    show_if: auth.enabled
     contents:
-    - type: string-input
+    - type: input
       label: Password
-      variable: password
+      required: true
+      variable: auth.password
+      settings:
+        type: string
 - name: resources
   label: Resources
   sections:
@@ -31,18 +36,18 @@ tabs:
       label: Resources
     - type: subtitle
       label: Configure resources assigned to this Redis instance.
-    - type: number-input
+    - type: input
       label: RAM
-      variable: resources.requests.memory
+      variable: master.resources.requests.memory
       settings:
         unit: Mi
-        default: 256
-    - type: number-input
+        type: number
+    - type: input
       label: CPU
-      variable: resources.requests.cpu
+      variable: master.resources.requests.cpu
       settings:
         unit: m
-        default: 100
+        type: number
     sections:
     - name: persistence
       contents:

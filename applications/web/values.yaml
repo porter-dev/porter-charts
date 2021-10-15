@@ -73,6 +73,7 @@ health:
 
 pvc:
   enabled: false
+  existingVolume: ""
   storage: 20Gi
   mountPath: /mypath
   existingVolume: ""
