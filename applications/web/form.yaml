@@ -45,8 +45,6 @@ tabs:
             label: Network Settings
           - type: subtitle
             label: For containers that you do not want to expose to external traffic (e.g. databases and add-ons), you may make them accessible only to other internal services running within the same cluster.
-          - type: subtitle
-            label: "Important: The HTTPS issuer must be installed for *.porter.run domains to work."
           - type: checkbox
             variable: ingress.enabled
             label: Expose to external traffic
