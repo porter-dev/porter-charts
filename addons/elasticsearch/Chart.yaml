@@ -9,4 +9,4 @@ maintainers:
 name: elasticsearch
 sources:
   - https://github.com/elastic/elasticsearch
-version: 0.6.0
+version: 0.5.0
