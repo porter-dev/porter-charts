@@ -17,7 +17,8 @@ controller:
     https: 443
 
   # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
-  config: {}
+  config:
+    use-proxy-protocol: "true"
 
   # Will add custom headers before sending traffic to backends according to https://github.com/kubernetes/ingress-nginx/tree/master/docs/examples/customization/custom-headers
   proxySetHeaders: {}
@@ -235,7 +236,8 @@ controller:
   service:
     enabled: true
 
-    annotations: {}
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
     labels: {}
     ## Deprecated, instead simply do not provide a clusterIP value
     omitClusterIP: false
