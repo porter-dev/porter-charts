@@ -4,15 +4,15 @@ tabs:
   label: Config
   sections:
   - name: section_one
-    contents:
+    contents: 
     - type: heading
       label: Admin Settings
-    - type: input
+    - type: string-input
       variable: auth.rootPassword
       label: Password
       required: true
       settings:
-        type: string
+        default: mongopassword
 - name: resource
   label: Resources
   sections:
@@ -20,16 +20,16 @@ tabs:
     contents:
     - type: heading
       label: Resource Allocation
-    - type: input
+    - type: number-input
       variable: replicaCount
       required: true
       label: Number of Replicasets
       settings:
-        type: number
-    - type: input
+        default: 2
+    - type: number-input
       variable: persistence.size
       required: true
       label: Storage (Gi)
       settings:
+        default: 8
         unit: Gi
-        type: number

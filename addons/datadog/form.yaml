@@ -8,43 +8,37 @@ tabs:
           - type: heading
             label: Deploy DataDog Agent
           - type: subtitle
-            label: This installs the DataDog agent, which forwards all logs from Porter
-                to DataDog for ingestion. It may take around 30 minutes for the logs
-                to arrive in your DataDog instance.
-          - type: input
+            label: This installs the DataDog agent, which forwards all logs from Porter to DataDog for ingestion. It may take around 30 minutes for the logs to arrive in your DataDog instance.
+          - type: string-input
             label: DataDog Site
             variable: datadog.site
             required: true
             settings:
-                type: string
-          - type: input
+              default: "datadoghq.com"
+          - type: string-input
             label: DataDog API Key
             variable: datadog.apiKey
             required: true
             settings:
-                type: string
+              default: ""
           - type: heading
             label: Logging
           - type: subtitle
-            label: Forward logs from all containers to DataDog. Be aware that this
-                may incur additional cost based on your retention settings.
+            label: Forward logs from all containers to DataDog. Be aware that this may incur additional cost based on your retention settings.
           - type: checkbox
             label: Enable Logging
             variable: datadog.logs.enabled
           - type: heading
             label: DogStatsD
           - type: subtitle
-            label: Gather custom application metrics with DogStatsD. This automatically
-                injects DD_AGENT_HOST as an environment variable to your pods to use
-                in the code.
+            label: Gather custom application metrics with DogStatsD. This automatically injects DD_AGENT_HOST as an environment variable to your pods to use in the code.
           - type: checkbox
             label: Enable DogStatsD
             variable: clusterAgent.admissionController.enabled
           - type: heading
             label: APM
           - type: subtitle
-            label: Use APM to trace your applications. This automatically injects
-                environment variables to be used by standard datadog tracing libraries.
+            label: Use APM to trace your applications. This automatically injects environment variables to be used by standard datadog tracing libraries.
           - type: checkbox
             label: Enable APM
             variable: datadog.apm.enabled
@@ -57,17 +51,17 @@ tabs:
             label: Resources
           - type: subtitle
             label: Configure resources assigned to the Datadog agent.
-          - type: input
+          - type: number-input
             label: Datadog agent RAM
             variable: agents.containers.agent.resources.requests.memory
-            placeholder: 'ex: 256'
+            placeholder: "ex: 256"
             settings:
-                unit: Mi
-                type: number
-          - type: input
+              unit: Mi
+              default: 256
+          - type: number-input
             label: Datadog agent CPU
             variable: agents.containers.agent.resources.requests.cpu
-            placeholder: 'ex: 100'
+            placeholder: "ex: 100"
             settings:
-                unit: m
-                type: number
+              unit: m
+              default: 100

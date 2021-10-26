@@ -1,20 +1,18 @@
 name: Wallarm
 tabs:
-- name: main
-  label: Main
-  sections:
-  - name: section_one
-    contents:
-    - type: heading
-      label: Wallarm Ingress Controller
-    - type: subtitle
-      label: Protect your APIs with Wallarm. This addon installs the Wallarm Ingress
-        Controller for Wallarm's US Cloud.
-    - type: input
-      label: Cloud WAF Token
-      variable: controller.wallarm.token
-      placeholder: YOUR_CLOUD_NODE_TOKEN
-      required: true
-      settings:
-        docs: https://docs.wallarm.com/admin-en/installation-kubernetes-en/
-        type: string
+  - name: main
+    label: Main
+    sections:
+      - name: section_one
+        contents:
+          - type: heading
+            label: Wallarm Ingress Controller
+          - type: subtitle
+            label: Protect your APIs with Wallarm. This addon installs the Wallarm Ingress Controller for Wallarm's US Cloud.
+          - type: string-input
+            label: Cloud WAF Token
+            variable: controller.wallarm.token
+            placeholder: YOUR_CLOUD_NODE_TOKEN
+            required: true
+            settings:
+              docs: https://docs.wallarm.com/admin-en/installation-kubernetes-en/

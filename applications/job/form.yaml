@@ -7,28 +7,26 @@ tabs:
   - name: pre
     contents:
     - type: variable
-      variable: showStartCommand
+      variable: showStartCommand 
       settings:
         default: true
     - type: variable
-      variable: showCronToggle
+      variable: showCronToggle 
       settings:
         default: true
   - name: section_one
     show_if: showStartCommand
-    contents:
+    contents: 
     - type: heading
       label: Container Settings
     - type: subtitle
       name: command_description
       label: Set the command to run as a job.
-    - type: input
+    - type: string-input
       label: Command
       variable: container.command
-      placeholder: 'ex: sh ./script.sh'
+      placeholder: "ex: sh ./script.sh"
       required: true
-      settings:
-        type: string
   - name: cron_toggle
     show_if: showCronToggle
     contents:
@@ -37,22 +35,30 @@ tabs:
     - type: checkbox
       variable: schedule.enabled
       label: Enable cron schedule
+      settings:
+        default: false
   - name: cron_job
     show_if: schedule.enabled
     contents:
     - type: heading
       label: Cron Job Schedule
     - type: subtitle
-      label: Run a job periodically on a schedule specified as a cron expression.
-        You can use https://crontab.guru/ to confirm your schedule. For example, */5
-        * * * * is every 5 minutes.
-    - type: input
+      label: Run a job periodically on a schedule specified as a cron expression. You can use https://crontab.guru/ to confirm your schedule. For example, */5 * * * * is every 5 minutes.
+    - type: string-input
       label: Schedule
       variable: schedule.value
-      placeholder: 'ex: */5 * * * *'
-      required: true
+      placeholder: "ex: */5 * * * *"
       settings:
-        type: string
+        default: "*/5 * * * *"
+  - name: env_vars
+    contents:
+    - type: heading
+      label: Environment Variables
+    - type: subtitle
+      label: Set environment variables for your secrets and environment-specific configuration.
+    - type: env-key-value-array
+      label: 
+      variable: container.env.normal
   - name: webhook
     contents:
     - type: heading
@@ -60,6 +66,8 @@ tabs:
     - type: checkbox
       variable: auto_deploy
       label: Auto-deploy when webhook is called.
+      settings:
+        default: true
 - name: resources
   label: Resources
   sections:
@@ -69,34 +77,20 @@ tabs:
       label: Resources
     - type: subtitle
       label: Configure resources assigned to this container.
-    - type: input
+    - type: number-input
       label: RAM
       variable: resources.requests.memory
-      placeholder: 'ex: 256'
+      placeholder: "ex: 256"
       settings:
         unit: Mi
-        type: number
-    - type: input
+        default: 256
+    - type: number-input
       label: CPU
       variable: resources.requests.cpu
-      placeholder: 'ex: 100'
+      placeholder: "ex: 100"
       settings:
         unit: m
-        type: number
-- name: env
-  label: Environment
-  sections:
-  - name: env_vars
-    contents:
-    - type: heading
-      label: Environment Variables
-    - type: subtitle
-      label: Set environment variables for your secrets and environment-specific configuration.
-    - type: key-value-array
-      label:
-      variable: container.env.normal
-      settings:
-        type: env
+        default: 100
 - name: advanced
   label: Advanced
   sections:
@@ -109,29 +103,30 @@ tabs:
     - type: checkbox
       variable: allowConcurrency
       label: Allow jobs to execute concurrently.
+      settings:
+        default: true
   - name: termination_grace_period
     contents:
     - type: heading
       label: Termination Settings
     - type: subtitle
       label: Specify how much time jobs have to gracefully shut down on SIGTERM.
-    - type: input
+    - type: number-input
       label: Termination Grace Period (seconds)
       variable: terminationGracePeriodSeconds
       settings:
-        type: number
+        default: 30
     - type: subtitle
       label: Specify whether SIGTERM should be propagated to child processes.
     - type: checkbox
       variable: sidecar.signalChildProcesses
       label: Propagate SIGTERM to child processes.
+      settings:
+        default: true
     - type: heading
       label: Image Settings
     - type: subtitle
-      label: To always pull the image with the specified tag even if the image has
-        been pulled in before (e.g. latest), set the pull policy to Always. Please
-        note that each image pull may incur additional cost based on the pricing of
-        your image registry.
+      label: To always pull the image with the specified tag even if the image has been pulled in before (e.g. latest), set the pull policy to Always. Please note that each image pull may incur additional cost based on the pricing of your image registry.
     - type: select
       label: Image Pull Policy
       variable: image.pullPolicy

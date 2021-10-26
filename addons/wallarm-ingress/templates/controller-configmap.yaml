@@ -12,7 +12,6 @@ data:
   enable-vts-status: "{{ .Values.controller.stats.enabled }}"
 {{- if .Values.controller.wallarm.enabled }}
   enable-wallarm: "{{ .Values.controller.wallarm.enabled }}"
-  enable-wallarm-acl: "{{ .Values.controller.wallarm.acl.enabled }}"
   wallarm-upstream-service: "{{ .Release.Namespace }}/{{ template "nginx-ingress.controller.fullname" . }}-wallarm-tarantool"
 {{- end }}
 {{- if .Values.controller.headers }}

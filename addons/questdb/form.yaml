@@ -1,0 +1,32 @@
+name: QuestDB
+tabs:
+- name: main
+  label: Info
+  sections:
+  - name: section_one
+    contents:
+    - type: number-input
+      label: "Web Console Port (default: 9000)"
+      variable: service.port
+      settings:
+        default: 9000
+    - type: heading
+      label: Postgres
+    - type: checkbox
+      label: Enable
+      variable: service.expose.postgresql.enabled
+    - type: number-input
+      label: "Port (default: 8812)"
+      variable: service.expose.postgresql.port
+      settings:
+        default: 8812
+    - type: heading
+      label: InfluxDB
+    - type: checkbox
+      label: Enable
+      variable: service.expose.influxdb.enabled
+    - type: number-input
+      label: "Port (default: 9009)"
+      variable: service.expose.influxdb.port
+      settings:
+        default: 8812

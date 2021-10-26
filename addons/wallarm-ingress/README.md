@@ -1,24 +1,47 @@
-# wallarm-ingress
+# Helm chart for Wallarm WAF Ingress controller
 
-[wallarm-ingress](https://github.com/wallarm/ingress) is the distribution of Wallarm Node based on the
-[community supported NGINX Ingress controller](https://github.com/kubernetes/ingress-nginx).
+This chart bootstraps [wallarm-ingress](https://github.com/wallarm/ingress) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
-Wallarm Ingress Controller allows you to use Wallarm Application Security Platform to protect web services
-that are running in the Kubernetes cluster.
+[Wallarm WAF Ingress controller (wallarm-ingress)](https://github.com/wallarm/ingress) is the distribution of the Wallarm WAF node based on the [community supported NGINX Ingress controller](https://github.com/kubernetes/ingress-nginx) version 0.26.2. Wallarm Ingress Controller allows you to use Wallarm WAF node to protect web services that are running in the Kubernetes cluster.
 
-To use, add the `kubernetes.io/ingress.class: nginx` annotation to your Ingress resources.
+## Requirements
 
-## TL;DR;
+* Kubernetes platform version 1.20 and lower
+* Helm package manager
 
-https://docs.wallarm.com/admin-en/installation-kubernetes-en/
+## Deployment
 
-## Introduction
+To deploy the Wallarm WAF Ingress controller with default `values.yaml`:
 
-This chart bootstraps an wallarm-ingress deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+1. Create the [WAF node with the **Cloud** type](https://docs.wallarm.com/user-guides/nodes/cloud-node/) in the Wallarm Console.
+2. Clone this repository by using the command:
 
-## Prerequisites
+    ```
+    git clone https://github.com/wallarm/ingress-chart --branch 2.18.1-7 --single-branch
+    ```
+3. Install the Wallarm WAF Ingress controller chart by using the command:
 
-  - Kubernetes 1.6+
+    ```
+    helm install --set controller.wallarm.enabled=true,controller.wallarm.token=<YOUR_CLOUD_NODE_TOKEN>,controller.wallarm.apiHost=api.wallarm.com <INGRESS_CONTROLLER_NAME> ingress-chart/wallarm-ingress -n <KUBERNETES_NAMESPACE>
+    ```
+  
+    * `<YOUR_CLOUD_NODE_TOKEN>` is the cloud WAF node token
+    * `<INGRESS_CONTROLLER_NAME>` is the name for the Wallarm Ingress controller
+    * `<KUBERNETES_NAMESPACE>` is the namespace of your Ingress
+    * `controller.wallarm.apiHost` can be `api.wallarm.com` for the EU Wallarm Cloud or `us1.api.wallarm.com` for the US Wallarm Cloud
+4. Enable traffic analysis by using the command:
+
+    ```
+    kubectl annotate ingress <YOUR_INGRESS_NAME> nginx.ingress.kubernetes.io/wallarm-mode=monitoring
+    ```
+
+Alternatively, you can provide a `values.yaml` file that specifies the values for the parameters while installing the chart. The set of `values.yaml` paramaters is described in the next section. For example:
+
+```
+helm install my-release wallarm/wallarm-ingress -f values.yaml
+```
+
+You will find more details on the Wallarm WAF Ingress controller deployment in our [official documentation](https://docs.wallarm.com/admin-en/installation-kubernetes-en/).
 
 ## Configuration
 
@@ -221,43 +244,13 @@ Parameter | Description | Default
 `tcp` | TCP service key:value pairs. The value is evaluated as a template. | `{}`
 `udp` | UDP service key:value pairs The value is evaluated as a template. | `{}`
 
+## Debuggging Inggress issues
 
-Usage example
-
-Helm v2
-
-```console
-$ helm install wallarm/wallarm-ingress --name my-release \
-    --set controller.wallarm.enabled=true
-```
-
-Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
-
-```console
-$ helm install wallarm/wallarm-ingress --name my-release -f values.yaml
-```
-
-Helm v3
-
-```console
-$ helm install wallarm/wallarm-ingress my-release \
-    --set controller.wallarm.enabled=true
+A useful trick to debug issues with ingress is to increase the logLevel as described [here](https://github.com/kubernetes/ingress-nginx/blob/master/docs/troubleshooting.md#debug)
 
 ```
-
-Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
-
-```console
-$ helm install my-release wallarm/wallarm-ingress -f values.yaml
+helm install wallarm/wallarm-ingress --set controller.extraArgs.v=2
 ```
-
-A useful trick to debug issues with ingress is to increase the logLevel
-as described [here](https://github.com/kubernetes/ingress-nginx/blob/master/docs/troubleshooting.md#debug)
-
-```console
-$ helm install wallarm/wallarm-ingress --set controller.extraArgs.v=2
-```
-> **Tip**: You can use the default [values.yaml](values.yaml)
 
 ## PodDisruptionBudget
 

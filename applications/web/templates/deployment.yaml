@@ -61,10 +61,6 @@ spec:
             - name: http
               containerPort: {{ .Values.container.port }}
               protocol: TCP
-          {{ if and (not .Values.health.enabled) (.Values.readinessProbe) }}
-          readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
-          {{ end }}
           {{ if .Values.health.enabled }}
           livenessProbe:
             httpGet:
@@ -169,11 +165,10 @@ spec:
         {{ end }}
         {{ if .Values.pvc.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-storage"
-        {{ if not (eq .Values.pvc.existingVolume "")}}
           persistentVolumeClaim:
+        {{ if not (eq .Values.pvc.existingVolume "")}}
             claimName: {{ .Values.pvc.existingVolume }}
         {{ else }}
-          persistentVolumeClaim:
             claimName: "{{ include "docker-template.fullname" . }}-pvc"
         {{ end }}
         {{ end }}
