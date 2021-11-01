@@ -33,6 +33,7 @@ spec:
         command:
         - /manager
         image: "{{ .Values.agent.image }}"
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: porter-agent-config
