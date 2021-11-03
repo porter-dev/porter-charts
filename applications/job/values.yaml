@@ -32,5 +32,11 @@ resources:
   
 paused: false
 
+cloudsql:
+  enabled: false
+  connectionName: ""
+  dbPort: 5432
+  serviceAccountJSON: ""
+
 sidecar:
   signalChildProcesses: true

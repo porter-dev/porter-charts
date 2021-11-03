@@ -81,4 +81,25 @@ data:
             - {{ .Values.terminationGracePeriodSeconds | quote }}
             {{- $cmdSpl := trim .Values.container.command | split " " }}
             - {{ $cmdSpl._0 | quote }}
+          {{- if .Values.cloudsql.enabled }}
+          - name: cloud-sql-proxy
+            image: gcr.io/cloudsql-docker/gce-proxy:1.17
+            command:
+              - "/cloud_sql_proxy"
+              - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
+              - "-credential_file=/secrets/service_account.json"
+            securityContext:
+              runAsNonRoot: true
+            volumeMounts:
+            - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+              mountPath: /secrets/
+              readOnly: true
+          {{ end }}
+          {{ if .Values.cloudsql.enabled }}
+          volumes:
+            - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+              secret:
+                secretName: "cloudsql-secret-{{ include "docker-template.fullname" . }}"
+          {{ end }}
+          
 {{- end }}
