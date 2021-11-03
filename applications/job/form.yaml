@@ -136,3 +136,32 @@ tabs:
           value: IfNotPresent
         - label: Always
           value: Always
+  - name: cloud_sql_toggle
+    show_if: currentCluster.service.is_gcp
+    contents:
+      - type: heading
+        label: Google Cloud SQL
+      - type: subtitle
+        label: Securely connect to Google Cloud SQL (GKE only).
+      - type: checkbox
+        variable: cloudsql.enabled
+        label: Enable Google Cloud SQL Proxy
+        settings:
+          default: false
+  - name: cloud_sql_contents
+    show_if: cloudsql.enabled
+    contents:
+      - type: string-input
+        label: Instance Connection Name
+        variable: cloudsql.connectionName
+        placeholder: "ex: project-123:us-east1:pachyderm"
+      - type: number-input
+        label: DB Port
+        variable: cloudsql.dbPort
+        placeholder: "ex: 5432"
+        settings:
+          default: 5432
+      - type: string-input
+        label: Service Account JSON
+        variable: cloudsql.serviceAccountJSON
+        placeholder: "ex: { <SERVICE_ACCOUNT_JSON> }"
