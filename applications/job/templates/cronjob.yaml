@@ -68,6 +68,9 @@ spec:
             - {{ .Values.terminationGracePeriodSeconds | quote }}
             {{- $cmdSpl := trim .Values.container.command | split " " }}
             - {{ $cmdSpl._0 | quote }}
+            {{- if .Values.cloudsql.enabled }}
+            - "cloud_sql_proxy"
+            {{- end }}
           {{- if .Values.cloudsql.enabled }}
           - name: cloud-sql-proxy
             image: gcr.io/cloudsql-docker/gce-proxy:1.17
