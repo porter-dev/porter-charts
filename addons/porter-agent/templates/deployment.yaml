@@ -43,6 +43,9 @@ spec:
             port: 8081
           initialDelaySeconds: 15
           periodSeconds: 20
+        ports:
+        - containerPort: 10001
+          name: http
         name: manager
         readinessProbe:
           httpGet:
