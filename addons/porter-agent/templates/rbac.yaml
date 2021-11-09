@@ -58,6 +58,19 @@ rules:
   - apiGroups:
       - ""
     resources:
+      - deployments
+      - replicasets
+      - statefulsets
+      - jobs
+      - daemonsets
+      - cronjobs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
       - pods/finalizers
     verbs:
       - update
