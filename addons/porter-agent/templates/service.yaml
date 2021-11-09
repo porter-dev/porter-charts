@@ -7,9 +7,23 @@ metadata:
   namespace: porter-agent-system
 spec:
   ports:
-  - name: https
-    port: 8443
-    targetPort: https
+    - name: https
+      port: 8443
+      targetPort: https
   selector:
     control-plane: controller-manager
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    control-plane: controller-manager
+  name: porter-agent-controller-manager
+  namespace: porter-agent-system
+spec:
+  ports:
+    - name: http
+      port: 10001
+      targetPort: http
+  selector:
+    control-plane: controller-manager
