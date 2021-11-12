@@ -67,6 +67,10 @@ tabs:
     contents:
     - type: heading
       label: Postgres Interface
+    - type: variable
+      variable: showPostgresSettings
+      settings:
+        default: true
   - name: postgres_interface
     contents:
     - type: checkbox
@@ -77,14 +81,14 @@ tabs:
   - name: postgres_settings
     contents:
     - type: string-input
-      show_if: service.expose.postgresql.enabled
+      show_if: showPostgresSettings
       label: Postgres database username
       variable: config.pg_user
       placeholder: "ex: admin"
       settings:
         default: admin
     - type: string-input
-      show_if: service.expose.postgresql.enabled
+      show_if: showPostgresSettings
       label: Postgres database password
       variable: config.pg_password
       placeholder: "ex: quest"
