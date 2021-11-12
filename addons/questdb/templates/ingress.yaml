@@ -22,15 +22,15 @@ spec:
   - http:
       paths:
       - path: /
-          pathType: Prefix
-          backend:
-            serviceName: {{ $fullName }}
-            servicePort: 9000
+        pathType: Prefix
+        backend:
+          serviceName: {{ $fullName }}
+          servicePort: 9000
       {{- if .Values.service.expose.healthcheck.enabled }}
       - path: /healthcheck
-          pathType: Exact
-          backend:
-            serviceName: {{ $fullName }}
-            servicePort: 9003
+        pathType: Exact
+        backend:
+          serviceName: {{ $fullName }}
+          servicePort: 9003
       {{- end }}
 {{- end  }}
