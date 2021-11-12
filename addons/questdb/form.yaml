@@ -94,6 +94,17 @@ tabs:
       placeholder: "ex: quest"
       settings:
         default: quest
+  - name: external_traffic_heading
+    contents:
+    - type: heading
+      label: External traffic
+  - name: external_traffic
+    contents:
+    - type: checkbox
+      label: Expose to external traffic
+      variable: ingress.enabled
+      settings:
+        default: false
   - name: telemetry_heading
     contents:
     - type: heading

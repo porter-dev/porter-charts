@@ -34,7 +34,7 @@ service:
       enabled: true
       port: 8812
     influxdb:
-      enabled: false
+      enabled: true
       port: 9009
     healthcheck:
       enabled: true
@@ -46,7 +46,7 @@ persistence:
   size: 50Gi
 
 ingress:
-  enabled: true
+  enabled: false
   annotations: {}
 
 resources: {}
