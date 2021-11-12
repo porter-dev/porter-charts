@@ -60,6 +60,9 @@ spec:
             - name: influxdb
               containerPort: 9009
               protocol: TCP
+            - name: healthcheck
+              containerPort: 9003
+              protocol: TCP
           # QuestDB doesn't really expose an endpoint that works well for
           # these probes. Hopefully soon?
           # livenessProbe:
@@ -71,7 +74,7 @@ spec:
           #     path: /
           #     port: http
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}       
+            {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -1,7 +1,7 @@
 image:
   repository: questdb/questdb
   pullPolicy: IfNotPresent
-  tag: 6.0.7.1
+  tag: 6.1.1
 
 imagePullSecrets: []
 nameOverride: ""
@@ -15,7 +15,15 @@ questdb:
   config:
     enabled: true
     options:
-       shared.worker.count: 2
+      http.enabled: false # Do not expose the Web Console
+
+config:
+  service_worker_count: 2
+  db_root: db
+  db_backup_root: backups
+  pg_user: admin
+  pg_password: quest
+  enable_telemetry: true
 
 service:
   annotations: {}
@@ -23,11 +31,14 @@ service:
   port: 9000
   expose:
     postgresql:
-      enabled: false
+      enabled: true
       port: 8812
     influxdb:
       enabled: false
       port: 9009
+    healthcheck:
+      enabled: true
+      port: 9003
 
 persistence:
   enabled: true
@@ -35,7 +46,7 @@ persistence:
   size: 50Gi
 
 ingress:
-  enabled: false
+  enabled: true
   annotations: {}
 
 resources: {}

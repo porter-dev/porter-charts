@@ -10,5 +10,8 @@ data:
     {{- range $key, $value := index .Values.questdb.config.options }}
     {{ $key }} = {{ $value }}
     {{ end }}
+    {{- range $key, $value := index .Values.config }}
+    {{ $key }} = {{ $value }}
+    {{ end }}
 
 {{ end }}
