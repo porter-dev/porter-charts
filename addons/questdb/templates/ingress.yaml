@@ -1,7 +1,7 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "questdb.fullname" . -}}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
 apiVersion: extensions/v1beta1
 {{- end }}
@@ -32,19 +32,15 @@ spec:
   - http:
       paths:
       - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ $fullName }}
-            port:
-              number: 9000
+          pathType: Prefix
+          backend:
+            serviceName: {{ $fullName }}
+            servicePort: 9000
       {{- if .Values.service.expose.healthcheck.enabled }}
       - path: /healthcheck
-        pathType: Exact
-        backend:
-          service:
-            name: {{ $fullName }}
-            port:
-              number: 9003
+          pathType: Exact
+          backend:
+            serviceName: {{ $fullName }}
+            servicePort: 9003
       {{- end }}
 {{- end  }}
