@@ -10,8 +10,13 @@ data:
     {{- range $key, $value := index .Values.questdb.config.options }}
     {{ $key }} = {{ $value }}
     {{ end }}
-    {{- range $key, $value := index .Values.config }}
-    {{ $key }} = {{ $value }}
-    {{ end }}
+    shared.worker.count = {{ .Values.config.service_worker_count }}
+    http.min.enabled = {{ .Values.service.expose.healthcheck.enabled }}
+    cairo.root = {{ .Values.config.db_root }}
+    cairo.sql.backup.root = {{ .Values.config.db_backup_root }}
+    pg.enabled = {{ .Values.service.expose.postgresql.enabled }}
+    pg.user = {{ .Values.config.pg_user }}
+    pg.password = {{ .Values.config.pg_password }}
+    telemetry.enabled = {{ .Values.config.enable_telemetry }}
 
 {{ end }}
