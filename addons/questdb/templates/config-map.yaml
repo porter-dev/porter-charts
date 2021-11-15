@@ -1,0 +1,22 @@
+{{- if .Values.questdb.config.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "questdb.fullname" . }}
+  labels:
+    {{- include "questdb.labels" . | nindent 4 }}
+data:
+  server.conf: |
+    {{- range $key, $value := index .Values.questdb.config.options }}
+    {{ $key }} = {{ $value }}
+    {{ end }}
+    shared.worker.count = {{ .Values.config.service_worker_count }}
+    http.min.enabled = {{ .Values.service.expose.healthcheck.enabled }}
+    cairo.root = {{ .Values.config.db_root }}
+    cairo.sql.backup.root = {{ .Values.config.db_backup_root }}
+    pg.enabled = {{ .Values.service.expose.postgresql.enabled }}
+    pg.user = {{ .Values.config.pg_user }}
+    pg.password = {{ .Values.config.pg_password }}
+    telemetry.enabled = {{ .Values.config.enable_telemetry }}
+
+{{ end }}
