@@ -1,6 +1,6 @@
 apiVersion: v2
 name: questdb
-version: 0.13.0
+version: 0.1.0
 appVersion: 6.1.1
 description: Run QuestDB on Kubernetes via Helm
 icon: https://questdb.io/img/favicon.png
@@ -14,8 +14,8 @@ keywords:
   - timeseries
   - sql
 maintainers:
-- email: containers@questdb.io
-  name: QuestDB Team
+  - email: containers@questdb.io
+    name: QuestDB Team
 
 # Chart.yaml reference:
 # https://helm.sh/docs/topics/charts/#the-chart-yaml-file
