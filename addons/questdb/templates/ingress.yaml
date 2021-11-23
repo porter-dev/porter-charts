@@ -1,6 +1,7 @@
 {{- if .Values.ingress.enabled -}}
 {{- if gt (len .Values.ingress.hosts) 0 -}}
 {{- $fullName := include "questdb.fullname" . -}}
+{{- $healthcheckEnabled := .Values.service.expose.healthcheck.enabled }}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
@@ -35,7 +36,7 @@ spec:
           backend:
             serviceName: {{ $fullName }}
             servicePort: 9000
-        {{- if .Values.service.expose.healthcheck.enabled }}
+        {{- if $healthcheckEnabled }}
         - path: /healthcheck
           pathType: Exact
           backend:
