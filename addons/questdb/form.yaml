@@ -67,10 +67,6 @@ tabs:
     contents:
     - type: heading
       label: Postgres Interface
-    - type: variable
-      variable: showPostgresSettings
-      settings:
-        default: true
   - name: postgres_interface
     contents:
     - type: checkbox
@@ -79,16 +75,15 @@ tabs:
       settings:
         default: true
   - name: postgres_settings
+    show_if: service.expose.postgresql.enabled
     contents:
     - type: string-input
-      show_if: showPostgresSettings
       label: Postgres database username
       variable: config.pg_user
       placeholder: "ex: admin"
       settings:
         default: admin
     - type: string-input
-      show_if: showPostgresSettings
       label: Postgres database password
       variable: config.pg_password
       placeholder: "ex: quest"
@@ -105,6 +100,14 @@ tabs:
       variable: ingress.enabled
       settings:
         default: false
+  - name: external_domain
+    show_if: ingress.enabled
+    contents:
+    - type: subtitle
+      label: Assign custom domain(s) to your QuestDB instance. You must first create an A record in your domain provider that points to your cluster load balancer's IP address for this.
+    - type: array-input
+      variable: ingress.hosts
+      label: Domain Name
   - name: telemetry_heading
     contents:
     - type: heading

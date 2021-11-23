@@ -47,6 +47,7 @@ persistence:
 
 ingress:
   enabled: false
+  hosts: []
   annotations: {}
 
 resources: {}
