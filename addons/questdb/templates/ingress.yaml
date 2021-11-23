@@ -1,4 +1,5 @@
 {{- if .Values.ingress.enabled -}}
+{{- if gt (len .Values.ingress.hosts) 0 -}}
 {{- $fullName := include "questdb.fullname" . -}}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
@@ -18,19 +19,29 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  tls:
+    - hosts:
+        {{- range .Values.ingress.hosts }}
+        - {{ . }}
+        {{- end }}
+      secretName: {{ $fullName }}
   rules:
-  - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          serviceName: {{ $fullName }}
-          servicePort: 9000
-      {{- if .Values.service.expose.healthcheck.enabled }}
-      - path: /healthcheck
-        pathType: Exact
-        backend:
-          serviceName: {{ $fullName }}
-          servicePort: 9003
-      {{- end }}
-{{- end  }}
+    {{- range .Values.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: {{ $fullName }}
+            servicePort: 9000
+        {{- if .Values.service.expose.healthcheck.enabled }}
+        - path: /healthcheck
+          pathType: Exact
+          backend:
+            serviceName: {{ $fullName }}
+            servicePort: 9003
+        {{- end }}
+    {{- end }}
+{{- end }}
+{{- end }}
