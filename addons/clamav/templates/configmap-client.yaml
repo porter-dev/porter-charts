@@ -15,7 +15,7 @@ data:
     LogTime yes
     PidFile /run/clamd.pid
     TCPSocket 3310
-    TCPAddr {{ include "clamav.fullname" . }}-server
+    TCPAddr {{ include "clamav.fullname" . }}-server.{{ .Release.Namespace }}.svc.cluster.local
     Foreground yes
     ExcludePath /host-fs/dev
     ExcludePath /host-fs/sys

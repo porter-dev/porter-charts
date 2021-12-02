@@ -1,0 +1,37 @@
+name: ClamAV
+hasSource: false
+includeHiddenFields: false
+tabs:
+- name: main
+  label: ClamAV Settings
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: Slack Webhook
+    - type: checkbox
+      variable: client.slack.enabled
+      label: Enable a Slack webhook for alerting
+      settings:
+        default: false
+  - name: webhook
+    show_if: client.slack.enabled
+    contents:
+    - type: string-input
+      label: (Required) Slack Webhook
+      placeholder: "https://<my-slack-webhook>"
+      required: true
+      variable: client.slack.webhook
+  - name: test
+    contents:
+    - type: heading
+      label: Test Mode
+    - type: subtitle
+      label: If running in test mode, a test will be run every 15 minutes which looks for an EICAR anti-virus signature. If you have Slack webhooks enabled, you should receive an alert for every node within 15 minutes of the test starting.
+    - type: checkbox
+      variable: client.test
+      label: Enable test mode
+      settings:
+        default: false
+    
+      

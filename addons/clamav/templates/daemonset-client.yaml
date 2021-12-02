@@ -24,6 +24,9 @@ spec:
       serviceAccountName: {{ include "clamav.client.serviceAccountName" . }}
       containers:
         - name: clamd
+          {{- if .Values.client.test }}
+          command: ["crond", "-f", "-d", "8", "-c", "/cron_test"]
+          {{- end }}
           securityContext:
             privileged: true
             capabilities:
@@ -36,6 +39,10 @@ spec:
           {{- if .Values.client.slack.enabled }}
           - name: SLACK_WEBHOOK
             value: {{ .Values.client.slack.webhook }}
+          {{- end }}
+          {{- if .Values.client.test }}
+          - name: CLAMAV_TEST
+            value: "true"
           {{- end }}
           volumeMounts:
           - name: data-vol

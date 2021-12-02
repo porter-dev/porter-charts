@@ -46,6 +46,9 @@ client:
   slack:
     enabled: false
     # webhook: <your-webhook>
+
+  # set test to true to run a test scan with EICAR signature
+  test: false
   resources:
     limits:
       memory: 200Mi
