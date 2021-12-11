@@ -31,6 +31,11 @@ spec:
           args: [ "while true; do sleep 30; done;" ]
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          {{- range $key, $val := .Values.container.env.normal }}
+            - name: {{ $key }}
+              value: {{ quote $val }}
+          {{- end }}  
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
