@@ -34,8 +34,7 @@ spec:
           env:
           {{- range $key, $val := .Values.container.env.normal }}
             - name: {{ $key }}
-            {{- $splVal := split "_" $val -}}
-            value: {{ quote $val }}
+              value: {{ quote $val }}
           {{- end }}  
       {{- with .Values.nodeSelector }}
       nodeSelector:
