@@ -1,6 +1,6 @@
 apiVersion: v2
 name: postgres-toolbox
-description: A Helm chart for Kubernetes
+description: A Helm chart for deploying a Pod with psql and some basic database+networking utilities preinstalled.
 
 # A chart can be either an 'application' or a 'library' chart.
 #
