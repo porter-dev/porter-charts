@@ -20,3 +20,15 @@ tabs:
       settings:
         unit: Mi
         default: 128
+- name: env
+  label: Environment
+  sections:
+  - name: env_vars
+    contents:
+    - type: heading
+      label: Environment Variables
+    - type: subtitle
+      label: Set environment variables for your secrets and environment-specific configuration.
+    - type: env-key-value-array
+      label: 
+      variable: container.env.normal
