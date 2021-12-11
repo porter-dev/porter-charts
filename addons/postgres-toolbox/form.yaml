@@ -1,0 +1,19 @@
+tabs:
+- name: main
+  label: Main Settings
+  sections:
+  - name: resource_settings
+    contents: 
+    - type: heading
+      label: Resource Limits
+    - type: subtitle
+      label: Set resource limits for the toolbox
+      variable: resources.limits.cpu
+      label: CPU
+      settings:
+        default: 100m
+    - type: number-input
+      variable: resources.limits.memory
+      label: Memory
+      settings:
+        default: 128Mi
