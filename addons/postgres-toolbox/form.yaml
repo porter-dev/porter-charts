@@ -8,12 +8,15 @@ tabs:
       label: Resource Limits
     - type: subtitle
       label: Set resource limits for the toolbox
+    - type: number-input
       variable: resources.limits.cpu
       label: CPU
       settings:
-        default: 100m
+        unit: m
+        default: 100
     - type: number-input
       variable: resources.limits.memory
       label: Memory
       settings:
-        default: 128Mi
+        unit: Mi
+        default: 128
