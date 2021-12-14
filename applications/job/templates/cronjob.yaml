@@ -54,6 +54,10 @@ spec:
           - name: sidecar
             image: public.ecr.aws/o1j4x7p4/job-sidecar:latest
             imagePullPolicy: Always
+            securityContext:
+              capabilities:
+                add:
+                - SYS_PTRACE
             resources:
               requests:
                 cpu: 10m
