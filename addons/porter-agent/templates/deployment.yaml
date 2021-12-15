@@ -54,12 +54,12 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
         resources:
-          limits:
-            cpu: 100m
-            memory: 30Mi
           requests:
-            cpu: 100m
-            memory: 20Mi
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
         securityContext:
           allowPrivilegeEscalation: false
       securityContext:
