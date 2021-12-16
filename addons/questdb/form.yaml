@@ -67,10 +67,6 @@ tabs:
     contents:
     - type: heading
       label: Postgres Interface
-    - type: variable
-      variable: showPostgresSettings
-      settings:
-        default: true
   - name: postgres_interface
     contents:
     - type: checkbox
@@ -79,32 +75,20 @@ tabs:
       settings:
         default: true
   - name: postgres_settings
+    show_if: service.expose.postgresql.enabled
     contents:
     - type: string-input
-      show_if: showPostgresSettings
       label: Postgres database username
       variable: config.pg_user
       placeholder: "ex: admin"
       settings:
         default: admin
     - type: string-input
-      show_if: showPostgresSettings
       label: Postgres database password
       variable: config.pg_password
       placeholder: "ex: quest"
       settings:
         default: quest
-  - name: external_traffic_heading
-    contents:
-    - type: heading
-      label: External traffic
-  - name: external_traffic
-    contents:
-    - type: checkbox
-      label: Expose to external traffic
-      variable: ingress.enabled
-      settings:
-        default: false
   - name: telemetry_heading
     contents:
     - type: heading
