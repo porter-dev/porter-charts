@@ -89,25 +89,6 @@ tabs:
       placeholder: "ex: quest"
       settings:
         default: quest
-  - name: external_traffic_heading
-    contents:
-    - type: heading
-      label: External traffic
-  - name: external_traffic
-    contents:
-    - type: checkbox
-      label: Expose to external traffic
-      variable: ingress.enabled
-      settings:
-        default: false
-  - name: external_domain
-    show_if: ingress.enabled
-    contents:
-    - type: subtitle
-      label: Assign custom domain(s) to your QuestDB instance. You must first create an A record in your domain provider that points to your cluster load balancer's IP address for this.
-    - type: array-input
-      variable: ingress.hosts
-      label: Domain Name
   - name: telemetry_heading
     contents:
     - type: heading
