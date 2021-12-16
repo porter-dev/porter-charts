@@ -45,10 +45,6 @@ persistence:
   accessMode: ReadWriteOnce
   size: 50Gi
 
-ingress:
-  enabled: false
-  annotations: {}
-
 resources: {}
 nodeSelector: {}
 tolerations: []
