@@ -1,0 +1,84 @@
+auto_deploy: true
+autoscaling:
+  enabled: false
+  maxReplicas: 10
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 50
+  targetMemoryUtilizationPercentage: 50
+cloudsql:
+  connectionName: ""
+  dbPort: 5432
+  enabled: false
+  serviceAccountJSON: ""
+clusterId: 14
+container:
+  command: null
+  env:
+    normal:
+      TEST0: testing0
+      TEST1: testing1
+    synced:
+    - keys:
+      - name: TEST2
+        secret: false
+      - name: TEST3
+        secret: true
+      - name: TEST4
+        secret: true
+      - name: TEST
+        secret: false
+      name: envgrouptest
+      version: 9
+  lifecycle:
+    postStart: null
+    preStop: null
+  port: 80
+currentCluster:
+  service:
+    is_aws: true
+    is_do: false
+    is_gcp: false
+health:
+  enabled: false
+  failureThreshold: 3
+  path: /healthz
+  periodSeconds: 5
+  readinessProbe:
+    enabled: false
+    path: /ready
+    periodSeconds: 5
+image:
+  pullPolicy: Always
+  repository: nginx
+  tag: latest
+ingress:
+  annotations: {}
+  custom_domain: false
+  custom_paths: []
+  enabled: false
+  hosts: []
+  porter_hosts: []
+  provider: aws
+  wildcard: false
+namespace: default
+nodeSelector: {}
+pvc:
+  enabled: false
+  existingVolume: ""
+  mountPath: /mypath
+  storage: 20Gi
+replicaCount: 1
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+service:
+  port: 80
+serviceAccount:
+  annotations: {}
+  create: true
+  name: ""
+showStartCommand: true
+statefulset:
+  enabled: false
+terminationGracePeriodSeconds: 30
