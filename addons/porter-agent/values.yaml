@@ -14,3 +14,11 @@ redis:
   architecture: standalone
   auth:
     enabled: false
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 30Mi
+  requests:
+    cpu: 100m
+    memory: 20Mi

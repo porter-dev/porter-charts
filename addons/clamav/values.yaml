@@ -1,0 +1,56 @@
+# Default values for clamav.
+server:
+  replicaCount: 1
+
+  image:
+    repository: public.ecr.aws/o1j4x7p4/clamav-server
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: latest
+
+  imagePullSecrets: []
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  service:
+    type: ClusterIP
+  resources:
+    limits:
+      memory: 2Gi
+    requests:
+      memory: 1.5Gi
+      cpu: 200m
+client:
+  image:
+    repository: public.ecr.aws/o1j4x7p4/clamav-client
+    pullPolicy: Always
+    tag: latest
+  imagePullSecrets: []
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: ""
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  slack:
+    enabled: false
+    # webhook: <your-webhook>
+  resources:
+    limits:
+      memory: 200Mi
+    requests:
+      memory: 100Mi
+      cpu: 100m
+nameOverride: ""
+fullnameOverride: ""

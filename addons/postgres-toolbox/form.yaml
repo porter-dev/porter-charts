@@ -1,0 +1,34 @@
+tabs:
+- name: main
+  label: Main Settings
+  sections:
+  - name: resource_settings
+    contents: 
+    - type: heading
+      label: Resource Limits
+    - type: subtitle
+      label: Set resource limits for the toolbox
+    - type: number-input
+      variable: resources.limits.cpu
+      label: CPU
+      settings:
+        unit: m
+        default: 100
+    - type: number-input
+      variable: resources.limits.memory
+      label: Memory
+      settings:
+        unit: Mi
+        default: 128
+- name: env
+  label: Environment
+  sections:
+  - name: env_vars
+    contents:
+    - type: heading
+      label: Environment Variables
+    - type: subtitle
+      label: Set environment variables for your secrets and environment-specific configuration.
+    - type: env-key-value-array
+      label: 
+      variable: container.env.normal

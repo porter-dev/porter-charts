@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "clamav.fullname" . }}-client
+  labels:
+    name: clamav-client
+spec:
+  selector:
+    matchLabels:
+      name: clamav-client
+  template:
+    metadata:
+    {{- with .Values.client.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        name: clamav-client
+    spec:
+      {{- with .Values.client.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "clamav.client.serviceAccountName" . }}
+      containers:
+        - name: clamd
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["SYS_ADMIN"]
+          image: "{{ .Values.client.image.repository }}:{{ .Values.client.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.client.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.client.resources | nindent 12 }}
+          env:
+          {{- if .Values.client.slack.enabled }}
+          - name: SLACK_WEBHOOK
+            value: {{ .Values.client.slack.webhook }}
+          {{- end }}
+          volumeMounts:
+          - name: data-vol
+            mountPath: /data
+          - name: host-fs
+            mountPath: /host-fs
+            readOnly: true
+          - name: clamav-volume
+            mountPath: /etc/clamav
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: data-vol
+        emptyDir: {}
+      - name: host-fs
+        hostPath:
+          path: /
+      - name: clamav-volume
+        configMap:
+          name: {{ include "clamav.fullname" . }}-client-config
+      {{- with .Values.client.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.client.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.client.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
