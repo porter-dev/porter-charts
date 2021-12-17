@@ -72,7 +72,6 @@ data:
                   name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
                   key: {{ $key.name }}
               {{- end }}
-              value: {{ $key.name }}
             {{- end }}
             {{- end }}
             resources:

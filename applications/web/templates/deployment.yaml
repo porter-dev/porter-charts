@@ -153,7 +153,6 @@ spec:
                   name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
                   key: {{ $key.name }}
               {{- end }}
-              value: {{ $key.name }}
             {{- end }}
             {{- end }}
             {{- if or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter") }}
