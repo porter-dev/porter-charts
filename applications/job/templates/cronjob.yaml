@@ -45,6 +45,23 @@ spec:
                 value: {{ quote $val }}
               {{- end }}
               {{- end }}
+              {{- range $syncedEnv := .Values.container.env.synced }}
+              {{- range $key := $syncedEnv.keys }}
+              - name: {{ $key.name }}
+                {{- if $key.secret }}
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
+                    key: {{ $key.name }}
+                {{- else }}
+                valueFrom:
+                  configMapKeyRef:
+                    name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
+                    key: {{ $key.name }}
+                {{- end }}
+                value: {{ $key.name }}
+              {{- end }}
+              {{- end }}
             resources:
               requests:
                 cpu: {{ .Values.resources.requests.cpu }}
