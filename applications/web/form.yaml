@@ -68,6 +68,14 @@ tabs:
           - type: array-input
             variable: ingress.hosts
             label: Domain Name
+      - name: domain_name
+        show_if: ingress.custom_domain
+        contents:
+          - type: checkbox
+            variable: ingress.tls
+            label: Enable TLS and automatically create certificates
+            settings:
+              default: true
       - name: do_wildcard
         show_if:
           and:
