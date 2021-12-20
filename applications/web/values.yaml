@@ -38,7 +38,7 @@ ingress:
   custom_paths: []
   annotations: {}
   wildcard: false
-  custom_paths: []
+  tls: true
 
 container:
   port: 80
