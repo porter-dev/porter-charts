@@ -2,8 +2,10 @@
 {{- $fullName := include "docker-template.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 {{- $customPaths := .Values.ingress.custom_paths -}}
-{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: networking.k8s.io/v1beta1
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+apiVersion: networking.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta" -}}
+apiVersion: networking.k8s.io/v1beta
 {{- else -}}
 apiVersion: extensions/v1beta1
 {{- end }}
@@ -42,6 +44,7 @@ metadata:
     {{- end }}
     {{- end }}
 spec:
+  ingressClassName: nginx
   {{- if .Values.ingress.tls }}
   tls:
     - hosts:
@@ -66,14 +69,30 @@ spec:
             {{ if gt (len $customPaths) 0 }}
             {{- range $customPaths }}
             - path: {{ .path }}
+              pathType: Prefix
               backend:
-                serviceName: {{ .serviceName }}
+                {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1" }}                
+                service:
+                  name: {{ .serviceName }}
+                  port:
+                    number: {{ .servicePort }}
+                {{- else }}
+                serviceName: {{ .serviceName }} 
                 servicePort: {{ .servicePort }}
+                {{- end }}
             {{- end }}
             {{ else }}
             - backend:
+              pathType: Prefix
+              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+                service:
+                  name: {{ $fullName }}
+                  port:
+                    number: {{ $svcPort }}
+              {{- else }}
                 serviceName: {{ $fullName }}
                 servicePort: {{ $svcPort }}
+              {{- end }}
             {{ end }}
     {{- end }}
     {{- range .Values.ingress.porter_hosts }}
@@ -83,14 +102,30 @@ spec:
             {{ if gt (len $customPaths) 0 }}
             {{- range $customPaths }}
             - path: {{ .path }}
+              pathType: Prefix
               backend:
-                serviceName: {{ .serviceName }}
+                {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1" }}                
+                service:
+                  name: {{ .serviceName }}
+                  port:
+                    number: {{ .servicePort }}
+                {{- else }}
+                serviceName: {{ .serviceName }} 
                 servicePort: {{ .servicePort }}
+                {{- end }}
             {{- end }}
             {{ else }}
             - backend:
+              pathType: Prefix
+              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+                service:
+                  name: {{ $fullName }}
+                  port:
+                    number: {{ $svcPort }}
+              {{- else }}
                 serviceName: {{ $fullName }}
                 servicePort: {{ $svcPort }}
+              {{- end }}
             {{ end }}
     {{- end }}
 {{- end }}
