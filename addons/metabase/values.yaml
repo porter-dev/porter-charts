@@ -32,7 +32,7 @@ statefulset:
 ingress:
   enabled: true
   host: ""
-  provider: aws
+  #provider: aws
 
 container:
   port: 3000
@@ -44,5 +44,5 @@ container:
 
 resources:
   requests:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 1000m
+    memory: 2048Mi
