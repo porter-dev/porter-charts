@@ -53,7 +53,7 @@ spec:
         http:
           paths:
             - backend:
-                serviceName: {{ $fullName }}
+                serviceName: {{ include "docker-template.fullname" }}
                 servicePort: {{ $svcPort }}
     {{- end }}
 
