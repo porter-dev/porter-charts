@@ -32,7 +32,7 @@ metadata:
     {{/* - range $k, $v := .Values.ingress.annotations */}}
     {{/* - if $v */}}
     {{/* - if and (not (eq $v "null")) $v */}}
-    {{/* $k */}}: {{/* $v */}}
+    {{/* $k */}} {{/* $v */}}
     {{/* - end */}}
     {{/* - end */}}
     {{/* - end */}}
