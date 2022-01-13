@@ -31,7 +31,7 @@ statefulset:
 
 ingress:
   enabled: true
-  host: ""
+  hosts: []
   custom_domain: true
   tls: true
   wildcard: false
