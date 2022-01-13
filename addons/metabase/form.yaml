@@ -23,7 +23,7 @@ tabs:
       variable: ingress.custom_domain
       label: Configure Custom Domain
       settings:
-        default: true 
+        default: true
   - name: domain_name
     show_if: ingress.custom_domain
     contents:

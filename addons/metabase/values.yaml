@@ -32,6 +32,8 @@ statefulset:
 ingress:
   enabled: true
   host: ""
+  custom_domain: true
+  tls: true
   #provider: aws
 
 container:
