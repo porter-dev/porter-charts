@@ -33,7 +33,7 @@ tabs:
   - name: ingress_tls_enabled
     show_if: ingress.custom_domain
     contents:
-       - type: checkbox
+      - type: checkbox
         variable: ingress.tls
         label: Enable TLS and automatically create certificates
         settings:
