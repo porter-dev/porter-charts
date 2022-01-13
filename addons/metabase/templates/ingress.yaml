@@ -12,20 +12,47 @@ metadata:
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
   annotations:
-    {{- if eq .Values.ingress.provider "aws"}}
-    kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    {{- else if eq .Values.ingress.provider "digitalocean"}}
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    {{- if .Values.ingress.tls }}
+    {{- if not (hasKey .Values.ingress.annotations "cert-manager.io/cluster-issuer")}}
+    {{- if .Values.ingress.wildcard }}
+    cert-manager.io/cluster-issuer: letsencrypt-prod-wildcard
     {{- else }}
-    {{ end }}
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    # provider-agnostic default annotations
+    # if value is provided as "null" or null, it is unset 
+    {{- if gt (len .Values.ingress.annotations) 0}}
+    {{- range $k, $v := .Values.ingress.annotations }}
+    {{- if $v}}
+    {{- if and (not (eq $v "null")) $v}}
+    {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
 spec:
-  {{ if .Values.ingress.host }}
+  {{- if .Values.ingress.tls }}
   tls:
     - hosts:
-        - {{ .Values.ingress.host }}
-      secretName: tls-secret
-  {{ end }}
+        {{- range .Values.ingress.hosts }}
+        - {{ . }}
+        {{- end }}
+        {{- range .Values.ingress.porter_hosts }}
+        - {{ . }}
+        {{- end }}
+      {{ if .Values.ingress.wildcard }}
+      secretName: wildcard-cert-tls
+      {{ else }}
+      secretName: metabase-ssl-secret 
+      {{ end }}
+  {{- end }}
   rules:
     {{ if eq .Values.ingress.host "" }}
     - http:

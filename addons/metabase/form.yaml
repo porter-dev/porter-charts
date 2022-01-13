@@ -13,31 +13,36 @@ tabs:
       variable: ingress.enabled
       label: Expose to external traffic
       settings:
-        default: false
+        default: true
   - name: domain_toggle
     show_if: ingress.enabled
     contents:
     - type: subtitle
-      label: Assign custom domain to your deployment. You must first create an A record in your domain provider that points to your cluster load balancer's IP address for this.
+      label: Assign custom domain to your deployment. You must first create an A/CNAME record in your domain provider that points to your cluster load balancer's IP address for this.
     - type: checkbox
       variable: ingress.custom_domain
       label: Configure Custom Domain
       settings:
-        default: false
-  - name: provider
-    show_if: ingress.custom_domain
-    contents:
-    - type: string-input
-      variable: ingress.provider
-      label: Provider Type (aws, gcp, or digitalocean)
-      settings:
-        default: aws   
+        default: true 
   - name: domain_name
     show_if: ingress.custom_domain
     contents:
     - type: array-input
       variable: ingress.hosts
       label: Domain Name
+  - name: ingress_tls_enabled
+    show_if: ingress.custom_domain
+    contents:
+       - type: checkbox
+        variable: ingress.tls
+        label: Enable TLS and automatically create certificates
+        settings:
+          default: true
+  - name: do_wildcard
+    show_if:
+      and:
+        - ingress.custom_domain
+        - currentCluster.service.is_do
 - name: resources
   label: Computing resources
   sections:
