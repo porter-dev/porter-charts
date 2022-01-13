@@ -34,6 +34,7 @@ ingress:
   host: ""
   custom_domain: true
   tls: true
+  wildcard: false
   #provider: aws
 
 container:
