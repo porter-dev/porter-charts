@@ -52,10 +52,10 @@ tabs:
       variable: resources.requests.memory
       settings:
         unit: Mi
-        default: 256
+        default: 2048
     - type: number-input
       label: CPU
       variable: resources.requests.cpu
       settings:
         unit: m
-        default: 100
+        default: 1000
