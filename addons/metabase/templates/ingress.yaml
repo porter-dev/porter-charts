@@ -17,26 +17,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
-    {{/* - if .Values.ingress.tls */}}
-    {{/* - if not (hasKey .Values.ingress.annotations "cert-manager.io/cluster-issuer") */}}
-    {{/* - if .Values.ingress.wildcard */}}
-    #cert-manager.io/cluster-issuer: letsencrypt-prod-wildcard
-    {{/* - else */}}
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    {{/* - end */}}
-    {{/* - end */}}
-    {{/* - end */}}
-    # provider-agnostic default annotations
-    # if value is provided as "null" or null, it is unset 
-    {{/* - if gt (len .Values.ingress.annotations) 0 */}}
-    {{/* - range $k, $v := .Values.ingress.annotations */}}
-    {{/* - if $v */}}
-    {{/* - if and (not (eq $v "null")) $v */}}
-    {{/* $k */}} {{/* $v */}}
-    {{/* - end */}}
-    {{/* - end */}}
-    {{/* - end */}}
-    {{/* - end */}}
 spec:
   {{- if .Values.ingress.tls }}
   tls:
@@ -44,7 +25,7 @@ spec:
         {{- range .Values.ingress.hosts }}
         - {{ . }}
         {{- end }}
-      secretName: metabase-cert-tls
+      secretName: {{ include "docker-template.fullname" . }}
   {{- end }}
 
   rules:
