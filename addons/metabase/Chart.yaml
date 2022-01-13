@@ -4,4 +4,4 @@ description: Template for deploying Metabase onto Porter.
 icon: https://pbs.twimg.com/profile_images/961380992727465985/4unoiuHt.jpg
 name: metabase
 type: application
-version: 0.7.0
+version: 0.8.0
