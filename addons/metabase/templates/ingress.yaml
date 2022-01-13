@@ -21,9 +21,9 @@ metadata:
     {{/* - if not (hasKey .Values.ingress.annotations "cert-manager.io/cluster-issuer") */}}
     {{/* - if .Values.ingress.wildcard */}}
     #cert-manager.io/cluster-issuer: letsencrypt-prod-wildcard
-    {{- else }}
+    {{/* - else */}}
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    {{- end }}
+    {{/* - end */}}
     {{/* - end */}}
     {{/* - end */}}
     # provider-agnostic default annotations
