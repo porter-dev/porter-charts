@@ -45,6 +45,8 @@ tabs:
             label: Network Settings
           - type: subtitle
             label: For containers that you do not want to expose to external traffic (e.g. databases and add-ons), you may make them accessible only to other internal services running within the same cluster.
+          - type: subtitle
+            label: "Important: The HTTPS issuer must be installed for *.porter.run domains to work."
           - type: checkbox
             variable: ingress.enabled
             label: Expose to external traffic
@@ -66,6 +68,14 @@ tabs:
           - type: array-input
             variable: ingress.hosts
             label: Domain Name
+      - name: domain_name
+        show_if: ingress.custom_domain
+        contents:
+          - type: checkbox
+            variable: ingress.tls
+            label: Enable TLS and automatically create certificates
+            settings:
+              default: true
       - name: do_wildcard
         show_if:
           and:
@@ -153,7 +163,7 @@ tabs:
             label: Set environment variables for your secrets and environment-specific configuration.
           - type: env-key-value-array
             label:
-            variable: container.env.normal
+            variable: container.env
   - name: advanced
     label: Advanced
     sections:
