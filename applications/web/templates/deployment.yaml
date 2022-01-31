@@ -61,6 +61,11 @@ spec:
             - name: http
               containerPort: {{ .Values.container.port }}
               protocol: TCP
+            {{- range .Values.container.extraPorts }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: TCP
+            {{- end }}
           {{ if and (not .Values.health.enabled) (.Values.readinessProbe) }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}

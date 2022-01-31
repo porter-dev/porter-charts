@@ -4,6 +4,14 @@ metadata:
   name: {{ include "docker-template.fullname" . }}
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
+  {{- if .Values.service.annotations }}
+  {{- if gt (len .Values.service.annotations) 0}}
+  annotations:
+    {{- range $k, $v := .Values.service.annotations }}
+    {{ $k }}: {{ $v }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
 spec:
   {{ if .Values.ingress.enabled }}
   type: NodePort
@@ -18,5 +26,14 @@ spec:
       {{- if and .Release.IsUpgrade (not .Values.ingress.enabled) }}
       nodePort: null
       {{- end }}
+  {{- range .Values.service.extraPorts }}
+    - port: {{ .port }}
+      targetPort: {{ .targetPort }}
+      protocol: TCP
+      name: {{ .name }}
+      {{- if and $.Release.IsUpgrade (not $.Values.ingress.enabled) }}
+      nodePort: null
+      {{- end }}
+  {{- end }}
   selector:
     {{- include "docker-template.selectorLabels" . | nindent 4 }}
