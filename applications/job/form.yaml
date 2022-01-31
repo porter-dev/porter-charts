@@ -60,7 +60,8 @@ tabs:
       label: 
       variable: container.env
       settings: 
-        enableSyncedEnvGroups: true
+        options:
+          enable_synced_env_groups: true
   - name: webhook
     contents:
     - type: heading
