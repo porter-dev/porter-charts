@@ -58,7 +58,9 @@ tabs:
       label: Set environment variables for your secrets and environment-specific configuration.
     - type: env-key-value-array
       label: 
-      variable: container.env.normal
+      variable: container.env
+      settings: 
+        enable_sync_vars: true
   - name: webhook
     contents:
     - type: heading
