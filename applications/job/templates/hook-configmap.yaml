@@ -73,6 +73,11 @@ data:
                 memory: 10Mi
               limits:
                 memory: 10Mi
+            {{- if (.Values.sidecar.timeout) }}
+            env:
+            - name: TIMEOUT
+              value: {{ .Values.sidecar.timeout | quote }}
+            {{- end }}
             command:
             - "./job_killer.sh"
             {{- if (.Values.sidecar.signalChildProcesses) }}
