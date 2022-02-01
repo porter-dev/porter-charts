@@ -113,6 +113,13 @@ tabs:
     - type: heading
       label: Termination Settings
     - type: subtitle
+      label: Specify how much time jobs have to run.
+    - type: number-input
+      label: Job Timeout (seconds)
+      variable: sidecar.timeout
+      settings:
+        default: 3600
+    - type: subtitle
       label: Specify how much time jobs have to gracefully shut down on SIGTERM.
     - type: number-input
       label: Termination Grace Period (seconds)
