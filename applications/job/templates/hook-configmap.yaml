@@ -65,7 +65,7 @@ data:
               limits:
                 memory: {{ .Values.resources.requests.memory }}
           - name: sidecar
-            image: public.ecr.aws/o1j4x7p4/job-sidecar:dev
+            image: public.ecr.aws/o1j4x7p4/job-sidecar:latest
             imagePullPolicy: Always
             resources:
               requests:
