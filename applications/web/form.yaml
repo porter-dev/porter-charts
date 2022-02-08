@@ -220,7 +220,7 @@ tabs:
         contents:
           - type: string-input
             label: Startup Check Endpoint
-            variable: startup.path
+            variable: health.startupProbe.path
             placeholder: "ex: /startupz"
             settings:
               required: true
