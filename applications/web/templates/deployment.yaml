@@ -100,10 +100,10 @@ spec:
           {{ end }}
           startupProbe:
             httpGet:
-              path: {{ .Values.health.path }}
+              path: {{ .Values.health.startupProbe.path }}
               port: http
-            periodSeconds: {{ .Values.health.periodSeconds }}
-            failureThreshold: {{ .Values.health.failureThreshold }}
+            periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
           {{ end }}
           resources:
             requests:
