@@ -41,16 +41,16 @@ autoscaling:
 
 health:
   enabled: false
-  path: "ls -l"
+  command: "ls -l"
   periodSeconds: 5
   failureThreshold: 3
   readinessProbe:
     enabled: false
-    path: "ls -l"
+    command: "ls -l"
     periodSeconds: 5
   startupProbe:
     enabled: false
-    path: "ls -l"
+    command: "ls -l"
     failureThreshold: 3
     periodSeconds: 5
 
