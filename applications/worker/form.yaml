@@ -117,37 +117,20 @@ tabs:
     - type: subtitle
       label: Define custom health check tests to ensure zero down-time deployments.
     - type: checkbox
+      label: Enable Startup Probe
+      variable: health.startupProbe.enabled
+      settings:
+        default: false
+    - type: checkbox
       variable: health.enabled
       label: Enable Custom Health Checks
       settings:
         default: false
-  - name: health_check_command
-    show_if: health.enabled
-    contents:
-    - type: string-input
-      label: Health Check Command
-      variable: health.command
-      placeholder: "ex: ls -l"
-      settings:
-        required: true
-        default: "ls -l"
-    - type: heading
-      label: Custom Health Check Rules
-    - type: subtitle
-      label: Configure how many times a health check will be performed before deeming the container as failed.
-    - type: number-input
-      label: Failure Threshold
-      variable: health.failureThreshold
-      placeholder: "ex: 3"
-    - type: subtitle
-      label: Configure the interval at which health check is repeated in the case of failure.
-    - type: number-input
-      label: Repeat Interval
-      variable: health.periodSeconds
-      placeholder: "ex: 30"
     - type: checkbox
-      label: Enable Startup Probe
-      variable: health.startupProbe.enabled
+      label: Enable Readiness Probe
+      variable: health.readinessProbe.enabled
+      settings:
+        default: false
   - name: startup_check_command
     show_if: health.startupProbe.enabled
     contents:
@@ -172,9 +155,30 @@ tabs:
       label: Repeat Interval
       variable: health.startupProbe.periodSeconds
       placeholder: "ex: 30"
-    - type: checkbox
-      label: Enable Readiness Probe
-      variable: health.readinessProbe.enabled
+  - name: health_check_command
+    show_if: health.enabled
+    contents:
+    - type: string-input
+      label: Health Check Command
+      variable: health.command
+      placeholder: "ex: ls -l"
+      settings:
+        required: true
+        default: "ls -l"
+    - type: heading
+      label: Custom Health Check Rules
+    - type: subtitle
+      label: Configure how many times a health check will be performed before deeming the container as failed.
+    - type: number-input
+      label: Failure Threshold
+      variable: health.failureThreshold
+      placeholder: "ex: 3"
+    - type: subtitle
+      label: Configure the interval at which health check is repeated in the case of failure.
+    - type: number-input
+      label: Repeat Interval
+      variable: health.periodSeconds
+      placeholder: "ex: 30"
   - name: readiness_check_command
     show_if: health.readinessProbe.enabled
     contents:
