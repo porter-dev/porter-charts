@@ -1,16 +1,8 @@
-{{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "docker-template.name" -}}
+{{- define "clamav.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
-{{- end }}
-
-{{/*
-Expand the name of the chart.
-*/}}
-{{- define "hook.name" -}}
-{{- printf "%s-%s" .Release.Name (randAlphaNum 10 | lower) }}
 {{- end }}
 
 {{/*
@@ -18,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "docker-template.fullname" -}}
+{{- define "clamav.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -34,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "docker-template.chart" -}}
+{{- define "clamav.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "docker-template.labels" -}}
-helm.sh/chart: {{ include "docker-template.chart" . }}
-{{ include "docker-template.selectorLabels" . }}
+{{- define "clamav.labels" -}}
+helm.sh/chart: {{ include "clamav.chart" . }}
+{{ include "clamav.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -53,18 +45,29 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "docker-template.selectorLabels" -}}
-app.kubernetes.io/name: {{ .Release.Name }}
+{{- define "clamav.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "clamav.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Create the name of the service account to use
+Create the name of the service account to use for the server
 */}}
-{{- define "docker-template.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "docker-template.fullname" .) .Values.serviceAccount.name }}
+{{- define "clamav.server.serviceAccountName" -}}
+{{- if .Values.server.serviceAccount.create }}
+{{- printf "%s-%s" (default (include "clamav.fullname" .) .Values.server.serviceAccount.name) "server" }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- default "default" .Values.server.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the service account to use for the client
+*/}}
+{{- define "clamav.client.serviceAccountName" -}}
+{{- if .Values.client.serviceAccount.create }}
+{{- printf "%s-%s" (default (include "clamav.fullname" .) .Values.client.serviceAccount.name) "client" }}
+{{- else }}
+{{- default "default" .Values.client.serviceAccount.name }}
 {{- end }}
 {{- end }}
