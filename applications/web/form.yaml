@@ -68,7 +68,7 @@ tabs:
           - type: array-input
             variable: ingress.hosts
             label: Domain Name
-      - name: ingress_tls_enabled
+      - name: domain_name
         show_if: ingress.custom_domain
         contents:
           - type: checkbox
@@ -163,7 +163,7 @@ tabs:
             label: Set environment variables for your secrets and environment-specific configuration.
           - type: env-key-value-array
             label:
-            variable: container.env.normal
+            variable: container.env
   - name: advanced
     label: Advanced
     sections:
@@ -184,10 +184,44 @@ tabs:
           - type: subtitle
             label: Define custom health check endpoints to ensure zero down-time deployments.
           - type: checkbox
+            label: Enable Startup Probe
+            variable: health.startupProbe.enabled
+            settings:
+              default: false
+          - type: checkbox
             variable: health.enabled
             label: Enable Custom Health Checks
             settings:
               default: false
+          - type: checkbox
+            label: Enable Readiness Probe
+            variable: health.readinessProbe.enabled
+            settings:
+              default: false
+      - name: startup_check_endpoint
+        show_if: health.startupProbe.enabled
+        contents:
+          - type: string-input
+            label: Startup Check Endpoint
+            variable: health.startupProbe.path
+            placeholder: "ex: /startupz"
+            settings:
+              required: true
+              default: /startupz
+          - type: heading
+            label: Custom Startup Check Rules
+          - type: subtitle
+            label: Configure how many times a startup check will be performed before deeming the container as failed.
+          - type: number-input
+            label: Failure Threshold
+            variable: health.startupProbe.failureThreshold
+            placeholder: "ex: 3"
+          - type: subtitle
+            label: Configure the interval at which the startup check is repeated in the case of failure.
+          - type: number-input
+            label: Repeat Interval
+            variable: health.startupProbe.periodSeconds
+            placeholder: "ex: 30"     
       - name: health_check_endpoint
         show_if: health.enabled
         contents:
@@ -212,9 +246,6 @@ tabs:
             label: Repeat Interval
             variable: health.periodSeconds
             placeholder: "ex: 30"
-          - type: checkbox
-            label: Enable Readiness Probe
-            variable: health.readinessProbe.enabled
       - name: readiness_probe
         show_if: health.readinessProbe.enabled
         contents:
