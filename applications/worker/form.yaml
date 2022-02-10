@@ -126,6 +126,8 @@ tabs:
   - name: startup_check_command
     show_if: health.startupProbe.enabled
     contents:
+    - type: heading
+      label: Startup Probe
     - type: string-input
       label: Startup Check Command
       variable: health.startupProbe.command
@@ -157,6 +159,8 @@ tabs:
   - name: health_check_command
     show_if: health.enabled
     contents:
+    - type: heading
+      label: Liveness Probe
     - type: string-input
       label: Liveness Check Command
       variable: health.command
@@ -188,6 +192,8 @@ tabs:
   - name: readiness_check_command
     show_if: health.readinessProbe.enabled
     contents:
+    - type: heading
+      label: Readiness Probe
     - type: string-input
       label: Startup Check Command
       variable: health.readinessProbe.command
