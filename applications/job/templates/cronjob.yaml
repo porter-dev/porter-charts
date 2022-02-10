@@ -70,6 +70,11 @@ spec:
           - name: sidecar
             image: public.ecr.aws/o1j4x7p4/job-sidecar:latest
             imagePullPolicy: Always
+            {{- if (.Values.sidecar.timeout) }}
+            env:
+            - name: TIMEOUT
+              value: {{ .Values.sidecar.timeout | quote }}
+            {{- end }}
             resources:
               requests:
                 cpu: 10m
