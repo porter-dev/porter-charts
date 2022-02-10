@@ -31,8 +31,11 @@ statefulset:
 
 ingress:
   enabled: true
-  host: ""
-  provider: aws
+  hosts: []
+  custom_domain: true
+  tls: true
+  wildcard: false
+  #provider: aws
 
 container:
   port: 3000
@@ -44,5 +47,5 @@ container:
 
 resources:
   requests:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 1000m
+    memory: 2048Mi
