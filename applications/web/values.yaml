@@ -70,6 +70,11 @@ health:
     enabled: false
     path: "/ready"
     periodSeconds: 5
+  startupProbe:
+    enabled: false
+    path: "/startupz"
+    failureThreshold: 3
+    periodSeconds: 5
 
 pvc:
   enabled: false
