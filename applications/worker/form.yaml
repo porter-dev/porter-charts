@@ -116,24 +116,18 @@ tabs:
       label: Custom Health Checks
     - type: subtitle
       label: Define custom health check tests to ensure zero down-time deployments.
+  - name: startup_check
+    contents:
     - type: checkbox
       label: Enable Startup Probe
       variable: health.startupProbe.enabled
       settings:
         default: false
-    - type: checkbox
-      variable: health.enabled
-      label: Enable Custom Health Checks
-      settings:
-        default: false
-    - type: checkbox
-      label: Enable Readiness Probe
-      variable: health.readinessProbe.enabled
-      settings:
-        default: false
   - name: startup_check_command
     show_if: health.startupProbe.enabled
     contents:
+    - type: heading
+      label: Startup Probe
     - type: string-input
       label: Startup Check Command
       variable: health.startupProbe.command
@@ -155,33 +149,51 @@ tabs:
       label: Repeat Interval
       variable: health.startupProbe.periodSeconds
       placeholder: "ex: 30"
+  - name: liveness_check
+    contents:
+    - type: checkbox
+      variable: health.enabled
+      label: Enable Liveness Checks
+      settings:
+        default: false
   - name: health_check_command
     show_if: health.enabled
     contents:
+    - type: heading
+      label: Liveness Probe
     - type: string-input
-      label: Health Check Command
+      label: Liveness Check Command
       variable: health.command
       placeholder: "ex: ls -l"
       settings:
         required: true
         default: "ls -l"
     - type: heading
-      label: Custom Health Check Rules
+      label: Custom Liveness Check Rules
     - type: subtitle
-      label: Configure how many times a health check will be performed before deeming the container as failed.
+      label: Configure how many times a liveness check will be performed before deeming the container as failed.
     - type: number-input
       label: Failure Threshold
       variable: health.failureThreshold
       placeholder: "ex: 3"
     - type: subtitle
-      label: Configure the interval at which health check is repeated in the case of failure.
+      label: Configure the interval at which liveness check is repeated in the case of failure.
     - type: number-input
       label: Repeat Interval
       variable: health.periodSeconds
       placeholder: "ex: 30"
+  - name: readiness_check
+    contents:
+    - type: checkbox
+      label: Enable Readiness Probe
+      variable: health.readinessProbe.enabled
+      settings:
+        default: false
   - name: readiness_check_command
     show_if: health.readinessProbe.enabled
     contents:
+    - type: heading
+      label: Readiness Probe
     - type: string-input
       label: Startup Check Command
       variable: health.readinessProbe.command
