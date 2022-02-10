@@ -214,14 +214,14 @@ tabs:
             label: Repeat Interval
             variable: health.startupProbe.periodSeconds
             placeholder: "ex: 30"
-      - name: health_check
+      - name: liveness_check
         contents:
           - type: checkbox
             variable: health.enabled
             label: Enable Liveness Probe
             settings:
               default: false   
-      - name: health_check_endpoint
+      - name: liveness_check_endpoint
         show_if: health.enabled
         contents:
           - type: string-input
