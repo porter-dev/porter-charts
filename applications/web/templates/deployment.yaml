@@ -100,10 +100,10 @@ spec:
           {{ end }}
           startupProbe:
             httpGet:
-              path: {{ .Values.health.path }}
+              path: {{ .Values.health.startupProbe.path }}
               port: http
-            periodSeconds: {{ .Values.health.periodSeconds }}
-            failureThreshold: {{ .Values.health.failureThreshold }}
+            periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
           {{ end }}
           resources:
             requests:
@@ -137,6 +137,22 @@ spec:
                   key: {{ $key }}
             {{- else }}
               value: {{ quote $val }}
+            {{- end }}
+            {{- end }}
+            {{- range $syncedEnv := .Values.container.env.synced }}
+            {{- range $key := $syncedEnv.keys }}
+            - name: {{ $key.name }}
+              {{- if $key.secret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
+                  key: {{ $key.name }}
+              {{- else }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
+                  key: {{ $key.name }}
+              {{- end }}
             {{- end }}
             {{- end }}
             {{- if or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter") }}
