@@ -42,3 +42,5 @@ sidecar:
   signalChildProcesses: true
   # The timeout value in seconds for the job run
   timeout: 3600
+
+retainFailedHooks: false
