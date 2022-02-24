@@ -42,7 +42,7 @@ metadata:
     {{- end }}
     {{- end }}
     {{- else}}
-    # adding a fix for scenarios where ingress annotations are inside .Values.ingress.annotations.normal
+    # adding a fix for scenarios where ingress annotations are inside ingress.annotations.normal
     {{- if gt (len .Values.ingress.annotations.normal) 0}}
     {{- range $k, $v := .Values.ingress.annotations.normal }}
     {{- if $v}}
