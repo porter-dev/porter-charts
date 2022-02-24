@@ -68,7 +68,7 @@ tabs:
           - type: array-input
             variable: ingress.hosts
             label: Domain Name
-      - name: domain_name
+      - name: ingress_tls_enabled
         show_if: ingress.custom_domain
         contents:
           - type: checkbox
