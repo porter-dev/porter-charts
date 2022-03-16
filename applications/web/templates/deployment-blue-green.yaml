@@ -1,0 +1,217 @@
+{{- if and (not $.Values.statefulset.enabled) $.Values.bluegreen.enabled -}}
+{{- range $v, $tag := $.Values.bluegreen.imageTags }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "docker-template.fullname" $ }}-{{ $tag }}
+  labels:
+    {{- include "docker-template.labels" $ | nindent 4 }}
+spec:
+  {{- if not $.Values.autoscaling.enabled }}
+  replicas: {{ $.Values.replicaCount }}
+  {{ end }}
+  selector:
+    matchLabels:
+      {{- include "docker-template.selectorLabels" $ | nindent 6 }}
+      porter.run/blue-green-value: {{ $tag | quote }}
+  template:
+    metadata:
+      annotations:
+        {{- with $.Values.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "docker-template.selectorLabels" $ | nindent 8 }}
+        "porter.run/blue-green-value": {{ $tag | quote }}
+    spec:
+      serviceAccountName: {{ include "docker-template.serviceAccountName" $ }}
+      terminationGracePeriodSeconds: {{ $.Values.terminationGracePeriodSeconds }}
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ $.Chart.Name }}
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          image: "{{ $.Values.image.repository }}:{{ $tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          {{- if and $.Values.container.command (not (or (eq $.Values.image.repository "porterdev/hello-porter") (eq $.Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) }}
+          command: 
+          {{- range $command := trim $.Values.container.command | split " " }}
+          - {{ $command | quote }}
+          {{- end }}
+          {{- end }}
+          {{- if or ($.Values.container.lifecycle.postStart) ($.Values.container.lifecycle.preStop) }}
+          lifecycle:
+            {{- if $.Values.container.lifecycle.postStart }}
+            postStart:
+              exec:
+                command: 
+                {{- range $command := trim $.Values.container.lifecycle.postStart | split " " }}
+                - {{ $command | quote }}
+                {{- end }}
+            {{- end }}
+            {{- if $.Values.container.lifecycle.preStop }}
+            preStop:
+              exec:
+                command: 
+                {{- range $command := trim $.Values.container.lifecycle.preStop | split " " }}
+                - {{ $command | quote }}
+                {{- end }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ $.Values.container.port }}
+              protocol: TCP
+            {{- range $.Values.container.extraPorts }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: TCP
+            {{- end }}
+          {{ if and (not $.Values.health.enabled) ($.Values.readinessProbe) }}
+          readinessProbe:
+            {{- toYaml $.Values.readinessProbe | nindent 12 }}
+          {{ end }}
+          {{ if and (not $.Values.health.enabled) ($.Values.startupProbe) }}
+          startupProbe:
+            {{- toYaml $.Values.startupProbe | nindent 12 }}
+          {{ end }}
+          {{ if and (not $.Values.health.enabled) ($.Values.livenessProbe) }}
+          livenessProbe:
+            {{- toYaml $.Values.livenessProbe | nindent 12 }}
+          {{ end }}
+          {{ if $.Values.health.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ $.Values.health.path }}
+              port: http
+            periodSeconds: {{ $.Values.health.periodSeconds }}
+            failureThreshold: {{ $.Values.health.failureThreshold }}
+          {{ if not $.Values.health.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ $.Values.health.path }}
+              port: http
+            periodSeconds: {{ $.Values.health.periodSeconds }}
+          {{ else }}
+          readinessProbe:
+            httpGet:
+              path: {{ $.Values.health.readinessProbe.path }}
+              port: http
+            periodSeconds: {{ $.Values.health.readinessProbe.periodSeconds }}          
+          {{ end }}
+          {{ if $.Values.health.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: {{ $.Values.health.startupProbe.path }}
+              port: http
+            periodSeconds: {{ $.Values.health.startupProbe.periodSeconds }}
+            failureThreshold: {{ $.Values.health.startupProbe.failureThreshold }}
+          {{ end }}
+          {{ end }}
+          resources:
+            requests:
+              cpu: {{ $.Values.resources.requests.cpu }}
+              memory: {{ $.Values.resources.requests.memory }}
+            limits:
+              memory: {{ $.Values.resources.requests.memory }}
+          env:
+            # Porter default environment variables
+            - name: PORTER_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: PORTER_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: PORTER_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: PORTER_POD_IMAGE_TAG
+              value: "{{ $tag }}"
+            {{- range $key, $val := $.Values.container.env.normal }}
+            - name: {{ $key }}
+            {{- $splVal := split "_" $val -}}
+            {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $splVal._1 }}
+                  key: {{ $key }}
+            {{- else }}
+              value: {{ quote $val }}
+            {{- end }}
+            {{- end }}
+            {{- range $syncedEnv := $.Values.container.env.synced }}
+            {{- range $key := $syncedEnv.keys }}
+            - name: {{ $key.name }}
+              {{- if $key.secret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
+                  key: {{ $key.name }}
+              {{- else }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
+                  key: {{ $key.name }}
+              {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if or (eq $.Values.image.repository "porterdev/hello-porter") (eq $.Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter") }}
+            - name: PORT
+              value: {{ $.Values.container.port | quote }}
+            {{- end }}
+          {{ if $.Values.pvc.enabled }}
+          volumeMounts:
+            - name: "{{ include "docker-template.fullname" $ }}-storage"
+              mountPath: {{ $.Values.pvc.mountPath }}
+          {{ end }}
+        {{- if $.Values.cloudsql.enabled }}
+        - name: cloud-sql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.17
+          command:
+            - "/cloud_sql_proxy"
+            - "-instances={{ $.Values.cloudsql.connectionName }}=tcp:{{ $.Values.cloudsql.dbPort }}"
+            - "-credential_file=/secrets/service_account.json"
+          securityContext:
+            runAsNonRoot: true
+          volumeMounts:
+          - name: "sidecar-volume-{{ include "docker-template.fullname" $ }}"
+            mountPath: /secrets/
+            readOnly: true
+        {{ end }}
+      {{- if gt (len $.Values.nodeSelector) 0}}
+      nodeSelector:
+        {{- range $k, $v := $.Values.nodeSelector }}
+        {{ $k }}: {{ $v }}
+        {{- end }}
+      {{- end }}
+      tolerations:
+        - key: "removable"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      {{ if or $.Values.pvc.enabled $.Values.cloudsql.enabled }}
+      volumes:
+        {{ if $.Values.cloudsql.enabled }}
+        - name: "sidecar-volume-{{ include "docker-template.fullname" $ }}"
+          secret:
+            secretName: "cloudsql-secret-{{ include "docker-template.fullname" $ }}"
+        {{ end }}
+        {{ if $.Values.pvc.enabled }}
+        - name: "{{ include "docker-template.fullname" . }}-storage"
+          persistentVolumeClaim:
+        {{ if not (eq $.Values.pvc.existingVolume "")}}
+            claimName: {{ $.Values.pvc.existingVolume }}
+        {{ else }}
+            claimName: "{{ include "docker-template.fullname" $ }}-pvc"
+        {{ end }}
+        {{ end }}
+      {{ end }}
+{{- if not (eq $v (sub (len $.Values.bluegreen.imageTags) 1) ) }}
+---
+{{- end }}
+{{- end }}
+{{- end }}
