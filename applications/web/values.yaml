@@ -89,3 +89,11 @@ cloudsql:
   serviceAccountJSON: ""
 
 nodeSelector: {}
+
+bluegreen:
+  enabled: false
+  # if bluegreen is enabled, set the activeImageTag and the list of imageTags
+  # activeImageTag: mytag1
+  # imageTags:
+  # - mytag1
+  # - mytag2
