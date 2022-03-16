@@ -22,7 +22,7 @@ spec:
         {{- end }}
       labels:
         {{- include "docker-template.selectorLabels" $ | nindent 8 }}
-        "porter.run/blue-green-value": {{ $tag }}
+        "porter.run/blue-green-value": {{ $tag | quote }}
     spec:
       serviceAccountName: {{ include "docker-template.serviceAccountName" $ }}
       terminationGracePeriodSeconds: {{ $.Values.terminationGracePeriodSeconds }}
