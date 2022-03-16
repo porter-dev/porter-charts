@@ -13,7 +13,7 @@ spec:
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" $ | nindent 6 }}
-      porter.run/blue-green-value: {{ $tag }}
+      porter.run/blue-green-value: {{ $tag | quote }}
   template:
     metadata:
       annotations:

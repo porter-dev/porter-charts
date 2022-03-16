@@ -38,5 +38,5 @@ spec:
   selector:
     {{- include "docker-template.selectorLabels" . | nindent 4 }}
     {{- if .Values.bluegreen.enabled }}
-    porter.run/blue-green-value: {{ .Values.bluegreen.activeImageTag }}
+    porter.run/blue-green-value: {{ .Values.bluegreen.activeImageTag | quote }}
     {{- end }}
