@@ -37,6 +37,6 @@ spec:
   {{- end }}
   selector:
     {{- include "docker-template.selectorLabels" . | nindent 4 }}
-    {{- if and .Values.bluegreen.enabled .Values.bluegreen.disablePrimaryDeployment not (eq (len .Values.bluegreen.imageTags) 0)) }}
+    {{- if and .Values.bluegreen.enabled .Values.bluegreen.disablePrimaryDeployment (.Values.bluegreen.imageTags | len | eq 0 | not) }}
     porter.run/blue-green-value: {{ .Values.bluegreen.activeImageTag | quote }}
     {{- end }}
