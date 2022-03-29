@@ -3,7 +3,7 @@
 {{- $svcPort := .Values.service.port -}}
 {{- $allHosts := concat .Values.ingress.hosts .Values.ingress.porter_hosts -}}
 {{- $customPaths := .Values.ingress.custom_paths -}}
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
 apiVersion: networking.k8s.io/v1
 {{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta" -}}
 apiVersion: networking.k8s.io/v1beta
@@ -73,7 +73,7 @@ spec:
             - path: {{ .path }}
               pathType: Prefix
               backend:
-                {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1" }}                
+                {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}                
                 service:
                   name: {{ .serviceName }}
                   port:
