@@ -1,7 +1,7 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "docker-template.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
-{{- $allHosts := concat .Values.ingress.hosts, .Values.ingress.porter_hosts -}}
+{{- $allHosts := concat .Values.ingress.hosts .Values.ingress.porter_hosts -}}
 {{- $customPaths := .Values.ingress.custom_paths -}}
 {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
 apiVersion: networking.k8s.io/v1
