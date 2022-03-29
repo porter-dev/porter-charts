@@ -86,7 +86,7 @@ spec:
             {{ else }}
             - backend:
               pathType: Prefix
-              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
                 service:
                   name: {{ $fullName }}
                   port:
