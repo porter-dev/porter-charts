@@ -41,7 +41,7 @@ metadata:
     # provider-agnostic default annotations
     # if value is provided as "null" or null, it is unset
     # adding a fix for scenarios where ingress annotations are inside ingress.annotations.normal
-    {{- if not (hasKey .Values.ingress.annotations "normal")}} 
+    {{- if not (hasKey .Values.ingress.annotations "normal")}}
     {{- if gt (len .Values.ingress.annotations) 0}}
     {{- range $k, $v := .Values.ingress.annotations }}
     {{- if $v}}
@@ -79,7 +79,7 @@ spec:
       {{ if .Values.ingress.wildcard }}
       secretName: wildcard-cert-tls
       {{ else }}
-      secretName: {{ include "docker-template.fullname" . }}  
+      secretName: {{ include "docker-template.fullname" . }}
       {{ end }}
       {{- end }}
   {{- end }}
@@ -96,13 +96,13 @@ spec:
               pathType: ImplementationSpecific
               {{- end }}
               backend:
-                {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}                
+                {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
                 service:
                   name: {{ .serviceName }}
                   port:
                     number: {{ .servicePort }}
                 {{- else }}
-                serviceName: {{ .serviceName }} 
+                serviceName: {{ .serviceName }}
                 servicePort: {{ .servicePort }}
                 {{- end }}
             {{- end }}
