@@ -5,8 +5,8 @@
 {{- $customPaths := .Values.ingress.custom_paths -}}
 {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
 apiVersion: networking.k8s.io/v1
-{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta" -}}
-apiVersion: networking.k8s.io/v1beta
+{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" -}}
+apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
 apiVersion: extensions/v1beta1
 {{- end }}
@@ -71,7 +71,9 @@ spec:
             {{ if gt (len $customPaths) 0 }}
             {{- range $customPaths }}
             - path: {{ .path }}
-              pathType: Prefix
+              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+              pathType: ImplementationSpecific
+              {{- end }}
               backend:
                 {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}                
                 service:
