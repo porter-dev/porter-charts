@@ -80,6 +80,21 @@ rules:
       - get
       - patch
       - update
+  - apiGroups:
+      - "batch"
+    resources:
+      - "jobs"
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - "events"
+    verbs:
+      - get
+      - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole

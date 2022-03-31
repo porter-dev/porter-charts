@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   labels:
     control-plane: controller-manager
+  annotations:
+    porter.run/agent-major-version: "v2"
   name: porter-agent-controller-manager
   namespace: porter-agent-system
 spec:
