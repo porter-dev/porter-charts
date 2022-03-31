@@ -1,8 +1,11 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "docker-template.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
+{{- $allHosts := concat .Values.ingress.hosts .Values.ingress.porter_hosts -}}
 {{- $customPaths := .Values.ingress.custom_paths -}}
-{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+apiVersion: networking.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
 apiVersion: extensions/v1beta1
@@ -13,7 +16,9 @@ metadata:
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
   annotations:
+  {{- if not (.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress") }}
     kubernetes.io/ingress.class: "nginx"
+  {{- end }}
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
@@ -56,13 +61,13 @@ metadata:
     {{- end }}
     {{- end }}
 spec:
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+  ingressClassName: nginx
+{{- end }}
   {{- if .Values.ingress.tls }}
   tls:
     - hosts:
-        {{- range .Values.ingress.hosts }}
-        - {{ . }}
-        {{- end }}
-        {{- range .Values.ingress.porter_hosts }}
+        {{- range $allHosts }}
         - {{ . }}
         {{- end }}
       {{ if .Values.ingress.wildcard }}
@@ -73,38 +78,39 @@ spec:
   {{- end }}
 
   rules:
-    {{- range .Values.ingress.hosts }}
+    {{- range $allHosts }}
       - host: {{ . }}
         http:
           paths:
             {{ if gt (len $customPaths) 0 }}
             {{- range $customPaths }}
             - path: {{ .path }}
+              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+              pathType: ImplementationSpecific
+              {{- end }}
               backend:
-                serviceName: {{ .serviceName }}
+                {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}                
+                service:
+                  name: {{ .serviceName }}
+                  port:
+                    number: {{ .servicePort }}
+                {{- else }}
+                serviceName: {{ .serviceName }} 
                 servicePort: {{ .servicePort }}
+                {{- end }}
             {{- end }}
             {{ else }}
             - backend:
+              pathType: Prefix
+              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+                service:
+                  name: {{ $fullName }}
+                  port:
+                    number: {{ $svcPort }}
+              {{- else }}
                 serviceName: {{ $fullName }}
                 servicePort: {{ $svcPort }}
-            {{ end }}
-    {{- end }}
-    {{- range .Values.ingress.porter_hosts }}
-      - host: {{ . }}
-        http:
-          paths:
-            {{ if gt (len $customPaths) 0 }}
-            {{- range $customPaths }}
-            - path: {{ .path }}
-              backend:
-                serviceName: {{ .serviceName }}
-                servicePort: {{ .servicePort }}
-            {{- end }}
-            {{ else }}
-            - backend:
-                serviceName: {{ $fullName }}
-                servicePort: {{ $svcPort }}
+              {{- end }}
             {{ end }}
     {{- end }}
 {{- end }}
