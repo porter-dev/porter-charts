@@ -86,8 +86,10 @@ spec:
                 {{- end }}
             {{- end }}
             {{ else }}
-            - backend:
-              pathType: Prefix
+            - {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+              pathType: ImplementationSpecific
+              {{- end }}
+              backend:
               {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
                 service:
                   name: {{ $fullName }}
