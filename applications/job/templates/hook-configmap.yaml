@@ -27,6 +27,12 @@ data:
             helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
             helm.sh/revision: "{{ .Release.Revision }}"
             meta.helm.sh/release-name: "{{ .Release.Name }}"
+          annotations:
+            {{- if .Values.safeToEvict }}
+            "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
+            {{- else }}
+            "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+            {{- end }}
         spec:
           restartPolicy: Never
           shareProcessNamespace: true

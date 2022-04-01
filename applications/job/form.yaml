@@ -27,6 +27,18 @@ tabs:
       variable: container.command
       placeholder: "ex: sh ./script.sh"
       required: true
+  - name: description
+    contents: 
+    - type: heading
+      label: Description
+    - type: subtitle
+      name: command_description
+      label: Add an optional description for this job. 
+    - type: string-input
+      label: Description
+      variable: description
+      placeholder: "ex: this job runs a database migration before every deployment"
+      required: false
   - name: cron_toggle
     show_if: showCronToggle
     contents:
