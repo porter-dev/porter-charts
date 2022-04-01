@@ -44,7 +44,7 @@ tabs:
       label: Cron Job Schedule
     - type: subtitle
       label: Run a job periodically on a schedule specified as a cron expression. You can use https://crontab.guru/ to confirm your schedule. For example, */5 * * * * is every 5 minutes.
-    - type: string-input
+    - type: cron
       label: Schedule
       variable: schedule.value
       placeholder: "ex: */5 * * * *"
