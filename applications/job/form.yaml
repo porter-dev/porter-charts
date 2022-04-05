@@ -34,7 +34,7 @@ tabs:
     - type: subtitle
       name: command_description
       label: Add an optional description for this job. 
-    - type: string-input
+    - type: text-area
       label: Description
       variable: description
       placeholder: "ex: this job runs a database migration before every deployment"
