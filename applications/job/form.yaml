@@ -34,11 +34,13 @@ tabs:
     - type: subtitle
       name: command_description
       label: Add an optional description for this job. 
-    - type: string-input
-      label: Description
+    - type: text-area
       variable: description
       placeholder: "ex: this job runs a database migration before every deployment"
       required: false
+      settings:
+        options: 
+          maxCount: 516
   - name: cron_toggle
     show_if: showCronToggle
     contents:
