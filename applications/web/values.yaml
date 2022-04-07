@@ -40,6 +40,13 @@ ingress:
   wildcard: false
   tls: true
 
+
+privateIngress:
+  enabled: false
+  privateIngressClass:
+  hosts: []
+  custom_paths: []
+
 container:
   port: 80
   command:
