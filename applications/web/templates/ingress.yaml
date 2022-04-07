@@ -117,6 +117,8 @@ spec:
     {{- end }}
 {{- end }}
 {{- if .Values.ingress.privateIngress.enabled -}}
+{{- $fullName := include "docker-template.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
 {{- $allPrivateHosts := concat .Values.ingress.privateIngress.hosts  -}}
 ---
 {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
