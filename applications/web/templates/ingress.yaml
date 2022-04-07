@@ -120,6 +120,7 @@ spec:
 {{- $fullName := include "docker-template.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 {{- $allPrivateHosts := concat .Values.ingress.privateIngress.hosts  -}}
+{{- $customPaths := .Values.ingress.custom_paths -}}
 ---
 {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
 apiVersion: networking.k8s.io/v1
