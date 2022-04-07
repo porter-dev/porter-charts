@@ -20,44 +20,44 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-connect-timeout: '60'
     nginx.ingress.kubernetes.io/proxy-read-timeout: '60'
     nginx.ingress.kubernetes.io/proxy-send-timeout: '60'
-  spec:
-    ingressClassName: {{ .Values.privateIngress.privateIngressClass }}
-    rules:
-    {{- range $allPrivateHosts }}
-      - host: {{ . }}
-        http:
-          paths:
-            {{ if gt (len $customPaths) 0 }}
-            {{- range $customPaths }}
-            - path: {{ .path }}
-              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-              pathType: ImplementationSpecific
-              {{- end }}
-              backend:
-                {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}                
-                service:
-                  name: {{ .serviceName }}
-                  port:
-                    number: {{ .servicePort }}
-                {{- else }}
-                serviceName: {{ .serviceName }} 
-                servicePort: {{ .servicePort }}
-                {{- end }}
+spec:
+  ingressClassName: {{ .Values.privateIngress.privateIngressClass }}
+  rules:
+  {{- range $allPrivateHosts }}
+    - host: {{ . }}
+      http:
+        paths:
+          {{ if gt (len $customPaths) 0 }}
+          {{- range $customPaths }}
+          - path: {{ .path }}
+            {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+            pathType: ImplementationSpecific
             {{- end }}
-            {{ else }}
-            - {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-              pathType: ImplementationSpecific
-              {{- end }}
-              backend:
-              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-                service:
-                  name: {{ $fullName }}
-                  port:
-                    number: {{ $svcPort }}
+            backend:
+              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}                
+              service:
+                name: {{ .serviceName }}
+                port:
+                  number: {{ .servicePort }}
               {{- else }}
-                serviceName: {{ $fullName }}
-                servicePort: {{ $svcPort }}
+              serviceName: {{ .serviceName }} 
+              servicePort: {{ .servicePort }}
               {{- end }}
-            {{ end }}
-    {{- end }}
+          {{- end }}
+          {{ else }}
+          - {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+            pathType: ImplementationSpecific
+            {{- end }}
+            backend:
+            {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $svcPort }}
+            {{- else }}
+              serviceName: {{ $fullName }}
+              servicePort: {{ $svcPort }}
+            {{- end }}
+          {{ end }}
+  {{- end }}
 {{- end }}
