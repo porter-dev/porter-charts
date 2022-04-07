@@ -39,6 +39,10 @@ ingress:
   annotations: {}
   wildcard: false
   tls: true
+  privateIngress:
+    enabled: false
+    privateIngressClass:
+    hosts: []
 
 container:
   port: 80
