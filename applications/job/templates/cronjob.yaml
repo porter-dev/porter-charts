@@ -94,7 +94,7 @@ spec:
             {{- end }}
             - {{ .Values.terminationGracePeriodSeconds | quote }}
             {{- $cmdSpl := trim .Values.container.command | splitList " " }}
-            - {{ $cmdSpl._0 | quote }}
+            - {{ $cmdSpl| first | quote }}
             {{- if .Values.cloudsql.enabled }}
             - "cloud_sql_proxy"
             {{- end }}
