@@ -34,7 +34,7 @@ spec:
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job"))) }}
             command: 
-            {{- range $command := trim .Values.container.command | split " " }}
+            {{- range $command := trim .Values.container.command | splitList " " }}
             - {{ $command | quote }}
             {{- end }}
             {{- end }}
@@ -93,7 +93,7 @@ spec:
             - "-c"
             {{- end }}
             - {{ .Values.terminationGracePeriodSeconds | quote }}
-            {{- $cmdSpl := trim .Values.container.command | split " " }}
+            {{- $cmdSpl := trim .Values.container.command | splitList " " }}
             - {{ $cmdSpl._0 | quote }}
             {{- if .Values.cloudsql.enabled }}
             - "cloud_sql_proxy"
