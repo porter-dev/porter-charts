@@ -33,7 +33,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) }}
           command: 
-          {{- range $command := trim .Values.container.command | split " " }}
+          {{- range $command := trim .Values.container.command | splitList " " }}
           - {{ $command | quote }}
           {{- end }}
           {{- end }}
@@ -57,7 +57,7 @@ spec:
           livenessProbe:
             exec:
               command:
-              {{- range $command := trim .Values.health.command | split " " }}
+              {{- range $command := trim .Values.health.command | splitList " " }}
               - {{ $command | quote }}
               {{- end }}
             periodSeconds: {{ .Values.health.periodSeconds }}
@@ -67,7 +67,7 @@ spec:
           startupProbe:
             exec:
               command:
-              {{- range $command := trim .Values.health.startupProbe.command | split " " }}
+              {{- range $command := trim .Values.health.startupProbe.command | splitList " " }}
               - {{ $command | quote }}
               {{- end }}
             periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
@@ -76,7 +76,7 @@ spec:
           readinessProbe:
             exec:
               command:
-              {{- range $command := trim .Values.health.readinessProbe.command | split " " }}
+              {{- range $command := trim .Values.health.readinessProbe.command | splitList " " }}
               - {{ $command | quote }}
               {{- end }}
             periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
