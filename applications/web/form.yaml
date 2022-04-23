@@ -187,11 +187,11 @@ tabs:
         contents:
           - type: checkbox
             label: Enable Startup Probe
-            variable: health.startupProbe.enabled
+            variable: startupProbe.enabled
             settings:
               default: false
       - name: startup_check_endpoint
-        show_if: health.startupProbe.enabled
+        show_if: startupProbe.enabled
         contents:
           - type: heading
             label: Startup Probe
@@ -219,22 +219,22 @@ tabs:
       - name: liveness_check
         contents:
           - type: checkbox
-            variable: health.enabled
+            variable: livenessProbe.enabled
             label: Enable Liveness Probe
             settings:
               default: false   
       - name: liveness_check_endpoint
-        show_if: health.enabled
+        show_if: livenessProbe.enabled
         contents:
           - type: heading
             label: Liveness Probe
           - type: string-input
             label: Liveness Check Endpoint
             variable: health.path
-            placeholder: "ex: /healthz"
+            placeholder: "ex: /livez"
             settings:
               required: true
-              default: /healthz
+              default: /livez
           - type: heading
             label: Custom Liveness Check Rules
           - type: subtitle
@@ -253,11 +253,11 @@ tabs:
         contents:
           - type: checkbox
             label: Enable Readiness Probe
-            variable: health.readinessProbe.enabled
+            variable: readinessProbe.enabled
             settings:
               default: false  
       - name: readiness_probe
-        show_if: health.readinessProbe.enabled
+        show_if: readinessProbe.enabled
         contents:
           - type: heading
             label: Readiness Probe
@@ -267,7 +267,7 @@ tabs:
             label: Readiness Probe Endpoint
             variable: health.readinessProbe.path
             settings:
-              default: /ready
+              default: /readyz
           - type: number-input
             label: Repeat Interval
             variable: health.readinessProbe.periodSeconds
