@@ -23,7 +23,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
-    {{- if gt (len $customPaths) 0 }}
+    {{- if and (gt (len $customPaths) 0) .Values.ingress.rewriteCustomPathsEnabled }}
     nginx.ingress.kubernetes.io/rewrite-target: /
     {{- end }}
     {{- if .Values.ingress.tls }}
