@@ -66,46 +66,28 @@ spec:
               containerPort: {{ .containerPort }}
               protocol: TCP
             {{- end }}
-          {{ if and (not .Values.health.enabled) (.Values.readinessProbe) }}
-          readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
-          {{ end }}
-          {{ if and (not .Values.health.enabled) (.Values.startupProbe) }}
-          startupProbe:
-            {{- toYaml .Values.startupProbe | nindent 12 }}
-          {{ end }}
-          {{ if and (not .Values.health.enabled) (.Values.livenessProbe) }}
-          livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
-          {{ end }}
-          {{ if .Values.health.enabled }}
+          {{ if .Values.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
-              path: {{ .Values.health.path }}
+              path: {{ .Values.livenessProbe.path }}
               port: http
-            periodSeconds: {{ .Values.health.periodSeconds }}
-            failureThreshold: {{ .Values.health.failureThreshold }}
-          {{ if not .Values.health.readinessProbe.enabled }}
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.health.path }}
-              port: http
-            periodSeconds: {{ .Values.health.periodSeconds }}
-          {{ else }}
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.health.readinessProbe.path }}
-              port: http
-            periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}          
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
           {{ end }}
-          {{ if .Values.health.startupProbe.enabled }}
+          {{ if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.readinessProbe.path }}
+              port: http
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}         
+          {{ end }}
+          {{ if .Values.startupProbe.enabled }}
           startupProbe:
             httpGet:
-              path: {{ .Values.health.startupProbe.path }}
+              path: {{ .Values.startupProbe.path }}
               port: http
-            periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
-            failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
-          {{ end }}
+            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
           {{ end }}
           resources:
             requests:
