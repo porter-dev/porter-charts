@@ -36,6 +36,7 @@ ingress:
   provider: aws
   custom_domain: false
   custom_paths: []
+  rewriteCustomPathsEnabled: true
   annotations: {}
   wildcard: false
   tls: true
