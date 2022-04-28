@@ -66,28 +66,28 @@ spec:
               containerPort: {{ .containerPort }}
               protocol: TCP
             {{- end }}
-          {{ if .Values.livenessProbe.enabled }}
+          {{ if .Values.health.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
-              path: {{ .Values.livenessProbe.path }}
+              path: {{ .Values.health.livenessProbe.path }}
               port: http
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
           {{ end }}
-          {{ if .Values.readinessProbe.enabled }}
+          {{ if .Values.health.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.readinessProbe.path }}
+              path: {{ .Values.health.readinessProbe.path }}
               port: http
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}         
+            periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}         
           {{ end }}
-          {{ if .Values.startupProbe.enabled }}
+          {{ if .Values.health.startupProbe.enabled }}
           startupProbe:
             httpGet:
-              path: {{ .Values.startupProbe.path }}
+              path: {{ .Values.health.startupProbe.path }}
               port: http
-            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
-            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+            periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
           {{ end }}
           resources:
             requests:
