@@ -68,7 +68,7 @@ spec:
   tls:
     - hosts:
         {{- range $allHosts }}
-        - {{ . }}
+        - {{ . | quote }}
         {{- end }}
       {{ if .Values.ingress.wildcard }}
       secretName: wildcard-cert-tls
@@ -79,7 +79,7 @@ spec:
 
   rules:
     {{- range $allHosts }}
-      - host: {{ . }}
+      - host: {{ . | quote }}
         http:
           paths:
             {{ if gt (len $customPaths) 0 }}
