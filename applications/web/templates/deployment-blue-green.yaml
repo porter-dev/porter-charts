@@ -36,7 +36,7 @@ spec:
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           {{- if and $.Values.container.command (not (or (eq $.Values.image.repository "porterdev/hello-porter") (eq $.Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) }}
           command: 
-          {{- range $command := trim $.Values.container.command | split " " }}
+          {{- range $command := trim $.Values.container.command | splitList " " }}
           - {{ $command | quote }}
           {{- end }}
           {{- end }}
@@ -46,7 +46,7 @@ spec:
             postStart:
               exec:
                 command: 
-                {{- range $command := trim $.Values.container.lifecycle.postStart | split " " }}
+                {{- range $command := trim $.Values.container.lifecycle.postStart | splitList " " }}
                 - {{ $command | quote }}
                 {{- end }}
             {{- end }}
@@ -54,7 +54,7 @@ spec:
             preStop:
               exec:
                 command: 
-                {{- range $command := trim $.Values.container.lifecycle.preStop | split " " }}
+                {{- range $command := trim $.Values.container.lifecycle.preStop | splitList " " }}
                 - {{ $command | quote }}
                 {{- end }}
             {{- end }}
