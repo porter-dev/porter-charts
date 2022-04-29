@@ -36,6 +36,9 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
+container:
+  port: 5678
+
 service:
   port: 80
 
