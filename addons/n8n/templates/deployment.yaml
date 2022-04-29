@@ -35,16 +35,52 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: {{ .Values.container.port }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+          env:
+            # Porter default environment variables
+            - name: PORTER_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: PORTER_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: PORTER_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: PORTER_POD_IMAGE_TAG
+              value: "{{ .Values.image.tag }}"
+            {{- range $key, $val := .Values.container.env.normal }}
+            - name: {{ $key }}
+            {{- $splVal := split "_" $val -}}
+            {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $splVal._1 }}
+                  key: {{ $key }}
+            {{- else }}
+              value: {{ quote $val }}
+            {{- end }}
+            {{- end }}
+            - name: DB_TYPE
+              value: "{{ .Values.n8n.database.dbType }}"
+            - name: DB_POSTGRESDB_HOST
+              value: "{{ .Values.n8n.database.dbHost }}"
+            - name: DB_POSTGRESDB_PORT
+              value: "{{ .Values.n8n.database.dbPort }}"
+            - name: DB_POSTGRESDB_DATABASE
+              value: "{{ .Values.n8n.database.dbName }}"
+            - name: DB_POSTGRESDB_USER
+              value: "{{ .Values.n8n.database.dbUser }}"
+            - name: DB_POSTGRESDB_PASSWORD
+              value: "{{ .Value.n8n.database.dbPasswd }}"
+            - name: DB_POSTGRESDB_SCHEMA
+              value: "{{ .Value.n8n.database.dbSchema }}"
+            - name: GENERIC_TIMEZONE
+              value: "{{ .Value.n8n.genericTimezone }}"        
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
