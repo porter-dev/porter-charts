@@ -39,7 +39,7 @@ tabs:
         settings:
           default: true
 - name: resources
-  label: Computing resources
+  label: Resources
   sections:
   - name: main_section
     contents:
@@ -65,7 +65,7 @@ tabs:
   - name: db_vars
     contents:
     - type: heading
-      label: Database variables
+      label: Configure n8n
     - type: subtitle
       label: Set Postgres connection variables
     - type: string-input
