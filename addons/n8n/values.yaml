@@ -69,7 +69,7 @@ affinity: {}
 
 n8n:
   database:
-    dbType: ""
+    dbType: "postgresdb"
     dbHost: ""
     dbName: ""
     dbPort: ""
