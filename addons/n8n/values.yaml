@@ -79,3 +79,4 @@ n8n:
     dbPasswd: ""
     dbSchema: ""
   genericTimezone: ""
+  webhookUrl: ""

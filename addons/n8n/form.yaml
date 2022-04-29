@@ -97,3 +97,6 @@ tabs:
     - type: string-input
       label: Generic Timezone
       variable: n8n.genericTimezone
+    - type: string-input
+      label: Webhook URL - set this to https://<N8N_DOMAIN>, where N8N_DOMAIN is the domain you're using to access n8n
+      variable: n8n.webhookUrl
