@@ -68,6 +68,7 @@ tolerations: []
 affinity: {}
 
 n8n:
+  port: 5678
   database:
     dbType: "postgresdb"
     dbHost: ""

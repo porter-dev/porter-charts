@@ -53,12 +53,16 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
+            - name: N8N_LISTEN_ADDRESS
+              value: "0.0.0.0"
+            - name: N8N_PORT
+              value: {{ .Values.n8n.port }}
             - name: DB_TYPE
               value: "{{ .Values.n8n.database.dbType }}"
             - name: DB_POSTGRESDB_HOST
               value: "{{ .Values.n8n.database.dbHost }}"
             - name: DB_POSTGRESDB_PORT
-              value: "{{ .Values.n8n.database.dbPort }}"
+              value: {{ .Values.n8n.database.dbPort }}
             - name: DB_POSTGRESDB_DATABASE
               value: "{{ .Values.n8n.database.dbName }}"
             - name: DB_POSTGRESDB_USER
