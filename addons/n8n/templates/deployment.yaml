@@ -64,11 +64,11 @@ spec:
             - name: DB_POSTGRESDB_USER
               value: "{{ .Values.n8n.database.dbUser }}"
             - name: DB_POSTGRESDB_PASSWORD
-              value: "{{ .Value.n8n.database.dbPasswd }}"
+              value: "{{ .Values.n8n.database.dbPasswd }}"
             - name: DB_POSTGRESDB_SCHEMA
-              value: "{{ .Value.n8n.database.dbSchema }}"
+              value: "{{ .Values.n8n.database.dbSchema }}"
             - name: GENERIC_TIMEZONE
-              value: "{{ .Value.n8n.genericTimezone }}"        
+              value: "{{ .Values.n8n.genericTimezone }}"        
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
