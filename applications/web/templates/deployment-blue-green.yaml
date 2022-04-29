@@ -68,46 +68,17 @@ spec:
               containerPort: {{ .containerPort }}
               protocol: TCP
             {{- end }}
-          {{ if and (not $.Values.health.enabled) ($.Values.readinessProbe) }}
+          {{ if ($.Values.readinessProbe) }}
           readinessProbe:
             {{- toYaml $.Values.readinessProbe | nindent 12 }}
           {{ end }}
-          {{ if and (not $.Values.health.enabled) ($.Values.startupProbe) }}
+          {{ if ($.Values.startupProbe) }}
           startupProbe:
             {{- toYaml $.Values.startupProbe | nindent 12 }}
           {{ end }}
-          {{ if and (not $.Values.health.enabled) ($.Values.livenessProbe) }}
+          {{ if ($.Values.livenessProbe) }}
           livenessProbe:
             {{- toYaml $.Values.livenessProbe | nindent 12 }}
-          {{ end }}
-          {{ if $.Values.health.enabled }}
-          livenessProbe:
-            httpGet:
-              path: {{ $.Values.health.path }}
-              port: http
-            periodSeconds: {{ $.Values.health.periodSeconds }}
-            failureThreshold: {{ $.Values.health.failureThreshold }}
-          {{ if not $.Values.health.readinessProbe.enabled }}
-          readinessProbe:
-            httpGet:
-              path: {{ $.Values.health.path }}
-              port: http
-            periodSeconds: {{ $.Values.health.periodSeconds }}
-          {{ else }}
-          readinessProbe:
-            httpGet:
-              path: {{ $.Values.health.readinessProbe.path }}
-              port: http
-            periodSeconds: {{ $.Values.health.readinessProbe.periodSeconds }}          
-          {{ end }}
-          {{ if $.Values.health.startupProbe.enabled }}
-          startupProbe:
-            httpGet:
-              path: {{ $.Values.health.startupProbe.path }}
-              port: http
-            periodSeconds: {{ $.Values.health.startupProbe.periodSeconds }}
-            failureThreshold: {{ $.Values.health.startupProbe.failureThreshold }}
-          {{ end }}
           {{ end }}
           resources:
             requests:
