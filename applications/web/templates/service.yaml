@@ -13,7 +13,7 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
-  {{ if .Values.ingress.enabled }}
+  {{ if or .Values.ingress.enabled .Values.customNodePort.enabled }}
   type: NodePort
   {{ else }}
   type: ClusterIP
@@ -25,6 +25,8 @@ spec:
       name: http
       {{- if and .Release.IsUpgrade (not .Values.ingress.enabled) }}
       nodePort: null
+      {{- else if .Values.customNodePort.enabled }}
+      nodePort: {{ .Values.customNodePort.port }}
       {{- end }}
   {{- range .Values.service.extraPorts }}
     - port: {{ .port }}
