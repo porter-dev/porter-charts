@@ -53,18 +53,6 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
-            {{- range $key, $val := .Values.container.env.normal }}
-            - name: {{ $key }}
-            {{- $splVal := split "_" $val -}}
-            {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $splVal._1 }}
-                  key: {{ $key }}
-            {{- else }}
-              value: {{ quote $val }}
-            {{- end }}
-            {{- end }}
             - name: DB_TYPE
               value: "{{ .Values.n8n.database.dbType }}"
             - name: DB_POSTGRESDB_HOST
