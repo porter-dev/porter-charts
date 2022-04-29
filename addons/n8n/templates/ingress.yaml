@@ -1,6 +1,6 @@
-{{- if .Values.ingress.enabled -}}
-{{- $fullName := include "n8n.fullname" . -}}
+{{- $fullName := include "docker-template.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
+{{- if .Values.ingress.enabled -}}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
@@ -10,32 +10,31 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "n8n.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+    {{- include "docker-template.labels" . | nindent 4 }}
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   {{- if .Values.ingress.tls }}
   tls:
-    {{- range .Values.ingress.tls }}
     - hosts:
-        {{- range .hosts }}
-        - {{ . | quote }}
+        {{- range .Values.ingress.hosts }}
+        - {{ . }}
         {{- end }}
-      secretName: {{ .secretName }}
-    {{- end }}
+      secretName: {{ include "docker-template.fullname" . }}
   {{- end }}
+
   rules:
     {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
-      http:
-        paths:
-          {{- range .paths }}
-          - path: {{ . }}
-            backend:
-              serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
-          {{- end }}
+      - host: {{ . }}
+        http:
+          paths:
+            - backend:
+                serviceName: {{ $fullName }}
+                servicePort: {{ $svcPort }}
     {{- end }}
-  {{- end }}
+{{- end }}

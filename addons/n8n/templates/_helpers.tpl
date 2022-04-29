@@ -60,34 +60,3 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-{{/* Create a list of config files for n8n */}}
-{{- define "n8n.configFiles" -}}
-    {{- $conf_val := "" }}
-    {{- $sec_val  := "" }}
-    {{- $separator  := "" }}
-    {{- if .Values.config }}
-        {{- $conf_val = "/n8n-config/config.json" }}
-    {{- end }}
-    {{- if .Values.secret }}
-        {{- $sec_val = "/n8n-secret/secret.json" }}
-    {{- end }}
-    {{- if and .Values.config .Values.secret }}
-        {{- $separator  = "," }}
-    {{- end }}
-    {{- print $conf_val $separator $sec_val }}
-{{- end }}
-
-
-{{/* PVC existing, emptyDir, Dynamic */}}
-{{- define "n8n.pvc" -}}
-{{- if or (not .Values.persistence.enabled) (eq .Values.persistence.type "emptyDir") -}}
-          emptyDir: {}
-{{- else if and .Values.persistence.enabled .Values.persistence.existingClaim -}}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim }}
-{{- else if and .Values.persistence.enabled (eq .Values.persistence.type "dynamic")  -}}
-          persistentVolumeClaim:
-            claimName: {{ include "n8n.fullname" . }}
-{{- end }}
-{{- end }}
