@@ -72,7 +72,9 @@ spec:
             - name: DB_POSTGRESDB_SCHEMA
               value: "{{ .Values.n8n.database.dbSchema }}"
             - name: GENERIC_TIMEZONE
-              value: "{{ .Values.n8n.genericTimezone }}"        
+              value: "{{ .Values.n8n.genericTimezone }}"  
+            - name: WEBHOOK_URL
+              value: "{{ .Values.n8n.webhookUrl }}"      
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
