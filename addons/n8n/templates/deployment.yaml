@@ -56,7 +56,7 @@ spec:
             - name: N8N_LISTEN_ADDRESS
               value: "0.0.0.0"
             - name: N8N_PORT
-              value: {{ .Values.n8n.port }}
+              value: "{{ .Values.n8n.port }}"
             - name: DB_TYPE
               value: "{{ .Values.n8n.database.dbType }}"
             - name: DB_POSTGRESDB_HOST
