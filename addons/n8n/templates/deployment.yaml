@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "docker-template.fullname" . }}
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "docker-template.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "docker-template.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.container.port }}
+              protocol: TCP
+          env:
+            # Porter default environment variables
+            - name: PORTER_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: PORTER_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: PORTER_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: PORTER_POD_IMAGE_TAG
+              value: "{{ .Values.image.tag }}"
+            - name: N8N_LISTEN_ADDRESS
+              value: "0.0.0.0"
+            - name: N8N_PORT
+              value: "{{ .Values.n8n.port }}"
+            - name: DB_TYPE
+              value: "{{ .Values.n8n.database.dbType }}"
+            - name: DB_POSTGRESDB_HOST
+              value: "{{ .Values.n8n.database.dbHost }}"
+            - name: DB_POSTGRESDB_PORT
+              value: "{{ .Values.n8n.database.dbPort }}"
+            - name: DB_POSTGRESDB_DATABASE
+              value: "{{ .Values.n8n.database.dbName }}"
+            - name: DB_POSTGRESDB_USER
+              value: "{{ .Values.n8n.database.dbUser }}"
+            - name: DB_POSTGRESDB_PASSWORD
+              value: "{{ .Values.n8n.database.dbPasswd }}"
+            - name: DB_POSTGRESDB_SCHEMA
+              value: "{{ .Values.n8n.database.dbSchema }}"
+            - name: GENERIC_TIMEZONE
+              value: "{{ .Values.n8n.genericTimezone }}"  
+            - name: WEBHOOK_URL
+              value: "{{ .Values.n8n.webhookUrl }}"      
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
