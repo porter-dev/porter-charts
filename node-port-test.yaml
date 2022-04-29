@@ -1,0 +1,15 @@
+customNodePort:
+  enabled: true
+  port: 30002
+ingress:
+  enabled: false
+cloudsql:
+  connectionName: test:us-west1:production
+  dbPort: 5432
+  enabled: true
+  serviceAccountJSON: >-
+    svc
+  additionalConnection:
+    enabled: true
+    dbPort: 5433
+    connectionName: test:us-west1:read
