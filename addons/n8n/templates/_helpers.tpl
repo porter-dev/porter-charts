@@ -1,7 +1,8 @@
+{{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "n8n.name" -}}
+{{- define "docker-template.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "n8n.fullname" -}}
+{{- define "docker-template.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +27,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "n8n.chart" -}}
+{{- define "docker-template.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "n8n.labels" -}}
-helm.sh/chart: {{ include "n8n.chart" . }}
-{{ include "n8n.selectorLabels" . }}
+{{- define "docker-template.labels" -}}
+helm.sh/chart: {{ include "docker-template.chart" . }}
+{{ include "docker-template.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +46,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "n8n.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "n8n.name" . }}
+{{- define "docker-template.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "docker-template.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "n8n.serviceAccountName" -}}
+{{- define "docker-template.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "n8n.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "docker-template.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
