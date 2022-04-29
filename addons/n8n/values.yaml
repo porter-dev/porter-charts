@@ -73,7 +73,7 @@ n8n:
     dbType: "postgresdb"
     dbHost: ""
     dbName: ""
-    dbPort: ""
+    dbPort: 5432
     dbUser: ""
     dbPasswd: ""
     dbSchema: ""
