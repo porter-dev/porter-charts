@@ -68,15 +68,15 @@ spec:
               containerPort: {{ .containerPort }}
               protocol: TCP
             {{- end }}
-          {{ if ($.Values.readinessProbe) }}
+          {{ if ($.Values.readinessProbe.enabled) }}
           readinessProbe:
             {{- toYaml $.Values.readinessProbe | nindent 12 }}
           {{ end }}
-          {{ if ($.Values.startupProbe) }}
+          {{ if ($.Values.startupProbe.enabled) }}
           startupProbe:
             {{- toYaml $.Values.startupProbe | nindent 12 }}
           {{ end }}
-          {{ if ($.Values.livenessProbe) }}
+          {{ if ($.Values.livenessProbe.enabled) }}
           livenessProbe:
             {{- toYaml $.Values.livenessProbe | nindent 12 }}
           {{ end }}
