@@ -1,0 +1,40 @@
+{{- $fullName := include "docker-template.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- if .Values.ingress.enabled -}}
+{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  {{- if .Values.ingress.tls }}
+  tls:
+    - hosts:
+        {{- range .Values.ingress.hosts }}
+        - {{ . }}
+        {{- end }}
+      secretName: {{ include "docker-template.fullname" . }}
+  {{- end }}
+
+  rules:
+    {{- range .Values.ingress.hosts }}
+      - host: {{ . }}
+        http:
+          paths:
+            - backend:
+                serviceName: {{ $fullName }}
+                servicePort: {{ $svcPort }}
+    {{- end }}
+{{- end }}
