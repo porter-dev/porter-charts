@@ -153,7 +153,11 @@ spec:
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
           command:
             - "/cloud_sql_proxy"
+            {{- if .Values.cloudsql.additionalConnection.enabled }}
+            - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }},{{ .Values.cloudsql.additionalConnection.connectionName }}=tcp:{{ .Values.cloudsql.additionalConnection.dbPort }}"
+            {{- else }}
             - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
+            {{- end }}
             - "-credential_file=/secrets/service_account.json"
           securityContext:
             runAsNonRoot: true
