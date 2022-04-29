@@ -98,7 +98,11 @@ cloudsql:
   connectionName: ""
   dbPort: 5432
   serviceAccountJSON: ""
-
+  additionalConnection:
+    enabled: false
+    dbPort: 5432
+    connectionName: ""
+    
 nodeSelector: {}
 
 bluegreen:
@@ -115,3 +119,7 @@ bluegreen:
   # imageTags:
   # - mytag1
   # - mytag2
+
+customNodePort:
+  enabled: false
+  port: 30000
