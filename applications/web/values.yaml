@@ -70,14 +70,17 @@ autoscaling:
   targetMemoryUtilizationPercentage: 50
 
 health:
-  enabled: false
-  path: "/healthz"
-  periodSeconds: 5
-  failureThreshold: 3
+  livenessProbe:
+    enabled: false
+    path: "/livez"
+    periodSeconds: 5
+    failureThreshold: 3
+
   readinessProbe:
     enabled: false
-    path: "/ready"
+    path: "/readyz"
     periodSeconds: 5
+
   startupProbe:
     enabled: false
     path: "/startupz"
@@ -95,7 +98,11 @@ cloudsql:
   connectionName: ""
   dbPort: 5432
   serviceAccountJSON: ""
-
+  additionalConnection:
+    enabled: false
+    dbPort: 5432
+    connectionName: ""
+    
 nodeSelector: {}
 
 bluegreen:
@@ -112,3 +119,7 @@ bluegreen:
   # imageTags:
   # - mytag1
   # - mytag2
+
+customNodePort:
+  enabled: false
+  port: 30000
