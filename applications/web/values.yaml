@@ -69,22 +69,23 @@ autoscaling:
   targetCPUUtilizationPercentage: 50
   targetMemoryUtilizationPercentage: 50
 
-livenessProbe:
-  enabled: false
-  path: "/livez"
-  periodSeconds: 5
-  failureThreshold: 3
+health:
+  livenessProbe:
+    enabled: false
+    path: "/livez"
+    periodSeconds: 5
+    failureThreshold: 3
 
-readinessProbe:
-  enabled: false
-  path: "/readyz"
-  periodSeconds: 5
+  readinessProbe:
+    enabled: false
+    path: "/readyz"
+    periodSeconds: 5
 
-startupProbe:
-  enabled: false
-  path: "/startupz"
-  failureThreshold: 3
-  periodSeconds: 5
+  startupProbe:
+    enabled: false
+    path: "/startupz"
+    failureThreshold: 3
+    periodSeconds: 5
 
 pvc:
   enabled: false
