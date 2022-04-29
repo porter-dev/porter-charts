@@ -11,8 +11,8 @@ upgrade_notes:
     target: v0.14.0
     note: |
       `v0.14.0` fixed the parsing issue on the `PORTER_POD_IMAGE_TAG` variable that's injected into the container.
-  - previous: v0.52.0
-    target: v0.53.0
+  - previous: v0.39.0
+    target: v0.40.0
     note: |
       **WARNING**: this may not be backwards compatible with your configuration.
 
