@@ -14,6 +14,12 @@ tabs:
       label: Expose to external traffic
       settings:
         default: true
+  - name: nodeport_field
+    show_if: ingress.enabled
+    contents:
+      - type: number-input
+        label: Optionally assign a NodePort for n8n, in order to ensure n8n is only accessible from within your cluster VPC network. Use a port between 30000-32767
+        variable: service.nodePort
   - name: domain_toggle
     show_if: ingress.enabled
     contents:
