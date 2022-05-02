@@ -65,38 +65,15 @@ tabs:
       settings:
         unit: m
         default: 100
-- name: n8n
-  label: N8n Configuration
+- name: env
+  label: N8n configuration
   sections:
-  - name: db_vars
+  - name: env_vars
     contents:
     - type: heading
-      label: Configure n8n
+      label: Environment Variables
     - type: subtitle
-      label: Set Postgres connection variables
-    - type: string-input
-      label: Database Host
-      variable: n8n.database.dbHost
-    - type: number-input
-      label: Database Port
-      variable: n8n.database.dbPort
-    - type: string-input
-      label: Database User
-      variable: n8n.database.dbUser
-    - type: string-input
-      label: Database Password
-      variable: n8n.database.dbPasswd
-    - type: string-input
-      label: Database Name
-      variable: n8n.database.dbName
-    - type: string-input
-      label: Database Schema
-      variable: n8n.database.dbSchema
-    - type: subtitle
-      label: Set generic configuration settings
-    - type: string-input
-      label: Generic Timezone
-      variable: n8n.genericTimezone
-    - type: string-input
-      label: Webhook URL - set this to https://<N8N_DOMAIN>, where N8N_DOMAIN is the domain you're using to access n8n
-      variable: n8n.webhookUrl
+      label: Set environment variables for your secrets and environment-specific configuration. For configuring n8n, please see the n8n documentation.
+    - type: env-key-value-array
+      label: 
+      variable: container.env.normal
