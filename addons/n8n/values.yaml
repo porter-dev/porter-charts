@@ -46,9 +46,21 @@ service:
 ingress:
   enabled: true
   hosts: []
-  custom_domain: true
-  tls: true
+  porter_hosts: []
+  provider: aws
+  custom_domain: false
+  custom_paths: []
+  rewriteCustomPathsEnabled: true
+  annotations: {}
   wildcard: false
+  tls: true
+
+
+privateIngress:
+  enabled: false
+  privateIngressClass:
+  hosts: []
+  custom_paths: []
 
 resources:
   requests:
