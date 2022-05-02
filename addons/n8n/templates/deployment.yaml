@@ -56,25 +56,19 @@ spec:
             - name: N8N_LISTEN_ADDRESS
               value: "0.0.0.0"
             - name: N8N_PORT
-              value: "{{ .Values.n8n.port }}"
-            - name: DB_TYPE
-              value: "{{ .Values.n8n.database.dbType }}"
-            - name: DB_POSTGRESDB_HOST
-              value: "{{ .Values.n8n.database.dbHost }}"
-            - name: DB_POSTGRESDB_PORT
-              value: "{{ .Values.n8n.database.dbPort }}"
-            - name: DB_POSTGRESDB_DATABASE
-              value: "{{ .Values.n8n.database.dbName }}"
-            - name: DB_POSTGRESDB_USER
-              value: "{{ .Values.n8n.database.dbUser }}"
-            - name: DB_POSTGRESDB_PASSWORD
-              value: "{{ .Values.n8n.database.dbPasswd }}"
-            - name: DB_POSTGRESDB_SCHEMA
-              value: "{{ .Values.n8n.database.dbSchema }}"
-            - name: GENERIC_TIMEZONE
-              value: "{{ .Values.n8n.genericTimezone }}"  
-            - name: WEBHOOK_URL
-              value: "{{ .Values.n8n.webhookUrl }}"      
+              value: "5678"
+            {{- range $key, $val := .Values.container.env.normal }}
+            - name: {{ $key }}
+            {{- $splVal := split "_" $val -}}
+            {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $splVal._1 }}
+                  key: {{ $key }}
+            {{- else }}
+              value: {{ quote $val }}
+            {{- end }}
+            {{- end }}      
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
