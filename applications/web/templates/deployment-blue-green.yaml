@@ -35,7 +35,7 @@ spec:
           image: "{{ $.Values.image.repository }}:{{ $tag }}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           {{- if and $.Values.container.command (not (or (eq $.Values.image.repository "porterdev/hello-porter") (eq $.Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) }}
-          command: 
+          command:
           {{- range $command := trim $.Values.container.command | splitList " " }}
           - {{ $command | quote }}
           {{- end }}
@@ -45,7 +45,7 @@ spec:
             {{- if $.Values.container.lifecycle.postStart }}
             postStart:
               exec:
-                command: 
+                command:
                 {{- range $command := trim $.Values.container.lifecycle.postStart | splitList " " }}
                 - {{ $command | quote }}
                 {{- end }}
@@ -53,7 +53,7 @@ spec:
             {{- if $.Values.container.lifecycle.preStop }}
             preStop:
               exec:
-                command: 
+                command:
                 {{- range $command := trim $.Values.container.lifecycle.preStop | splitList " " }}
                 - {{ $command | quote }}
                 {{- end }}
@@ -102,6 +102,8 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ $tag }}"
+            - name: PORTER_POD_REVISION
+              value: "{{ .Release.Revision }}"
             {{- range $key, $val := $.Values.container.env.normal }}
             - name: {{ $key }}
             {{- $splVal := split "_" $val -}}
