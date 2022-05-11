@@ -33,7 +33,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) }}
-          command: 
+          command:
           {{- range $command := trim .Values.container.command | splitList " " }}
           - {{ $command | quote }}
           {{- end }}
@@ -43,7 +43,7 @@ spec:
             {{- if .Values.container.lifecycle.postStart }}
             postStart:
               exec:
-                command: 
+                command:
                 {{- range $command := trim .Values.container.lifecycle.postStart | splitList " " }}
                 - {{ $command | quote }}
                 {{- end }}
@@ -51,7 +51,7 @@ spec:
             {{- if .Values.container.lifecycle.preStop }}
             preStop:
               exec:
-                command: 
+                command:
                 {{- range $command := trim .Values.container.lifecycle.preStop | splitList " " }}
                 - {{ $command | quote }}
                 {{- end }}
@@ -66,28 +66,28 @@ spec:
               containerPort: {{ .containerPort }}
               protocol: TCP
             {{- end }}
-          {{ if .Values.livenessProbe.enabled }}
+          {{ if .Values.health.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
-              path: {{ .Values.livenessProbe.path }}
+              path: {{ .Values.health.livenessProbe.path }}
               port: http
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
           {{ end }}
-          {{ if .Values.readinessProbe.enabled }}
+          {{ if .Values.health.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.readinessProbe.path }}
+              path: {{ .Values.health.readinessProbe.path }}
               port: http
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}         
+            periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
           {{ end }}
-          {{ if .Values.startupProbe.enabled }}
+          {{ if .Values.health.startupProbe.enabled }}
           startupProbe:
             httpGet:
-              path: {{ .Values.startupProbe.path }}
+              path: {{ .Values.health.startupProbe.path }}
               port: http
-            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
-            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+            periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
           {{ end }}
           resources:
             requests:
@@ -111,6 +111,8 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
+            - name: PORTER_POD_REVISION
+              value: "{{ .Release.Revision }}"
             {{- range $key, $val := .Values.container.env.normal }}
             - name: {{ $key }}
             {{- $splVal := split "_" $val -}}
@@ -153,7 +155,11 @@ spec:
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
           command:
             - "/cloud_sql_proxy"
+            {{- if .Values.cloudsql.additionalConnection.enabled }}
+            - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }},{{ .Values.cloudsql.additionalConnection.connectionName }}=tcp:{{ .Values.cloudsql.additionalConnection.dbPort }}"
+            {{- else }}
             - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
+            {{- end }}
             - "-credential_file=/secrets/service_account.json"
           securityContext:
             runAsNonRoot: true

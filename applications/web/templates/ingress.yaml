@@ -62,13 +62,17 @@ metadata:
     {{- end }}
 spec:
 {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+{{- if eq .Values.ingress.provider "azure" }}
+  ingressClassName: azure-application-gateway
+{{- else }}
   ingressClassName: nginx
+{{- end }}
 {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
     - hosts:
         {{- range $allHosts }}
-        - {{ . }}
+        - {{ . | quote }}
         {{- end }}
       {{ if .Values.ingress.wildcard }}
       secretName: wildcard-cert-tls
@@ -79,7 +83,7 @@ spec:
 
   rules:
     {{- range $allHosts }}
-      - host: {{ . }}
+      - host: {{ . | quote }}
         http:
           paths:
             {{ if gt (len $customPaths) 0 }}
