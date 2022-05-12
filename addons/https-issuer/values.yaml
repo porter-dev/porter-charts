@@ -1,6 +1,7 @@
 email: "contact@getporter.dev"
 gce:
   enabled: false
+ingressClass: nginx
 wildcard:
   enabled: false
   do_access_token: "" 
