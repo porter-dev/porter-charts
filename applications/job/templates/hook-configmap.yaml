@@ -91,10 +91,10 @@ data:
             imagePullPolicy: Always
             resources:
               requests:
-                cpu: 10m
-                memory: 10Mi
+                cpu: {{ .Values.sidecar.resources.requests.cpu }}
+                memory: {{ .Values.sidecar.resources.requests.memory }}
               limits:
-                memory: 10Mi
+                memory: {{ .Values.sidecar.resources.requests.memory }}
             {{- if (.Values.sidecar.timeout) }}
             env:
             - name: TIMEOUT
