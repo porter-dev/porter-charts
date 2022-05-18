@@ -69,6 +69,26 @@ autoscaling:
   targetCPUUtilizationPercentage: 50
   targetMemoryUtilizationPercentage: 50
 
+keda:
+  enabled: false
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  fallback:
+    failureThreshold: 3
+    failureReplicas: 6
+  hpa:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policy:
+        value: 10
+        periodSeconds: 300
+  trigger:
+    metricName: ""
+    metricQuery: ""
+    metricThreshold: ""
+
 health:
   livenessProbe:
     enabled: false
