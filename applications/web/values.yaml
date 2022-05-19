@@ -47,6 +47,7 @@ privateIngress:
   privateIngressClass:
   hosts: []
   custom_paths: []
+  annotations: {}
 
 container:
   port: 80
