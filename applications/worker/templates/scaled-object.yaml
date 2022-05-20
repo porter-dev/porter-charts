@@ -1,0 +1,37 @@
+{{- if .Values.keda.enabled -}}
+{{- $fullName := include "docker-template.fullname" . -}}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ $fullName }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $fullName }}
+  pollingInterval: {{ .Values.keda.pollingInterval }}
+  cooldownPeriod: {{ .Values.keda.cooldownPeriod }}
+  minReplicaCount: {{ .Values.keda.minReplicaCount }}
+  maxReplicaCount: {{ .Values.keda.maxReplicaCount }}
+  fallback:
+    failureThreshold: {{ .Values.keda.fallback.failureThreshold }}
+    replicas: {{ .Values.keda.fallback.failureReplicas }}
+  advanced:
+    restoreToOriginalReplicaCount: true
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: {{ .Values.keda.hpa.scaleDown.stabilizationWindowSeconds }}
+          policies:
+          - type: Percent
+            value: {{ .Values.keda.hpa.scaleDown.policy.value }}
+            periodSeconds: {{ .Values.keda.hpa.scaleDown.policy.periodSeconds }}
+  triggers:
+    - type: prometheus
+      metadata:
+        # Required fields:
+        serverAddress: http://prometheus-server.monitoring.svc.cluster.local:80
+        metricName: {{ .Values.keda.trigger.metricName }}
+        query: {{ .Values.keda.trigger.metricQuery }}
+        threshold: '{{ .Values.keda.trigger.metricThreshold }}'
+{{- end }}
