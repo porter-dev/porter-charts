@@ -37,6 +37,10 @@ spec:
           {{- range $command := trim .Values.container.command | splitList " " }}
           - {{ $command | quote }}
           {{- end }}
+          args:
+          {{- range $args := trim .Values.container.args | splitList " " }}
+          - {{ $command | quote }}
+          {{- end }}
           {{- end }}
           {{- if or (.Values.container.lifecycle.postStart) (.Values.container.lifecycle.preStop) }}
           lifecycle:
