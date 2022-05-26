@@ -1004,6 +1004,10 @@ agents:
       operator: "Equal"
       value: "true"
       effect: "NoSchedule"
+    - key: "porter.run/workload-kind"
+      operator: "Equal"
+      value: "system"
+      effect: "NoSchedule"
 
   # agents.nodeSelector -- Allow the DaemonSet to schedule on selected nodes
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/

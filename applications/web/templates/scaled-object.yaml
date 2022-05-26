@@ -20,6 +20,12 @@ spec:
     restoreToOriginalReplicaCount: true
     horizontalPodAutoscalerConfig:
       behavior:
+        scaleUp:
+          stabilizationWindowSeconds: {{ .Values.keda.hpa.scaleUp.stabilizationWindowSeconds }}
+          policies:
+          - type: Percent
+            value: {{ .Values.keda.hpa.scaleUp.policy.value }}
+            periodSeconds: {{ .Values.keda.hpa.scaleUp.policy.periodSeconds }}
         scaleDown:
           stabilizationWindowSeconds: {{ .Values.keda.hpa.scaleDown.stabilizationWindowSeconds }}
           policies:
