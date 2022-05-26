@@ -49,6 +49,11 @@ keda:
     failureThreshold: 3
     failureReplicas: 6
   hpa:
+    scaleUp:
+      stabilizationWindowSeconds: 300
+      policy:
+        value: 10
+        periodSeconds: 300
     scaleDown:
       stabilizationWindowSeconds: 300
       policy:
