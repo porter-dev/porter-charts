@@ -37,6 +37,7 @@ ingress:
   rewriteCustomPathsEnabled: true
   tls: true
   wildcard: false
+  annotations: {}
   #provider: aws
 
 privateIngress:
