@@ -37,6 +37,13 @@ ingress:
   wildcard: false
   #provider: aws
 
+privateIngress:
+  enabled: false
+  privateIngressClass:
+  hosts: []
+  custom_paths: []
+  annotations: {}
+
 container:
   port: 3000
   env: 
