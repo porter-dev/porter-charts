@@ -33,9 +33,19 @@ ingress:
   enabled: true
   hosts: []
   custom_domain: true
+  custom_paths: []
+  rewriteCustomPathsEnabled: true
   tls: true
   wildcard: false
+  annotations: {}
   #provider: aws
+
+privateIngress:
+  enabled: false
+  privateIngressClass:
+  hosts: []
+  custom_paths: []
+  annotations: {}
 
 container:
   port: 3000

@@ -1,7 +1,11 @@
+{{- if .Values.ingress.enabled -}}
 {{- $fullName := include "docker-template.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
-{{- if .Values.ingress.enabled -}}
-{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+{{- $allHosts := concat .Values.ingress.hosts -}}
+{{- $customPaths := .Values.ingress.custom_paths -}}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+apiVersion: networking.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1/Ingress" -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
 apiVersion: extensions/v1beta1
@@ -12,29 +16,108 @@ metadata:
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
   annotations:
+  {{- if not (.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress") }}
     kubernetes.io/ingress.class: "nginx"
+  {{- end }}
+  {{- if eq .Values.ingress.provider "azure" }}
+    kubernetes.io/ingress.class: addon-http-application-routing
+  {{- end }}
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    {{- if and (gt (len $customPaths) 0) .Values.ingress.rewriteCustomPathsEnabled }}
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    {{- end }}
+    {{- if .Values.ingress.tls }}
+    {{- if not (hasKey .Values.ingress.annotations "cert-manager.io/cluster-issuer")}}
+    {{- if .Values.ingress.wildcard }}
+    cert-manager.io/cluster-issuer: letsencrypt-prod-wildcard
+    {{- else }}
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    # provider-agnostic default annotations
+    # if value is provided as "null" or null, it is unset
+    # adding a fix for scenarios where ingress annotations are inside ingress.annotations.normal
+    {{- if not (hasKey .Values.ingress.annotations "normal")}} 
+    {{- if gt (len .Values.ingress.annotations) 0}}
+    {{- range $k, $v := .Values.ingress.annotations }}
+    {{- if $v}}
+    {{- if and (not (eq $v "null")) $v}}
+    {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- if hasKey .Values.ingress.annotations "normal"}}
+    {{- if gt (len .Values.ingress.annotations.normal) 0}}
+    {{- range $k, $v := .Values.ingress.annotations.normal }}
+    {{- if $v}}
+    {{- if and (not (eq $v "null")) $v}}
+    {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
 spec:
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+{{- if ne .Values.ingress.provider "azure" }}
+  ingressClassName: nginx
+{{- end }}
+{{- end }}
   {{- if .Values.ingress.tls }}
   tls:
     - hosts:
-        {{- range .Values.ingress.hosts }}
-        - {{ . }}
+        {{- range $allHosts }}
+        - {{ . | quote }}
         {{- end }}
-      secretName: {{ include "docker-template.fullname" . }}
+      {{ if .Values.ingress.wildcard }}
+      secretName: wildcard-cert-tls
+      {{ else }}
+      secretName: {{ include "docker-template.fullname" . }}  
+      {{ end }}
   {{- end }}
 
   rules:
-    {{- range .Values.ingress.hosts }}
-      - host: {{ . }}
+    {{- range $allHosts }}
+      - host: {{ . | quote }}
         http:
           paths:
-            - backend:
+            {{ if gt (len $customPaths) 0 }}
+            {{- range $customPaths }}
+            - path: {{ .path }}
+              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+              pathType: ImplementationSpecific
+              {{- end }}
+              backend:
+                {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}                
+                service:
+                  name: {{ .serviceName }}
+                  port:
+                    number: {{ .servicePort }}
+                {{- else }}
+                serviceName: {{ .serviceName }} 
+                servicePort: {{ .servicePort }}
+                {{- end }}
+            {{- end }}
+            {{ else }}
+            - {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+              pathType: ImplementationSpecific
+              {{- end }}
+              backend:
+              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+                service:
+                  name: {{ $fullName }}
+                  port:
+                    number: {{ $svcPort }}
+              {{- else }}
                 serviceName: {{ $fullName }}
                 servicePort: {{ $svcPort }}
+              {{- end }}
+            {{ end }}
     {{- end }}
 {{- end }}
