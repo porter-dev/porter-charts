@@ -33,6 +33,8 @@ ingress:
   enabled: true
   hosts: []
   custom_domain: true
+  custom_paths: []
+  rewriteCustomPathsEnabled: true
   tls: true
   wildcard: false
   #provider: aws
