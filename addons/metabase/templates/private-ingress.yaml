@@ -53,7 +53,7 @@ spec:
   {{- if .Values.privateIngress.tls }}
   tls:
     - hosts:
-        {{- range $allHosts }}
+        {{- range $allPrivateHosts }}
         - {{ . | quote }}
         {{- end }}
       secretName: {{ include "docker-template.fullname" . }}-private
