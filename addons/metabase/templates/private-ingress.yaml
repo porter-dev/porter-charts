@@ -50,6 +50,14 @@ metadata:
     {{- end }}
 spec:
   ingressClassName: {{ .Values.privateIngress.privateIngressClass }}
+  {{- if .Values.privateIngress.tls }}
+  tls:
+    - hosts:
+        {{- range $allHosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ include "docker-template.fullname" . }}-private
+  {{- end }}
   rules:
   {{- range $allPrivateHosts }}
     - host: {{ . }}
