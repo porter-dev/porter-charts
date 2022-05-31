@@ -80,6 +80,12 @@ tolerations: []
 
 affinity: {}
 
+pvc:
+  enabled: false
+  storage: 20Gi
+  mountPath: /mypath
+  existingVolume: ""
+
 n8n:
   port: 5678
   database:
