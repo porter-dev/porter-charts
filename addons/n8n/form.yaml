@@ -77,3 +77,32 @@ tabs:
     - type: env-key-value-array
       label: 
       variable: container.env.normal
+- name: advanced
+  label: Advanced
+  sections:
+  - name: persistence
+    contents:
+      - type: heading
+        label: Persistent Disks
+      - type: subtitle
+        label: Attach persistent disks to your deployment to retain data across releases.
+      - type: checkbox
+        label: Enable Persistence
+        variable: pvc.enabled
+  - name: persistent_storage
+    show_if: pvc.enabled
+    contents:
+      - type: number-input
+        label: Persistent Storage
+        variable: pvc.storage
+        placeholder: "ex: 20"
+        settings:
+          unit: Gi
+          default: 20
+      - type: string-input
+        label: Mount Path
+        variable: pvc.mountPath
+        placeholder: "ex: /mypath"
+        settings:
+          required: true
+          default: /mypath    
