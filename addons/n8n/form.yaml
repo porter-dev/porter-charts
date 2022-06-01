@@ -8,7 +8,7 @@ tabs:
     - type: heading
       label: Network Settings
     - type: subtitle
-      label: For containers that you do not want to expose to external traffic (e.g. databases and add-on's), you may make them accessible only to other internal services running within the same cluster. 
+      label: For containers that you do not want to expose to external traffic (e.g. databases and add-on's), you may make them accessible only to other internal services running within the same cluster.
     - type: checkbox
       variable: ingress.enabled
       label: Expose to external traffic
@@ -75,7 +75,7 @@ tabs:
     - type: subtitle
       label: Set environment variables for your secrets and environment-specific configuration. For configuring n8n, please see the n8n documentation.
     - type: env-key-value-array
-      label: 
+      label:
       variable: container.env.normal
 - name: advanced
   label: Advanced
