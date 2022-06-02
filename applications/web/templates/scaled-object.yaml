@@ -17,19 +17,19 @@ spec:
     failureThreshold: {{ .Values.keda.fallback.failureThreshold }}
     replicas: {{ .Values.keda.fallback.failureReplicas }}
   advanced:
-    restoreToOriginalReplicaCount: true
+    restoreToOriginalReplicaCount: false
     horizontalPodAutoscalerConfig:
       behavior:
         scaleUp:
           stabilizationWindowSeconds: {{ .Values.keda.hpa.scaleUp.stabilizationWindowSeconds }}
           policies:
-          - type: Percent
+          - type: {{ .Values.keda.hpa.scaleUp.policy.type }}
             value: {{ .Values.keda.hpa.scaleUp.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleUp.policy.periodSeconds }}
         scaleDown:
           stabilizationWindowSeconds: {{ .Values.keda.hpa.scaleDown.stabilizationWindowSeconds }}
           policies:
-          - type: Percent
+          - type: {{ .Values.keda.hpa.scaleDown.policy.type }}
             value: {{ .Values.keda.hpa.scaleDown.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleDown.policy.periodSeconds }}
   triggers:
