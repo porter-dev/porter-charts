@@ -84,11 +84,13 @@ keda:
     scaleUp:
       stabilizationWindowSeconds: 300
       policy:
+        type: Percent
         value: 10
         periodSeconds: 300
     scaleDown:
       stabilizationWindowSeconds: 300
       policy:
+        type: Percent
         value: 10
         periodSeconds: 300
   trigger:
