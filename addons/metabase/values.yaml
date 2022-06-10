@@ -42,6 +42,7 @@ ingress:
 
 privateIngress:
   enabled: false
+  tls: false
   privateIngressClass:
   hosts: []
   custom_paths: []
