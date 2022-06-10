@@ -114,7 +114,7 @@ spec:
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ $tag }}"
             - name: PORTER_POD_REVISION
-              value: "{{ .Release.Revision }}"
+              value: "{{ $.Release.Revision }}"
             {{- range $key, $val := $.Values.container.env.normal }}
             - name: {{ $key }}
             {{- $splVal := split "_" $val -}}
