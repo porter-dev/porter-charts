@@ -77,6 +77,11 @@ spec:
             httpGet:
               path: {{ .Values.health.livenessProbe.path }}
               port: http
+            {{ if .Values.health.livenessProbe.auth.enabled }}
+            httpHeaders:
+              - name: Authorization
+                value: Basic {{ .Values.livenessProbe.auth.basicAuthHeader }}
+            {{ end }}
             periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
             failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
           {{ end }}
@@ -85,6 +90,11 @@ spec:
             httpGet:
               path: {{ .Values.health.readinessProbe.path }}
               port: http
+            {{ if .Values.health.readinessProbe.auth.enabled }}
+            httpHeaders:
+              - name: Authorization
+                value: Basic {{ .Values.readinessProbe.auth.basicAuthHeader }}
+            {{ end }}
             periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
           {{ end }}
           {{ if .Values.health.startupProbe.enabled }}
@@ -92,6 +102,11 @@ spec:
             httpGet:
               path: {{ .Values.health.startupProbe.path }}
               port: http
+            {{ if .Values.health.startupProbe.auth.enabled }}
+            httpHeaders:
+              - name: Authorization
+                value: Basic {{ .Values.startupProbe.auth.basicAuthHeader }}
+            {{ end }}
             periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
             failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
           {{ end }}
