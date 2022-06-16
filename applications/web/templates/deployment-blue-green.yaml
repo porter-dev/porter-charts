@@ -76,7 +76,7 @@ spec:
               {{ if .Values.health.livenessProbe.auth.enabled }}
               httpHeaders:
                 - name: Authorization
-                  value: Basic {{ printf "%s:%s" .Values.livenessProbe.auth.username .Values.livenessProbe.auth.password | b64enc | quote }}
+                  value: Basic {{ printf "%s:%s" .Values.health.livenessProbe.auth.username .Values.health.livenessProbe.auth.password | b64enc | quote }}
               {{ end }}
             periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
             failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
@@ -89,7 +89,7 @@ spec:
               {{ if .Values.health.readinessProbe.auth.enabled }}
               httpHeaders:
                 - name: Authorization
-                  value: Basic {{ printf "%s:%s" .Values.readinessProbe.auth.username .Values.readinessProbe.auth.password | b64enc | quote }}
+                  value: Basic {{ printf "%s:%s" .Values.health.readinessProbe.auth.username .Values.health.readinessProbe.auth.password | b64enc | quote }}
               {{ end }}
             periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
           {{ end }}
@@ -101,7 +101,7 @@ spec:
             {{ if .Values.health.startupProbe.auth.enabled }}
               httpHeaders:
                 - name: Authorization
-                  value: Basic {{ printf "%s:%s" .Values.startupProbe.auth.username .Values.startupProbe.auth.password | b64enc | quote }}
+                  value: Basic {{ printf "%s:%s" .Values.health.startupProbe.auth.username .Values.health.startupProbe.auth.password | b64enc | quote }}
               {{ end }}
             periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
             failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
