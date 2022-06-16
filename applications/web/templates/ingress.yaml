@@ -75,11 +75,13 @@ spec:
         {{- range $allHosts }}
         - {{ . | quote }}
         {{- end }}
+      {{- if not .Values.ingress.useDefaultIngressTLSSecret }}
       {{ if .Values.ingress.wildcard }}
       secretName: wildcard-cert-tls
       {{ else }}
       secretName: {{ include "docker-template.fullname" . }}  
       {{ end }}
+      {{- end }}
   {{- end }}
 
   rules:
