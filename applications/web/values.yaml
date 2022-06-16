@@ -106,7 +106,7 @@ health:
     failureThreshold: 3
     auth:
       enabled: false
-      basicAuthHeader:
+      basicAuthHeader: ""
 
   readinessProbe:
     enabled: false
@@ -114,7 +114,7 @@ health:
     periodSeconds: 5
     auth:
       enabled: false
-      basicAuthHeader:
+      basicAuthHeader: ""
 
   startupProbe:
     enabled: false
@@ -123,7 +123,7 @@ health:
     periodSeconds: 5
     auth:
       enabled: false
-      basicAuthHeader:
+      basicAuthHeader: ""
 
 pvc:
   enabled: false
