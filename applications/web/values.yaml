@@ -104,17 +104,29 @@ health:
     path: "/livez"
     periodSeconds: 5
     failureThreshold: 3
+    auth:
+      enabled: false
+      username: ""
+      password: ""
 
   readinessProbe:
     enabled: false
     path: "/readyz"
     periodSeconds: 5
+    auth:
+      enabled: false
+      username: ""
+      password: ""
 
   startupProbe:
     enabled: false
     path: "/startupz"
     failureThreshold: 3
     periodSeconds: 5
+    auth:
+      enabled: false
+      username: ""
+      password: ""
 
 pvc:
   enabled: false
