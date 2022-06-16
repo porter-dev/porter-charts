@@ -68,28 +68,43 @@ spec:
               containerPort: {{ .containerPort }}
               protocol: TCP
             {{- end }}
-          {{ if $.Values.health.livenessProbe.enabled }}
+          {{ if .Values.health.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
-              path: {{ $.Values.health.livenessProbe.path }}
+              path: {{ .Values.health.livenessProbe.path }}
               port: http
-            periodSeconds: {{ $.Values.health.livenessProbe.periodSeconds }}
-            failureThreshold: {{ $.Values.health.livenessProbe.failureThreshold }}
+              {{ if .Values.health.livenessProbe.auth.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.health.livenessProbe.auth.username .Values.health.livenessProbe.auth.password | b64enc }}
+              {{ end }}
+            periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
           {{ end }}
-          {{ if $.Values.health.readinessProbe.enabled }}
+          {{ if .Values.health.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
-              path: {{ $.Values.health.readinessProbe.path }}
+              path: {{ .Values.health.readinessProbe.path }}
               port: http
-            periodSeconds: {{ $.Values.health.readinessProbe.periodSeconds }}
+              {{ if .Values.health.readinessProbe.auth.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.health.readinessProbe.auth.username .Values.health.readinessProbe.auth.password | b64enc }}
+              {{ end }}
+            periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
           {{ end }}
-          {{ if $.Values.health.startupProbe.enabled }}
+          {{ if .Values.health.startupProbe.enabled }}
           startupProbe:
             httpGet:
-              path: {{ $.Values.health.startupProbe.path }}
+              path: {{ .Values.health.startupProbe.path }}
               port: http
-            periodSeconds: {{ $.Values.health.startupProbe.periodSeconds }}
-            failureThreshold: {{ $.Values.health.startupProbe.failureThreshold }}
+            {{ if .Values.health.startupProbe.auth.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.health.startupProbe.auth.username .Values.health.startupProbe.auth.password | b64enc }}
+              {{ end }}
+            periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
           {{ end }}
           resources:
             requests:
