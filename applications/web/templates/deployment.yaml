@@ -93,7 +93,7 @@ spec:
             {{ if .Values.health.readinessProbe.auth.enabled }}
             httpHeaders:
               - name: Authorization
-                value: Basic {{ .Values.readinessProbe.auth.basicAuthHeader }}
+                value: Basic {{ .Values.health.readinessProbe.auth.basicAuthHeader }}
             {{ end }}
             periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
           {{ end }}
