@@ -106,7 +106,6 @@ health:
     scheme: "HTTP"
     periodSeconds: 5
     failureThreshold: 3
-    timeoutSeconds: 1
     auth:
       enabled: false
       username: ""
@@ -117,7 +116,6 @@ health:
     path: "/readyz"
     scheme: "HTTP"
     periodSeconds: 5
-    timeoutSeconds: 1
     auth:
       enabled: false
       username: ""
@@ -129,7 +127,6 @@ health:
     scheme: "HTTP"
     failureThreshold: 3
     periodSeconds: 5
-    timeoutSeconds: 1
     auth:
       enabled: false
       username: ""

@@ -81,7 +81,6 @@ spec:
               {{ end }}
             periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
             failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
-            timeoutSeconds: {{ .Values.health.livenessProbe.timeoutSeconds }}
           {{ end }}
           {{ if .Values.health.readinessProbe.enabled }}
           readinessProbe:
@@ -95,7 +94,6 @@ spec:
                   value: Basic {{ printf "%s:%s" .Values.health.readinessProbe.auth.username .Values.health.readinessProbe.auth.password | b64enc }}
               {{ end }}
             periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.health.readinessProbe.timeoutSeconds }}
           {{ end }}
           {{ if .Values.health.startupProbe.enabled }}
           startupProbe:
@@ -110,7 +108,6 @@ spec:
               {{ end }}
             periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
             failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
-            timeoutSeconds: {{ .Values.health.startupProbe.timeoutSeconds }}
           {{ end }}
           resources:
             requests:
