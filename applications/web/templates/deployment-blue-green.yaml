@@ -68,17 +68,43 @@ spec:
               containerPort: {{ .containerPort }}
               protocol: TCP
             {{- end }}
-          {{ if ($.Values.readinessProbe.enabled) }}
-          readinessProbe:
-            {{- toYaml $.Values.readinessProbe | nindent 12 }}
-          {{ end }}
-          {{ if ($.Values.startupProbe.enabled) }}
-          startupProbe:
-            {{- toYaml $.Values.startupProbe | nindent 12 }}
-          {{ end }}
-          {{ if ($.Values.livenessProbe.enabled) }}
+          {{ if .Values.health.livenessProbe.enabled }}
           livenessProbe:
-            {{- toYaml $.Values.livenessProbe | nindent 12 }}
+            httpGet:
+              path: {{ .Values.health.livenessProbe.path }}
+              port: http
+              {{ if .Values.health.livenessProbe.auth.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.health.livenessProbe.auth.username .Values.health.livenessProbe.auth.password | b64enc }}
+              {{ end }}
+            periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
+          {{ end }}
+          {{ if .Values.health.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.health.readinessProbe.path }}
+              port: http
+              {{ if .Values.health.readinessProbe.auth.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.health.readinessProbe.auth.username .Values.health.readinessProbe.auth.password | b64enc }}
+              {{ end }}
+            periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
+          {{ end }}
+          {{ if .Values.health.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.health.startupProbe.path }}
+              port: http
+            {{ if .Values.health.startupProbe.auth.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.health.startupProbe.auth.username .Values.health.startupProbe.auth.password | b64enc }}
+              {{ end }}
+            periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
           {{ end }}
           resources:
             requests:
@@ -103,7 +129,7 @@ spec:
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ $tag }}"
             - name: PORTER_POD_REVISION
-              value: "{{ .Release.Revision }}"
+              value: "{{ $.Release.Revision }}"
             {{- range $key, $val := $.Values.container.env.normal }}
             - name: {{ $key }}
             {{- $splVal := split "_" $val -}}
