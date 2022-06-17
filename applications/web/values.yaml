@@ -105,6 +105,7 @@ health:
     path: "/livez"
     periodSeconds: 5
     failureThreshold: 3
+    timeoutSeconds: 1
     auth:
       enabled: false
       username: ""
@@ -114,6 +115,7 @@ health:
     enabled: false
     path: "/readyz"
     periodSeconds: 5
+    timeoutSeconds: 1
     auth:
       enabled: false
       username: ""
@@ -124,6 +126,7 @@ health:
     path: "/startupz"
     failureThreshold: 3
     periodSeconds: 5
+    timeoutSeconds: 1
     auth:
       enabled: false
       username: ""
