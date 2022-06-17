@@ -40,6 +40,7 @@ ingress:
   annotations: {}
   wildcard: false
   tls: true
+  useDefaultIngressTLSSecret: false
 
 
 privateIngress:
@@ -102,28 +103,34 @@ health:
   livenessProbe:
     enabled: false
     path: "/livez"
+    scheme: "http"
     periodSeconds: 5
     failureThreshold: 3
     auth:
       enabled: false
-      basicAuthHeader: ""
+      username: ""
+      password: ""
 
   readinessProbe:
     enabled: false
     path: "/readyz"
+    scheme: "http"
     periodSeconds: 5
     auth:
       enabled: false
-      basicAuthHeader: ""
+      username: ""
+      password: ""
 
   startupProbe:
     enabled: false
     path: "/startupz"
+    scheme: "http"
     failureThreshold: 3
     periodSeconds: 5
     auth:
       enabled: false
-      basicAuthHeader: ""
+      username: ""
+      password: ""
 
 pvc:
   enabled: false
