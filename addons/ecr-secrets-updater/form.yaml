@@ -1,0 +1,24 @@
+name: Porter ECR Secrets Updater
+tabs:
+  - name: main
+    label: Main Settings
+    sections:
+      - name: creds
+        contents:
+          - type: heading
+            label: AWS Credentials
+          - type: subtitle
+            label: Set your AWS credentials to automate the process of updating ECR secrets.
+          - type: string-input
+            variable: awsCreds.awsAccessKeyID
+            label: AWS Access Key ID
+            settings:
+              required: true
+          - type: string-input
+            variable: awsCreds.awsSecretAccessKey
+            label: AWS Secret Access Key
+            settings:
+              required: true
+          - type: string-input
+            variable: awsCreds.awsSessionToken
+            label: AWS Session Token (only required for temporary security credentials retrieved via STS)

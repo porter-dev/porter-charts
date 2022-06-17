@@ -1,0 +1,4 @@
+awsCreds:
+  awsAccessKeyID: ""
+  awsSecretAccessKey: ""
+  awsSessionToken: ""
