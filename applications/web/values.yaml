@@ -124,7 +124,7 @@ health:
   startupProbe:
     enabled: false
     path: "/startupz"
-    scheme: "http"
+    scheme: "HTTP"
     failureThreshold: 3
     periodSeconds: 5
     auth:
