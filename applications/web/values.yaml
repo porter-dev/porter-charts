@@ -103,7 +103,7 @@ health:
   livenessProbe:
     enabled: false
     path: "/livez"
-    scheme: "http"
+    scheme: "HTTP"
     periodSeconds: 5
     failureThreshold: 3
     auth:
@@ -114,7 +114,7 @@ health:
   readinessProbe:
     enabled: false
     path: "/readyz"
-    scheme: "http"
+    scheme: "HTTP"
     periodSeconds: 5
     auth:
       enabled: false
