@@ -49,7 +49,7 @@ data:
           {{- end }}
           {{- with .Values.nodeSelector }}
           nodeSelector:
-    {{ toYaml . | indent 6 }}
+    {{ toYaml . | indent 8 }}
       {{- end }}
           containers:
           - name: {{ .Chart.Name }}
