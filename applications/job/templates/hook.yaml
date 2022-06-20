@@ -50,6 +50,14 @@ spec:
           operator: "Equal"
           value: "true"
           effect: "NoSchedule"
+      {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 6 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
       volumes:
       - name: manifest-data
         configMap:
