@@ -43,7 +43,7 @@ data:
             value: "true"
             effect: "NoSchedule"
           nodeSelector:
-          {{toYaml .globalTolerations.tolerations | indent 2}}
+          {{toYaml .Values.nodeSelector | indent 2}}
           containers:
           - name: {{ .Chart.Name }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
