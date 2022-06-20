@@ -49,5 +49,5 @@ sidecar:
 
 retainFailedHooks: false
 
-tolerations:
-nodeSelector:
+tolerations: []
+nodeSelector: {}
