@@ -51,7 +51,6 @@ spec:
           value: "true"
           effect: "NoSchedule"
       {{- with .Values.tolerations }}
-      tolerations:
 {{ toYaml . | indent 6 }}
       {{- end }}
       {{- with .Values.nodeSelector }}
