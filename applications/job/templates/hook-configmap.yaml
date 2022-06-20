@@ -41,6 +41,13 @@ data:
             operator: "Equal"
             value: "true"
             effect: "NoSchedule"
+          {{- with .Values.tolerations }}    
+    {{ toYaml . | indent 6 }}
+          {{- end }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+    {{ toYaml . | indent 6 }}
+      {{- end }}
           containers:
           - name: {{ .Chart.Name }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
