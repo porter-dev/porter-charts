@@ -49,9 +49,5 @@ sidecar:
 
 retainFailedHooks: false
 nodeSelector:
-  porter.run/workload-kind: on-demand
-tolerations:
-  - effect: NoSchedule
-    key: porter.run/workload-kind
-    operator: Equal
-    value: on-demand
+  porter.run/workload-kind: {}
+tolerations: []
