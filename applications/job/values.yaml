@@ -48,6 +48,10 @@ sidecar:
       memory: 10Mi
 
 retainFailedHooks: false
-
-tolerations: []
-nodeSelector: {}
+nodeSelector:
+  porter.run/workload-kind: on-demand
+tolerations:
+  - effect: NoSchedule
+    key: porter.run/workload-kind
+    operator: Equal
+    value: on-demand
