@@ -171,3 +171,10 @@ bluegreen:
 customNodePort:
   enabled: false
   port: 30000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["all"]

@@ -91,3 +91,9 @@ cloudsql:
   serviceAccountJSON: ""
 
 nodeSelector: {}
+
+securityContext:
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["all"]

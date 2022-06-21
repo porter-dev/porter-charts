@@ -12,4 +12,15 @@ spec:
       image: busybox
       command: ['wget']
       args: ['{{ include "docker-template.fullname" . }}:{{ .Values.service.port }}']
+      securityContext:
+        allowPrivilegeEscalation: false
+        runAsNonRoot: true
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["all"]
+      resources:
+        request:
+          memory: 32Mi
+        limits:
+          memory: 32Mi
   restartPolicy: Never
