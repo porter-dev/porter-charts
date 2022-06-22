@@ -1,0 +1,17 @@
+name: New Relic agent
+tabs:
+- name: main
+  label: Info
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: Deploy New Relic
+    - type: subtitle
+      label: This installs the consolidated New Relic Kubernetes agent, for which you need to supply a cluster name - ideally one that's unique to your New Relic dashboard, as well as your license key.
+    - type: string-input
+      label: New Relic License Key
+      variable: global.licenseKey
+    - type: string-input
+      label: Cluster Name
+      variable: global.cluster
