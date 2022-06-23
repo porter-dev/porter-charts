@@ -4,12 +4,12 @@
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "docker-template.fullname" . }}-{{ $tag }}
+  name: {{ include "docker-template.fullname" $ }}-{{ $tag }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "docker-template.fullname" . }}-{{ $tag }}
+    name: {{ include "docker-template.fullname" $ }}-{{ $tag }}
   minReplicas: {{ $.Values.autoscaling.minReplicas }}
   maxReplicas: {{ $.Values.autoscaling.maxReplicas }}
   metrics:
