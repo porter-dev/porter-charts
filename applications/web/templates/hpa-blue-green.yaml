@@ -1,5 +1,5 @@
 {{- if and (not $.Values.statefulset.enabled) $.Values.bluegreen.enabled -}}
-{{- if .Values.autoscaling.enabled }}
+{{- if $.Values.autoscaling.enabled }}
 {{- range $v, $tag := $.Values.bluegreen.imageTags }}
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -10,10 +10,10 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "docker-template.fullname" . }}-{{ $tag }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  minReplicas: {{ $.Values.autoscaling.minReplicas }}
+  maxReplicas: {{ $.Values.autoscaling.maxReplicas }}
   metrics:
-{{- with .Values.autoscaling.targetMemoryUtilizationPercentage }}
+{{- with $.Values.autoscaling.targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
@@ -21,7 +21,7 @@ spec:
           type: Utilization
           averageUtilization: {{ . }}
 {{- end }}
-{{- with .Values.autoscaling.targetCPUUtilizationPercentage }}
+{{- with $.Values.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: cpu

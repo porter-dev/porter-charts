@@ -1,3 +1,4 @@
+{{- if not .Values.bluegreen.enabled -}}
 {{- if .Values.autoscaling.enabled }}
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -26,5 +27,6 @@ spec:
         target:
           type: Utilization
           averageUtilization: {{ . }}
+{{- end }}
 {{- end }}
 {{- end }}
