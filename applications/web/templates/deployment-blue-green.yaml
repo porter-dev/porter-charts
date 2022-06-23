@@ -108,6 +108,7 @@ spec:
                 - name: Authorization
                   value: Basic {{ printf "%s:%s" $.Values.health.startupProbe.auth.username $.Values.health.startupProbe.auth.password | b64enc }}
               {{ end }}
+
             periodSeconds: {{ $.Values.health.startupProbe.periodSeconds }}
             failureThreshold: {{ $.Values.health.startupProbe.failureThreshold }}
             timeoutSeconds: {{ $.Values.health.startupProbe.timeoutSeconds }}
