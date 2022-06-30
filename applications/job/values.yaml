@@ -21,15 +21,15 @@ container:
   env:
     normal:
 
-schedule: 
-  enabled: false 
+schedule:
+  enabled: false
   value: "*/5 * * * *"
 
 resources:
   requests:
     cpu: 100m
     memory: 256Mi
-  
+
 paused: false
 
 cloudsql:
@@ -48,3 +48,6 @@ sidecar:
       memory: 10Mi
 
 retainFailedHooks: false
+nodeSelector:
+  porter.run/workload-kind: {}
+tolerations: []

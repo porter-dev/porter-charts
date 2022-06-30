@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: porter-ecr-secrets-updater-cronjob
+spec:
+  schedule: "0 */8 * * *"
+  jobTemplate:
+    spec:
+      backoffLimit: 5
+      template:
+        spec:
+          serviceAccountName: porter-ecr-secrets-updater-svc-acc
+          containers:
+            - name: update-secrets
+              image: public.ecr.aws/o1j4x7p4/porter-ecr-secrets-updater:latest
+              imagePullPolicy: Always
+              args:
+                - --aws_access_key_id="{{ .Values.awsCreds.awsAccessKeyID }}"
+                - --aws_secret_access_key="{{ .Values.awsCreds.awsSecretAccessKey }}"
+                - --aws_session_token="{{ .Values.awsCreds.awsSessionToken }}"
+          restartPolicy: OnFailure

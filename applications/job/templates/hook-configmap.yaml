@@ -36,11 +36,12 @@ data:
         spec:
           restartPolicy: Never
           shareProcessNamespace: true
-          tolerations:
+          tolerations: {{- toYaml .Values.tolerations | nindent 6 }}
           - key: "removable"
             operator: "Equal"
             value: "true"
             effect: "NoSchedule"
+          nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}
           containers:
           - name: {{ .Chart.Name }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
