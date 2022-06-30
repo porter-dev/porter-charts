@@ -68,7 +68,12 @@ spec:
             {{- else }}
               value: {{ quote $val }}
             {{- end }}
-            {{- end }}      
+            {{- end }}
+          {{ if .Values.pvc.enabled }}
+          volumeMounts:
+            - name: "{{ include "docker-template.fullname" . }}-storage"
+              mountPath: {{ .Values.pvc.mountPath }}
+          {{ end }}         
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -83,3 +88,13 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{ if .Values.pvc.enabled }}
+      volumes:
+        - name: "{{ include "docker-template.fullname" . }}-storage"
+          persistentVolumeClaim:
+        {{ if not (eq .Values.pvc.existingVolume "")}}
+            claimName: {{ .Values.pvc.existingVolume }}
+        {{ else }}
+            claimName: "{{ include "docker-template.fullname" . }}-pvc"
+        {{ end }}
+      {{ end }}
