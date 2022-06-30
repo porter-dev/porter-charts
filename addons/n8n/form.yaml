@@ -105,4 +105,4 @@ tabs:
         placeholder: "ex: /mypath"
         settings:
           required: true
-          default: /mypath    
+          default: /mypath

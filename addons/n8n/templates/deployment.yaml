@@ -68,12 +68,12 @@ spec:
             {{- else }}
               value: {{ quote $val }}
             {{- end }}
-            {{- end }}    
+            {{- end }}
           {{ if .Values.pvc.enabled }}
           volumeMounts:
             - name: "{{ include "docker-template.fullname" . }}-storage"
               mountPath: {{ .Values.pvc.mountPath }}
-          {{ end }}  
+          {{ end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
