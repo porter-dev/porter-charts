@@ -49,6 +49,8 @@ privateIngress:
   hosts: []
   custom_paths: []
   annotations: {}
+  tls: false
+  # secretName: my-existing-secret
 
 container:
   port: 80
