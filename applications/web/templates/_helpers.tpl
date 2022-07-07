@@ -48,7 +48,7 @@ Selector labels
 */}}
 {{- define "docker-template.selectorLabels" -}}
 app.kubernetes.io/name: {{ .Release.Name }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Release.Name }}-{{ include "docker-template.name" . }}
 {{- end }}
 
 {{/*
