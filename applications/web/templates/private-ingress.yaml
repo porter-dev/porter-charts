@@ -26,9 +26,9 @@ metadata:
     # provider-agnostic default annotations
     # if value is provided as "null" or null, it is unset
     # adding a fix for scenarios where ingress annotations are inside ingress.annotations.normal
-    {{- if not (hasKey .Values.ingress.annotations "normal")}} 
-    {{- if gt (len .Values.ingress.annotations) 0}}
-    {{- range $k, $v := .Values.ingress.annotations }}
+    {{- if not (hasKey .Values.privateIngress.annotations "normal")}} 
+    {{- if gt (len .Values.privateIngress.annotations) 0}}
+    {{- range $k, $v := .Values.privateIngress.annotations }}
     {{- if $v}}
     {{- if and (not (eq $v "null")) $v}}
     {{ $k }}: {{ $v }}
@@ -37,9 +37,9 @@ metadata:
     {{- end }}
     {{- end }}
     {{- end }}
-    {{- if hasKey .Values.ingress.annotations "normal"}}
-    {{- if gt (len .Values.ingress.annotations.normal) 0}}
-    {{- range $k, $v := .Values.ingress.annotations.normal }}
+    {{- if hasKey .Values.privateIngress.annotations "normal"}}
+    {{- if gt (len .Values.privateIngress.annotations.normal) 0}}
+    {{- range $k, $v := .Values.privateIngress.annotations.normal }}
     {{- if $v}}
     {{- if and (not (eq $v "null")) $v}}
     {{ $k }}: {{ $v }}
@@ -50,6 +50,18 @@ metadata:
     {{- end }}
 spec:
   ingressClassName: {{ .Values.privateIngress.privateIngressClass }}
+  {{- if .Values.privateIngress.tls }}
+  tls:
+    - hosts:
+        {{- range $allPrivateHosts }}
+        - {{ . | quote }}
+        {{- end }}
+      {{- if .Values.privateIngress.secretName }}
+      secretName: {{ .Values.privateIngress.secretName }}
+      {{- else }}
+      secretName: {{ include "docker-template.fullname" . }}
+      {{- end }}
+  {{- end }}
   rules:
   {{- range $allPrivateHosts }}
     - host: {{ . }}
