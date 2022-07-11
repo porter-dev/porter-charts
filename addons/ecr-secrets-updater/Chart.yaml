@@ -1,5 +1,5 @@
 apiVersion: v2
-name: porter-ecr-secrets-updater
+name: ECR Secrets Updater
 description: A Helm chart to update a Porter release's ECR secrets through a cronjob
 type: application
 version: 0.1.0
