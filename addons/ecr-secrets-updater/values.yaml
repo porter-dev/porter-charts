@@ -1,0 +1,7 @@
+awsCreds:
+  awsAccessKeyID: ""
+  awsSecretAccessKey: ""
+  awsSessionToken: ""
+
+schedule:
+  value: "0 */8 * * *"
