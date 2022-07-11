@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: porter-ecr-secrets-updater-cronjob
 spec:
-  schedule: "0 */8 * * *"
+  schedule: "{{ .Values.schedule.value }}"
   jobTemplate:
     spec:
       backoffLimit: 5
