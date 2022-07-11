@@ -22,3 +22,14 @@ tabs:
           - type: string-input
             variable: awsCreds.awsSessionToken
             label: AWS Session Token (only required for temporary security credentials retrieved via STS)
+          - type: heading
+            label: Schedule
+          - type: subtitle
+            label: Set the cron job schedule.
+          - type: cron
+            variable: schedule.value
+            label: Crontab expression
+            placeholder: "ex: 0 */8 * * *"
+            settings:
+              required: false
+              default: "0 */8 * * *"
