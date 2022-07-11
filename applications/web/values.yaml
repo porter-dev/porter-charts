@@ -49,6 +49,8 @@ privateIngress:
   hosts: []
   custom_paths: []
   annotations: {}
+  tls: false
+  # secretName: my-existing-secret
 
 container:
   port: 80
@@ -103,8 +105,10 @@ health:
   livenessProbe:
     enabled: false
     path: "/livez"
+    scheme: "HTTP"
     periodSeconds: 5
     failureThreshold: 3
+    timeoutSeconds: 1
     auth:
       enabled: false
       username: ""
@@ -113,7 +117,9 @@ health:
   readinessProbe:
     enabled: false
     path: "/readyz"
+    scheme: "HTTP"
     periodSeconds: 5
+    timeoutSeconds: 1
     auth:
       enabled: false
       username: ""
@@ -122,8 +128,10 @@ health:
   startupProbe:
     enabled: false
     path: "/startupz"
+    scheme: "HTTP"
     failureThreshold: 3
     periodSeconds: 5
+    timeoutSeconds: 1
     auth:
       enabled: false
       username: ""
