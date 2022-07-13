@@ -5,7 +5,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: porter-ecr-secrets-updater-svc-acc
-    namespace: default
+    namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
   name: porter-ecr-secrets-updater-clusterrole
