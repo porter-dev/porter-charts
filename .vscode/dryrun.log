@@ -1,6 +1,0 @@
-make --dry-run --always-make --keep-going --print-directory
-make: Entering directory `/Users/mnafees/git/porter-dev/porter-charts'
-make: Leaving directory `/Users/mnafees/git/porter-dev/porter-charts'
- 
-make: *** No targets specified and no makefile found.  Stop.
-
