@@ -90,9 +90,10 @@ spec:
           {{ if .Values.health.livenessCommand.enabled }}
           livenessProbe:
             exec:
-              {{- range $command := trim .Values.health.livenessCommand.command | splitList " " }}
-              - {{ $command | quote }}
-              {{- end }}
+              command:
+                {{- range $command := trim .Values.health.livenessCommand.command | splitList " " }}
+                - {{ $command | quote }}
+                {{- end }}
             initialDelaySeconds: {{ .Values.health.livenessCommand.initialDelaySeconds }}
             periodSeconds: {{ .Values.health.livenessCommand.periodSeconds }}
           {{ end }}
