@@ -113,12 +113,6 @@ health:
       enabled: false
       username: ""
       password: ""
-  
-  livenessCommand:
-    enabled: false
-    command: "ls -l"
-    periodSeconds: 5
-    initialDelaySeconds: 5
 
   readinessProbe:
     enabled: false

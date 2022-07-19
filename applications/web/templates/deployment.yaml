@@ -87,16 +87,6 @@ spec:
             failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
             timeoutSeconds: {{ .Values.health.livenessProbe.timeoutSeconds }}
           {{ end }}
-          {{ if .Values.health.livenessCommand.enabled }}
-          livenessProbe:
-            exec:
-              command:
-                {{- range $command := trim .Values.health.livenessCommand.command | splitList " " }}
-                - {{ $command | quote }}
-                {{- end }}
-            initialDelaySeconds: {{ .Values.health.livenessCommand.initialDelaySeconds }}
-            periodSeconds: {{ .Values.health.livenessCommand.periodSeconds }}
-          {{ end }}
           {{ if .Values.health.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
