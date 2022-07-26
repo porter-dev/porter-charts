@@ -24,10 +24,6 @@ tabs:
             variable: container.command
       - name: section_one_cont
         contents:
-          - type: url-link
-            label: Container URL
-            value: |
-              .items[] | printf("https://my-url.com/%s", .metadata.name)
           - type: subtitle
             label: Specify the port your application is running on.
           - type: number-input
