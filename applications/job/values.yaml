@@ -48,3 +48,5 @@ sidecar:
       memory: 10Mi
 
 retainFailedHooks: false
+nodeSelector: {}
+tolerations: []
