@@ -25,6 +25,11 @@ tabs:
       - name: section_one_cont
         contents:
           - type: subtitle
+            label: Custom URL Link component
+          - type: url-link
+            label: Learn more about start commands
+            value: ["https://google.com/{.name}/{namespace}/{chart.metadata.appVersion}"]
+          - type: subtitle
             label: Specify the port your application is running on.
           - type: number-input
             variable: container.port
