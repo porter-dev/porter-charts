@@ -91,3 +91,5 @@ cloudsql:
   serviceAccountJSON: ""
 
 nodeSelector: {}
+
+tolerations: []

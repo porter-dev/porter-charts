@@ -161,6 +161,7 @@ spec:
           operator: "Equal"
           value: "true"
           effect: "NoSchedule"
+        {{ .Values.tolerations }}
       {{ if or .Values.pvc.enabled .Values.cloudsql.enabled }}
       volumes:
         {{ if .Values.cloudsql.enabled }}
