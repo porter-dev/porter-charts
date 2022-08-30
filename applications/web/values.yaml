@@ -42,6 +42,10 @@ ingress:
   tls: true
   useDefaultIngressTLSSecret: false
 
+albIngress:
+  enabled: false
+  certificate_arn:
+  custom_paths: []
 
 privateIngress:
   enabled: false
