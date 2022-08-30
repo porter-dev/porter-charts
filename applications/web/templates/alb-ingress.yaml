@@ -2,7 +2,7 @@
 {{- $fullName := include "docker-template.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 {{- $allHosts := .Values.albIngress.hosts -}}
-{{- $customPaths := .Values.ingress.custom_paths -}}
+{{- $customPaths := .Values.albIngress.custom_paths -}}
 {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
 apiVersion: networking.k8s.io/v1
 {{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1/Ingress" -}}
