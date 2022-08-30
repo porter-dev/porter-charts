@@ -13,7 +13,7 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
-  {{ if or .Values.ingress.enabled .Values.customNodePort.enabled }}
+  {{ if or .Values.ingress.enabled .Values.albIngress.enabled .Values.customNodePort.enabled }}
   type: NodePort
   {{ else }}
   type: ClusterIP
