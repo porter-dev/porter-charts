@@ -17,6 +17,9 @@ metadata:
     {{- include "docker-template.labels" . | nindent 4 }}
   annotations:
     kubernetes.io/ingress.class: alb
+    {{- if .Values.albIngress.group_name }}
+    alb.ingress.kubernetes.io/group.name: {{ .Values.albIngress.group_name }}
+    {{- end }}
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
