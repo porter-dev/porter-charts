@@ -47,6 +47,7 @@ albIngress:
   hosts: [] 
   certificate_arn:
   custom_paths: []
+  group_name:
 
 privateIngress:
   enabled: false
