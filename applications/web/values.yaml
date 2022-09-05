@@ -48,6 +48,8 @@ albIngress:
   certificate_arn:
   custom_paths: []
   group_name:
+  target_type: ip
+  security_groups:
 
 privateIngress:
   enabled: false

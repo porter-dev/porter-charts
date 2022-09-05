@@ -26,6 +26,10 @@ metadata:
     {{- if .Values.albIngress.certificate_arn }}
     alb.ingress.kubernetes.io/certificate-arn: {{ .Values.albIngress.certificate_arn }}
     {{- end }}
+    alb.ingress.kubernetes.io/target-type: {{ .Values.albIngress.target_type }}
+    {{- if .Values.albIngress.security_groups }}
+    alb.ingress.kubernetes.io/security-groups: {{ .Values.albIngress.security_groups }}
+    {{- end }}
 spec:
   rules:
   {{- range $allHosts }}
