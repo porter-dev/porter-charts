@@ -26,6 +26,16 @@ metadata:
     {{- if .Values.albIngress.certificate_arn }}
     alb.ingress.kubernetes.io/certificate-arn: {{ .Values.albIngress.certificate_arn }}
     {{- end }}
+    alb.ingress.kubernetes.io/target-type: {{ .Values.albIngress.target_type }}
+    {{- if .Values.albIngress.security_groups }}
+    alb.ingress.kubernetes.io/security-groups: {{ .Values.albIngress.security_groups }}
+    {{- end }}
+    {{- if .Values.albIngress.healthcheck_port }}
+    alb.ingress.kubernetes.io/healthcheck-port: {{ .Values.albIngress.healthcheck_port }}
+    {{- end }}
+    {{- if .Values.albIngress.healthcheck_protocol }}
+    alb.ingress.kubernetes.io/healthcheck-protocol: {{ .Values.albIngress.healthcheck_protocol }}
+    {{- end }}
 spec:
   rules:
   {{- range $allHosts }}
