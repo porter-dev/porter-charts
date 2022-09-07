@@ -48,6 +48,10 @@ albIngress:
   certificate_arn:
   custom_paths: []
   group_name:
+  target_type: ip
+  security_groups:
+  healthcheck_port:
+  healthcheck_protocol:
 
 privateIngress:
   enabled: false
