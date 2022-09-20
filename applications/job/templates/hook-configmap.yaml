@@ -10,7 +10,7 @@ data:
     apiVersion: batch/v1
     kind: Job
     metadata:
-      name: "{{ .Release.Name | trunc 47 }}-{{ randAlphaNum 10 | lower }}"
+      name: "{{ .Release.Name | trunc 47 }}-{{ randAlphaNum 10 | lower }}-hook"
       namespace: {{ .Release.Namespace | quote }}
       labels:
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
