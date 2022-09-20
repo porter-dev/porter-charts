@@ -170,6 +170,9 @@ cloudsql:
     dbPort: 5432
     connectionName: ""
     
+datadog:
+  enabled: false
+    
 nodeSelector: {}
 
 bluegreen:
