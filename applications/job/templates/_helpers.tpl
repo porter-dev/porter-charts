@@ -10,7 +10,7 @@ Expand the name of the chart.
 Expand the name of the chart.
 */}}
 {{- define "hook.name" -}}
-{{- printf "%s-%s" .Release.Name (randAlphaNum 10 | lower) }}
+{{- printf "%s-%s" (.Release.Name | trunc 53) (randAlphaNum 10 | lower) }}
 {{- end }}
 
 {{/*

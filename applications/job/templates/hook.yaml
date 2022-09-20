@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-{{ randAlphaNum 10 | lower }}"
+  name: "{{ .Release.Name | trunc 53 }}-{{ randAlphaNum 10 | lower }}"
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "-5"
