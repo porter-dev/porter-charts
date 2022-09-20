@@ -49,6 +49,7 @@ albIngress:
   custom_paths: []
   group_name:
   target_type: ip
+  scheme: internet-facing
   security_groups:
   healthcheck_port:
   healthcheck_protocol:
@@ -168,6 +169,9 @@ cloudsql:
     enabled: false
     dbPort: 5432
     connectionName: ""
+    
+datadog:
+  enabled: false
     
 nodeSelector: {}
 
