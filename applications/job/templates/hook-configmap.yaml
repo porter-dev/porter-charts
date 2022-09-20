@@ -135,4 +135,9 @@ data:
               secret:
                 secretName: "cloudsql-secret-{{ include "docker-template.fullname" . }}"
           {{ end }}
+<<<<<<< HEAD
 {{- end }}
+=======
+
+{{- end }}
+>>>>>>> bd04345 (job name can be 63 chars max)
