@@ -39,18 +39,17 @@ data:
         spec:
           restartPolicy: Never
           shareProcessNamespace: true
-          tolerations: {{- toYaml .Values.tolerations | nindent 6 }}
+          tolerations:
           - key: "removable"
             operator: "Equal"
             value: "true"
             effect: "NoSchedule"
-          nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}
           containers:
           - name: {{ .Chart.Name }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: "{{ .Values.image.pullPolicy }}"
             {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job"))) }}
-            command: 
+            command:
             {{- range $command := trim .Values.container.command | splitList " " }}
             - {{ $command | quote }}
             {{- end }}
@@ -135,5 +134,5 @@ data:
               secret:
                 secretName: "cloudsql-secret-{{ include "docker-template.fullname" . }}"
           {{ end }}
-          
+
 {{- end }}
