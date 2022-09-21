@@ -135,4 +135,5 @@ data:
               secret:
                 secretName: "cloudsql-secret-{{ include "docker-template.fullname" . }}"
           {{ end }}
+          
 {{- end }}
