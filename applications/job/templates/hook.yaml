@@ -25,7 +25,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: job-manager
-        image: porterhub/job-manager:latest
+        image: public.ecr.aws/o1j4x7p4/job-manager:latest
         imagePullPolicy: Always
         args:
         - "create"
