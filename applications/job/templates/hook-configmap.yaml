@@ -10,7 +10,7 @@ data:
     apiVersion: batch/v1
     kind: Job
     metadata:
-      name: "{{ .Release.Name }}-{{ randAlphaNum 10 | lower }}"
+      name: "{{ .Release.Name | trunc 47 }}-{{ randAlphaNum 10 | lower }}-hook"
       namespace: {{ .Release.Namespace | quote }}
       labels:
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -53,7 +53,7 @@ data:
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: "{{ .Values.image.pullPolicy }}"
             {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job"))) }}
-            command: 
+            command:
             {{- range $command := trim .Values.container.command | splitList " " }}
             - {{ $command | quote }}
             {{- end }}
@@ -138,5 +138,4 @@ data:
               secret:
                 secretName: "cloudsql-secret-{{ include "docker-template.fullname" . }}"
           {{ end }}
-          
 {{- end }}
