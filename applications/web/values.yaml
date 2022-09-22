@@ -28,7 +28,7 @@ service:
 
 statefulset:
   enabled: false
-  
+
 ingress:
   enabled: true
   hosts: []
@@ -44,7 +44,7 @@ ingress:
 
 albIngress:
   enabled: false
-  hosts: [] 
+  hosts: []
   certificate_arn:
   custom_paths: []
   group_name:
@@ -124,7 +124,7 @@ health:
       enabled: false
       username: ""
       password: ""
-  
+
   livenessCommand:
     enabled: false
     command: "ls -l"
@@ -169,18 +169,18 @@ cloudsql:
     enabled: false
     dbPort: 5432
     connectionName: ""
-    
+
 datadog:
   enabled: false
-    
+
 nodeSelector: {}
 
 bluegreen:
   enabled: false
 
   # if this is set to true, the main deployment won't render and the service selector will use the
-  # activeImageTag. For zero-downtime updates, set this to false until the new deployments are created, 
-  # and then set this to true. 
+  # activeImageTag. For zero-downtime updates, set this to false until the new deployments are created,
+  # and then set this to true.
   disablePrimaryDeployment: false
 
   # if bluegreen is enabled, set the activeImageTag and the list of imageTags
@@ -193,3 +193,8 @@ bluegreen:
 customNodePort:
   enabled: false
   port: 30000
+
+stack:
+  enabled: false
+  name: ""
+  revision: 0

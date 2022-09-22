@@ -91,3 +91,8 @@ cloudsql:
   serviceAccountJSON: ""
 
 nodeSelector: {}
+
+stack:
+  enabled: false
+  name: ""
+  revision: 0
