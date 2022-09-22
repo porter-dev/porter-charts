@@ -23,6 +23,9 @@ spec:
         {{- end }}
       labels:
         {{- include "docker-template.selectorLabels" . | nindent 8 }}
+        {{- if .Values.stack.enabled }}
+        porter.run/stack-name: "{{ .Values.stack.name }}"
+        {{- end }}
     spec:
       serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
@@ -152,6 +155,12 @@ spec:
               value: "{{ .Values.image.tag }}"
             - name: PORTER_POD_REVISION
               value: "{{ .Release.Revision }}"
+            {{- if .Values.stack.enabled }}
+            - name: PORTER_STACK_NAME
+              value: "{{ .Values.stack.name }}"
+            - name: PORTER_STACK_REVISION
+              value: "{{ .Values.stack.revision }}"
+            {{- end }}
             {{- range $key, $val := .Values.container.env.normal }}
             - name: {{ $key }}
             {{- $splVal := split "_" $val -}}
