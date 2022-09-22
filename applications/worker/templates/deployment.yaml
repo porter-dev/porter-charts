@@ -106,7 +106,7 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
-            {{- if .Values.datadog.enabled }}
+            {{- if .Values.stack.enabled }}
             - name: PORTER_STACK_NAME
               value: "{{ .Values.stack.name }}"
             - name: PORTER_STACK_REVISION
