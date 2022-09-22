@@ -153,7 +153,7 @@ spec:
               value: "{{ .Values.image.tag }}"
             - name: PORTER_POD_REVISION
               value: "{{ .Release.Revision }}"
-            {{- if .Values.datadog.enabled }}
+            {{- if .Values.stack.enabled }}
             - name: PORTER_STACK_NAME
               value: "{{ .Values.stack.name }}"
             - name: PORTER_STACK_REVISION
