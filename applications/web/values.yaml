@@ -193,3 +193,8 @@ bluegreen:
 customNodePort:
   enabled: false
   port: 30000
+
+stack:
+  enabled: false
+  name: ""
+  revision: 0

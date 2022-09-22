@@ -92,4 +92,7 @@ cloudsql:
 
 nodeSelector: {}
 
-tolerations: []
+stack:
+  enabled: false
+  name: ""
+  revision: 0
