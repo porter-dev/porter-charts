@@ -20,6 +20,9 @@ spec:
         {{- end }}
       labels:
         {{- include "docker-template.selectorLabels" . | nindent 8 }}
+        {{- if .Values.stack.enabled }}
+        porter.run/stack-name: "{{ .Values.stack.name }}"
+        {{- end }}
     spec:
       serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
@@ -32,7 +35,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) }}
-          command: 
+          command:
           {{- range $command := trim .Values.container.command | splitList " " }}
           - {{ $command | quote }}
           {{- end }}
@@ -103,6 +106,12 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
+            {{- if .Values.stack.enabled }}
+            - name: PORTER_STACK_NAME
+              value: "{{ .Values.stack.name }}"
+            - name: PORTER_STACK_REVISION
+              value: "{{ .Values.stack.revision }}"
+            {{- end }}
             {{- range $key, $val := .Values.container.env.normal }}
             - name: {{ $key }}
             {{- $splVal := split "_" $val -}}

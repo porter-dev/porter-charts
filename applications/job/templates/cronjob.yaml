@@ -19,6 +19,9 @@ spec:
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         helm.sh/revision: "{{ .Release.Revision }}"
         meta.helm.sh/release-name: "{{ .Release.Name }}"
+        {{- if .Values.stack.enabled }}
+        porter.run/stack-name: "{{ .Values.stack.name }}"
+        {{- end }}
       annotations:
         {{- if .Values.safeToEvict }}
         "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
@@ -33,7 +36,7 @@ spec:
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job"))) }}
-            command: 
+            command:
             {{- range $command := trim .Values.container.command | splitList " " }}
             - {{ $command | quote }}
             {{- end }}
