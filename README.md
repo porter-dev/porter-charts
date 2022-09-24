@@ -4,7 +4,7 @@ This repository contains [Helm charts](https://helm.sh/) that are offered on [Po
 
 ## Applications vs Add-Ons
 
-The [`/applications`](/applications) folder contains templates that are used to deploy your applications onto Porter. Porter currently offers three types of application templates: web, worker, and job templates. Please [read the docs](https://docs.getporter.dev/docs/add-ons) for more info. 
+The [`/applications`](/applications) folder contains templates that are used to deploy your applications onto Porter. Porter currently offers three types of application templates: web, worker, and job templates. Please [read the docs](https://docs.porter.run/deploying-addons/overview) for more info. 
 
 The [`/addons`](/addons) folder contains templates for deploying everything that is not application source code: databases, logging/monitoring agents, SSL cert managers, etc.
 
