@@ -1,5 +1,5 @@
 name: Web
-hasSource: true
+hasSource: registry-only
 tabs:
   - name: main
     label: Main
