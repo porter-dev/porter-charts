@@ -18,43 +18,27 @@ spec:
         control-plane: controller-manager
     spec:
       containers:
-      - args:
-        - --secure-listen-address=0.0.0.0:8443
-        - --upstream=http://127.0.0.1:8080/
-        - --logtostderr=true
-        - --v=10
-        image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
-        name: kube-rbac-proxy
-        ports:
-        - containerPort: 8443
-          name: https
-      - args:
-        - --health-probe-bind-address=:8081
-        - --metrics-bind-address=127.0.0.1:8080
-        - --leader-elect
-        command:
-        - /manager
-        image: "{{ .Values.agent.image }}"
+      - image: "{{ .Values.agent.image }}"
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: porter-agent-config
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8081
-          initialDelaySeconds: 15
-          periodSeconds: 20
+        # livenessProbe:
+        #   httpGet:
+        #     path: /healthz
+        #     port: 8081
+        #   initialDelaySeconds: 15
+        #   periodSeconds: 20
         ports:
         - containerPort: 10001
           name: http
         name: manager
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: 8081
-          initialDelaySeconds: 5
-          periodSeconds: 10
+        # readinessProbe:
+        #   httpGet:
+        #     path: /readyz
+        #     port: 8081
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
         resources:
           requests:
             cpu: {{ .Values.resources.requests.cpu }}
@@ -64,8 +48,6 @@ spec:
             memory: {{ .Values.resources.limits.memory }}
         securityContext:
           allowPrivilegeEscalation: false
-      securityContext:
-        runAsNonRoot: true
       {{- if .Values.agent.privateRegistry.enabled }}
       imagePullSecrets:
         - name: "{{ .Values.agent.privateRegistry.secret }}"
