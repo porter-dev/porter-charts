@@ -4,7 +4,7 @@ metadata:
   labels:
     control-plane: controller-manager
   annotations:
-    porter.run/agent-major-version: "v2"
+    porter.run/agent-major-version: "v3"
   name: porter-agent-controller-manager
   namespace: porter-agent-system
 spec:
