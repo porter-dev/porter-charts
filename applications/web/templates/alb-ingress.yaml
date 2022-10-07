@@ -30,6 +30,24 @@ metadata:
     {{- if .Values.albIngress.security_groups }}
     alb.ingress.kubernetes.io/security-groups: {{ .Values.albIngress.security_groups }}
     {{- end }}
+    {{- if .Values.albIngress.healthcheck_path }}
+    alb.ingress.kubernetes.io/healthcheck-path: {{ .Values.albIngress.healthcheck_path }}
+    {{- end }}
+    {{- if .Values.albIngress.healthcheck_interval_seconds }}
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: {{ .Values.albIngress.healthcheck_interval_seconds }}
+    {{- end }}
+    {{- if .Values.albIngress.healthcheck_timeout_seconds }}
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: {{ .Values.albIngress.healthcheck_timeout_seconds }}
+    {{- end }}
+    {{- if .Values.albIngress.healthcheck_success_codes }}
+    alb.ingress.kubernetes.io/success-codes: {{ .Values.albIngress.healthcheck_success_codes }}
+    {{- end }}
+    {{- if .Values.albIngress.healthcheck_healthy_threshold_count }}
+    alb.ingress.kubernetes.io/healthy-threshold-count: {{ .Values.albIngress.healthcheck_healthy_threshold_count }}
+    {{- end }}
+    {{- if .Values.albIngress.healthcheck_unhealthy_threshold_count }}
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: {{ .Values.albIngress.healthcheck_unhealthy_threshold_count }}
+    {{- end }}
     {{- if .Values.albIngress.healthcheck_port }}
     alb.ingress.kubernetes.io/healthcheck-port: {{ .Values.albIngress.healthcheck_port }}
     {{- end }}
