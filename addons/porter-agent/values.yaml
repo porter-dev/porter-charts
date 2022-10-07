@@ -9,6 +9,7 @@ agent:
   clusterID: ""
   projectID: ""
   lokiURL: porter-agent-loki.porter-agent-system:9095
+  lokiHTTPURL: http://porter-agent-loki.porter-agent-system:3100
 
 resources:
   limits:

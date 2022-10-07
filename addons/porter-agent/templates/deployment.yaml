@@ -32,6 +32,9 @@ spec:
         ports:
         - containerPort: 10001
           name: http
+        volumeMounts:
+        - name: sqlite-volume
+          mountPath: /porter/sqlite
         name: manager
         # readinessProbe:
         #   httpGet:
@@ -54,3 +57,7 @@ spec:
       {{- end }}
       serviceAccountName: porter-agent-controller-manager
       terminationGracePeriodSeconds: 10
+      volumes:
+      - name: sqlite-volume
+        persistentVolumeClaim:
+          claimName: "{{ .Release.Name }}-sqlite-pvc"
