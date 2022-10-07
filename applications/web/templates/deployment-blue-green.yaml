@@ -81,9 +81,11 @@ spec:
                 - name: Authorization
                   value: Basic {{ printf "%s:%s" $.Values.health.livenessProbe.auth.username $.Values.health.livenessProbe.auth.password | b64enc }}
               {{ end }}
-            periodSeconds: {{ $.Values.health.livenessProbe.periodSeconds }}
-            failureThreshold: {{ $.Values.health.livenessProbe.failureThreshold }}
-            timeoutSeconds: {{ $.Values.health.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.health.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.health.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.health.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
           {{ end }}
           {{ if $.Values.health.livenessCommand.enabled }}
           livenessProbe:
@@ -92,8 +94,11 @@ spec:
                 {{- range $command := trim $.Values.health.livenessCommand.command | splitList " " }}
                 - {{ $command | quote }}
                 {{- end }}
-            initialDelaySeconds: {{ $.Values.health.livenessCommand.initialDelaySeconds }}
-            periodSeconds: {{ $.Values.health.livenessCommand.periodSeconds }}
+            initialDelaySeconds: {{ .Values.health.livenessCommand.initialDelaySeconds }}
+            periodSeconds: {{ .Values.health.livenessCommand.periodSeconds }}
+            timeoutSeconds: {{ .Values.health.livenessCommand.timeoutSeconds }}
+            successThreshold: {{ .Values.health.livenessCommand.successThreshold }}
+            failureThreshold: {{ .Values.health.livenessCommand.failureThreshold }}
           {{ end }}
           {{ if $.Values.health.readinessProbe.enabled }}
           readinessProbe:
@@ -106,8 +111,11 @@ spec:
                 - name: Authorization
                   value: Basic {{ printf "%s:%s" $.Values.health.readinessProbe.auth.username $.Values.health.readinessProbe.auth.password | b64enc }}
               {{ end }}
-            periodSeconds: {{ $.Values.health.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ $.Values.health.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.health.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.health.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.health.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.health.readinessProbe.failureThreshold }}
           {{ end }}
           {{ if $.Values.health.startupProbe.enabled }}
           startupProbe:
@@ -120,9 +128,11 @@ spec:
                 - name: Authorization
                   value: Basic {{ printf "%s:%s" $.Values.health.startupProbe.auth.username $.Values.health.startupProbe.auth.password | b64enc }}
               {{ end }}
-            periodSeconds: {{ $.Values.health.startupProbe.periodSeconds }}
-            failureThreshold: {{ $.Values.health.startupProbe.failureThreshold }}
-            timeoutSeconds: {{ $.Values.health.startupProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.health.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.health.startupProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.health.startupProbe.successThreshold }}
+            failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
           {{ end }}
           resources:
             requests:
