@@ -51,6 +51,12 @@ albIngress:
   target_type: ip
   scheme: internet-facing
   security_groups:
+  healthcheck_path:
+  healthcheck_interval_seconds:
+  healthcheck_timeout_seconds:
+  healthcheck_success_codes:
+  healthcheck_healthy_threshold_count:
+  healthcheck_unhealthy_threshold_count:
   healthcheck_port:
   healthcheck_protocol:
 
