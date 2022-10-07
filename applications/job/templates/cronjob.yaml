@@ -123,11 +123,15 @@ spec:
           {{ end }}
           restartPolicy: Never
           shareProcessNamespace: true
-          tolerations:
-          - key: "removable"
-            operator: "Equal"
-            value: "true"
-            effect: "NoSchedule"
+          nodeSelector: {{- toYaml .Values.nodeSelector | nindent 12 }}
+          tolerations: 
+          {{ if .Values.tolerations}}
+          {{ toYaml .Values.tolerations | nindent 12 }}
+          {{ end }}
+            - key: "removable"
+              operator: "Equal"
+              value: "true"
+              effect: "NoSchedule"
       backoffLimit: 0
       {{- if (.Values.sidecar.timeout) }}
       activeDeadlineSeconds: {{ .Values.sidecar.timeout }}
