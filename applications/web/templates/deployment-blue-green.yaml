@@ -81,11 +81,11 @@ spec:
                 - name: Authorization
                   value: Basic {{ printf "%s:%s" $.Values.health.livenessProbe.auth.username $.Values.health.livenessProbe.auth.password | b64enc }}
               {{ end }}
-            initialDelaySeconds: {{ .Values.health.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.health.livenessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.health.livenessProbe.successThreshold }}
-            failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ $.Values.health.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ $.Values.health.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ $.Values.health.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ $.Values.health.livenessProbe.successThreshold }}
+            failureThreshold: {{ $.Values.health.livenessProbe.failureThreshold }}
           {{ end }}
           {{ if $.Values.health.livenessCommand.enabled }}
           livenessProbe:
