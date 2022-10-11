@@ -22,14 +22,15 @@ spec:
         {{- if .Values.stack.enabled }}
         porter.run/stack-name: "{{ .Values.stack.name }}"
         {{- end }}
-      annotations:
-        {{- if .Values.safeToEvict }}
-        "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
-        {{- else }}
-        "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
-        {{- end }}
     spec:
       template:
+        metadata:
+          annotations:
+            {{- if .Values.safeToEvict }}
+            "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
+            {{- else }}
+            "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+            {{- end }}
         spec:
           containers:
           - name: {{ .Chart.Name }}
@@ -123,11 +124,15 @@ spec:
           {{ end }}
           restartPolicy: Never
           shareProcessNamespace: true
-          tolerations:
-          - key: "removable"
-            operator: "Equal"
-            value: "true"
-            effect: "NoSchedule"
+          nodeSelector: {{- toYaml .Values.nodeSelector | nindent 12 }}
+          tolerations: 
+          {{ if .Values.tolerations}}
+          {{ toYaml .Values.tolerations | nindent 12 }}
+          {{ end }}
+            - key: "removable"
+              operator: "Equal"
+              value: "true"
+              effect: "NoSchedule"
       backoffLimit: 0
       {{- if (.Values.sidecar.timeout) }}
       activeDeadlineSeconds: {{ .Values.sidecar.timeout }}

@@ -51,6 +51,12 @@ albIngress:
   target_type: ip
   scheme: internet-facing
   security_groups:
+  healthcheck_path:
+  healthcheck_interval_seconds:
+  healthcheck_timeout_seconds:
+  healthcheck_success_codes:
+  healthcheck_healthy_threshold_count:
+  healthcheck_unhealthy_threshold_count:
   healthcheck_port:
   healthcheck_protocol:
 
@@ -117,9 +123,11 @@ health:
     enabled: false
     path: "/livez"
     scheme: "HTTP"
+    initialDelaySeconds: 0
     periodSeconds: 5
-    failureThreshold: 3
     timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 3
     auth:
       enabled: false
       username: ""
@@ -128,15 +136,21 @@ health:
   livenessCommand:
     enabled: false
     command: "ls -l"
-    periodSeconds: 5
     initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 3
 
   readinessProbe:
     enabled: false
     path: "/readyz"
     scheme: "HTTP"
+    initialDelaySeconds: 0
     periodSeconds: 5
     timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 3
     auth:
       enabled: false
       username: ""
