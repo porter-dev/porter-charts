@@ -24,6 +24,8 @@ container:
 schedule:
   enabled: false
   value: "*/5 * * * *"
+  successfulHistory: 20
+  failedHistory: 20
 
 resources:
   requests:

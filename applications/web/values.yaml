@@ -212,3 +212,7 @@ stack:
   enabled: false
   name: ""
   revision: 0
+
+emptyDir:
+  enabled: false
+  mountPath: /mypath
