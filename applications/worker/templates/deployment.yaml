@@ -149,6 +149,11 @@ spec:
             - name: "{{ include "docker-template.fullname" . }}-storage"
               mountPath: {{ .Values.pvc.mountPath }}
           {{ end }}
+          {{ if .Values.emptyDir.enabled }}
+          volumeMounts:
+            - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
+              mountPath: {{ .Values.emptyDir.mountPath }}
+          {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
@@ -174,8 +179,7 @@ spec:
           operator: "Equal"
           value: "true"
           effect: "NoSchedule"
-        {{ .Values.tolerations }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled }}
       volumes:
         {{ if .Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
@@ -186,5 +190,9 @@ spec:
         - name: "{{ include "docker-template.fullname" . }}-storage"
           persistentVolumeClaim:
             claimName: "{{ include "docker-template.fullname" . }}-pvc"
+        {{ end }}
+        {{ if .Values.emptyDir.enabled }}
+        - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
+          emptyDir: {}
         {{ end }}
       {{ end }}
