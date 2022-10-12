@@ -169,11 +169,10 @@ spec:
         {{ $k }}: {{ $v }}
         {{- end }}
       {{- end }}
+      {{- if .Values.tolerations }}
       tolerations:
-        - key: "removable"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
+        {{- toYaml .Values.tolerations | nindent 10 }}
+      {{- end }}
       {{ if or .Values.pvc.enabled .Values.cloudsql.enabled }}
       volumes:
         {{ if .Values.cloudsql.enabled }}
