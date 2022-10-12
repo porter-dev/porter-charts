@@ -4,8 +4,8 @@ kind: CronJob
 metadata:
   name: {{ include "docker-template.fullname" . }}
 spec:
-  successfulJobsHistoryLimit: 20
-  failedJobsHistoryLimit: 20
+  successfulJobsHistoryLimit: {{ .Values.schedule.successfulHistory }}
+  failedJobsHistoryLimit: {{ .Values.schedule.failedHistory }}
   concurrencyPolicy: {{ ternary "Allow" "Forbid" .Values.allowConcurrency }}
   startingDeadlineSeconds: 20
   suspend: {{ not .Values.schedule.enabled }}
