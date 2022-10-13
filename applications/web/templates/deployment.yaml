@@ -11,6 +11,19 @@ spec:
   replicas: {{ .Values.replicaCount }}
   {{ end }}
   {{ end }}
+  {{- if not .Values.topology.enabled }}
+  topologySpreadConstraints: 
+    - maxSkew: {{ .Values.topology.maxSkew }}
+      topologyKey: {{ .Values.topology.topologyKey }}
+      whenUnsatisfiable: {{ .Values.topology.whenUnsatisfiable }}
+      {{- if .Values.topology.labelSelector.enabled }}
+      labelSelector: 
+        matchLabels:
+          {{- range $k, $v := .Values.topology.labelSelector.matchLabels }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
+      {{- end }}
+  {{ end }}
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
