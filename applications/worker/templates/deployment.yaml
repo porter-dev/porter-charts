@@ -182,8 +182,12 @@ spec:
         {{ $k }}: {{ $v }}
         {{- end }}
       {{- end }}
-      {{- if .Values.tolerations }}
       tolerations:
+        - key: "removable"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      {{- if .Values.tolerations }}
         {{- toYaml .Values.tolerations | nindent 8 }}
       {{- end }}
       {{ if or .Values.pvc.enabled .Values.cloudsql.enabled }}
