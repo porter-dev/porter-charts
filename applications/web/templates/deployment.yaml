@@ -11,7 +11,7 @@ spec:
   replicas: {{ .Values.replicaCount }}
   {{ end }}
   {{ end }}
-  {{- if not .Values.topology.enabled }}
+  {{- if .Values.topology.enabled }}
   topologySpreadConstraints: 
     - maxSkew: {{ .Values.topology.maxSkew }}
       topologyKey: {{ .Values.topology.topologyKey }}
