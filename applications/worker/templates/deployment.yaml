@@ -8,7 +8,7 @@ spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{ end }}
-  {{- if not .Values.topology.enabled }}
+  {{- if .Values.topology.enabled }}
   topologySpreadConstraints: 
     - maxSkew: {{ .Values.topology.maxSkew }}
       topologyKey: {{ .Values.topology.topologyKey }}
