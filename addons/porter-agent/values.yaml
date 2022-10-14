@@ -39,6 +39,13 @@ loki:
   persistence:
     enabled: true
     size: 100Gi
+  resources:
+    limits:
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 1Gi
+
 
 promtail:
   enabled: true
@@ -47,3 +54,9 @@ promtail:
     serverPort: 3101
     clients:
       - url: http://{{ .Release.Name }}-loki.{{ .Release.Namespace }}:3100/loki/api/v1/push
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
