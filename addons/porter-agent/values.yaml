@@ -57,9 +57,11 @@ promtail:
     snippets:
       extraRelabelConfigs:
       - source_labels:
+          _ __meta_kubernetes_pod_node_name
           - __meta_kubernetes_pod_annotation_helm_sh_revision
-        target_label: helm_sh_revision
+        target_label: porter_pod_name
         action: replace
+        separator: '_'
   resources:
     limits:
       memory: 256Mi
