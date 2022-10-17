@@ -54,10 +54,12 @@ promtail:
     clients:
       - url: http://{{ .Release.Name }}-loki.{{ .Release.Namespace }}:3100/loki/api/v1/push
     # See https://github.com/grafana/helm-charts/blob/18282f1780c73130a89ba5e0ee0f8c5721f08b13/charts/promtail/values.yaml#L343
-    extraRelabelConfigs:
+    snippets:
+      extraRelabelConfigs:
       - source_labels:
           - __meta_kubernetes_pod_annotation_helm_sh_revision
         target_label: helm_sh_revision
+        action: replace
   resources:
     limits:
       memory: 256Mi
