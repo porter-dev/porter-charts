@@ -11,5 +11,6 @@ data:
   PROJECT_ID: "{{ .Values.agent.projectID }}"
   LOG_STORE_KIND: "loki"
   LOG_STORE_ADDRESS: "{{ .Values.agent.lokiURL }}"
+  LOG_STORE_HTTP_ADDRESS: "{{ .Values.agent.lokiHTTPURL }}"
   SQL_LITE: "true"
-  SQL_LITE_PATH: "./agent.db"
+  SQL_LITE_PATH: "/porter/sqlite/agent.db"
