@@ -23,12 +23,6 @@ spec:
         envFrom:
         - configMapRef:
             name: porter-agent-config
-        # livenessProbe:
-        #   httpGet:
-        #     path: /healthz
-        #     port: 8081
-        #   initialDelaySeconds: 15
-        #   periodSeconds: 20
         ports:
         - containerPort: 10001
           name: http
@@ -36,12 +30,18 @@ spec:
         - name: sqlite-volume
           mountPath: /porter/sqlite
         name: manager
-        # readinessProbe:
-        #   httpGet:
-        #     path: /readyz
-        #     port: 8081
-        #   initialDelaySeconds: 5
-        #   periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /livez
+            port: 10001
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 10001
+          initialDelaySeconds: 5
+          periodSeconds: 10
         resources:
           requests:
             cpu: {{ .Values.resources.requests.cpu }}
