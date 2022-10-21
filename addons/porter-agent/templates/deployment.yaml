@@ -4,7 +4,8 @@ metadata:
   labels:
     control-plane: controller-manager
   annotations:
-    porter.run/agent-major-version: "v2"
+    porter.run/agent-major-version: "v3"
+    porter.run/agent-version: "{{ .Chart.Version }}"
   name: porter-agent-controller-manager
   namespace: porter-agent-system
 spec:
@@ -18,41 +19,28 @@ spec:
         control-plane: controller-manager
     spec:
       containers:
-      - args:
-        - --secure-listen-address=0.0.0.0:8443
-        - --upstream=http://127.0.0.1:8080/
-        - --logtostderr=true
-        - --v=10
-        image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
-        name: kube-rbac-proxy
-        ports:
-        - containerPort: 8443
-          name: https
-      - args:
-        - --health-probe-bind-address=:8081
-        - --metrics-bind-address=127.0.0.1:8080
-        - --leader-elect
-        command:
-        - /manager
-        image: "{{ .Values.agent.image }}"
+      - image: "{{ .Values.agent.image }}"
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: porter-agent-config
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8081
-          initialDelaySeconds: 15
-          periodSeconds: 20
         ports:
         - containerPort: 10001
           name: http
+        volumeMounts:
+        - name: sqlite-volume
+          mountPath: /porter/sqlite
         name: manager
+        livenessProbe:
+          httpGet:
+            path: /livez
+            port: 10001
+          initialDelaySeconds: 15
+          periodSeconds: 20
         readinessProbe:
           httpGet:
             path: /readyz
-            port: 8081
+            port: 10001
           initialDelaySeconds: 5
           periodSeconds: 10
         resources:
@@ -64,11 +52,21 @@ spec:
             memory: {{ .Values.resources.limits.memory }}
         securityContext:
           allowPrivilegeEscalation: false
-      securityContext:
-        runAsNonRoot: true
       {{- if .Values.agent.privateRegistry.enabled }}
       imagePullSecrets:
         - name: "{{ .Values.agent.privateRegistry.secret }}"
       {{- end }}
       serviceAccountName: porter-agent-controller-manager
       terminationGracePeriodSeconds: 10
+      {{- if gt (len .Values.nodeSelector) 0}}
+      nodeSelector:
+        {{- range $k, $v := .Values.nodeSelector }}
+        {{ $k }}: {{ $v }}
+        {{- end }}
+      {{- end }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      volumes:
+      - name: sqlite-volume
+        persistentVolumeClaim:
+          claimName: "{{ .Release.Name }}-sqlite-pvc"
