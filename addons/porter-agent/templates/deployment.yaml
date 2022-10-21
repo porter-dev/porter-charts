@@ -57,6 +57,14 @@ spec:
       {{- end }}
       serviceAccountName: porter-agent-controller-manager
       terminationGracePeriodSeconds: 10
+      {{- if gt (len .Values.nodeSelector) 0}}
+      nodeSelector:
+        {{- range $k, $v := .Values.nodeSelector }}
+        {{ $k }}: {{ $v }}
+        {{- end }}
+      {{- end }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
       volumes:
       - name: sqlite-volume
         persistentVolumeClaim:
