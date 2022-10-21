@@ -1,19 +1,15 @@
 agent:
-  image: ""
+  image: "public.ecr.aws/o1j4x7p4/porter-agent:v3"
   porterHost: "dashboard.getporter.dev"
   porterPort: "80"
   porterToken: ""
   privateRegistry:
-    enabled: true
+    enabled: false
     secret: ""
   clusterID: ""
   projectID: ""
-
-redis:
-  fullnameOverride: porter-redis
-  architecture: standalone
-  auth:
-    enabled: false
+  lokiURL: porter-agent-loki.porter-agent-system:9095
+  lokiHTTPURL: http://porter-agent-loki.porter-agent-system:3100
 
 resources:
   limits:
@@ -22,3 +18,57 @@ resources:
   requests:
     cpu: 100m
     memory: 256Mi
+
+nodeSelector: {}
+tolerations: []
+
+loki:
+  enabled: true
+  isDefault: true
+  config:
+    limits_config:
+      reject_old_samples: true
+      # reject samples older than retention time
+      reject_old_samples_max_age: 168h
+      max_concurrent_tail_requests: 50
+    table_manager:
+      retention_deletes_enabled: true
+      retention_period: 168h
+  url: http://{{(include "loki.serviceName" .)}}:{{ .Values.loki.service.port }}
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: http-metrics
+    initialDelaySeconds: 45
+  livenessProbe:
+    httpGet:
+      path: /ready
+      port: http-metrics
+    initialDelaySeconds: 45
+  datasource:
+    jsonData: {}
+    uid: ""
+  persistence:
+    enabled: true
+    size: 100Gi
+  resources:
+    limits:
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 1Gi
+
+
+promtail:
+  enabled: true
+  config:
+    logLevel: info
+    serverPort: 3101
+    clients:
+      - url: http://{{ .Release.Name }}-loki.{{ .Release.Namespace }}:3100/loki/api/v1/push
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
