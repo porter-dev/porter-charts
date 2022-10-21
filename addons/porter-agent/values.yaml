@@ -19,6 +19,9 @@ resources:
     cpu: 100m
     memory: 256Mi
 
+nodeSelector: {}
+tolerations: []
+
 loki:
   enabled: true
   isDefault: true
