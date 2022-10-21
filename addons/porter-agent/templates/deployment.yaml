@@ -5,6 +5,7 @@ metadata:
     control-plane: controller-manager
   annotations:
     porter.run/agent-major-version: "v3"
+    porter.run/agent-version: "{{ .Chart.Version }}"
   name: porter-agent-controller-manager
   namespace: porter-agent-system
 spec:
