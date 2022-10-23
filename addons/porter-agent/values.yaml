@@ -58,7 +58,6 @@ loki:
       cpu: 100m
       memory: 1Gi
 
-
 promtail:
   enabled: true
   config:
@@ -66,6 +65,15 @@ promtail:
     serverPort: 3101
     clients:
       - url: http://{{ .Release.Name }}-loki.{{ .Release.Namespace }}:3100/loki/api/v1/push
+    # See https://github.com/grafana/helm-charts/blob/18282f1780c73130a89ba5e0ee0f8c5721f08b13/charts/promtail/values.yaml#L343
+    snippets:
+      extraRelabelConfigs:
+      - source_labels:
+          - __meta_kubernetes_pod_name
+          - __meta_kubernetes_pod_annotation_helm_sh_revision
+        target_label: porter_pod_name
+        action: replace
+        separator: '_'
   resources:
     limits:
       memory: 256Mi
