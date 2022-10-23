@@ -10,6 +10,8 @@ metadata:
   namespace: porter-agent-system
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       control-plane: controller-manager
