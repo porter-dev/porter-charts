@@ -69,6 +69,7 @@ promtail:
     snippets:
       extraRelabelConfigs:
       - source_labels:
+          - __meta_kubernetes_namespace
           - __meta_kubernetes_pod_name
           - __meta_kubernetes_pod_annotation_helm_sh_revision
         target_label: porter_pod_name
