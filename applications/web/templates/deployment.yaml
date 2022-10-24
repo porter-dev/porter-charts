@@ -265,6 +265,9 @@ spec:
           operator: "Equal"
           value: "true"
           effect: "NoSchedule"
+      {{- if .Values.tolerations }}
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
       {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled }}
       volumes:
         {{ if .Values.cloudsql.enabled }}

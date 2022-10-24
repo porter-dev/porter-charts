@@ -198,6 +198,8 @@ datadog:
 
 nodeSelector: {}
 
+tolerations: []
+
 bluegreen:
   enabled: false
 
