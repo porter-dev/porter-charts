@@ -16,6 +16,7 @@ tabs:
       label: 🍺 Hello Porter Settings
     - type: subtitle
       label: Update ports for Hello Porter with Porter
+    - type: number-input
       variable: service.port
       label: Service Port
       settings:
