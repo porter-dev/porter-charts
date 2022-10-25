@@ -34,7 +34,7 @@
           "default": false
         },
         "custom_paths": {
-          "type": "string"
+          "type": "array"
         },
         "rewriteCustomPathsEnabled": {
           "type": "boolean",
@@ -68,10 +68,10 @@
           "default": 80
         },
         "command": {
-          "type": "string"
+          "type": ["string", "null"]
         },
         "args": {
-          "type": "array",
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
