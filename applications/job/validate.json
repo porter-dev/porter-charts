@@ -15,7 +15,7 @@
           "default": 80
         },
         "command": {
-          "type": "string"
+          "type": ["string", "null"]
         },
         "env": {
           "type": "object",
