@@ -6,6 +6,15 @@ auto_deploy: true
 
 replicaCount: 1
 
+topology: 
+  enabled: false
+  maxSkew:
+  topologyKey:
+  whenUnsatisfiable:
+  labelSelector: 
+    enabled: false
+    matchLabels: {}
+
 terminationGracePeriodSeconds: 30
 
 image:
@@ -188,6 +197,8 @@ datadog:
   enabled: false
 
 nodeSelector: {}
+
+tolerations: []
 
 bluegreen:
   enabled: false
