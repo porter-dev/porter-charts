@@ -135,6 +135,6 @@ spec:
               effect: "NoSchedule"
       backoffLimit: 0
       {{- if (.Values.sidecar.timeout) }}
-      activeDeadlineSeconds: {{ .Values.sidecar.timeout }}
+      activeDeadlineSeconds: {{ add .Values.sidecar.timeout 300 }}
       {{- end }}
 {{ end }}
