@@ -8,19 +8,6 @@ spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{ end }}
-  {{- if .Values.topology.enabled }}
-  topologySpreadConstraints: 
-    - maxSkew: {{ .Values.topology.maxSkew }}
-      topologyKey: {{ .Values.topology.topologyKey }}
-      whenUnsatisfiable: {{ .Values.topology.whenUnsatisfiable }}
-      {{- if .Values.topology.labelSelector.enabled }}
-      labelSelector: 
-        matchLabels:
-          {{- range $k, $v := .Values.topology.labelSelector.matchLabels }}
-          {{ $k }}: {{ $v }}
-          {{- end }}
-      {{- end }}
-  {{ end }}
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
@@ -195,6 +182,19 @@ spec:
       {{- if .Values.tolerations }}
         {{- toYaml .Values.tolerations | nindent 8 }}
       {{- end }}
+      {{- if .Values.topology.enabled }}
+      topologySpreadConstraints: 
+        - maxSkew: {{ .Values.topology.maxSkew }}
+          topologyKey: {{ .Values.topology.topologyKey }}
+          whenUnsatisfiable: {{ .Values.topology.whenUnsatisfiable }}
+          {{- if .Values.topology.labelSelector.enabled }}
+          labelSelector: 
+            matchLabels:
+              {{- range $k, $v := .Values.topology.labelSelector.matchLabels }}
+              {{ $k }}: {{ $v }}
+              {{- end }}
+          {{- end }}
+      {{ end }}
       {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled }}
       volumes:
         {{ if .Values.cloudsql.enabled }}
