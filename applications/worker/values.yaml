@@ -61,17 +61,31 @@ keda:
     scaleUp:
       stabilizationWindowSeconds: 300
       policy:
+        type: Percent
         value: 10
         periodSeconds: 300
     scaleDown:
       stabilizationWindowSeconds: 300
       policy:
+        type: Percent
         value: 10
         periodSeconds: 300
   trigger:
-    metricName: ""
-    metricQuery: ""
-    metricThreshold: ""
+    prometheus:
+      enabled: false
+      metricName: ""
+      metricQuery: ""
+      metricThreshold: ""
+    datadog:
+      enabled: false
+      apiKey: ""
+      appKey: ""
+      datadogSite: "datadoghq.com"
+      query: ""
+      queryValue: ""
+      activationQueryValue: ""
+      age: ""
+      metricUnavailableValue: ""
 
 health:
   enabled: false
