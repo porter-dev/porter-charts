@@ -1,0 +1,18 @@
+name: Agent
+tabs:
+- name: logging
+  label: Log Configuration
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: Logging Settings
+    - type: subtitle
+      label: Configure logging settings
+    - type: number-input
+      label: Retention Period (Hours)
+      variable: loki.config.table_manager.retention_period
+      placeholder: "ex: 168"
+      settings:
+        unit: h
+        default: 168
