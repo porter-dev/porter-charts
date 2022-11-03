@@ -8,7 +8,7 @@ tabs:
     - type: heading
       label: Logging Settings
     - type: subtitle
-      label: Configure logging settings
+      label: Configure retention settings
     - type: number-input
       label: Retention Period (Hours)
       variable: loki.config.table_manager.retention_period
@@ -16,3 +16,40 @@ tabs:
       settings:
         unit: h
         default: 168
+  - name: backend_storage_config
+    contents:
+    - type: select
+      label:  Backend Storage Config
+      variable: loki.config.storage_config.boltdb_shipper.shared_store
+      settings:
+        default: filesystem
+        options:
+        - label: "Filesystem"
+          value: filesystem
+        - label: "S3 Bucket"
+          value: s3
+  - name: s3_config
+    show_if:
+      is: "s3"
+      variable: loki.config.storage_config.boltdb_shipper.shared_store
+    contents:
+    - type: string-input
+      variable: loki.config.storage_config.aws.access_key_id
+      required: true
+      label: AWS Access Key ID
+      placeholder: "ex: AKIAIOSFODNN7EXAMPLE"
+    - type: string-input
+      variable: loki.config.storage_config.aws.secret_access_key
+      required: true
+      label: AWS Secret Key
+      placeholder: "○ ○ ○ ○ ○ ○ ○ ○ ○"
+    - type: string-input
+      variable: loki.config.storage_config.aws.region
+      required: true
+      label: AWS Region
+      placeholder: "ex. us-east-2"
+    - type: string-input
+      variable: loki.config.storage_config.aws.s3
+      required: true
+      label: Bucket name, in the form of s3://{region}/{bucket}. For example, s3://us-east-2/porter-logs
+      placeholder: "ex. s3://us-east-2/porter-logs"
