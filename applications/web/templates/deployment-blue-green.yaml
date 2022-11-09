@@ -193,10 +193,10 @@ spec:
             - name: "{{ include "docker-template.fullname" $ }}-storage"
               mountPath: {{ $.Values.pvc.mountPath }}
           {{ end }}
-          {{ if .Values.emptyDir.enabled }}
+          {{ if $.Values.emptyDir.enabled }}
           volumeMounts:
             - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
-            mountPath: {{ .Values.emptyDir.mountPath }}
+            mountPath: {{ $.Values.emptyDir.mountPath }}
           {{ end }}
         {{- if $.Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
@@ -223,23 +223,23 @@ spec:
           operator: "Equal"
           value: "true"
           effect: "NoSchedule"
-      {{- if .Values.tolerations }}
-        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- if $.Values.tolerations }}
+        {{- toYaml $.Values.tolerations | nindent 8 }}
       {{- end }}
-      {{- if .Values.topology.enabled }}
+      {{- if $.Values.topology.enabled }}
       topologySpreadConstraints: 
-        - maxSkew: {{ .Values.topology.maxSkew }}
-          topologyKey: {{ .Values.topology.topologyKey }}
-          whenUnsatisfiable: {{ .Values.topology.whenUnsatisfiable }}
-          {{- if .Values.topology.labelSelector.enabled }}
+        - maxSkew: {{ $.Values.topology.maxSkew }}
+          topologyKey: {{ $.Values.topology.topologyKey }}
+          whenUnsatisfiable: {{ $.Values.topology.whenUnsatisfiable }}
+          {{- if $.Values.topology.labelSelector.enabled }}
           labelSelector: 
             matchLabels:
-              {{- range $k, $v := .Values.topology.labelSelector.matchLabels }}
+              {{- range $k, $v := $.Values.topology.labelSelector.matchLabels }}
               {{ $k }}: {{ $v }}
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or $.Values.pvc.enabled $.Values.cloudsql.enabled .Values.emptyDir.enabled }}
+      {{ if or $.Values.pvc.enabled $.Values.cloudsql.enabled $.Values.emptyDir.enabled }}
       volumes:
         {{ if $.Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" $ }}"
@@ -255,7 +255,7 @@ spec:
             claimName: "{{ include "docker-template.fullname" $ }}-pvc"
         {{ end }}
         {{ end }}
-        {{ if .Values.emptyDir.enabled }}
+        {{ if $.Values.emptyDir.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
           emptyDir: {}
         {{ end }}
