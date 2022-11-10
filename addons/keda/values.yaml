@@ -23,17 +23,52 @@ imagePullSecrets: []
 operator:
   name: keda-operator
   replicaCount: 1
+  # -- Affinity for pod scheduling https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/ for KEDA operator. Takes precedence over the `affinity` field
+  affinity: {}
+    # podAntiAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #   - labelSelector:
+    #       matchExpressions:
+    #       - key: app
+    #         operator: In
+    #         values:
+    #         - keda-operator
+    #     topologyKey: "kubernetes.io/hostname"
 
 metricsServer:
+  replicaCount: 1
   # use ClusterFirstWithHostNet if `useHostNetwork: true` https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
   dnsPolicy: ClusterFirst
   useHostNetwork: false
+  # -- Affinity for pod scheduling https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/ for Metrics API Server. Takes precedence over the `affinity` field
+  affinity: {}
+    # podAntiAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #   - labelSelector:
+    #       matchExpressions:
+    #       - key: app
+    #         operator: In
+    #         values:
+    #         - keda-operator-metrics-apiserver
+    #     topologyKey: "kubernetes.io/hostname"
+
+upgradeStrategy:
+  operator: {}
+    # type: RollingUpdate
+    # rollingUpdate:
+    #   maxUnavailable: 1
+    #   maxSurge: 1
+  metricsApiServer: {}
+    # type: RollingUpdate
+    # rollingUpdate:
+    #   maxUnavailable: 1
+    #   maxSurge: 1
 
 podDisruptionBudget: {}
   # operator:
   #   minAvailable: 1
   #   maxUnavailable: 1
-  # metricServer: 
+  # metricServer:
   #   minAvailable: 1
   #   maxUnavailable: 1
 
@@ -58,6 +93,8 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: keda-operator
+  # Specifies whether a service account should automount API-Credentials
+  automountServiceAccountToken: true
   # Annotations to add to the service account
   annotations: {}
 
@@ -79,6 +116,23 @@ podIdentity:
     # Set to the value of the service account token expiration duration.
     # This will be set as an annotation on the KEDA service account.
     tokenExpiration: 3600
+  aws:
+    irsa:
+      # Set to true to enable AWS IAM Roles for Service Accounts (IRSA).
+      enabled: false
+      # Sets the token audience for IRSA.
+      # This will be set as an annotation on the KEDA service account.
+      audience: "sts.amazonaws.com"
+      # Set to the value of the ARN of an IAM role with a web identity provider.
+      # This will be set as an annotation on the KEDA service account.
+      roleArn: ""
+      # Sets the use of an STS regional endpoint instead of global. 
+      # Recommended to use regional endpoint in almost all cases.
+      # This will be set as an annotation on the KEDA service account.
+      stsRegionalEndpoints: "true"
+      # Set to the value of the service account token expiration duration.
+      # This will be set as an annotation on the KEDA service account.
+      tokenExpiration: 86400
 
 # Set this if you are using an external scaler and want to communicate
 # over TLS (recommended). This variable holds the name of the secret that
@@ -96,9 +150,13 @@ logging:
     # allowed values: 'debug', 'info', 'error', or an integer value greater than 0, specified as string
     # default value: info
     level: info
-    # allowed valuesL 'json' or 'console'
+    # allowed values: 'json' or 'console'
     # default value: console
     format: console
+    ## Logging time encoding for KEDA Operator
+    # allowed values are 'epoch', 'millis', 'nano', 'iso8601', 'rfc3339' or 'rfc3339nano'
+    # default value: rfc3339
+    timeEncoding: rfc3339
   metricServer:
     ## Logging level for Metrics Server
     # allowed values: '0' for info, '4' for debug, or an integer value greater than 0, specified as string
@@ -112,13 +170,17 @@ securityContext:
       - ALL
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
+    seccompProfile:
+      type: RuntimeDefault
   metricServer:
     capabilities:
       drop:
       - ALL
     allowPrivilegeEscalation: false
-    ## Metrics server needs to write the self-signed cert so it's not possible set this
+    ## Metrics server needs to write the self-signed cert. See FAQ for discussion of options.
     # readOnlyRootFilesystem: true
+    seccompProfile:
+      type: RuntimeDefault
 
 podSecurityContext:
   operator:
@@ -166,8 +228,13 @@ nodeSelector: {}
 
 tolerations: []
 
-affinity:
-  {}
+# -- Pod Topology Constraints https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+topologySpreadConstraints: {}
+  #operator: []
+  #metricsServer: []
+
+# -- Affinity for pod scheduling https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/ for both KEDA operator and Metrics API Server
+affinity: {}
   # podAntiAffinity:
   #   requiredDuringSchedulingIgnoredDuringExecution:
   #   - labelSelector:
@@ -221,6 +288,7 @@ prometheus:
       scrapeTimeout:
       namespace:
       additionalLabels: {}
+      relabelings: []
   operator:
     enabled: false
     port: 8080
@@ -232,6 +300,7 @@ prometheus:
       scrapeTimeout:
       namespace:
       additionalLabels: {}
+      relabelings: []
     prometheusRules:
       # Enables PrometheusRules creation for the Prometheus Operator
       enabled: false
