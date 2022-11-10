@@ -8,7 +8,11 @@ metadata:
     app.kubernetes.io/name: {{ .Values.operator.name }}-metrics-apiserver
     {{- include "keda.labels" . | indent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.metricsServer.replicaCount }}
+  {{- with .Values.upgradeStrategy.metricsApiServer }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   selector:
     matchLabels:
       app: {{ .Values.operator.name }}-metrics-apiserver
@@ -25,7 +29,7 @@ spec:
         {{- toYaml .Values.podLabels.metricsAdapter | nindent 8}}
         {{- end }}
       annotations:
-      {{- if .Values.prometheus.metricServer.enabled }}
+      {{- if and .Values.prometheus.metricServer.enabled ( not .Values.prometheus.metricServer.podMonitor.enabled ) }}
         prometheus.io/scrape: "true"
         prometheus.io/port: {{ .Values.prometheus.metricServer.port | quote }}
         prometheus.io/path: {{ .Values.prometheus.metricServer.path }}
@@ -42,6 +46,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
+      automountServiceAccountToken: true
       securityContext:
         {{- if .Values.podSecurityContext.metricServer }}
         {{- toYaml .Values.podSecurityContext.metricServer | nindent 8 }}
@@ -82,6 +87,7 @@ spec:
             {{- end }}
           args:
           - /usr/local/bin/keda-adapter
+          - --port={{ .Values.service.portHttpTarget }}
           - --secure-port={{ .Values.service.portHttpsTarget }}
           - --logtostderr=true
           {{- if .Values.prometheus.metricServer.enabled }}
@@ -143,8 +149,15 @@ spec:
       {{- with .Values.nodeSelector }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- if .Values.metricsServer.affinity }}
       affinity:
+        {{- toYaml .Values.metricsServer.affinity | nindent 8 }}
+      {{- else if .Values.affinity }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints.metricsServer}}
+      topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.tolerations }}
