@@ -1,5 +1,5 @@
 name: Worker
-hasSource: repo-only
+hasSource: true
 tabs:
 - name: main
   label: Main
