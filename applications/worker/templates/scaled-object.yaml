@@ -23,13 +23,13 @@ spec:
         scaleUp:
           stabilizationWindowSeconds: {{ .Values.keda.hpa.scaleUp.stabilizationWindowSeconds }}
           policies:
-          - type: Percent
+          - type: {{ or .Values.keda.hpa.scaleUp.policy.type "Percent" }}
             value: {{ .Values.keda.hpa.scaleUp.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleUp.policy.periodSeconds }}
         scaleDown:
           stabilizationWindowSeconds: {{ .Values.keda.hpa.scaleDown.stabilizationWindowSeconds }}
           policies:
-          - type: Percent
+          - type: {{ or .Values.keda.hpa.scaleDown.policy.type "Percent" }}
             value: {{ .Values.keda.hpa.scaleDown.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleDown.policy.periodSeconds }}
   triggers:
