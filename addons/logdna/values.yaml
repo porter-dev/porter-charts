@@ -19,6 +19,10 @@ daemonset:
       key: removable
       operator: Equal
       value: 'true'
+    - effect: NoSchedule
+      key: porter.run/workload-kind
+      operator: Equal
+      value: system
 
 priorityClassName: ""
 extraEnv: {}
