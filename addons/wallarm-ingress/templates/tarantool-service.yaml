@@ -1,24 +1,25 @@
+{{- if .Values.controller.wallarm.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
 {{- if .Values.controller.wallarm.tarantool.service.annotations }}
-  annotations:
-{{ toYaml .Values.controller.wallarm.tarantool.service.annotations | indent 4 }}
+  annotations: {{ toYaml .Values.controller.wallarm.tarantool.service.annotations | nindent 4 }}
 {{- end }}
   labels:
-    app: {{ template "nginx-ingress.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: {{ template "nginx-ingress.wallarmTarantoolName" . }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
-  name: {{ template "nginx-ingress.controller.fullname" . }}-wallarm-tarantool
+    {{- include "ingress-nginx.labels" . | nindent 4 }}
+    app.kubernetes.io/component: controller
+  {{- if .Values.controller.wallarm.tarantool.service.labels }}
+    {{- toYaml .Values.controller.wallarm.tarantool.service.labels | nindent 4 }}
+  {{- end }}
+  name: {{ include "ingress-nginx.controller.fullname" . }}-wallarm-tarantool
+  namespace: {{ .Release.Namespace }}
 spec:
+  type: ClusterIP
   ports:
     - name: tarantool
-      port: {{ template "nginx-ingress.wallarmTarantoolPort" . }}
+      port: {{ template "ingress-nginx.wallarmTarantoolPort" . }}
       protocol: TCP
   selector:
-    app: {{ template "nginx-ingress.name" . }}
-    component: {{ template "nginx-ingress.wallarmTarantoolName" . }}
-    release: {{ .Release.Name }}
-  type: ClusterIP
+    {{- include "ingress-nginx.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ template "ingress-nginx.wallarmTarantoolName" . }}
+{{- end }}

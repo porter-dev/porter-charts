@@ -1,17 +1,19 @@
-apiVersion: v1
+apiVersion: v2
 name: wallarm-ingress
-version: 0.25.0
+version: 4.2.4
+appVersion: 4.2.4-1
 home: https://github.com/wallarm/ingress
-description: Wallarm Ingress controller that uses ConfigMap to store the NGINX configuration.
-icon: https://assets.website-files.com/5fe3434623c64c793987363d/6006cb97f71f76f8a5e85a32_Frame%201923.png
+description: Ingress controller for Kubernetes using NGINX as a reverse proxy and load balancer with Wallarm module
+icon: https://static.wallarm.com/wallarm-logo.svg
 keywords:
   - ingress
   - nginx
   - wallarm
 sources:
-  - https://github.com/wallarm/ingress-chart
+  - https://github.com/wallarm/ingress
+type: application
 maintainers:
   - name: Wallarm Support Team
     email: support@wallarm.com
 engine: gotpl
-kubeVersion: ">=1.10.0-0"
+kubeVersion: ">=1.20.0-0"
