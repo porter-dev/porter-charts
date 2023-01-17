@@ -33,6 +33,7 @@ spec:
             value: {{ .Values.keda.hpa.scaleDown.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleDown.policy.periodSeconds }}
   triggers:
+    {{- if .Values.keda.trigger.enabled -}}
     - type: prometheus
       metadata:
         # Required fields:
@@ -40,4 +41,20 @@ spec:
         metricName: {{ .Values.keda.trigger.metricName }}
         query: {{ .Values.keda.trigger.metricQuery }}
         threshold: '{{ .Values.keda.trigger.metricThreshold }}'
+    {{- end }}
+    {{- if .Values.keda.datadog.enabled -}}
+    - type: datadog
+      metricType: Value
+      metadata:
+        query: '{{ .Values.keda.datadog.query }}'
+        queryValue: '{{ .Values.keda.datadog.queryValue }}'
+        activationQueryValue: '{{ .Values.keda.datadog.activationQueryValue }}'
+        queryAggregator: '{{ .Values.keda.datadog.queryAggregator }}'
+        age: '{{ .Values.keda.datadog.age }}'
+        timeWindowOffset: '{{ .Values.keda.datadog.timeWindowOffset }}'
+        lastAvailablePointOffset: '{{ .Values.keda.datadog.lastAvailablePointOffset }}'
+        metricUnavailableValue: '{{ .Values.keda.datadog.metricUnavailableValue }}'
+      authenticationRef:
+        name: {{ $fullName }}-trigger-auth-datadog
+    {{- end }}
 {{- end }}
