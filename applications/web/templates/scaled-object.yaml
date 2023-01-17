@@ -54,5 +54,7 @@ spec:
         timeWindowOffset: '{{ .Values.keda.datadog.timeWindowOffset }}'
         lastAvailablePointOffset: '{{ .Values.keda.datadog.lastAvailablePointOffset }}'
         metricUnavailableValue: '{{ .Values.keda.datadog.metricUnavailableValue }}'
+      authenticationRef:
+        name: {{ $fullName }}-trigger-auth-datadog
     {{- end }}
 {{- end }}
