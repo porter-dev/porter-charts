@@ -1,0 +1,170 @@
+name: Helm Chart CI (Core)
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/ci-core.yml'
+      - 'keda/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/ci-core.yml'
+      - 'keda/**'
+
+jobs:
+  lint-helm-3-x:
+    name: Lint Helm Chart
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Helm install
+      uses: Azure/setup-helm@v3
+
+    - name: Lint 'KEDA' Helm chart
+      run: helm lint keda
+
+  deploy-helm-3-x:
+    name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }} (${{ (matrix.enableAzureWorkloadIdentity == true && 'With Azure Workload Identity') || 'Without Azure Workload Identity' }})
+    needs: lint-helm-3-x
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        enableAzureWorkloadIdentity: [false, true]
+        kubernetesVersion: [v1.26, v1.25, v1.24, v1.23]
+        include:
+          # Azure Workload Identity
+        - enableAzureWorkloadIdentity: true
+          tenantId: contoso
+          clientId: ABC
+        - enableAzureWorkloadIdentity: false
+          tenantId: ""
+          clientId: ""
+          # Images are defined on every Kind release
+          # See https://github.com/kubernetes-sigs/kind/releases
+        - kubernetesVersion: v1.26
+          kindImage: kindest/node:v1.26.0@sha256:691e24bd2417609db7e589e1a479b902d2e209892a10ce375fab60a8407c7352
+        - kubernetesVersion: v1.25
+          kindImage: kindest/node:v1.25.0@sha256:428aaa17ec82ccde0131cb2d1ca6547d13cf5fdabcc0bbecf749baa935387cbf
+        - kubernetesVersion: v1.24
+          kindImage: kindest/node:v1.24.0@sha256:406fd86d48eaf4c04c7280cd1d2ca1d61e7d0d61ddef0125cb097bc7b82ed6a1
+        - kubernetesVersion: v1.23
+          kindImage: kindest/node:v1.23.6@sha256:1af0f1bee4c3c0fe9b07de5e5d3fafeb2eec7b4e1b268ae89fcab96ec67e8355
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Helm install
+      uses: Azure/setup-helm@v3
+      
+    - name: Create k8s ${{ matrix.kubernetesVersion }} Kind Cluster
+      uses: helm/kind-action@main
+      with:
+        node_image: ${{ matrix.kindImage }}
+
+    - name: Show Kubernetes version
+      run: |
+        kubectl version
+
+    - name: Show Kubernetes nodes
+      run: |
+        kubectl get nodes -o wide
+
+    - name: Show Helm version
+      run: |
+        helm version
+
+    - name: Generate values
+      run: |
+        cat <<EOF > test-values.yaml
+        image:
+          keda:
+            tag: main
+          metricsApiServer:   
+            tag: main
+          webhooks:   
+            tag: main
+        podIdentity:
+          azureWorkload:
+            enabled: ${{ matrix.enableAzureWorkloadIdentity }}
+            tenantId: ${{ matrix.tenantId }}
+            clientId: ${{ matrix.clientId }}
+        podDisruptionBudget:
+          operator:
+            maxUnavailable: 1 
+          metricServer:
+            maxUnavailable: 1
+          webhooks:
+            maxUnavailable: 1
+        prometheus:
+          operator:
+            enabled: true
+            podMonitor:
+              enabled: true
+          webhooks:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+        webhooks:
+          failurePolicy: Fail
+        EOF
+
+    - name: Install deps
+      run: |
+        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+        helm repo update
+        helm install prometheus-stack prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace --wait
+
+    - name: Create KEDA namespace
+      run: kubectl create ns keda
+
+    - name: Template Helm chart
+      run: helm template keda ./keda/ --namespace keda --values test-values.yaml
+
+    - name: Install Helm chart
+      run: helm install keda ./keda/ --namespace keda --values test-values.yaml --wait
+
+    - name: Show Kubernetes resources
+      run: kubectl get all --namespace keda
+      if: always()
+
+    - name: Get all CRDs
+      run: kubectl get crds -o wide
+
+    - name: Verify clustertriggerauthentications.keda.sh CRD is installed
+      run: kubectl get crd/clustertriggerauthentications.keda.sh -o wide
+
+    - name: Verify triggerauthentications.keda.sh CRD is installed
+      run: kubectl get crd/triggerauthentications.keda.sh -o wide
+
+    - name: Verify scaledjobs.keda.sh CRD is installed
+      run: kubectl get crd/scaledjobs.keda.sh -o wide
+
+    - name: Verify scaledobjects.keda.sh CRD is installed
+      run: kubectl get crd/scaledobjects.keda.sh -o wide
+
+    - name: Get all ScaledObjects
+      run: kubectl get scaledobjects -o wide
+
+    - name: Get all ScaledJobs
+      run: kubectl get scaledjobs -o wide
+
+    - name: Get all TriggerAuthentication
+      run: kubectl get triggerauth -o wide
+
+    - name: Get all ClusterTriggerAuthentication
+      run: kubectl get clustertriggerauth -o wide
+
+    - name: Deploy Nginx with autoscaling
+      run: kubectl apply -f ./samples/nginx-scaledobject.yml
+
+    - name: Get our Nginx ScaledObject
+      run: kubectl get scaledobjects/nginx-autoscaling -o wide
+      if: always()

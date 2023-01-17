@@ -1,0 +1,99 @@
+name: Helm Chart CI (HTTP add-on)
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/ci-http-add-on.yml'
+      - 'http-add-on/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/ci-http-add-on.yml'
+      - 'http-add-on/**'
+
+jobs:
+  lint-helm-3-x:
+    name: Lint Helm Chart
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Helm install
+      uses: Azure/setup-helm@v3
+
+    - name: Lint 'http-add-on' Helm chart
+      run: helm lint http-add-on
+
+  deploy-helm-3-x:
+    name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }}
+    needs: lint-helm-3-x
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        kubernetesVersion: [v1.24, v1.22, v1.21, v1.20, v1.19, v1.18, v1.17]
+        include:
+          # Images are defined on every Kind release
+          # See https://github.com/kubernetes-sigs/kind/releases
+        - kubernetesVersion: v1.25
+          kindImage: kindest/node:v1.25.0@sha256:428aaa17ec82ccde0131cb2d1ca6547d13cf5fdabcc0bbecf749baa935387cbf
+        - kubernetesVersion: v1.24
+          kindImage: kindest/node:v1.24.0@sha256:406fd86d48eaf4c04c7280cd1d2ca1d61e7d0d61ddef0125cb097bc7b82ed6a1
+        - kubernetesVersion: v1.23
+          kindImage: kindest/node:v1.23.6@sha256:1af0f1bee4c3c0fe9b07de5e5d3fafeb2eec7b4e1b268ae89fcab96ec67e8355
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Helm install
+      uses: Azure/setup-helm@v3
+
+    - name: Create k8s ${{ matrix.kubernetesVersion }} Kind Cluster
+      uses: helm/kind-action@main
+      with:
+        node_image: ${{ matrix.kindImage }}
+
+    - name: Show Kubernetes version
+      run: |
+        kubectl version
+
+    - name: Show Kubernetes nodes
+      run: |
+        kubectl get nodes -o wide
+
+    - name: Show Helm version
+      run: |
+        helm version
+
+    - name: Create KEDA namespace
+      run: kubectl create ns keda
+
+    - name: Install KEDA chart
+      run: helm install keda ./keda/ --namespace keda
+
+    - name: Template Helm chart
+      run: helm template http-add-on ./http-add-on/ --namespace keda
+
+    - name: Install Helm chart
+      run: helm install http-add-on ./http-add-on/ --namespace keda
+
+    - name: Show Kubernetes resources
+      run: kubectl get all --namespace keda
+      if: always()
+
+    - name: Get all HTTPScaledObjects
+      run: kubectl get httpscaledobjects
+
+    - name: Get all CRDs
+      run: kubectl get crds
+
+    - name: Get HTTPScaledObject CRD
+      run: kubectl get crds/httpscaledobjects.http.keda.sh
+
+    - name: Describe HTTPScaledObject CRD
+      run: kubectl describe crds/httpscaledobjects.http.keda.sh
