@@ -1,7 +1,7 @@
 apiVersion: v2
 name: tailscale-relay
 icon: https://img.stackshare.io/service/12662/Rdoemci7_400x400.jpg
-version: 0.8.0
+version: 0.9.0
 appVersion: v1.8.5
 description: Tailscale is a secure network between your servers, computers, and cloud instances.
 home: https://github.com/mvisonneau/tailscale-relay-over-k8s
