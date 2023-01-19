@@ -3,8 +3,6 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: {{ .Values.operator.name }}-metrics-apiserver
-  annotations:
-    {{- toYaml .Values.additionalAnnotations | nindent 4 }}
   labels:
     app.kubernetes.io/name: {{ .Values.operator.name }}
     {{- include "keda.labels" . | indent 4 }}
@@ -24,10 +22,6 @@ spec:
     {{- end }}
     {{- with .Values.prometheus.metricServer.podMonitor.scrapeTimeout }}
     scrapeTimeout: {{ . }}
-    {{- end }}
-    {{- with .Values.prometheus.metricServer.podMonitor.relabelings }}
-    relabelings:
-{{ toYaml . | indent 4 }}
     {{- end }}
   namespaceSelector:
     matchNames:
