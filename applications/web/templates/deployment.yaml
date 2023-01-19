@@ -86,7 +86,7 @@ spec:
             httpGet:
               path: {{ .Values.health.livenessProbe.path }}
               scheme: {{ .Values.health.livenessProbe.scheme }}
-              port: http
+              port: {{ .Values.health.livenessProbe.port | default "http" }}
               {{ if .Values.health.livenessProbe.auth.enabled }}
               httpHeaders:
                 - name: Authorization
@@ -116,7 +116,7 @@ spec:
             httpGet:
               path: {{ .Values.health.readinessProbe.path }}
               scheme: {{ .Values.health.readinessProbe.scheme }}
-              port: http
+              port: {{ .Values.health.readinessProbe.port | default "http" }}
               {{ if .Values.health.readinessProbe.auth.enabled }}
               httpHeaders:
                 - name: Authorization
@@ -133,7 +133,7 @@ spec:
             httpGet:
               path: {{ .Values.health.startupProbe.path }}
               scheme: {{ .Values.health.startupProbe.scheme }}
-              port: http
+              port: {{ .Values.health.startupProbe.port | default "http" }}
             {{ if .Values.health.startupProbe.auth.enabled }}
               httpHeaders:
                 - name: Authorization

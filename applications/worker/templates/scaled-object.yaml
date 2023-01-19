@@ -23,21 +23,26 @@ spec:
         scaleUp:
           stabilizationWindowSeconds: {{ .Values.keda.hpa.scaleUp.stabilizationWindowSeconds }}
           policies:
-          - type: Percent
+          - type: {{ or .Values.keda.hpa.scaleUp.policy.type "Percent" }}
             value: {{ .Values.keda.hpa.scaleUp.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleUp.policy.periodSeconds }}
         scaleDown:
           stabilizationWindowSeconds: {{ .Values.keda.hpa.scaleDown.stabilizationWindowSeconds }}
           policies:
-          - type: Percent
+          - type: {{ or .Values.keda.hpa.scaleDown.policy.type "Percent" }}
             value: {{ .Values.keda.hpa.scaleDown.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleDown.policy.periodSeconds }}
   triggers:
+<<<<<<< HEAD
     {{- if .Values.keda.trigger.prometheus.enabled -}}
+=======
+    {{- if .Values.keda.trigger.enabled -}}
+>>>>>>> master
     - type: prometheus
       metadata:
         # Required fields:
         serverAddress: http://prometheus-server.monitoring.svc.cluster.local:80
+<<<<<<< HEAD
         metricName: {{ .Values.keda.trigger.prometheus.metricName }}
         query: {{ .Values.keda.trigger.prometheus.metricQuery }}
         threshold: '{{ .Values.keda.trigger.prometheus.metricThreshold }}'
@@ -53,3 +58,25 @@ spec:
         metricUnavailableValue: "{{ .Values.keda.trigger.datadog.metricUnavailableValue }}"
     {{- end }}
 {{- end }}
+=======
+        metricName: {{ .Values.keda.trigger.metricName }}
+        query: {{ .Values.keda.trigger.metricQuery }}
+        threshold: '{{ .Values.keda.trigger.metricThreshold }}'
+    {{- end }}
+    {{- if .Values.keda.datadog.enabled -}}
+    - type: datadog
+      metricType: Value
+      metadata:
+        query: '{{ .Values.keda.datadog.query }}'
+        queryValue: '{{ .Values.keda.datadog.queryValue }}'
+        activationQueryValue: '{{ .Values.keda.datadog.activationQueryValue }}'
+        queryAggregator: '{{ .Values.keda.datadog.queryAggregator }}'
+        age: '{{ .Values.keda.datadog.age }}'
+        timeWindowOffset: '{{ .Values.keda.datadog.timeWindowOffset }}'
+        lastAvailablePointOffset: '{{ .Values.keda.datadog.lastAvailablePointOffset }}'
+        metricUnavailableValue: '{{ .Values.keda.datadog.metricUnavailableValue }}'
+      authenticationRef:
+        name: {{ $fullName }}-trigger-auth-datadog
+    {{- end }}
+{{- end }}
+>>>>>>> master

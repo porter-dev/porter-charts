@@ -123,21 +123,23 @@ keda:
         value: 10
         periodSeconds: 300
   trigger:
-    prometheus:
-      enabled: false
-      metricName: ""
-      metricQuery: ""
-      metricThreshold: ""
-    datadog:
-      enabled: false
-      apiKey: ""
-      appKey: ""
-      datadogSite: "datadoghq.com"
-      query: ""
-      queryValue: ""
-      activationQueryValue: ""
-      age: ""
-      metricUnavailableValue: ""
+    enabled: true
+    metricName: ""
+    metricQuery: ""
+    metricThreshold: ""
+  datadog:
+    enabled: false
+    apiKey: ""
+    appKey: ""
+    datadogSite: datadoghq.com
+    query: ""
+    queryValue: ""
+    activationQueryValue: "0"
+    queryAggregator: "max"
+    age: "90"
+    timeWindowOffset: "0"
+    lastAvailablePointOffset: "0"
+    metricUnavailableValue: ""
 
 health:
   livenessProbe:

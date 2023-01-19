@@ -71,6 +71,7 @@ keda:
         value: 10
         periodSeconds: 300
   trigger:
+<<<<<<< HEAD
     prometheus:
       enabled: false
       metricName: ""
@@ -86,6 +87,25 @@ keda:
       activationQueryValue: ""
       age: ""
       metricUnavailableValue: ""
+=======
+    enabled: true
+    metricName: ""
+    metricQuery: ""
+    metricThreshold: ""
+  datadog:
+    enabled: false
+    apiKey: ""
+    appKey: ""
+    datadogSite: datadoghq.com
+    query: ""
+    queryValue: ""
+    activationQueryValue: "0"
+    queryAggregator: "max"
+    age: "90"
+    timeWindowOffset: "0"
+    lastAvailablePointOffset: "0"
+    metricUnavailableValue: ""
+>>>>>>> master
 
 health:
   enabled: false

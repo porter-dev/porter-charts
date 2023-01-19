@@ -11,6 +11,10 @@ image:
     repository: ghcr.io/kedacore/keda-metrics-apiserver
     # Allows people to override tag if they don't want to use the app version
     tag:
+  webhooks:
+    repository: ghcr.io/kedacore/keda-admission-webhooks
+    # Allows people to override tag if they don't want to use the app version
+    tag:
   pullPolicy: Always
 
 crds:
@@ -52,6 +56,23 @@ metricsServer:
     #         - keda-operator-metrics-apiserver
     #     topologyKey: "kubernetes.io/hostname"
 
+webhooks:
+  enabled: true # This value will be removed in keda v2.12
+  name: keda-admission-webhooks
+  replicaCount: 1
+  # -- Affinity for pod scheduling https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/ for KEDA operator. Takes precedence over the `affinity` field
+  affinity: {}
+    # podAntiAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #   - labelSelector:
+    #       matchExpressions:
+    #       - key: app
+    #         operator: In
+    #         values:
+    #         - keda-operator
+    #     topologyKey: "kubernetes.io/hostname"
+  failurePolicy: Ignore
+
 upgradeStrategy:
   operator: {}
     # type: RollingUpdate
@@ -59,6 +80,11 @@ upgradeStrategy:
     #   maxUnavailable: 1
     #   maxSurge: 1
   metricsApiServer: {}
+    # type: RollingUpdate
+    # rollingUpdate:
+    #   maxUnavailable: 1
+    #   maxSurge: 1
+  webhooks: {}
     # type: RollingUpdate
     # rollingUpdate:
     #   maxUnavailable: 1
@@ -71,18 +97,28 @@ podDisruptionBudget: {}
   # metricServer:
   #   minAvailable: 1
   #   maxUnavailable: 1
+  # webhooks:
+  #   minAvailable: 1
+  #   maxUnavailable: 1
 
 # -- Custom labels to add into metadata
 additionalLabels:
   {}
   # foo: bar
 
+# -- Custom annotations to add into metadata
+additionalAnnotations:
+  {}
+  # foo: bar
+
 podAnnotations:
   keda: {}
   metricsAdapter: {}
+  webhooks: {}
 podLabels:
   keda: {}
   metricsAdapter: {}
+  webhooks: {}
 
 rbac:
   create: true
@@ -126,7 +162,7 @@ podIdentity:
       # Set to the value of the ARN of an IAM role with a web identity provider.
       # This will be set as an annotation on the KEDA service account.
       roleArn: ""
-      # Sets the use of an STS regional endpoint instead of global. 
+      # Sets the use of an STS regional endpoint instead of global.
       # Recommended to use regional endpoint in almost all cases.
       # This will be set as an annotation on the KEDA service account.
       stsRegionalEndpoints: "true"
@@ -163,6 +199,19 @@ logging:
     # default value: 0
     level: 0
 
+  webhooks:
+    ## Logging level for KEDA Operator
+    # allowed values: 'debug', 'info', 'error', or an integer value greater than 0, specified as string
+    # default value: info
+    level: info
+    # allowed values: 'json' or 'console'
+    # default value: console
+    format: console
+    ## Logging time encoding for KEDA Operator
+    # allowed values are 'epoch', 'millis', 'nano', 'iso8601', 'rfc3339' or 'rfc3339nano'
+    # default value: rfc3339
+    timeEncoding: rfc3339
+
 securityContext:
   operator:
     capabilities:
@@ -181,6 +230,14 @@ securityContext:
     # readOnlyRootFilesystem: true
     seccompProfile:
       type: RuntimeDefault
+  webhooks:
+    capabilities:
+      drop:
+      - ALL
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    seccompProfile:
+      type: RuntimeDefault
 
 podSecurityContext:
   operator:
@@ -189,6 +246,11 @@ podSecurityContext:
     # runAsGroup: 1000
     # fsGroup: 1000
   metricServer:
+    runAsNonRoot: true
+    # runAsUser: 1000
+    # runAsGroup: 1000
+    # fsGroup: 1000
+  webhooks:
     runAsNonRoot: true
     # runAsUser: 1000
     # runAsGroup: 1000
@@ -223,15 +285,22 @@ resources:
     requests:
       cpu: 100m
       memory: 100Mi
-
+  webhooks:
+    limits:
+      cpu: 50m
+      memory: 100Mi
+    requests:
+      cpu: 10m
+      memory: 10Mi
 nodeSelector: {}
 
 tolerations: []
 
 # -- Pod Topology Constraints https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
 topologySpreadConstraints: {}
-  #operator: []
-  #metricsServer: []
+  # operator: []
+  # metricsServer: []
+  # webhooks: []
 
 # -- Affinity for pod scheduling https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/ for both KEDA operator and Metrics API Server
 affinity: {}
@@ -254,6 +323,8 @@ priorityClassName: ""
 ## reasonable default
 http:
   timeout: 3000
+  keepAlive:
+    enabled: true
 
 ## Extra KEDA Operator and Metrics Adapter container arguments
 extraArgs:
@@ -275,12 +346,28 @@ volumes:
     extraVolumes: []
     extraVolumeMounts: []
 
+  webhooks:
+    extraVolumes: []
+    extraVolumeMounts: []
+
 prometheus:
   metricServer:
     enabled: false
     port: 9022
     portName: metrics
     path: /metrics
+    serviceMonitor:
+      # Enables ServiceMonitor creation for the Prometheus Operator
+      enabled: false
+      jobLabel:
+      targetLabels: []
+      podTargetLabels: []
+      port: metrics
+      targetPort:
+      interval:
+      scrapeTimeout:
+      relabellings: []
+      additionalLabels: {}
     podMonitor:
       # Enables PodMonitor creation for the Prometheus Operator
       enabled: false
@@ -292,7 +379,18 @@ prometheus:
   operator:
     enabled: false
     port: 8080
-    path: /metrics
+    serviceMonitor:
+      # Enables ServiceMonitor creation for the Prometheus Operator
+      enabled: false
+      jobLabel:
+      targetLabels: []
+      podTargetLabels: []
+      port: metrics
+      targetPort:
+      interval:
+      scrapeTimeout:
+      relabellings: []
+      additionalLabels: {}
     podMonitor:
       # Enables PodMonitor creation for the Prometheus Operator
       enabled: false
@@ -315,3 +413,37 @@ prometheus:
         #   expr: sum by ( scaledObject , scaler) (rate(keda_metrics_adapter_scaler_errors[2m]))  > 0
         #   for: 2m
         #   labels:
+  webhooks:
+    enabled: false
+    port: 8080
+    serviceMonitor:
+      # Enables ServiceMonitor creation for the Prometheus webhooks
+      enabled: false
+      jobLabel:
+      targetLabels: []
+      podTargetLabels: []
+      port: metrics
+      targetPort:
+      interval:
+      scrapeTimeout:
+      relabellings: []
+      additionalLabels: {}
+    prometheusRules:
+      # Enables PrometheusRules creation for the Prometheus Operator
+      enabled: false
+      namespace:
+      additionalLabels: {}
+      alerts: []
+
+certificates:
+  autoGenerated: true
+  secretName: kedaorg-certs
+  mountPath: /certs
+
+permissions:
+  metricServer:
+    restrict:
+      secret: false
+  operator:
+    restrict:
+      secret: false
