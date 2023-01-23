@@ -46,7 +46,9 @@ ingress:
   custom_domain: false
   custom_paths: []
   rewriteCustomPathsEnabled: true
-  annotations: {}
+  # annotations: {}
+  annotations: 
+    kubernetes.io/ingress.class: gce
   wildcard: false
   tls: true
   useDefaultIngressTLSSecret: false
