@@ -126,8 +126,6 @@ keda:
     metricName: ""
     metricQuery: ""
     metricThreshold: ""
-  datadog:
-    enabled: false
 
 health:
   livenessProbe:
