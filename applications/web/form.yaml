@@ -162,7 +162,7 @@ tabs:
           - type: subtitle
             label: Set environment variables for your secrets and environment-specific configuration.
           - type: env-key-value-array
-            label: test
+            label: ""
             variable: container.env
   - name: advanced
     label: Advanced
