@@ -162,7 +162,7 @@ tabs:
           - type: subtitle
             label: Set environment variables for your secrets and environment-specific configuration.
           - type: env-key-value-array
-            label:
+            label: test
             variable: container.env
   - name: advanced
     label: Advanced
@@ -266,6 +266,7 @@ tabs:
           - type: string-input
             label: Readiness Probe Endpoint
             variable: health.readinessProbe.path
+            placeholder: "/healthz"
             settings:
               default: /readyz
           - type: number-input
@@ -274,6 +275,14 @@ tabs:
             placeholder: "ex: 30"
             settings:
               default: 5
+          - type: number-input
+            label: Initial Delay Threshold
+            variable: health.readinessProbe.initialDelaySeconds
+            placeholder: "ex: 30"
+            settings:
+              default: 0
+          - type: subtitle
+            label: The number of seconds the readiness probe will wait before first executing after pod startup. If startup probe is enabled, this will start after startup probe has completed.              
       - name: persistence_toggle
         contents:
           - type: heading
