@@ -101,6 +101,9 @@ cloudsql:
   dbPort: 5432
   serviceAccountJSON: ""
 
+datadog:
+  enabled: false
+
 nodeSelector: {}
 
 tolerations: []
