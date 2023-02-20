@@ -32,7 +32,7 @@ spec:
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
             {{- end }}
         spec:
-          serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
+          serviceAccountName: cronjob-{{ include "docker-template.serviceAccountName" . }}
           containers:
           - name: {{ .Chart.Name }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
