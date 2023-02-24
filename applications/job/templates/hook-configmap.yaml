@@ -50,6 +50,8 @@ data:
               effect: "NoSchedule"
           {{- if .Values.serviceAccount.create }}
           serviceAccountName: cronjob-{{ include "docker-template.serviceAccountName" . }}
+          {{ else }}
+          serviceAcocuntName: {{ include "docker-template.serviceAccountName" . }}
           {{- end }}
           containers:
           - name: {{ .Chart.Name }}
