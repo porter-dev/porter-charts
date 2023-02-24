@@ -48,6 +48,7 @@ data:
               operator: "Equal"
               value: "true"
               effect: "NoSchedule"
+          serviceAccountName: cronjob-{{ include "docker-template.serviceAccountName" . }}
           containers:
           - name: {{ .Chart.Name }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
