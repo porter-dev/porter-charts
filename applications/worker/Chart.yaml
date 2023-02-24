@@ -10,4 +10,4 @@ keywords:
   - worker
 name: worker
 type: application
-version: 0.45.0
+version: 0.35.0
