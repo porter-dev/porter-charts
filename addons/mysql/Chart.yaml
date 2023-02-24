@@ -4,4 +4,4 @@ description: Template for deploying a MySQL database.
 icon: https://www.mysql.com/common/logos/logo-mysql-170x115.png
 name: mysql
 type: application
-version: 0.8.0
+version: 0.11.0
