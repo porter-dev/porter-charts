@@ -20,6 +20,9 @@ spec:
         {{- end }}
       labels:
         {{- include "docker-template.selectorLabels" . | nindent 8 }}
+        {{- if .Values.podLabels }}
+        {{- toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
         {{- if .Values.stack.enabled }}
         porter.run/stack-name: "{{ .Values.stack.name }}"
         {{- end }}
@@ -43,6 +46,25 @@ spec:
           {{- range $command := trim .Values.container.command | splitList " " }}
           - {{ $command | quote }}
           {{- end }}
+          {{- end }}
+          {{- if or (.Values.container.lifecycle.postStart) (.Values.container.lifecycle.preStop) }}
+          lifecycle:
+            {{- if .Values.container.lifecycle.postStart }}
+            postStart:
+              exec:
+                command:
+                {{- range $command := trim .Values.container.lifecycle.postStart | splitList " " }}
+                - {{ $command | quote }}
+                {{- end }}
+            {{- end }}
+            {{- if .Values.container.lifecycle.preStop }}
+            preStop:
+              exec:
+                command:
+                {{- range $command := trim .Values.container.lifecycle.preStop | splitList " " }}
+                - {{ $command | quote }}
+                {{- end }}
+            {{- end }}
           {{- end }}
           ports:
             - name: http

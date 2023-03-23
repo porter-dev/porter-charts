@@ -23,6 +23,9 @@ spec:
         {{- end }}
       labels:
         {{- include "docker-template.selectorLabels" . | nindent 8 }}
+        {{- if .Values.podLabels }}
+        {{- toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
         {{- if .Values.stack.enabled }}
         porter.run/stack-name: "{{ .Values.stack.name }}"
         {{- end }}
