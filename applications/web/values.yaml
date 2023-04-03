@@ -70,6 +70,7 @@ albIngress:
   healthcheck_unhealthy_threshold_count:
   healthcheck_port:
   healthcheck_protocol:
+  target_node_labels: 
 
 privateIngress:
   enabled: false
