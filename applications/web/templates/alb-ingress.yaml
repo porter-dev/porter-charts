@@ -54,6 +54,9 @@ metadata:
     {{- if .Values.albIngress.healthcheck_protocol }}
     alb.ingress.kubernetes.io/healthcheck-protocol: {{ .Values.albIngress.healthcheck_protocol }}
     {{- end }}
+    {{- if .Values.albIngress.target_node_labels }}
+    alb.ingress.kubernetes.io/target-node-labels: {{ .Values.albIngress.target_node_labels }}
+    {{- end }}
 spec:
   rules:
   {{- range $allHosts }}
