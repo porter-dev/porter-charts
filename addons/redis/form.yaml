@@ -15,37 +15,39 @@ tabs:
       label: Credentials
     - type: checkbox
       label: Use Password
-      variable: usePassword
+      variable: auth.enabled
   - name: password
-    show_if: usePassword
+    show_if: auth.enabled
     contents:
     - type: string-input
       label: Password
-      variable: password
+      variable: auth.enabled.password
 - name: resources
   label: Resources
   sections:
   - name: main_section
     contents:
     - type: heading
-      label: Resources
+      label: Resources - Master
     - type: subtitle
-      label: Configure resources assigned to this Redis instance.
+      label: Configure resources assigned to this Redis master instance.
     - type: number-input
       label: RAM
-      variable: resources.requests.memory
+      variable: master.resources.requests.memory
       settings:
         unit: Mi
         default: 256
     - type: number-input
       label: CPU
-      variable: resources.requests.cpu
+      variable: master.resources.requests.cpu
       settings:
         unit: m
         default: 100
     sections:
     - name: persistence
       contents:
+      - type: subtitle
+        label: Please enable persistence only if you have a stateful nodegroup in your cluster, running in a single AZ. Running a stateful Redis installation on non-stateful nodegroups can lead to issues with storage on AWS.
       - type: checkbox
         label: Enable persistence
         variable: master.persistence.enabled
