@@ -55,11 +55,9 @@ metadata:
     {{- end }}
     {{- end }}
 spec:
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
 {{- if ne .Values.ingress.provider "azure" }}
 {{- if ne "gce" (index .Values.ingress.annotations "kubernetes.io/ingress.class" ) }}
   ingressClassName: nginx
-{{- end }}
 {{- end }}
 {{- end }}
   {{- if .Values.ingress.tls }}
