@@ -10,9 +10,6 @@ metadata:
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
   annotations:
-  {{- if not (.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress") }}
-    kubernetes.io/ingress.class: "nginx"
-  {{- end }}
   {{- if eq .Values.ingress.provider "azure" }}
     kubernetes.io/ingress.class: addon-http-application-routing
   {{- end }}
@@ -79,7 +76,6 @@ spec:
       {{ end }}
       {{- end }}
   {{- end }}
-
   rules:
     {{- range $allHosts }}
       - host: {{ . | quote }}
@@ -88,34 +84,20 @@ spec:
             {{ if gt (len $customPaths) 0 }}
             {{- range $customPaths }}
             - path: {{ .path }}
-              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               pathType: ImplementationSpecific
-              {{- end }}
               backend:
-                {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}                
                 service:
                   name: {{ .serviceName }}
                   port:
                     number: {{ .servicePort }}
-                {{- else }}
-                serviceName: {{ .serviceName }} 
-                servicePort: {{ .servicePort }}
-                {{- end }}
             {{- end }}
             {{ else }}
-            - {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-              pathType: ImplementationSpecific
-              {{- end }}
+            - pathType: ImplementationSpecific
               backend:
-              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
                 service:
                   name: {{ $fullName }}
                   port:
                     number: {{ $svcPort }}
-              {{- else }}
-                serviceName: {{ $fullName }}
-                servicePort: {{ $svcPort }}
-              {{- end }}
             {{ end }}
     {{- end }}
 {{- end }}
