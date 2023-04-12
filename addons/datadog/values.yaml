@@ -475,7 +475,15 @@ datadog:
 
   ## The Datadog Agent supports many environment variables.
   ## ref: https://docs.datadoghq.com/agent/docker/?tab=standard#environment-variables
-  env: []
+  env:
+    - name: DD_CONTAINER_EXCLUDE_LOGS
+      value: kube_namespace:.*
+    - name: DD_CONTAINER_EXCLUDE_METRICS
+      value: kube_namespace:.*
+    - name: DD_CONTAINER_INCLUDE_LOGS
+      value: kube_namespace:default kube_namespace:ingress-nginx
+    - name: DD_CONTAINER_INCLUDE_METRICS
+      value: kube_namespace:default kube_namespace:ingress-nginx
   #   - name: <ENV_VAR_NAME>
   #     value: <ENV_VAR_VALUE>
 
@@ -933,7 +941,7 @@ clusterAgent:
 
   admissionController:
     # clusterAgent.admissionController.enabled -- Enable the admissionController to be able to inject APM/Dogstatsd config and standard tags (env, service, version) automatically into your pods
-    enabled: true
+    enabled: false
 
     # clusterAgent.admissionController.mutateUnlabelled -- Enable injecting config without having the pod label 'admission.datadoghq.com/enabled="true"'
     mutateUnlabelled: false
