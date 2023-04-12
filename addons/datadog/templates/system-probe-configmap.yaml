@@ -32,16 +32,42 @@ data:
       collect_dns_stats: {{ $.Values.datadog.systemProbe.collectDNSStats }}
       max_tracked_connections: {{ $.Values.datadog.systemProbe.maxTrackedConnections }}
       conntrack_max_state_size: {{ $.Values.datadog.systemProbe.conntrackMaxStateSize }}
+      runtime_compiler_output_dir: {{ $.Values.datadog.systemProbe.runtimeCompilationAssetDir }}/build
+      kernel_header_download_dir: {{ $.Values.datadog.systemProbe.runtimeCompilationAssetDir }}/kernel-headers
+      apt_config_dir: /host/etc/apt
+      yum_repos_dir: /host/etc/yum.repos.d
+      zypper_repos_dir: /host/etc/zypp/repos.d
+      btf_path: {{ $.Values.datadog.systemProbe.btfPath }}
     network_config:
       enabled: {{ $.Values.datadog.networkMonitoring.enabled }}
+      conntrack_init_timeout: {{ $.Values.datadog.systemProbe.conntrackInitTimeout }}
+    service_monitoring_config:
+      enabled: {{ $.Values.datadog.serviceMonitoring.enabled }}
     runtime_security_config:
       enabled: {{ $.Values.datadog.securityAgent.runtime.enabled }}
-      debug: false
+      fim_enabled: {{ $.Values.datadog.securityAgent.runtime.fimEnabled }}
       socket: /var/run/sysprobe/runtime-security.sock
       policies:
         dir: /etc/datadog-agent/runtime-security.d
       syscall_monitor:
         enabled: {{ $.Values.datadog.securityAgent.runtime.syscallMonitor.enabled }}
+      network:
+        enabled: {{ $.Values.datadog.securityAgent.runtime.network.enabled }}
+      remote_configuration:
+        enabled: {{ if and .Values.datadog.securityAgent.runtime.enabled .Values.datadog.remoteConfiguration.enabled -}} true {{else -}} false {{end}}
+{{- if .Values.datadog.securityAgent.runtime.activityDump.enabled }}
+      activity_dump:
+        enabled: true
+        traced_cgroups_count: {{ $.Values.datadog.securityAgent.runtime.activityDump.tracedCgroupsCount }}
+        cgroup_dump_timeout: {{ $.Values.datadog.securityAgent.runtime.activityDump.cgroupDumpTimeout }}
+        cgroup_wait_list_size:  {{ $.Values.datadog.securityAgent.runtime.activityDump.cgroupWaitListSize }}
+        path_merge:
+          enabled: {{ $.Values.datadog.securityAgent.runtime.activityDump.pathMerge.enabled }}
+{{ else }}
+      activity_dump:
+        enabled: false
+        traced_cgroups_count: 0
+{{ end }}
 
 {{- if eq .Values.datadog.systemProbe.seccomp "localhost/system-probe" }}
 ---
@@ -68,8 +94,10 @@ data:
             "capget",
             "capset",
             "chdir",
+            "chmod",
             "clock_gettime",
             "clone",
+            "clone3",
             "close",
             "connect",
             "copy_file_range",
@@ -83,7 +111,6 @@ data:
             "epoll_ctl_old",
             "epoll_pwait",
             "epoll_wait",
-            "epoll_wait",
             "epoll_wait_old",
             "eventfd",
             "eventfd2",
@@ -91,6 +118,8 @@ data:
             "execveat",
             "exit",
             "exit_group",
+            "faccessat",
+            "faccessat2",
             "fchmod",
             "fchmodat",
             "fchown",
@@ -98,6 +127,7 @@ data:
             "fchownat",
             "fcntl",
             "fcntl64",
+            "flock",
             "fstat",
             "fstat64",
             "fstatfs",
@@ -109,7 +139,9 @@ data:
             "getegid",
             "geteuid",
             "getgid",
+            "getgroups",
             "getpeername",
+            "getpgrp",
             "getpid",
             "getppid",
             "getpriority",
@@ -145,6 +177,7 @@ data:
             "newfstatat",
             "open",
             "openat",
+            "openat2",
             "pause",
             "perf_event_open",
             "pipe",
@@ -162,8 +195,11 @@ data:
             "recvmmsg",
             "recvmsg",
             "rename",
+            "renameat",
+            "renameat2",
             "restart_syscall",
             "rmdir",
+            "rseq",
             "rt_sigaction",
             "rt_sigpending",
             "rt_sigprocmask",
@@ -187,7 +223,9 @@ data:
             "setgid32",
             "setgroups",
             "setgroups32",
+            "setitimer",
             "setns",
+            "setpgid",
             "setrlimit",
             "setsid",
             "setsidaccept4",
@@ -201,6 +239,7 @@ data:
             "stat",
             "stat64",
             "statfs",
+            "symlinkat",
             "sysinfo",
             "tgkill",
             "umask",
@@ -210,10 +249,7 @@ data:
             "wait4",
             "waitid",
             "waitpid",
-            "write",
-            "getgroups",
-            "getpgrp",
-            "setpgid"
+            "write"
           ],
           "action": "SCMP_ACT_ALLOW",
           "args": null
@@ -232,6 +268,22 @@ data:
             }
           ],
           "comment": "",
+          "includes": {},
+          "excludes": {}
+        },
+        {
+          "names": [
+            "kill"
+          ],
+          "action": "SCMP_ACT_ALLOW",
+          "args": [
+            {
+              "index": 1,
+              "value": 0,
+              "op": "SCMP_CMP_EQ"
+            }
+          ],
+          "comment": "allow process detection via kill",
           "includes": {},
           "excludes": {}
         }

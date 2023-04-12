@@ -5,16 +5,29 @@
 {{- $version := .Values.agents.image.tag | toString | trimSuffix "-jmx" -}}
 {{- $length := len (split "." $version) -}}
 {{- if and (eq $length 1) (eq $version "6") -}}
-{{- $version = "6.19.0" -}}
+{{- $version = "6.36.0" -}}
 {{- end -}}
 {{- if and (eq $length 1) (eq $version "7") -}}
-{{- $version = "7.19.0" -}}
+{{- $version = "7.36.0" -}}
 {{- end -}}
 {{- if and (eq $length 1) (eq $version "latest") -}}
-{{- $version = "7.19.0" -}}
+{{- $version = "7.36.0" -}}
 {{- end -}}
-{{- if not (semverCompare "^6.19.0-0 || ^7.19.0-0" $version) -}}
-{{- fail "This version of the chart requires an agent image 7.19.0 or greater. If you want to force and skip this check, use `--set agents.image.doNotCheckTag=true`" -}}
+{{- if not (semverCompare "^6.36.0-0 || ^7.36.0-0" $version) -}}
+{{- fail "This version of the chart requires an agent image 7.36.0 or greater. If you want to force and skip this check, use `--set agents.image.doNotCheckTag=true`" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "check-dca-version" -}}
+{{- if not .Values.clusterAgent.image.doNotCheckTag -}}
+{{- $version := .Values.clusterAgent.image.tag | toString -}}
+{{- $length := len (split "." $version) -}}
+{{- if and (eq $length 1) (eq $version "latest") -}}
+{{- $version = "1.20.0" -}}
+{{- end -}}
+{{- if not (semverCompare ">=1.20.0-0" $version) -}}
+{{- fail "This version of the chart requires a cluster agent image 1.20.0 or greater. If you want to force and skip this check, use `--set clusterAgent.image.doNotCheckTag=true`" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -31,6 +44,7 @@ false
 {{- end -}}
 
 {{- define "agent-has-env-ad" -}}
+{{- if not .Values.agents.image.doNotCheckTag -}}
 {{- $version := .Values.agents.image.tag | toString | trimSuffix "-jmx" -}}
 {{- $length := len (split "." $version) -}}
 {{- if and (eq $length 1) (eq $version "6") -}}
@@ -46,6 +60,9 @@ false
 true
 {{- else -}}
 false
+{{- end -}}
+{{- else -}}
+true
 {{- end -}}
 {{- end -}}
 
@@ -164,7 +181,7 @@ Return the container runtime socket
 {{- end -}}
 {{- end -}}
 {{- if eq .Values.targetSystem "windows" -}}
-\\.\pipe\docker_engine
+{{- .Values.datadog.dockerSocketPath | default .Values.datadog.criSocketPath | default `\\.\pipe\docker_engine` -}}
 {{- end -}}
 {{- end -}}
 
@@ -236,18 +253,29 @@ Accepts a map with `port` (default port) and `settings` (probe settings).
 Return a remote image path based on `.Values` (passed as root) and `.` (any `.image` from `.Values` passed as parameter)
 */}}
 {{- define "image-path" -}}
+{{- if .image.digest -}}
 {{- if .image.repository -}}
-{{- .image.repository -}}:{{ .image.tag }}
+{{- .image.repository -}}@{{ .image.digest }}
 {{- else -}}
-{{ .root.registry }}/{{ .image.name }}:{{ .image.tag }}
+{{ .root.registry }}/{{ .image.name }}@{{ .image.digest }}
+{{- end -}}
+{{- else -}}
+{{- $tagSuffix := "" -}}
+{{- if .image.tagSuffix -}}
+{{- $tagSuffix = printf "-%s" .image.tagSuffix -}}
+{{- end -}}
+{{- if .image.repository -}}
+{{- .image.repository -}}:{{ .image.tag }}{{ $tagSuffix }}
+{{- else -}}
+{{ .root.registry }}/{{ .image.name }}:{{ .image.tag }}{{ $tagSuffix }}
 {{- end -}}
 {{- end -}}
-
+{{- end -}}
 {{/*
 Return true if a system-probe feature is enabled.
 */}}
 {{- define "system-probe-feature" -}}
-{{- if or .Values.datadog.securityAgent.runtime.enabled .Values.datadog.networkMonitoring.enabled .Values.datadog.systemProbe.enableTCPQueueLength .Values.datadog.systemProbe.enableOOMKill -}}
+{{- if or .Values.datadog.securityAgent.runtime.enabled .Values.datadog.securityAgent.runtime.fimEnabled .Values.datadog.networkMonitoring.enabled .Values.datadog.systemProbe.enableTCPQueueLength .Values.datadog.systemProbe.enableOOMKill .Values.datadog.serviceMonitoring.enabled -}}
 true
 {{- else -}}
 false
@@ -258,7 +286,7 @@ false
 Return true if the system-probe container should be created.
 */}}
 {{- define "should-enable-system-probe" -}}
-{{- if and (not .Values.providers.gke.autopilot) (eq (include "system-probe-feature" .) "true") -}}
+{{- if and (not .Values.providers.gke.autopilot) (eq (include "system-probe-feature" .) "true") (eq .Values.targetSystem "linux") -}}
 true
 {{- else -}}
 false
@@ -270,7 +298,7 @@ false
 Return true if a security-agent feature is enabled.
 */}}
 {{- define "security-agent-feature" -}}
-{{- if or .Values.datadog.securityAgent.compliance.enabled .Values.datadog.securityAgent.runtime.enabled -}}
+{{- if or .Values.datadog.securityAgent.compliance.enabled .Values.datadog.securityAgent.runtime.enabled .Values.datadog.securityAgent.runtime.fimEnabled -}}
 true
 {{- else -}}
 false
@@ -281,7 +309,7 @@ false
 Return true if the security-agent container should be created.
 */}}
 {{- define "should-enable-security-agent" -}}
-{{- if and (not .Values.providers.gke.autopilot) (eq (include "security-agent-feature" .) "true") -}}
+{{- if and (not .Values.providers.gke.autopilot) (eq .Values.targetSystem "linux") (eq (include "security-agent-feature" .) "true") -}}
 true
 {{- else -}}
 false
@@ -292,7 +320,7 @@ false
 Return true if the compliance features should be enabled.
 */}}
 {{- define "should-enable-compliance" -}}
-{{- if and (not .Values.providers.gke.autopilot) .Values.datadog.securityAgent.compliance.enabled -}}
+{{- if and (not .Values.providers.gke.autopilot) (eq .Values.targetSystem "linux") .Values.datadog.securityAgent.compliance.enabled -}}
 true
 {{- else -}}
 false
@@ -303,7 +331,20 @@ false
 Return true if the runtime security features should be enabled.
 */}}
 {{- define "should-enable-runtime-security" -}}
-{{- if and (not .Values.providers.gke.autopilot) .Values.datadog.securityAgent.runtime.enabled -}}
+{{- if and (not .Values.providers.gke.autopilot) (or .Values.datadog.securityAgent.runtime.enabled .Values.datadog.securityAgent.runtime.fimEnabled) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true if the hostPid features should be enabled for the Agent pod.
+*/}}
+{{- define "should-enable-host-pid" -}}
+{{- if eq .Values.targetSystem "windows" -}}
+false
+{{- else if and (not .Values.providers.gke.autopilot) (or (eq  (include "should-enable-compliance" .) "true") .Values.datadog.dogstatsd.useHostPID .Values.datadog.useHostPID) -}}
 true
 {{- else -}}
 false
@@ -346,10 +387,72 @@ false
 
 
 {{/*
+Return true if a trace-agent needs to be deployed.
+*/}}
+{{- define "should-enable-trace-agent" -}}
+{{- if or (eq  (include "trace-agent-use-tcp-port" .) "true") (eq  (include "trace-agent-use-uds" .) "true") -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true hostPath should be use for DSD socket. Return always false on GKE autopilot.
+*/}}
+{{- define "should-mount-hostPath-for-dsd-socket" -}}
+{{- if or .Values.providers.gke.autopilot (eq .Values.targetSystem "windows") -}}
+false
+{{- end -}}
+{{- if .Values.datadog.dogstatsd.useSocketVolume -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true if a APM over UDS is configured. Return always false on GKE autopilot.
+*/}}
+{{- define "trace-agent-use-uds" -}}
+{{- if or .Values.providers.gke.autopilot (eq .Values.targetSystem "windows") -}}
+false
+{{- end -}}
+{{- if or .Values.datadog.apm.socketEnabled .Values.datadog.apm.useSocketVolume -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true if a traffic over TCP is configured for APM.
+*/}}
+{{- define "trace-agent-use-tcp-port" -}}
+{{- if or .Values.datadog.apm.portEnabled .Values.datadog.apm.enabled -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+
+{{/*
 Return true if Kubernetes resource monitoring (orchestrator explorer) should be enabled.
 */}}
 {{- define "should-enable-k8s-resource-monitoring" -}}
-{{- if and .Values.datadog.orchestratorExplorer.enabled (or .Values.clusterAgent.enabled (include "existingClusterAgent-configured" .)) -}}
+{{- if and .Values.datadog.orchestratorExplorer.enabled (or .Values.clusterAgent.enabled (eq (include "existingClusterAgent-configured" .) "true")) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true if the Cluster Check Workers have to be deployed
+*/}}
+{{- define "should-enable-cluster-check-workers" -}}
+{{- if or .Values.datadog.kubeStateMetricsCore.useClusterCheckRunners (and .Values.datadog.clusterChecks.enabled .Values.clusterChecksRunner.enabled) -}}
 true
 {{- else -}}
 false
@@ -365,6 +468,50 @@ gke-autopilot
 {{- end -}}
 {{- end -}}
 
+{{/*
+Return the service account name
+*/}}
+{{- define "agents.serviceAccountName" -}}
+{{- if .Values.providers.gke.autopilot -}}
+datadog-agent
+{{- else if .Values.agents.rbac.create -}}
+{{ template "datadog.fullname" . }}
+{{- else -}}
+{{ .Values.agents.rbac.serviceAccountName }}
+{{- end -}}
+{{- end -}}
+
+{{- define "agents-useConfigMap-configmap-name" -}}
+{{- if .Values.providers.gke.autopilot -}}
+datadog-agent-datadog-yaml
+{{- else -}}
+{{ template "datadog.fullname" . }}-datadog-yaml
+{{- end -}}
+{{- end -}}
+
+{{- define "agents-install-info-configmap-name" -}}
+{{- if .Values.providers.gke.autopilot -}}
+datadog-agent-installinfo
+{{- else -}}
+{{ template "datadog.fullname" . }}-installinfo
+{{- end -}}
+{{- end -}}
+
+{{- define "agents.confd-configmap-name" -}}
+{{- if .Values.providers.gke.autopilot -}}
+datadog-agent-confd
+{{- else -}}
+{{ template "datadog.fullname" . }}-confd
+{{- end -}}
+{{- end -}}
+
+{{- define "datadog-checksd-configmap-name" -}}
+{{- if .Values.providers.gke.autopilot -}}
+datadog-agent-checksd
+{{- else -}}
+{{ template "datadog.fullname" . }}-checksd
+{{- end -}}
+{{- end -}}
 
 {{/*
 Common template labels
@@ -383,6 +530,9 @@ helm.sh/chart: '{{ include "datadog.chart" . }}'
 {{ include "datadog.template-labels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- if .Values.commonLabels}}
+{{ toYaml .Values.commonLabels }}
 {{- end }}
 {{- end -}}
 
@@ -438,7 +588,180 @@ Return Kubelet volumeMount
 Return true if the Cluster Agent needs a confd configmap
 */}}
 {{- define "need-cluster-agent-confd" -}}
-{{- if (or (.Values.clusterAgent.confd) (.Values.datadog.kubeStateMetricsCore.enabled)) -}}
+{{- if (or (.Values.clusterAgent.confd) (.Values.datadog.kubeStateMetricsCore.enabled) (.Values.clusterAgent.advancedConfd) (.Values.datadog.helmCheck.enabled)) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true if we can enable Service Internal Traffic Policy
+*/}}
+{{- define "enable-service-internal-traffic-policy" -}}
+{{- if or (semverCompare "^1.22-0" .Capabilities.KubeVersion.GitVersion) .Values.agents.localService.forceLocalServiceEnabled -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the local service name
+*/}}
+{{- define "localService.name" -}}
+{{- if ne .Values.agents.localService.overrideName "" }}
+{{- .Values.agents.localService.overrideName -}}
+{{- else -}}
+{{ template "datadog.fullname" . }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true if runtime compilation is enabled in the system-probe
+*/}}
+{{- define "runtime-compilation-enabled" -}}
+{{- if or .Values.datadog.systemProbe.enableTCPQueueLength .Values.datadog.systemProbe.enableOOMKill .Values.datadog.serviceMonitoring.enabled -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true if secret RBACs are needed for secret backend.
+*/}}
+{{- define "need-secret-permissions" -}}
+{{- if .Values.datadog.secretBackend.command -}}
+{{- if and .Values.datadog.secretBackend.enableGlobalPermissions (eq .Values.datadog.secretBackend.command "/readsecret_multiple_providers.sh") -}}
+true
+{{- end -}}
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+Returns env vars correctly quoted and valueFrom respected
+*/}}
+{{- define "additional-env-entries" -}}
+{{- if . -}}
+{{- range . }}
+- name: {{ .name }}
+{{- if .value }}
+  value: {{ .value | quote }}
+{{- else }}
+  valueFrom:
+{{ toYaml .valueFrom | indent 4 }}
+{{- end }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Returns env vars correctly quoted and valueFrom respected, defined in a dict
+*/}}
+{{- define "additional-env-dict-entries" -}}
+{{- range $key, $value := . }}
+- name: {{ $key }}
+{{- if kindIs "map" $value }}
+{{ toYaml $value | indent 2 }}
+{{- else }}
+  value: {{ $value | quote }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Return the appropriate apiVersion for PodDisruptionBudget policy APIs.
+*/}}
+{{- define "policy.poddisruptionbudget.apiVersion" -}}
+{{- if or (.Capabilities.APIVersions.Has "policy/v1/PodDisruptionBudget") (semverCompare ">=1.21" .Capabilities.KubeVersion.Version) -}}
+"policy/v1"
+{{- else -}}
+"policy/v1beta1"
+{{- end -}}
+{{- end -}}
+
+{{/*
+Returns securityContext depending of the OS
+*/}}
+{{- define "generate-security-context" -}}
+{{- if .securityContext -}}
+{{- if eq .targetSystem "windows" -}}
+  {{- if .securityContext.windowsOptions }}
+securityContext:
+  windowsOptions:
+    {{ toYaml .securityContext.windowsOptions }}
+  {{- end -}}
+{{- else }}
+securityContext:
+{{ toYaml .securityContext | indent 2 }}
+{{- if and .seccomp .kubeversion (semverCompare ">=1.19.0" .kubeversion) }}
+  seccompProfile:
+    {{- if hasPrefix "localhost/" .seccomp }}
+    type: Localhost
+    {{- else if eq "runtime/default" .seccomp }}
+    type: RuntimeDefault
+    {{- else }}
+    type: Unconfined
+    {{- end -}}
+    {{- if hasPrefix "localhost/" .seccomp }}
+    localhostProfile: {{ trimPrefix "localhost/" .seccomp }}
+    {{- end }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Verifies the OTLP/gRPC endpoint prefix.
+gRPC supports several naming schemes: https://github.com/grpc/grpc/blob/master/doc/naming.md
+The Datadog Agent Helm Chart currently only supports 'host:port' (usually '0.0.0.0:port').
+*/}}
+{{- define "verify-otlp-grpc-endpoint-prefix" -}}
+{{- if hasPrefix "unix:" . }}
+{{ fail "'unix' protocol is not currently supported on OTLP/gRPC endpoint" }}
+{{- end }}
+{{- if hasPrefix "unix-abstract:" . }}
+{{ fail "'unix-abstract' protocol is not currently supported on OTLP/gRPC endpoint" }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Verifies that an OTLP endpoint has a port explicitly set.
+*/}}
+{{- define "verify-otlp-endpoint-port" -}}
+{{- if not ( regexMatch ":[0-9]+$" . ) }}
+{{ fail "port must be set explicitly on OTLP endpoints" }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Returns the flag used to specify the config file for the process-agent.
+In 7.36, `--config` was deprecated and `--cfgpath` should be used instead.
+*/}}
+{{- define "process-agent-config-file-flag" -}}
+{{- if  .Values.providers.gke.autopilot -}}
+-config
+{{- else if not .Values.agents.image.doNotCheckTag -}}
+{{- $version := .Values.agents.image.tag | toString | trimSuffix "-jmx" -}}
+{{- $length := len (split "." $version ) -}}
+{{- if and (gt $length 1) (not (semverCompare "^6.36.0 || ^7.36.0" $version)) -}}
+--config
+{{- else -}}
+--cfgpath
+{{- end -}}
+{{- else -}}
+--config
+{{- end -}}
+{{- end -}}
+
+{{/*
+Returns whether or not the underlying OS is Google Container-Optimized-OS
+Note: GKE Autopilot clusters only use COS (see https://cloud.google.com/kubernetes-engine/docs/concepts/node-images)
+*/}}
+{{- define "can-mount-host-usr-src" -}}
+{{- if or .Values.providers.gke.autopilot .Values.providers.gke.cos -}}
 true
 {{- else -}}
 false

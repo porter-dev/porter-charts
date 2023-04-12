@@ -60,12 +60,13 @@ spec:
     targetPort: 8000
 {{ end }}
 
-{{- if .Values.datadog.serviceTopology.enabled -}}
+{{- if eq (include "enable-service-internal-traffic-policy" .) "true" }}
 ---
 apiVersion: v1
 kind: Service
+
 metadata:
-  name: {{ .Values.datadog.serviceTopology.serviceName | quote }}
+  name: {{ template "localService.name" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     app: "{{ template "datadog.fullname" . }}"
@@ -80,13 +81,24 @@ spec:
     - protocol: UDP
       port: {{ .Values.datadog.dogstatsd.port }}
       targetPort: {{ .Values.datadog.dogstatsd.port }}
-      name: dogstatsd
-{{- if .Values.datadog.apm.enabled }}
+      name: dogstatsdport
+{{- if eq  (include "trace-agent-use-tcp-port" .) "true" }}
     - protocol: TCP
       port: {{ .Values.datadog.apm.port }}
       targetPort: {{ .Values.datadog.apm.port }}
-      name: apm
+      name: traceport
 {{- end }}
-  topologyKeys:
-    - "kubernetes.io/hostname"
+{{- if .Values.datadog.otlp.receiver.protocols.grpc.enabled }}
+    - protocol: TCP
+      port: {{ .Values.datadog.otlp.receiver.protocols.grpc.endpoint | regexFind ":[0-9]+$" | trimPrefix ":" }}
+      targetPort: {{ .Values.datadog.otlp.receiver.protocols.grpc.endpoint | regexFind ":[0-9]+$" | trimPrefix ":" }}
+      name: otlpgrpcport
+{{- end }}
+{{- if .Values.datadog.otlp.receiver.protocols.http.enabled }}
+    - protocol: TCP
+      port: {{ .Values.datadog.otlp.receiver.protocols.http.endpoint | regexFind ":[0-9]+$" | trimPrefix ":" }}
+      targetPort: {{ .Values.datadog.otlp.receiver.protocols.http.endpoint | regexFind ":[0-9]+$" | trimPrefix ":" }}
+      name: otlphttpport
+ {{- end }}
+  internalTrafficPolicy: Local
 {{ end }}

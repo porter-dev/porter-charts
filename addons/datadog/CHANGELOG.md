@@ -1,5 +1,1041 @@
 # Datadog changelog
 
+## 3.25.2
+
+* Fix a bug with `datadog.remoteConfiguration.enabled` where Remote Config was only enabled for the main agent container but not other containers such as the trace-agent.
+
+## 3.25.1
+
+* Fix CI to unblock release of charts
+
+## 3.25.0
+
+* Automatically collect Security Profiles when CWS is enabled.
+
+## 3.24.0
+
+* Move `kube-state-metrics` default image registry from k8s.gcr.io to registry.k8s.io.
+
+## 3.23.0
+
+* Injects additional environment variables in the Cluster Agent
+* Add `clusterAgent.rbac.flareAdditionalPermissions` parameter to enable user Helm values retrieval in DCA flare (`true` by default)
+
+## 3.22.0
+
+* Auto-configure `clusterAgent.admissionController.configMode` based on `datadog.apm.socketEnabled|portEnabled`.
+
+## 3.21.0
+
+* Add `datadog.remoteConfiguration.enabled` parameter to enable remote configuration.
+
+## 3.20.3
+
+* Fix command script in linux init container to prevent blocking deployment in GKE Autopilot on Rapid release channel.
+* Only mount DogStatsD socket in non-Autopilot environments.
+
+## 3.20.2
+
+* Fix R/W volume mounts for CRI on Windows
+
+## 3.20.1
+
+* Fix command args in linux init container to prevent blocking deployment in GKE Autopilot.
+
+## 3.20.0
+
+* Enable CWS network detections by default.
+
+## 3.19.2
+
+* Fix R/W volume mounts in init containers on Windows
+
+## 3.19.1
+
+* Mount emptyDir volumes in `/etc/datadog-agent` and `/tmp` to allow the cluster-agent to write files in those
+  locations with read-only root filesystem.
+
+## 3.19.0
+
+* Declare `readOnly` in volumeMounts.
+
+## 3.18.0
+
+* Default `Agent` and `Cluster-Agent` image tags to `7.43.1`.
+
+## 3.17.1
+
+* Fix Cilium egress rules to kube-apiserver entities.
+
+## 3.17.0
+
+* Add the following configurations which allow environment variables to be defined in a dictionary:
+  * `agents.containers.agent.envDict`
+  * `agents.containers.processAgent.envDict`
+  * `agents.containers.securityAgent.envDict`
+  * `agents.containers.systemProbe.envDict`
+  * `agents.containers.traceAgent.envDict`
+  * `clusterAgent.envDict`
+  * `clusterChecksRunner.envDict`
+  * `datadog.envDict`
+
+## 3.16.2
+
+* Mount an emptyDir volume in `/opt/datadog-agent/run` to allow the cluster-agent to write files in that location
+  with read-only root filesystem.
+
+## 3.16.1
+
+* Fix `cluster-agent` deployment to allow the cluster-agent to write file in `/var/log/datadog` when it runs with
+  read-only root filesystem.
+
+## 3.16.0
+
+* Add new checksum to cluster agent deployment base on all cluster-agent configmap configuration.
+
+## 3.15.0
+
+* Beta: Enable remote configuration if `clusterAgent.admissionController.remoteInstrumentation` is enabled.
+
+## 3.14.0
+
+* Make the root filesystem of the cluster agent container read only by default
+
+## 3.13.0
+
+* Beta: Support APM library injection with Remote Configuration.
+
+## 3.12.0
+
+* Add `automountServiceAccountToken` option to configure automatic mounting of ServiceAccount's API credentials
+
+## 3.11.0
+
+* Default `Agent` and `Cluster-Agent` image tags to `7.43.0`.
+
+## 3.10.9
+
+* Default `Agent` and `Cluster-Agent` image tags to `7.42.2`.
+
+## 3.10.8
+
+* Fix `cluster-agent` SCC, remove duplicate `users` field.
+
+## 3.10.7
+
+* Default `Agent` and `Cluster-Agent` image tags to `7.42.1`.
+
+## 3.10.6
+
+* Includes the imagePullPolicy key for the seccomp-setup container template
+
+## 3.10.5
+
+* Only expose the shared volume for the auth-token in non autopilot environments.
+
+## 3.10.4
+
+* Fix documentation for `agents.containers.traceAgent.env` and `agents.containers.securityAgent.env`
+
+## 3.10.3
+
+* Fix default `hostPid` value set to true on Windows.
+* Fix auth token path value on Windows.
+
+## 3.10.1
+
+* Fix: add missing `DAC_READ_SEARCH` capability in agent PSP and SCC (openshift)
+
+## 3.10.0
+
+* Default `Agent` and `Cluster-Agent` image tags to `7.42.0`.
+
+## 3.9.0
+
+* Set processDiscovery to be true by default
+
+## 3.8.1
+
+* Update docs for `datadog.otlp.receiver.protocols.grpc.endpoint`
+
+## 3.8.0
+
+* Add `providers.gke.cos` option to prevent `/usr/src` from being mounted on COS
+
+## 3.7.3
+
+* Add support for Secret Annotations using `datadog.SecretAnnotations` helm value
+
+## 3.7.2
+
+* Rename dogstatsd port on the Agent Service to match the name of the dogstatsd port in the Agent pod (`dogstatsd -> dogstatsdport`).
+
+## 3.7.1
+
+* Add required capability to system-probe in order to make the `auth_token` file readable.
+
+## 3.7.0
+
+* Add `datadog.kubernetesEvents.*` options to configure new Kubernetes unbundling events feature.
+  (This parameter exists only in agent 7.42.0 and above and cluster-agent 7.42.0 and above.)
+* Add `datadog.clusterTagger.*` options to configure the Kubernetes cluster-tagger feature.
+  (This parameter exists only in agent 7.42.0 and above and cluster-agent 7.42.0 and above.)
+* Create `components-common-env` to define shared environment variable between "agent" and "cluster-agent" containers, and refactor `containers-common-env`.
+
+## 3.6.9
+
+* Add `auth_token` to all the containers.
+
+## 3.6.8
+
+* Add missing RBAC rules for collection of Vertical Pod Autoscaler resources in the Orchestrator Explorer.
+
+## 3.6.7
+
+* Default `Agent` and `Cluster-Agent` image tags to `7.41.1`.
+
+## 3.6.6
+
+* Fix missing volumeMount in `security-agent` container when `datadog.kubelet.hostCAPath` is provided.
+
+## 3.6.5
+
+* Fix missing Cluster Agent configuration in `security-agent` if CSPM is not actived.
+
+## 3.6.4
+
+* Change nesting for `providers.aks.enabled` parameter in Helm template.
+
+## 3.6.3
+
+* Add `datadog.kubeStateMetricsCore.annotationsAsTags` that expose the `annotations_as_tags` parameter of the KSM core check.
+  This parameter exists only in agent 7.42.0 and above and cluster-agent 7.42.0 and above.
+
+# 3.6.2
+
+* Add CRDs to the cluster agent RBAC to be able to collect them using the Orchestrator Explorer.
+
+## 3.6.1
+
+* Add `providers.aks.enabled` parameter to activate specific configuration options for AKS.
+
+## 3.6.0
+
+* Update "Agent" and "Cluster-Agent" versions to `7.41.0` by default.
+
+## 3.5.2
+
+* Fix API Key check in NOTES.txt following change of default value for `datadog.apiKey`.
+* Fix failure if PSP activated in Kubernetes 1.25 (PSP have been removed).
+
+## 3.5.1
+
+* Removing default value placeholder for the API Key in the values.yaml.
+
+## 3.5.0
+
+* Remove runtime compilation-related config values `enableKernelHeaderDownload` and `enableRuntimeCompiler` in the system-probe.
+
+## 3.4.0
+
+* Add `datadog.systemProbe.btfPath` for mounting user-provided BTF files (see datadog-agent PRs #13962 and #14096 for more context).
+
+## 3.3.3
+
+* Add a warning note to alert users about suboptimal configuration of Cluster Checks Runner.
+
+## 3.3.2
+
+* Fix GKE Autopilot mounts in the `trace-agent` container and `hostPid` setting for the Agent pods
+
+## 3.3.1
+
+* Remove `mountPropagation` for `*-release` files in `/etc`. It is not needed for individual files.
+
+## 3.3.0
+
+* Add datadog.hostPID option and deprecate datadog.dogstatsd.hostPID.
+
+## 3.2.2
+
+* Mount `/host/proc` and `/host/sys/fs/cgroup` in trace-agent container for better support of container tagging
+
+## 3.2.1
+
+* Default "Agent" and "Cluster-Agent" image tag to `7.40.1`.
+
+## 3.2.0
+
+* Default "Agent" and "Cluster-Agent" image tag to `7.40.0`.
+
+## 3.1.11
+
+* Allow disabling use of the Host Port when enabling OTLP Ingest for Agent
+* Add OTLP Ingest ports to Agent Service, to be used when Host Port is disabled
+
+## 3.1.10
+
+* Default "Agent" and "Cluster-Agent" image tag to `7.39.2`.
+
+## 3.1.9
+
+* Add `faccessat` to system-probe seccomp profile.
+
+## 3.1.8
+
+* Add `clone3` and `rseq` to system-probe seccomp profile.
+
+## 3.1.7
+
+* Fix the configuration of the default seccomp profile for system-probe
+
+## 3.1.6
+
+* Fix usage of `generate-security-context` helper.
+
+## 3.1.5
+
+* Use `securityContext.seccompProfile` instead of annotations for system-probe on kubernetes 1.19+.
+
+## 3.1.4
+
+* Default "Agent" and "Cluster-Agent" image tag to `7.39.1`.
+
+## 3.1.3
+
+* Add `datadog.helmCheck.valuesAsTags` option to collect helm values and use them as tags.
+
+## 3.1.2
+
+* Add `datadog.securityAgent.runtime.activityDump.enabled` configuration to enable CWS activity dumps.
+
+## 3.1.1
+
+* Set default value for `datadog.systemProbe.enableKernelHeaderDownload` to `true`
+
+## 3.1.0
+
+* Default Agent image to `7.39.0`.
+* Default Cluster-Agent image to `7.39.0`. Cluster-Agent versioning is now aligned with the Agent.
+
+## 3.0.4
+
+* Fix preventing mounting os-release in GKE autopilot for all containers.
+
+## 3.0.3
+
+* Add `faccessat2` to allowed actions in system-probe seccomp profile.
+
+## 3.0.2
+
+* Allow disabling kubeStateMetricsCore rbac creation.
+
+## 3.0.1
+
+* Add `datadog.systemProbe.enableDefaultKernelHeadersPaths` option that allows
+  to choose whether to mount the default kernel headers paths.
+
+## 3.0.0
+
+* Minimum version of the Agent supported is 7.36.0 and minimum version of the Cluster Agent supported is 1.20.0.
+* Disable the legacy KSM check and enable the KSM core check by default.
+* Drop support for Helm 2.
+
+## 2.37.9
+
+* Add `DD_PROMETHEUS_SCRAPE_VERSION` to Cluster Agent to match Agent version
+
+## 2.37.8
+
+* Fix the volumeMount duplication in `system-probe` container if `datadog.osReleasePath` value
+  corresponds to one of the default os-release-paths automatically mounted.
+* Add the option to disable the default os-release path mount linked to `system-probe` container.
+
+## 2.37.7
+
+* Fix Windows nodes deployment: do not mount `container-host-release-volumemounts` if
+  the `targetSystem` is "Windows".
+
+## 2.37.6
+
+* Add `chmod` to allowed actions in system-probe seccomp profile
+
+## 2.37.5
+
+* Mount host release files for proper host OS detection
+
+## 2.37.4
+
+* Add `digest` as a configurable value for all datadog images used
+
+## 2.37.3
+
+* Update default agent image version tag to `7.38.2`.
+* Rename view CI values.yaml files to be executed by the CI.
+
+## 2.37.2
+
+* Set traced_cgroups_count default value to 0 in the system-config file for CWS.
+
+## 2.37.1
+
+* Default Datadog Agent image to `7.38.1`.
+
+## 2.37.0
+
+* Default Datadog Agent image to `7.38.0`.
+* Default Datadog Cluster Agent image to `1.22.0`.
+
+## 2.36.9
+
+* Add `/etc/dnf/vars` and `/etc/yum/vars` to the default package management directories mounted for kernel header downloading.
+
+## 2.36.8
+
+* Add `datadog.clusterName` on clusterCheckRunner pods
+
+## 2.36.7
+
+* Add `priorityPreemptionPolicyValue` as a configurable value on the Agent charts
+
+## 2.36.6
+
+* Fix GKE Autopilot installation. The `process-agent` command must
+  use the `-config` argument to be compliant with the Datadog Agent's
+  GKE Autopilot security profile.
+
+## 2.36.5
+
+* Use `regexFind` in favor of `mustRegexFind` to support helm2.
+
+## 2.36.4
+
+* Support `commonlabels` configuration to be able to add common labels on all resources created by the chart.
+
+## 2.36.3
+
+* Fix usage of deprecated command flags in the process-agent.
+
+## 2.36.2
+
+* Documentation updates to comments in some agent templates
+
+## 2.36.1
+
+* Add `datadog.otlp` section to configure OTLP ingest.
+
+## 2.36.0
+
+* Default Datadog Agent image to `7.37.1`.
+* Default Datadog Cluster Agent image to `1.21.0`.
+
+## 2.35.6
+
+* Fix `include` in clusterchecks deployment template.
+
+## 2.35.5
+
+* Allow cross-DCA communication in DCA `NetworkPolicy` and `CiliumNetworkPolicy`
+
+## 2.35.4
+
+* Fix comments in `values.yaml` to allow a seamless `helm-docs` update.
+
+## 2.35.3
+
+* Add `openat2` to system-probe seccomp profile to fix issues with opening files.
+
+## 2.35.2
+
+* Update RBACs and the default check configuration to collect ingress metrics in Kube State Metrics Core.
+  Note: Ingress metrics collection requires Cluster Agent 1.21+.
+
+## 2.35.1
+
+* Fix Cluster-Agent SCC creation on openshift 3.x.
+
+## 2.35.0
+
+* The Admission Controller is now enabled by default.
+
+## 2.34.6
+
+* Avoid the error `<eq .Values.clusterAgent.admissionController.configMode "service">: error calling eq: incompatible types for comparison` that can happen in older helm versions.
+
+## 2.34.5
+
+* Add `datadog.securityAgent.runtime.fimEnabled` configuration to enable CWS File Integrity Monitoring.
+
+## 2.34.4
+
+* Add `clusterAgent.admissionController.failurePolicy` configuration to set the failure policy for dynamic admission control
+
+## 2.34.3
+
+* Introduce `clusterAgent.admissionController.configMode` (requires Cluster Agent `1.20+`). It allows choosing the kind of configuration to be injected ("hostip", "service", or "socket").
+
+## 2.34.2
+
+* Default Cluster Agent image to `1.20.0`.
+
+## 2.34.1
+
+* Add the `datadog.secretBackend.enableGlobalPermissions` value, which when set to `false`, does not allow Datadog agents to read all secrets in all clusters. Defaults to `true`.
+* Add the `datadog.secretBackend.roles` value,  which creates `Role` and `RoleBinding` for each namespace defined. Allows for opt-in read permissions for secrets in those namespaces.
+
+## 2.34.0
+
+* Default Datadog Agent image to `7.36.1`.
+
+## 2.33.8
+
+* Add `datadog.securityAgent.runtime.network.enabled` configuration to enable CWS network events.
+
+## 2.33.7
+
+* Fix inaccurate documentation example for `datadog.kubeStateMetricsCore.labelsAsTags`.
+
+## 2.33.6
+
+* Add `renameat2` to system-probe seccomp profile to fix issues with renaming files.
+
+## 2.33.5
+
+* Make the DCA leader election ConfigMap name depend on the Helm release name. (Requires DCA 1.21+)
+
+## 2.33.4
+
+* Improves help message when only `.datadog.containerInclude` is defined but no `.datadog.containerExclude`
+
+## 2.33.3
+
+* Add enableKernelHeaderDownload configuration option to system-probe.
+
+## 2.33.2
+
+* Add `revisionHistoryLimit` to set the number of old ReplicaSets in the Deployment.
+
+## 2.33.1
+
+* Default Datadog Agent image to `7.35.2`.
+
+## 2.33.0
+
+***Warning:*** From this version onwards, on GKE Autopilot, only one "datadog" Helm chart release is allowed by Kubernetes namespace due to the following new constraints:
+
+* On GKE Autopilot, hardcode the "Agent" DaemonSet serviceAccountName.
+* On GKE Autopilot, hardcode the "Install Info" ConfigMap name.
+
+## 2.32.6
+
+* Add `verticalpodautoscalers` in `kubernetes_state_core.yaml.default` to enable collection in KSM Core by default
+
+## 2.32.5
+
+* Fix process detection, by adding `kill` syscall with signal `0` to system-probe seccomp profile.
+
+## 2.32.4
+
+* Update `cluster-agent` image to the latest stable version: `1.19.0`
+
+## 2.32.3
+
+* Fix Go CPU profiling, by adding `setitimer` to system-probe seccomp profile.
+
+## 2.32.2
+
+* Fix scheduling of Helm check due to missing `helm.yaml` in Cluster Agent `confd`.
+
+## 2.32.1
+
+* Remove usage of `concat` to restore compatibility with Helm2.
+
+## 2.32.0
+
+* Default Datadog Agent image to `7.35.0`.
+
+## 2.31.1
+
+* Improves how securityContext are set depending on the `targetSystem` option (fix #590).
+
+## 2.31.0
+
+* Add `datadog.prometheusScrape.version` parameter to choose the version of the openmetrics check that the Prometheus auto-discovery should instantiate by default.
+  It now defaults to `2`, which requires an agent 7.34+.
+  It can be explicitely set to `1` to restore the behaviour of previous versions.
+
+## 2.30.21
+
+* Add `datadog.kubelet.podLogsPath` to customize hostPath mounted in to get Kubernetes PODs logs.
+
+## 2.30.20
+
+* Update "agents are spinning up" message to point towards the new Events Explorer
+
+## 2.30.19
+
+* Update documentation for enabling NPM.
+
+## 2.30.18
+
+* Enforce use of `root` user for the node agent.
+
+## 2.30.17
+
+* Add `datadog.helmCheck.collectEvents` to enable event collection in the Helm check.
+
+## 2.30.16
+
+* Default Datadog CRD chart to `0.4.7`.
+
+## 2.30.15
+
+* Default Datadog Agent image to `7.34.0`.
+* Default Datadog Cluster-Agent image to `1.18.0`.
+
+## 2.30.14
+
+* Default Datadog Agent image to `7.33.1`.
+
+## 2.30.13
+
+* Feat: Add `shareProcessNamespace` parameter.
+
+## 2.30.12
+
+* Add an option to remove the container runtime socket access.
+
+## 2.30.11
+
+* Fix CiliumNetworkPolicy: Allow sending support flares.
+
+## 2.30.10
+
+* Fix scheduling of Helm check. It's no longer scheduled on a daemonset agent.
+
+## 2.30.9
+
+* Add RBAC rules for Roles, RoleBindings, ClusterRoles, ClusterRoleBindings and ServiceAccounts in order to collect them in the Orchestrator Explorer from the Cluster-agent.
+
+## 2.30.8
+
+* Add option to enable Helm Check (requires Agent 7.35.0+ and Cluster Agent 1.19.0+).
+
+## 2.30.7
+
+* Add ingress RBAC rules for the Cluster Agent to collect ingress resources in the Orchestrator Explorer. (Feature available starting Cluster Agent v1.19)
+
+## 2.30.6
+
+* Fix syntax of agents.podAnnotations to be aligned with other podAnnotations setting.
+
+## 2.30.5
+
+* Add a new note to recommand to the Cluster Agent in HA mode when the `admission-controller` or the `metrics provider` are enabled.
+
+## 2.30.4
+
+* Add PV and PVC RBAC rules for the Cluster Agent in order to collect new resources in the Orchestrator Explorer.
+
+## 2.30.3
+
+* Add `datadog.logs.autoMultiLineDetection` parameter to setup automatic multi-line log detection
+  See <https://docs.datadoghq.com/agent/logs/advanced_log_collection/?tab=configurationfile#automatic-multi-line-aggregation>
+  This new option requires an agent 7.32+.
+
+## 2.30.2
+
+* rename the APM port in the local traffic policy service from `apm` to `traceport`
+
+## 2.30.1
+
+* clusterAgent.tolerations documented in values.yaml
+
+## 2.30.0
+
+* Default Datadog Agent image to `7.33.0`.
+* Default Datadog Cluster-Agent image to `1.17.0`.
+
+## 2.29.0
+
+* Add `agents.podSecurity.allowedUnsafeSysctls` parameter
+
+## 2.28.15
+
+* Remove unused configuration option from system_probe.yaml to address error message: `Unknown key in config file: runtime_security_config.debug`
+
+## 2.28.14
+
+* Update cluster-agent's podAntiAffinity from required to preferred
+
+## 2.28.13
+
+* Do not declare the volumes for `/etc/*-release` if there is no `system-probe`.
+  Only the `system-probe` container mounts them.
+
+## 2.28.12
+
+* Fix some typos in comments
+
+## 2.28.11
+
+* Fix deprecation warning in examples caused by the `datadog.apm.enabled` parameter
+
+## 2.28.10
+
+* Update confd examples for the mysql integration
+
+## 2.28.9
+
+* Fix Cluster-Agent SCC creation on openshift 3.x. : remove unset parameters.
+
+## 2.28.8
+
+* Fix `PodDisruptionBudget` api version definition when using `helm template`.
+
+## 2.28.7
+
+* Fix environment variables to be quoted correct with a loop and `quote` instead of `toYaml`.
+
+## 2.28.6
+
+* Update `PodDisruptionBudget` api version to get rid of `policy/v1beta1 PodDisruptionBudget is deprecated in v1.21+, unavailable in v1.25+; use policy/v1 PodDisruptionBudget` warning.
+
+## 2.28.5
+
+* Default Datadog Agent image to `7.32.4`.
+
+## 2.28.4
+
+* Add a new configuration section `datadog.secretBackend`.
+* Configuring `datadog.secretBackend.command="/readsecret_multiple_providers.sh"` will add the secret permissions required by the `/readsecret_multiple_providers.sh` helper.
+
+## 2.28.3
+
+* Update `agents.podSecurity.capabilities` to contain all `agents.containers.systemProbe.securityContext.capabilities`.
+
+## 2.28.2
+
+* Fix conflict between `clusterAgent.confd` and `clusterAgent.advancedConfd`: merge the 2 ConfigMaps.
+
+## 2.28.1
+
+* Fix `CAP_CHOWN` capability configuration for system-probe.
+
+## 2.28.0
+
+* Create priority Class to better support environments such as GKE Autopilot.
+
+## 2.27.10
+
+* Add `CAP_CHOWN` to the list of capabilities for system-probe.
+
+## 2.27.9
+
+* Adds `systemProbe.enableRuntimeCompiler`, `systemProbe.mountPackageManagementDirs` and `systemprobe.runtimeCompilationAssetDir` to configure eBPF runtime compiler in the system-probe.
+* Adds `systemProbe.mountPackageManagementDirs` to configure what volumes are mounted in the system-probe for runtime compilation.
+* Adds `systemProbe.osReleasePath` to configure what volume is mounted in the system-probe for host OS detection.
+* Adds renameat, symlinkat and flock to the allow syscalls in the system-probe's seccomp profile.
+
+## 2.27.8
+
+* Default Datadog Agent image to `7.32.3`.
+
+## 2.27.7
+
+* Nothing
+
+## 2.27.6
+
+* Default Datadog Agent image to `7.32.2`.
+
+## 2.27.5
+
+* Fix bugs that prevented running the ksm core check as a cluster check.
+
+## 2.27.4
+
+* Do not allow unsupported configs with the security agent in windows environments.
+* Ensure autoconf/extra config files are mounted in windows environments.
+
+## 2.27.3
+
+* Fix CiliumNetworkPolicy: Update toFQDNs policy to include `agent-http-intake` endpoint.
+* Fix CiliumNetworkPolicy: Update toFQDNs to include `api` endpoint.
+
+## 2.27.2
+
+* Expose the `labels_as_tags` parameter of the KSM core check.
+  This parameter exists only in agent 7.32.0 and above and cluster-agent 1.16.0 and above.
+
+# 2.27.1
+
+* Update README.md to clarify Helm 2 vs. Helm 3 instructions.
+* Fix typos in README.md in `How to join a Cluster Agent from another helm chart deployment (Linux)`.
+* Fixes a port number typo for the `datadog.apm.portEnabled` option from 8216 to 8126.
+
+# 2.27.0
+
+* Introduce `processAgent.processDiscovery` to configure `DD_PROCESS_AGENT_DISCOVERY_ENABLED`
+
+## 2.26.5
+
+* Add `verticalpodautoscalers` RBACs when `datadog.kubeStateMetricsCore.enabled` is `true`
+
+## 2.26.4
+
+* Update API/APP keys secret management documentation.
+
+## 2.26.3
+
+* Update CRDs version to `0.4.5` (reduced size)
+
+## 2.26.2
+
+* Add support for Universal Service Monitoring (currently under private Beta)
+
+## 2.26.1
+
+* Update CRDs version to `0.4.4`
+
+## 2.26.0
+
+* Default Datadog Agent image to `7.32.1`.
+
+## 2.25.0
+
+* Adding the following `agents.daemonsetAnnotations`, `clusterAgent.deploymentAnnotation` and `clusterChecksRunner.deploymentAnnotations` parameters to allow custom annotations on the agent's deployments/daemonsets to be setup
+
+## 2.24.1
+
+* Fix typo in variable name : `agents.localService.forceLocalServiceEnabled`
+
+## 2.24.0
+
+* Default Datadog Agent image to `7.32.0`.
+* Default Datadog Cluster Agent image to `1.16.0`.
+
+## 2.23.6
+
+* Add `datadog.expvarPort` parameter to customize the default expvar default port to not conflict with the default clusteragent metrics port if running in hostNetwork mode.
+* Defined cluster-agent containerPort `agentmetrics` to expose the default port, which is set to 5000 and already defined in the `NetworkPolicy` for the cluster-agent.
+
+## 2.23.5
+
+Change OpenShift SCC priorities from 10 to 8 to avoid conflicts with OpenShift Auth operator.
+
+## 2.23.4
+
+* Add a new configuration field `datadog.providers.eks.ec2.useHostnameFromFile` to allow use of host's `/var/lib/cloud/data/instance-id` for hostname detection.
+
+## 2.23.3
+
+* Add `agents.localService` parameters to customize the internal traffic policy service name and force its creation of Kubernetes 1.21.
+
+## 2.23.2
+
+* Add an `agents.podSecurity.defaultApparmor` setting to allow customizing the default AppArmor profile used by all containers but `system-probe`.
+
+## 2.23.1
+
+* Fix APM reporting via `trace-agent` hostPort if `datadog.apm.enabled: true`.
+
+## 2.23.0
+
+* Add new option to the Kubernetes State Metrics Core feature to run the Cluster Check on Cluster Check Workers. This option is meant to be leveraged in large clusters.
+
+## 2.22.18
+
+* Do not configure `trace-agent` hostPort if `datadog.apm.portEnabled: false`.
+
+## 2.22.17
+
+* Update general installation documentation and add how to disable APM.
+
+## 2.22.16
+
+* Support containerd on windows node with logs enabled.
+
+## 2.22.15
+
+* Add a new configuration field `datadog.kubeStateMetricsCore.collectSecretMetrics` to allow disabling the collection of `kubernetes_state.secret.*` metrics by the `kubernetes_state_core` check.
+
+## 2.22.14
+
+* Apply security context capabilities to security-agent only if compliance is enabled.
+
+## 2.22.13
+
+* Add configurable conntrack_init_timeout to sysprobe config.
+
+## 2.22.12
+
+* Replace the `prometheus` check targetting the Datadog Cluster Agent by the new `datadog_cluster_agent` integration. (Requires Datadog Agent 7.31+)
+
+## 2.22.11
+
+* Adds missing configuration option `DD_STRIP_PROCESS_ARGS` for the process agent.
+
+## 2.22.10
+
+* Default Datadog Agent image to `7.31.1`.
+* Default Datadog Cluster Agent image to `1.15.1`.
+
+## 2.22.9
+
+* Makes the runtime socket configurable when running on Windows instead of defaulting to `\\.\pipe\docker_engine`.
+
+## 2.22.8
+
+* Add a service with local [internal traffic policy](https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/) for traces and dogstatsd.
+  This works only on Kubernetes 1.22 or more recent.
+
+## 2.22.7
+
+* Add a default required pod anti-affinity for the cluster agent.
+
+## 2.22.6
+
+* Adds missing configuration option for `DD_KUBERNETES_NAMESPACE_LABELS_AS_TAGS`.
+
+## 2.22.5
+
+* Add support for using `envFrom` on all container definitions.
+
+## 2.22.4
+
+* Cluster Agent: `DD_TAGS` are included even when Datadog is not set as metrics provider.
+
+## 2.22.3
+
+* CiliumNetworkPolicy: Grant access to the agent to ECS container agent via localhost.
+
+## 2.22.2
+
+* Bind mount host /etc/os-release in system probe container.
+
+## 2.22.1
+
+* Fix CiliumNetworkPolicy `port` field.
+
+## 2.22.0
+
+* Default Datadog Agent image to 7.31.0.
+* Default Datadog Cluster Agent image to 1.15.0.
+
+## 2.21.5
+
+* Update descriptions for securityAgent configuration.
+
+## 2.21.4
+
+* Fix condition for including `sysprobe-socket-dir` and `sysprobe-config` volume mounts for `agent`.
+
+## 2.21.3
+
+* Default Datadog Agent image to 7.30.1.
+
+## 2.21.2
+
+* Fix Dogstatsd UDS socket configuration with a HostVolume when `useSocketVolume: true`.
+
+## 2.21.1
+
+* Disable by default UDS socket for dogstastd and apm on GKE autopilot.
+
+## 2.21.0
+
+* Enable APM by default with using a Unix Domain socket for communication.
+
+## 2.20.4
+
+* Skip KSM network policy creation when KSM creation is disabled.
+
+## 2.20.3
+
+* Add `agents.image.tagSuffix` and `clusterChecksRunner.image.tagSuffix` to be able to request JMX or Windows servercore images without having to explicitly specify the full version.
+
+## 2.20.2
+
+* Add an additional way to configure cluster check allowing multiple configs for the same check.
+
+## 2.20.1
+
+* Add Statefulsets RBAC rules for the Cluster Agent in order to collect new resources in the Orchestrator Explorer.
+
+## 2.20.0
+
+* Update default Agent image tag to `7.30.0`
+* Update default Cluster-Agent image tag to `1.14.0`
+
+## 2.19.9
+
+* Print a configuration notice to clarify the containers filtering behavior when a misconfiguration is detected.
+
+## 2.19.8
+
+* Update `datadog-crds` to `0.3.2`.
+
+## 2.19.7
+
+* Fix test value files in datadog/ci directory.
+
+## 2.19.6
+
+* Update `agent` image tag to `7.29.1`.
+* Update `clusterChecksRunner` image tag to `7.29.1`.
+
+## 2.19.5
+
+* Update link toe `kube-state-metrics` in README.md.
+
+## 2.19.4
+
+* Fix `runtimesocket` volumeMount for the `trace-agent` on windows deployment.
+
+## 2.19.3
+
+* Fix condition defining `should-enable-k8s-resource-monitoring`, which toggles the orchestrator explorer feature.
+
+## 2.19.2
+
+* Fix `dsdsocket` volumeMount for the `trace-agent` on windows deployment.
+
+## 2.19.1
+
+* Fix chart release process after updating the `kube-state-metrics` chart registry.
+
+## 2.19.0
+
+* Move to the new `kube-state-metrics` chart registry, but keep the version `2.13.2`.
+
+## 2.18.2
+
+* Update `kube-state-metrics` requirement chart documentation.
+* Add missing `DD_TAGS` envvar in `cluster-agent` deployment (Fix #304).
+
+## 2.18.1
+
+* Honor `doNotCheckTag` in Env AD detection, preventing install failures with custom images using non semver tags.
+
+## 2.18.0
+
+* Configure and activate the Dogstatsd UDS socket in an "emptyDir" volume by default. It will allow JMX-Fetch to use UDS by default.
+
+## 2.17.1
+
+* Update `cluster-agent` image tag to `1.13.1`.
+
+## 2.17.0
+
+* Update `agent` image tag to `7.29.0`.
+* Update `cluster-agent` image tag to `1.13.0`.
+
+## 2.16.6
+
+* Support template expansion for `clusterAgent.podAnnotations`
+* Support template expansion for `clusterAgent.rbac.serviceAccountAnnotations`
+
 ## 2.16.5
 
 * Remove other way of detecting OpenShift cluster as it's not supported by Helm2.
@@ -285,9 +1321,9 @@ Starting Agent 7.27, the recommended setup is to never set `datadog.dockerSocket
 
 * Changes default values to activate a maximum of built-in features to ease configuration.
   Notable changes:
-  - Cluster Agent, cluster checks and event collection are activated by default
-  - DatadogMetrics CRD usage is activated by default if ExternalMetrics are used
-  - Dogstatsd non-local traffic is activated by default (hostPort usage is not)
+  * Cluster Agent, cluster checks and event collection are activated by default
+  * DatadogMetrics CRD usage is activated by default if ExternalMetrics are used
+  * Dogstatsd non-local traffic is activated by default (hostPort usage is not)
 * Bump Agent version to `7.25.0` and Cluster Agent version to `1.10.0`
 * Introduce `.registry` parameter to quickly change registry for all Datadog images. Image name is retrieved from `.image.name`, however setting `.image.repository` still allows to override per image, ensuring backward compatibility
 
@@ -754,7 +1790,7 @@ variables, instead of passing one by one.
 ## 2.2.11
 
 * Add documentations around secret management in the datadog helm chart. It is to upstream
-  requested changes in the IBM charts repository: https://github.com/IBM/charts/pull/690#discussion_r411702458
+  requested changes in the IBM charts repository: <https://github.com/IBM/charts/pull/690#discussion_r411702458>
 * update `kube-state-metrics` dependency
 * uncomment every values.yaml parameters for IBM chart compliancy
 
@@ -832,6 +1868,7 @@ config to this environment variable.
 
 * Fix `system-probe` startup on latest versions of containerd.
   Here is the error that this change fixes:
+
   ```    State:          Waiting
       Reason:       CrashLoopBackOff
     Last State:     Terminated

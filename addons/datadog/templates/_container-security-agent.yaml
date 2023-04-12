@@ -2,9 +2,11 @@
 - name: security-agent
   image: "{{ include "image-path" (dict "root" .Values "image" .Values.agents.image) }}"
   imagePullPolicy: {{ .Values.agents.image.pullPolicy }}
+  {{- if eq  (include "should-enable-compliance" .) "true" }}
   securityContext:
     capabilities:
       add: ["AUDIT_CONTROL", "AUDIT_READ"]
+  {{- end }}
   command: ["security-agent", "start", "-c={{ template "datadog.confPath" . }}/datadog.yaml"]
   resources:
 {{ toYaml .Values.agents.containers.securityAgent.resources | indent 4 }}
@@ -12,12 +14,18 @@
   ports:
 {{ toYaml .Values.agents.containers.securityAgent.ports | indent 2 }}
 {{- end }}
-{{- if .Values.datadog.envFrom }}
+{{- if or .Values.datadog.envFrom .Values.agents.containers.securityAgent.envFrom }}
   envFrom:
-{{ toYaml .Values.datadog.envFrom | indent 4 }}
+{{- if .Values.datadog.envFrom }}
+{{ .Values.datadog.envFrom | toYaml | indent 4 }}
+{{- end }}
+{{- if .Values.agents.containers.securityAgent.envFrom }}
+{{ .Values.agents.containers.securityAgent.envFrom | toYaml | indent 4 }}
+{{- end }}
 {{- end }}
   env:
     {{- include "containers-common-env" . | nindent 4 }}
+    {{- include "containers-cluster-agent-env" . | nindent 4 }}
     - name: DD_LOG_LEVEL
       value: {{ .Values.agents.containers.securityAgent.logLevel | default .Values.datadog.logLevel | quote }}
     - name: DD_COMPLIANCE_CONFIG_ENABLED
@@ -27,43 +35,49 @@
       value: {{ .Values.datadog.securityAgent.compliance.checkInterval | quote }}
     - name: HOST_ROOT
       value: /host/root
-    {{- include "containers-cluster-agent-env" . | nindent 4 }}
     {{- end }}
     - name: DD_RUNTIME_SECURITY_CONFIG_ENABLED
       value:  {{ .Values.datadog.securityAgent.runtime.enabled | quote }}
-    {{- if .Values.datadog.securityAgent.runtime.enabled }}
+    {{- if or .Values.datadog.securityAgent.runtime.enabled .Values.datadog.securityAgent.runtime.fimEnabled }}
     - name: DD_RUNTIME_SECURITY_CONFIG_POLICIES_DIR
       value: "/etc/datadog-agent/runtime-security.d"
     - name: DD_RUNTIME_SECURITY_CONFIG_SOCKET
       value: /var/run/sysprobe/runtime-security.sock
-    - name: DD_RUNTIME_SECURITY_CONFIG_SYSCALL_MONITOR_ENABLED
-      value: {{ .Values.datadog.securityAgent.runtime.syscallMonitor.enabled | quote }}
     {{- end }}
-  {{- range $value := .Values.agents.containers.securityAgent.env }}
-    - name: {{ $value.name }}
-      value: {{ $value.value | quote }}
-  {{- end }}
+    {{- if eq .Values.targetSystem "linux" }}
+    - name: DD_DOGSTATSD_SOCKET
+      value: {{ .Values.datadog.dogstatsd.socketPath | quote }}
+    {{- end }}
+    {{- include "additional-env-entries" .Values.agents.containers.securityAgent.env | indent 4 }}
+    {{- include "additional-env-dict-entries" .Values.agents.containers.securityAgent.envDict | indent 4 }}
   volumeMounts:
     - name: config
       mountPath: {{ template "datadog.confPath" . }}
+      readOnly: true
+    {{- if (not .Values.providers.gke.autopilot) }}
+    - name: auth-token
+      mountPath: {{ template "datadog.confPath" . }}/auth
+      readOnly: true
+    - name: dsdsocket
+      mountPath: {{ (dir .Values.datadog.dogstatsd.socketPath) }}
+      readOnly: false # Need RW for UDS DSD socket
+    {{- end }}
     {{- if eq .Values.targetSystem "linux" }}
     - name: logdatadog
       mountPath: /var/log/datadog
+      readOnly: false # Need RW to write logs
     - name: tmpdir
       mountPath: /tmp
-      readOnly: false
-    - name: runtimesocketdir
-      mountPath: {{ print "/host/" (dir (include "datadog.dockerOrCriSocketPath" .)) | clean }}
-      readOnly: true
+      readOnly: false # Need RW to write to tmp directory
+    {{- include "linux-container-host-release-volumemounts" . | nindent 4 }}
     {{- end }}
-    {{- if eq .Values.targetSystem "windows" }}
-    - name: runtimesocket
-      mountPath: {{ template "datadog.dockerOrCriSocketPath" . }}
-    {{- end }}
+    {{- include "container-crisocket-volumemounts" . | nindent 4 }}
+    {{- include "container-cloudinit-volumemounts" . | nindent 4 }}
     {{- if .Values.agents.useConfigMap }}
-    - name: {{ template "datadog.fullname" . }}-datadog-yaml
+    - name: datadog-yaml
       mountPath: {{ template "datadog.confPath" . }}/datadog.yaml
       subPath: datadog.yaml
+      readOnly: true
     {{- end }}
     {{- if eq .Values.targetSystem "linux" }}
     {{- if .Values.datadog.securityAgent.compliance.enabled }}
@@ -79,21 +93,19 @@
     - name: hostroot
       mountPath: /host/root
       readOnly: true
-    {{- if eq .Values.targetSystem "linux" }}
-    - name: runtimesocketdir
-      mountPath: {{ print "/host/root" (dir (include "datadog.dockerOrCriSocketPath" .)) | clean }}
-      readOnly: true
-    {{- end }}
     - name: procdir
       mountPath: /host/proc
       readOnly: true
+    {{- if .Values.datadog.kubelet.hostCAPath }}
+{{ include "datadog.kubelet.volumeMount" . | indent 4 }}
+    {{- end }}
     {{- if .Values.datadog.securityAgent.compliance.configMap }}
     - name: complianceconfigdir
       mountPath: /etc/datadog-agent/compliance.d
       readOnly: true
     {{- end }}
     {{- end }}
-    {{- if .Values.datadog.securityAgent.runtime.enabled }}
+    {{- if or .Values.datadog.securityAgent.runtime.enabled .Values.datadog.securityAgent.runtime.fimEnabled }}
     {{- if .Values.datadog.securityAgent.runtime.policies.configMap }}
     - name: runtimepoliciesdir
       mountPath: /etc/datadog-agent/runtime-security.d
@@ -105,6 +117,7 @@
     - name: sysprobe-config
       mountPath: /etc/datadog-agent/system-probe.yaml
       subPath: system-probe.yaml
+      readOnly: true
     {{- end }}
     {{- end }}
 {{- if .Values.agents.volumeMounts }}
