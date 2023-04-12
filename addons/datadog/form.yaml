@@ -8,7 +8,7 @@ tabs:
           - type: heading
             label: Deploy DataDog Agent
           - type: subtitle
-            label: This installs the DataDog agent, which forwards all logs & metrics from your workloads in the default namespace and Nginx on your Porter cluster to DataDog for ingestion. It may take around 30 minutes for the logs to arrive in your DataDog instance.
+            label: This installs the DataDog agent, which forwards all logs & metrics from your applications to DataDog for ingestion. It may take around 30 minutes for the logs to arrive in your DataDog instance.
           - type: string-input
             label: DataDog Site
             variable: datadog.site
