@@ -475,15 +475,7 @@ datadog:
 
   ## The Datadog Agent supports many environment variables.
   ## ref: https://docs.datadoghq.com/agent/docker/?tab=standard#environment-variables
-  env:
-    - name: DD_CONTAINER_EXCLUDE_LOGS
-      value: kube_namespace:.*
-    - name: DD_CONTAINER_EXCLUDE_METRICS
-      value: kube_namespace:.*
-    - name: DD_CONTAINER_INCLUDE_LOGS
-      value: kube_namespace:default kube_namespace:ingress-nginx
-    - name: DD_CONTAINER_INCLUDE_METRICS
-      value: kube_namespace:default kube_namespace:ingress-nginx
+  env: {}
   #   - name: <ENV_VAR_NAME>
   #     value: <ENV_VAR_VALUE>
 
@@ -763,7 +755,7 @@ datadog:
   # Autodiscovery, as a space-sepatered list
 
   ## ref: https://docs.datadoghq.com/agent/guide/autodiscovery-management/?tab=containerizedagent#exclude-containers
-  containerExclude:  # "image:datadog/agent"
+  containerExclude: "kube_namespace:cert-manager kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system"
 
   # datadog.containerInclude -- Include containers in the Agent Autodiscovery,
   # as a space-separated list.  If a container matches an include rule, it’s
@@ -774,7 +766,7 @@ datadog:
 
   # datadog.containerExcludeLogs -- Exclude logs from the Agent Autodiscovery,
   # as a space-separated list
-  containerExcludeLogs:
+  containerExcludeLogs: "kube_namespace:cert-manager kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system"
 
   # datadog.containerIncludeLogs -- Include logs in the Agent Autodiscovery, as
   # a space-separated list
@@ -782,7 +774,7 @@ datadog:
 
   # datadog.containerExcludeMetrics -- Exclude metrics from the Agent
   # Autodiscovery, as a space-separated list
-  containerExcludeMetrics:
+  containerExcludeMetrics: "kube_namespace:cert-manager kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system"
 
   # datadog.containerIncludeMetrics -- Include metrics in the Agent
   # Autodiscovery, as a space-separated list
