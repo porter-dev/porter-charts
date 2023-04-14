@@ -410,12 +410,12 @@ datadog:
     # datadog.apm.socketEnabled -- Enable APM over Socket (Unix Socket or windows named pipe)
 
     ## ref: https://docs.datadoghq.com/agent/kubernetes/apm/
-    socketEnabled: true
+    socketEnabled: false
 
     # datadog.apm.portEnabled -- Enable APM over TCP communication (port 8126 by default)
 
     ## ref: https://docs.datadoghq.com/agent/kubernetes/apm/
-    portEnabled: false
+    portEnabled: true
 
     # datadog.apm.enabled -- Enable this to enable APM and tracing, on port 8126
     # DEPRECATED. Use datadog.apm.portEnabled instead
@@ -755,30 +755,30 @@ datadog:
   # Autodiscovery, as a space-sepatered list
 
   ## ref: https://docs.datadoghq.com/agent/guide/autodiscovery-management/?tab=containerizedagent#exclude-containers
-  containerExclude: "kube_namespace:cert-manager kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system"
+  containerExclude: 'kube_namespace:cert-manager kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system'
 
   # datadog.containerInclude -- Include containers in the Agent Autodiscovery,
   # as a space-separated list.  If a container matches an include rule, it’s
   # always included in the Autodiscovery
 
   ## ref: https://docs.datadoghq.com/agent/guide/autodiscovery-management/?tab=containerizedagent#include-containers
-  containerInclude:
+  containerInclude: null
 
   # datadog.containerExcludeLogs -- Exclude logs from the Agent Autodiscovery,
   # as a space-separated list
-  containerExcludeLogs: "kube_namespace:cert-manager kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system"
+  containerExcludeLogs: 'kube_namespace:cert-manager kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system'
 
   # datadog.containerIncludeLogs -- Include logs in the Agent Autodiscovery, as
   # a space-separated list
-  containerIncludeLogs:
+  containerIncludeLogs: null
 
   # datadog.containerExcludeMetrics -- Exclude metrics from the Agent
   # Autodiscovery, as a space-separated list
-  containerExcludeMetrics: "kube_namespace:cert-manager kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system"
+  containerExcludeMetrics: 'kube_namespace:cert-manager kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system'
 
   # datadog.containerIncludeMetrics -- Include metrics in the Agent
   # Autodiscovery, as a space-separated list
-  containerIncludeMetrics:
+  containerIncludeMetrics: null
 
   # datadog.excludePauseContainer -- Exclude pause containers from the Agent Autodiscovery.
 
@@ -936,7 +936,7 @@ clusterAgent:
     enabled: false
 
     # clusterAgent.admissionController.mutateUnlabelled -- Enable injecting config without having the pod label 'admission.datadoghq.com/enabled="true"'
-    mutateUnlabelled: false
+    mutateUnlabelled: true
 
     # clusterAgent.admissionController.configMode -- The kind of configuration to be injected, it can be "hostip", "service", or "socket".
 
