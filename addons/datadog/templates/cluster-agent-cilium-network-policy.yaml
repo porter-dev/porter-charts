@@ -50,9 +50,11 @@ specs:
           - matchName: {{ trimPrefix "https://" $.Values.datadog.dd_url }}
           {{- end}}
           {{- if $.Values.datadog.site}}
-          - matchPattern: "*-app.agent.{{  $.Values.datadog.site }}"
+          - matchName: "app.{{ $.Values.datadog.site }}"
+          - matchPattern: "*-app.agent.{{ $.Values.datadog.site }}"
           - matchName: "orchestrator.{{  $.Values.datadog.site }}"
           {{- else}}
+          - matchName: "app.datadoghq.com"
           - matchPattern: "*-app.agent.datadoghq.com"
           - matchName: "orchestrator.datadoghq.com"
           {{- end}}
@@ -78,14 +80,53 @@ specs:
       # When the control plane is on the same cluster, we must allow connections
       # to the node entity.
       - toEntities:
+          - kube-apiserver
           - host
           - remote-node
         toPorts:
           - ports:
               - port: "443"
                 protocol: TCP
+  - description: Ingress from cluster agent
+    endpointSelector:
+      matchLabels:
+        app: {{ template "datadog.fullname" . }}-cluster-agent
+        {{- if .Values.clusterAgent.podLabels }}
+        {{ toYaml .Values.clusterAgent.podLabels | indent 8 }}
+        {{- end }}
+    ingress:
+    -
+      fromEndpoints:
+        - matchLabels:
+            app: {{ template "datadog.fullname" . }}
+            {{- if .Values.clusterAgent.podLabels }}
+            {{ toYaml .Values.clusterAgent.podLabels | indent 10 }}
+            {{- end }}
+      toPorts:
+      - ports:
+        - port: "5005"
+          protocol: TCP
+  - description: Egress to cluster agent
+    endpointSelector:
+      matchLabels:
+        app: {{ template "datadog.fullname" . }}-cluster-agent
+        {{- if .Values.clusterAgent.podLabels }}
+        {{ toYaml .Values.clusterAgent.podLabels | indent 8 }}
+        {{- end }}
+    egress:
+    -
+      toEndpoints:
+        - matchLabels:
+            app: {{ template "datadog.fullname" . }}
+            {{- if .Values.clusterAgent.podLabels }}
+            {{ toYaml .Values.clusterAgent.podLabels | indent 10 }}
+            {{- end }}
+      toPorts:
+      - ports:
+        - port: "5005"
+          protocol: TCP
 {{- if $.Values.agents.enabled }}
-  - description: Ingress from agent
+  - description: "Ingress from agent"
     endpointSelector:
       matchLabels:
         app: {{ template "datadog.fullname" . }}-cluster-agent
