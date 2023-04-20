@@ -963,7 +963,13 @@ clusterAgent:
   # clusterAgent.confd -- Provide additional cluster check configurations. Each key will become a file in /conf.d.
 
   ## ref: https://docs.datadoghq.com/agent/autodiscovery/
-  confd: {}
+  confd:
+    nginx.yaml: |-
+      ad_identifiers:
+        - nginx_ingress_controller
+      logs:
+        - source: nginx-ingress-controller
+          service: controller
   #   mysql.yaml: |-
   #     cluster_check: true
   #     instances:
