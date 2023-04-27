@@ -15,4 +15,4 @@ maintainers:
 name: cert-manager
 sources:
   - https://github.com/jetstack/cert-manager
-version: 0.10.0
+version: 0.14.0
