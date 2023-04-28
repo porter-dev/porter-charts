@@ -14,10 +14,19 @@ resources:
     memory: 500Mi
 
 daemonset:
-  tolerations: []
+  tolerations:
+    - effect: NoSchedule
+      key: porter.run/workload-kind
+      value: "system"
+      operator: Equal
 
 priorityClassName: ""
-extraEnv: {}
+extraEnv:
+  - name: LOGDNA_USE_K8S_LOG_ENRICHMENT
+    value: "always"
+  - name: LOGDNA_K8S_METADATA_LINE_EXCLUSION
+    value: "namespace:cert-manager, namespace:kube-system, namespace:monitoring, namespace:porter-agent-system, label.app.kubernetes.io/instance:aws-vpc-cni"
+
 extraVolumeMounts: []
 extraVolumes: []
 
