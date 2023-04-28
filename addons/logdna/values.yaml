@@ -5,6 +5,7 @@ image:
 
 logdna:
   name: logdna-agent
+  key: ""
 
 resources:
   requests:
