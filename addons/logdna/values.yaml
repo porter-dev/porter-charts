@@ -5,20 +5,15 @@ image:
 
 logdna:
   name: logdna-agent
-  key: ""
 
 resources:
   requests:
     cpu: 20m
   limits:
-    memory: 75Mi
+    memory: 500Mi
 
 daemonset:
-  tolerations:
-    - effect: NoSchedule
-      key: removable
-      operator: Equal
-      value: 'true'
+  tolerations: []
 
 priorityClassName: ""
 extraEnv: {}

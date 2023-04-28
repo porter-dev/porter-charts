@@ -52,7 +52,7 @@ Parameter | Description | Default
 `logdna.key` | LogDNA Ingestion Key (Required) | None
 `logdna.tags` | Optional tags such as `production` | None
 `priorityClassName` | (Optional) Set a PriorityClass on the Daemonset | `""`
-`resources.limits.memory` | Memory resource limits | 75Mi
+`resources.limits.memory` | Memory resource limits |500Mi
 `updateOnSecretChange` | Optionally set annotation on daemonset to cause deploy when secret changes | None
 `extraEnv` | Additional environment variables | `{}`
 `extraVolumeMounts` | Additional Volume mounts | `[]`
