@@ -43,11 +43,8 @@ tabs:
       settings:
         unit: m
         default: 100
-    sections:
-    - name: persistence
-      contents:
-      - type: subtitle
-        label: Please enable persistence only if you have a stateful nodegroup in your cluster, running in a single AZ. Running a stateful Redis installation on non-stateful nodegroups can lead to issues with storage on AWS.
-      - type: checkbox
-        label: Enable persistence
-        variable: master.persistence.enabled
+    - type: subtitle
+      label: Please enable persistence only if you have a stateful nodegroup in your cluster, running in a single AZ. Running a stateful Redis installation on non-stateful nodegroups can lead to issues with storage on AWS.
+    - type: checkbox
+      label: Enable persistence
+      variable: master.persistence.enabled
