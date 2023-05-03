@@ -25,7 +25,7 @@ extraEnv:
   - name: LOGDNA_USE_K8S_LOG_ENRICHMENT
     value: "always"
   - name: LOGDNA_K8S_METADATA_LINE_EXCLUSION
-    value: "namespace:cert-manager, namespace:kube-system, namespace:monitoring, namespace:porter-agent-system, label.app.kubernetes.io/instance:aws-vpc-cni"
+    value: "namespace:cert-manager, namespace:ingress-nginx, namespace:kube-system, namespace:monitoring, namespace:porter-agent-system, label.app.kubernetes.io/instance:aws-vpc-cni"
   - name: LOGDNA_EXCLUSION_RULES
     value: "/var/log/chrony/**, /var/log/aws-routed-eni/**"
 
