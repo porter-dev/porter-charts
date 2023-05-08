@@ -171,7 +171,7 @@ spec:
             - name: PORTER_RESOURCES_REPLICAS
               valueFrom:
                 fieldRef:
-                  fieldPath: spec.replicas
+                  fieldPath: spec['replicas']
             - name: PORTER_NODE_NAME
               valueFrom:
                 fieldRef:
