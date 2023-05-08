@@ -122,6 +122,18 @@ spec:
               memory: {{ .Values.resources.requests.memory }}
           env:
             # Porter default environment variables
+            - name: PORTER_RESOURCES_RAM
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.template.spec.containers[0].resources.limits.memory
+            - name: PORTER_RESOURCES_CPU
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.template.spec.containers[0].resources.requests.cpu
+            - name: PORTER_RESOURCES_REPLICAS
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.replicas            
             - name: PORTER_NODE_NAME
               valueFrom:
                 fieldRef:
