@@ -160,6 +160,12 @@ spec:
               memory: {{ .Values.resources.requests.memory }}
           env:
             # Porter default environment variables
+            - name: PORTER_RESOURCES_RAM
+              value: "{{ .Values.resources.requests.memory }}"
+            - name: PORTER_RESOURCES_CPU
+              value: "{{ .Values.resources.requests.cpu }}"
+            - name: PORTER_RESOURCES_REPLICAS
+              value: "{{ .Values.replicaCount }}"
             - name: PORTER_NODE_NAME
               valueFrom:
                 fieldRef:
