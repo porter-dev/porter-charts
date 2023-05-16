@@ -1,6 +1,6 @@
 apiVersion: v2
 appVersion: 3.8.2
-description: LogDNA collector agent daemonset for Kubernetes.
+description: Mezmo(LogDNA) collector agent daemonset for Kubernetes.
 home: https://logdna.com
 icon: https://logdna.com/assets/images/logdna_logo_240w.png
 keywords:
@@ -16,7 +16,7 @@ keywords:
 maintainers:
   - email: help@logdna.com
     name: LogDNA
-name: agent
+name: mezmo-agent
 sources:
   - https://github.com/logdna/logdna-agent-v2
 type: application
