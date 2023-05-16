@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
+  {{- if and (not .Values.keda.enabled) (not .Values.autoscaling.enabled) }}
   replicas: {{ .Values.replicaCount }}
   {{ end }}
   selector:
