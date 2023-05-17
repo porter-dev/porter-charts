@@ -1,4 +1,4 @@
-{{- if ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job" }}
+{{- if or (ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job") (.Values.global) }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
