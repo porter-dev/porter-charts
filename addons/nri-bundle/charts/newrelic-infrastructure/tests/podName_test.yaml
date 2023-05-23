@@ -1,0 +1,50 @@
+suite: test object names
+templates:
+  - templates/controlplane/daemonset.yaml
+  - templates/controlplane/scraper-configmap.yaml
+  - templates/controlplane/agent-configmap.yaml
+  - templates/kubelet/daemonset.yaml
+  - templates/kubelet/scraper-configmap.yaml
+  - templates/kubelet/agent-configmap.yaml
+  - templates/kubelet/integrations-configmap.yaml
+  - templates/ksm/deployment.yaml
+  - templates/ksm/scraper-configmap.yaml
+  - templates/ksm/agent-configmap.yaml
+  - templates/agent-configmap.yaml
+  - templates/secret.yaml
+tests:
+  - it: name is created as expected
+    set:
+      licenseKey: test
+      cluster: test
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-nrk8s-ksm
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-nrk8s-controlplane
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-nrk8s-kubelet
+        template: templates/kubelet/daemonset.yaml
+  - it: name is overridden as expected
+    set:
+      licenseKey: test
+      cluster: test
+      fullnameOverride: fno
+    asserts:
+      - equal:
+          path: metadata.name
+          value: fno-ksm
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: metadata.name
+          value: fno-controlplane
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: metadata.name
+          value: fno-kubelet
+        template: templates/kubelet/daemonset.yaml
