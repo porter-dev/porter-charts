@@ -20,6 +20,11 @@ tabs:
             required: true
             settings:
               default: ""
+          - type: string-input
+            label: NewRelic Insights Key
+            variable: global.insightsKey
+            settings:
+              default: ""
           - type: heading
             label: Metadata Injection
           - type: subtitle
