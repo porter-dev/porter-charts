@@ -8,7 +8,7 @@ nri-prometheus:
 
 nri-metadata-injection:
   # nri-metadata-injection.enabled -- Install the [`nri-metadata-injection` chart](https://github.com/newrelic/k8s-metadata-injection/tree/main/charts/nri-metadata-injection)
-  enabled: true
+  enabled: false
 
 kube-state-metrics:
   # kube-state-metrics.enabled -- Install the [`kube-state-metrics` chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics) from the stable helm charts repository.
