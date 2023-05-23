@@ -5,6 +5,11 @@
 # nameOverride:
 # fullnameOverride:
 
+resourceClassName: circleci/resource-class
+resourceClassToken: XXXXX
+resourceClassCpuLimit: 500m
+resourceClassRunAsNonRoot: true
+
 agent:
   replicaCount: 1
 
@@ -159,7 +164,16 @@ agent:
 
   # Resource class settings. The tokens specified here will be used to claim tasks & the tasks
   # will be launched with the configured configs
-  resourceClasses: {}
+  resourceClasses:
+    "{{ .Values.resourceClassName }}":
+      token: {{ .Values.resourceClassToken }}
+      spec:
+        containers:
+          - resources:
+              limits:
+                cpu: {{ .Values.resourceClassCpuLimit }}
+        securityContext:
+          runAsNonRoot: {{ .Values.resourceClassRunAsNonRoot }} 
     # circleci-runner/resourceClass:
     #   token: XXXX
     #   metadata:
