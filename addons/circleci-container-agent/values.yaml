@@ -1,0 +1,243 @@
+# Default values for container-agent.
+
+## Overrides for generated resource names
+# See templates/_helpers.tpl
+# nameOverride:
+# fullnameOverride:
+
+agent:
+  replicaCount: 1
+
+  image:
+    registry: ""
+    repository: "circleci/runner-agent"
+    pullPolicy: Always
+    tag: "kubernetes-3"
+
+  pullSecrets: []
+
+  matchLabels:
+    app: container-agent
+
+  # Annotations to be added to agent pods
+  podAnnotations: {}
+
+  # Security Context policies for agent pods
+  podSecurityContext: {}
+
+  # Security Context policies for agent containers
+  containerSecurityContext: {}
+
+  # Liveness and readiness probe values
+  # Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
+  livenessProbe:
+    httpGet:
+      # should match container.healthCheckPath
+      path: "/live"
+      port: 7623
+      scheme: HTTP
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 5
+  readinessProbe:
+    httpGet:
+      # should match container.healthCheckPath
+      path: "/ready"
+      port: 7623
+      scheme: HTTP
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 3
+
+  # Agent pod resource configuration
+  # Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+  # Node labels for agent pod assignment
+  # Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  # Node tolerations for agent scheduling to nodes with taints
+  # Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  tolerations: []
+
+  # Agent affinity and anti-affinity
+  # Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+  # # An example of preferred pod anti-affinity, weight is in the range 1-100
+  # podAntiAffinity:
+  #   preferredDuringSchedulingIgnoredDuringExecution:
+  #   - weight: 100
+  #     podAffinityTerm:
+  #       labelSelector:
+  #         matchExpressions:
+  #         - key: app.kubernetes.io/name
+  #           operator: In
+  #           values:
+  #           - ingress-nginx
+  #         - key: app.kubernetes.io/instance
+  #           operator: In
+  #           values:
+  #           - ingress-nginx
+  #         - key: app.kubernetes.io/component
+  #           operator: In
+  #           values:
+  #           - controller
+  #       topologyKey: kubernetes.io/hostname
+
+  # # An example of required pod anti-affinity
+  # podAntiAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #   - labelSelector:
+  #       matchExpressions:
+  #       - key: app.kubernetes.io/name
+  #         operator: In
+  #         values:
+  #         - ingress-nginx
+  #       - key: app.kubernetes.io/instance
+  #         operator: In
+  #         values:
+  #         - ingress-nginx
+  #       - key: app.kubernetes.io/component
+  #         operator: In
+  #         values:
+  #         - controller
+  #     topologyKey: "kubernetes.io/hostname"
+
+  # Pod disruption budget settings
+  pdb:
+    create: false
+    minAvailable: 1
+    maxUnavailable: ""
+
+  # CircleCI Runner API URL
+  runnerAPI: "https://runner.circleci.com"
+
+  # A (preferably) unique name assigned to this particular container-agent instance.
+  # This name will appear in your runners inventory page in the CircleCI UI.
+  # If left unspecified, the name will default to the name of the deployment.
+  name: ""
+
+  # Tasks are drained during the termination grace period,
+  # so this should be sufficiently long relative to the maximum run time to ensure graceful shutdown
+  terminationGracePeriodSeconds: 18300 # 5 hours and 5 minutes
+  maxRunTime: "5h"
+
+  # Maximum number of tasks that can be run concurrently.
+  # IMPORTANT: This concurrency is independent of, and may be limited by, the Runner concurrency of your plan.
+  # Configure this value at your own risk based on the resources allocated to your cluster.
+  maxConcurrentTasks: 20
+
+  # Enable garbage collection of dangling Kubernetes objects managed by container agent
+  kubeGCEnabled: true
+  # The age of a Kubernetes object managed by container agent before the garbage collection deletes it
+  kubeGCThreshold: "5h5m"
+
+  # Toggle autodetection of OS and CPU architecture to request the appropriate task-agent binary in a heterogeneous cluster.
+  # If toggled on, this requires container-agent to have certain cluster-wide permissions for nodes.
+  # If toggled off, the cluster is assumed to be homogeneous and the OS and architecture of container-agent are used.
+  autodetectPlatform: true
+
+  # Name of the user provided secret containing resource class tokens. You can mix tokens from this secret
+  # and in the secret created from tokens specified in the resourceClasses section below
+  #
+  # The tokens should be specified as secret key-value pairs of the form
+  # ResourceClass: Token
+  # The resource class name needs to match the names configured below exactly to match tokens to the correct configuration
+  # As Kubernetes does not allow / in secret keys, a period (.) should be substituted instead 
+  customSecret: ""
+
+  # Resource class settings. The tokens specified here will be used to claim tasks & the tasks
+  # will be launched with the configured configs
+  resourceClasses: {}
+    # circleci-runner/resourceClass:
+    #   token: XXXX
+    #   metadata:
+    #     annotations:
+    #       custom.io: my-annotation
+    #   spec:
+    #     containers:
+    #       - resources:
+    #           limits:
+    #             cpu: 500m
+    #         volumeMounts:
+    #           - name: xyz
+    #             mountPath: /path/to/mount
+    #     securityContext:
+    #       runAsNonRoot: true
+    #     imagePullSecrets:
+    #       - name: my_cred
+    # circleci-runner/resourceClass2:
+    #   token: XXXX
+    #   spec: 
+    #     imagePullSecrets:
+    #       - name: "other"
+
+  ## Resource class constraint validation checker settings. The checker will periodically validate the 
+  ## node constraints in the resource class spec to ensure task pods can be scheduled before claiming tasks
+  constraintChecker:
+    # Enable constraint checking (This requires at least List Node permissions)
+    enable: false
+
+    # Number of failed checks before disabling task claim
+    threshold: 3
+  
+    # Check interval
+    interval: 15m
+
+# Kubernetes service account settings
+serviceAccount:
+  create: true
+  name: ""
+  automountServiceAccountToken: true
+  annotations: {}
+
+# Kubernetes Roles Based Access Control settings
+rbac:
+  create: true
+  role:
+    name: ""
+    rules: []
+  roleBinding:
+    name: ""
+  clusterRole:
+    name: ""
+    rules: []
+  clusterRoleBinding:
+    name: ""
+
+# Configuration values for the logging containers.
+# These containers run alongside service containers and stream their logs to the CircleCI UI
+logging:
+  image:
+    registry: ""
+    repository: "circleci/logging-collector"
+    tag: edge
+
+  # A service account with minimal permissions to collect the service container logs
+  serviceAccount:
+    create: true
+    name: "logging-collector"
+    annotations: {}
+
+    # The secret containing the service account token
+    secret:
+      name: "logging-collector-token"
+
+  rbac:
+    create: true
+    role:
+      name: "logging-collector"
+      rules: []
+    roleBinding:
+      name: "logging-collector"
