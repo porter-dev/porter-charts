@@ -1,0 +1,36 @@
+name: newrelic
+tabs:
+  - name: main
+    label: Info
+    sections:
+      - name: section_one
+        contents:
+          - type: heading
+            label: Deploy NewRelic Agengt
+          - type: subtitle
+            label: This installs the NewRelic agent, which forwards all logs & metrics from your applications to NewRelic for ingestion.
+          - type: string-input
+            label: Cluster Name
+            variable: global.cluster
+            settings:
+              default: ""
+          - type: string-input
+            label: NewRelic License Key
+            variable: global.licenseKey
+            required: true
+            settings:
+              default: ""
+          - type: heading
+            label: Metadata Injection
+          - type: subtitle
+            label: Enable metadata injection for your workloads
+          - type: checkbox
+            label: Enable Metadata Injection
+            variable: nri-metadata-injection.enabled
+          - type: heading
+            label: Logging
+          - type: subtitle
+            label: Enable logging and forward all logs to NewRelic
+          - type: checkbox
+            label: Enable logging
+            variable: newrelic-logging.enabled
