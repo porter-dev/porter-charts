@@ -8,7 +8,7 @@ nri-prometheus:
 
 nri-metadata-injection:
   # nri-metadata-injection.enabled -- Install the [`nri-metadata-injection` chart](https://github.com/newrelic/k8s-metadata-injection/tree/main/charts/nri-metadata-injection)
-  enabled: false
+  enabled: true
 
 kube-state-metrics:
   # kube-state-metrics.enabled -- Install the [`kube-state-metrics` chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics) from the stable helm charts repository.
@@ -24,6 +24,8 @@ nri-kube-events:
 newrelic-logging:
   # newrelic-logging.enabled -- Install the [`newrelic-logging` chart](https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-logging)
   enabled: false
+  fluentBit:
+    k8sBufferSize: 100k
 
 newrelic-pixie:
   # newrelic-pixie.enabled -- Install the [`newrelic-pixie`](https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-pixie)
@@ -99,7 +101,10 @@ global:
   # -- Sets pod's node selector
   nodeSelector: {}
   # -- Sets pod's tolerations to node taints
-  tolerations: []
+  tolerations:
+    - key: porter.run/workload-kind
+      effect: NoSchedule
+      operator: Exists
 
   # -- Adds extra attributes to the cluster and all the metrics emitted to the backend
   customAttributes: {}
