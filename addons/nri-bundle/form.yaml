@@ -25,6 +25,11 @@ tabs:
             variable: global.insightsKey
             settings:
               default: ""
+          - type: string-input
+            label: NewRelic Personal API Key(required for using the Metrics Adapter)
+            variable: newrelic-k8s-metrics-adapter.personalAPIKey
+            settings:
+              default: ""
           - type: heading
             label: Logging
           - type: subtitle
