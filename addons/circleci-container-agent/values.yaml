@@ -164,16 +164,7 @@ agent:
 
   # Resource class settings. The tokens specified here will be used to claim tasks & the tasks
   # will be launched with the configured configs
-  resourceClasses:
-    "{{ .Values.resourceClassName }}":
-      token: {{ .Values.resourceClassToken }}
-      spec:
-        containers:
-          - resources:
-              limits:
-                cpu: {{ .Values.resourceClassCpuLimit }}
-        securityContext:
-          runAsNonRoot: {{ .Values.resourceClassRunAsNonRoot }} 
+  resourceClasses: {}
     # circleci-runner/resourceClass:
     #   token: XXXX
     #   metadata:
