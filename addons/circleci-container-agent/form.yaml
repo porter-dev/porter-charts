@@ -1,0 +1,39 @@
+tabs:
+- name: main
+  label: Main Settings
+  sections:
+  - name: section_one
+    contents: 
+    - type: heading
+      label: CircleCi Container Agent Settings
+    - type: subtitle
+      label: Resource Class Settigs
+    - type: string-input
+      variable: resourceClassName
+      label: Resource Class Name
+      settings:
+        default: circleci/resource-class
+    - type: string-input
+      variable: resourceClassToken
+      label: Resource Class Token
+      settings:
+        default: XXXXX
+    - name: show-hidden
+      type: checkbox
+      label: Show hidden section 
+    - name: section_two
+      show_if: show-hidden
+      contents: 
+      - type: heading
+        label: Extra Settings
+      - type: string-input
+        variable: resourceClassCpuLimit
+        label: Resource Class CPU Limit
+        settings:
+          default: 500m
+      - type: checkbox
+        variable: resourceClassRunAsNonRoot
+        label: Run as non-root?
+        settings:
+          default: true
+...
