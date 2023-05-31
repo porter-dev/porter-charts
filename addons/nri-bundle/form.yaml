@@ -1,0 +1,49 @@
+name: newrelic
+tabs:
+  - name: main
+    label: Info
+    sections:
+      - name: section_one
+        contents:
+          - type: heading
+            label: Deploy NewRelic Agengt
+          - type: subtitle
+            label: This installs the NewRelic agent, which forwards all logs & metrics from your applications to NewRelic for ingestion.
+          - type: string-input
+            label: Cluster Name
+            variable: global.cluster
+            settings:
+              default: ""
+          - type: string-input
+            label: NewRelic License Key
+            variable: global.licenseKey
+            required: true
+            settings:
+              default: ""
+          - type: string-input
+            label: NewRelic Insights Key
+            variable: global.insightsKey
+            settings:
+              default: ""
+          - type: heading
+            label: Logging
+          - type: subtitle
+            label: Enable logging and forward all logs to NewRelic
+          - type: checkbox
+            label: Enable logging
+            variable: newrelic-logging.enabled
+          - type: heading
+            label: Kubernetes Events
+          - type: subtitle
+            label: Enable tracking Kubernetes events
+          - type: checkbox
+            label: Enable kube-events
+            variable: nri-kube-events.enabled
+          - type: heading
+            label: NewRelic Metrics Adapter
+          - type: subtitle
+            label: Enable NewRelic's K8s Metrics Adapter for custom queries
+          - type: checkbox
+            label: Enable kube-events
+            variable: newrelic-k8s-metrics-adapter.enabled
+          
