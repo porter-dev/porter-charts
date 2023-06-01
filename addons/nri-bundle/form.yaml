@@ -51,4 +51,17 @@ tabs:
           - type: checkbox
             label: Enable newrelic-k8s-metrics-adapter
             variable: newrelic-k8s-metrics-adapter.enabled
-          
+          - type: heading
+            label: NewRelic Prometheus
+          - type: subtitle
+            label: Enable NewRelic's Prometheus collector for apps exposing Prometheus metrics
+          - type: checkbox
+            label: Enable nri-prometheus
+            variable: nri-prometheus.enabled
+          - type: heading
+            label: Pixie
+          - type: subtitle
+            label: Enable Pixie - an open-source observability tool for Kubernetes applications
+          - type: checkbox
+            label: Enable pixie-chart
+            variable: pixie-chart.enabled
