@@ -17,6 +17,7 @@ sources:
   - https://github.com/newrelic/newrelic-infra-operator/tree/master/charts/newrelic-infra-operator
 
 version: 5.0.15
+appVersion: 5.0.15
 
 dependencies:
   - name: newrelic-infrastructure
