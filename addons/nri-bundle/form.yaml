@@ -12,24 +12,19 @@ tabs:
           - type: string-input
             label: Cluster Name
             variable: global.cluster
-            settings:
-              default: ""
           - type: string-input
             label: NewRelic License Key
             variable: global.licenseKey
             required: true
-            settings:
-              default: ""
           - type: string-input
             label: NewRelic Insights Key
             variable: global.insightsKey
-            settings:
-              default: ""
           - type: string-input
             label: NewRelic Personal API Key(required for using the Metrics Adapter)
             variable: newrelic-k8s-metrics-adapter.personalAPIKey
-            settings:
-              default: ""
+          - type: string-input
+            label: NewRelic Account ID(required for using the Metrics Adapter)
+            variable: newrelic-k8s-metrics-adapter.config.accountID
           - type: heading
             label: Logging
           - type: subtitle
