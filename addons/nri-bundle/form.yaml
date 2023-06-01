@@ -49,6 +49,6 @@ tabs:
           - type: subtitle
             label: Enable NewRelic's K8s Metrics Adapter for custom queries
           - type: checkbox
-            label: Enable kube-events
+            label: Enable newrelic-k8s-metrics-adapter
             variable: newrelic-k8s-metrics-adapter.enabled
           
