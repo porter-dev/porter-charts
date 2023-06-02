@@ -1,5 +1,5 @@
 {{- if or (ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job") (.Values.global) }}
-{{- if .Capabilities.APIVersions.Has "batch/v1/CronJob" }}
+{{- if $.Capabilities.APIVersions.Has "batch/v1/CronJob" }}
 apiVersion: batch/v1
 {{- else }}
 apiVersion: batch/v1beta1
