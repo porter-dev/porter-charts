@@ -59,6 +59,7 @@ albIngress:
   certificate_arn:
   custom_paths: []
   group_name:
+  group_order:
   target_type: ip
   scheme: internet-facing
   security_groups:
