@@ -15,7 +15,7 @@ metadata:
     alb.ingress.kubernetes.io/group.name: {{ .Values.albIngress.group_name }}
     {{- end }}
     {{- if .Values.albIngress.group_order }}
-    alb.ingress.kubernetes.io/group.order: {{ .Values.albIngress.group_order }}
+    alb.ingress.kubernetes.io/group.order: '{{ .Values.albIngress.group_order }}'
     {{- end }}
     alb.ingress.kubernetes.io/scheme: {{ .Values.albIngress.scheme }}
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
