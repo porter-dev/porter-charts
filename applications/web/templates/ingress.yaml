@@ -10,9 +10,6 @@ metadata:
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
   annotations:
-  {{- if eq .Values.ingress.provider "azure" }}
-    kubernetes.io/ingress.class: addon-http-application-routing
-  {{- end }}
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
@@ -55,10 +52,8 @@ metadata:
     {{- end }}
     {{- end }}
 spec:
-{{- if ne .Values.ingress.provider "azure" }}
 {{- if ne "gce" (index .Values.ingress.annotations "kubernetes.io/ingress.class" ) }}
   ingressClassName: nginx
-{{- end }}
 {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
