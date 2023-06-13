@@ -49,13 +49,6 @@ spec:
           {{ end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if or (and .Values.global .Values.container.command) (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")))) }}
-          {{- if .Values.container.command | contains "&&" }}
-          command:
-            - "/bin/sh"
-            - "-c"
-          args:
-            - "{{ .Values.container.command }}"
-          {{- else }}
           command:
           {{- range $command := trim .Values.container.command | splitList " " }}
           - {{ $command | quote }}
@@ -64,7 +57,6 @@ spec:
           args:
           {{- range $args := trim .Values.container.args | splitList " " }}
           - {{ $args | quote }}
-          {{- end }}
           {{- end }}
           {{- end }}
           {{- end }}
