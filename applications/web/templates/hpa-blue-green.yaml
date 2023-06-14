@@ -1,7 +1,11 @@
 {{- if and (not $.Values.statefulset.enabled) $.Values.bluegreen.enabled -}}
 {{- if $.Values.autoscaling.enabled }}
 {{- range $v, $tag := $.Values.bluegreen.imageTags }}
+{{- if $.Capabilities.APIVersions.Has "autoscaling/v2" }}
+apiVersion: autoscaling/v2
+{{- else }}
 apiVersion: autoscaling/v2beta2
+{{- end }}
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "docker-template.fullname" $ }}-{{ $tag }}
