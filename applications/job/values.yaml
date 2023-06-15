@@ -58,6 +58,10 @@ sidecar:
       cpu: 10m
       memory: 10Mi
 
+# Set this to add entries to the /etc/hosts file
+# Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
+hostAliases: []
+
 retainFailedHooks: false
 nodeSelector: {}
 tolerations: []
