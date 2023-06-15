@@ -6,7 +6,7 @@ tabs:
       - name: section_one
         contents:
           - type: heading
-            label: Deploy NewRelic Agengt
+            label: Deploy NewRelic Agent
           - type: subtitle
             label: This installs the NewRelic agent, which forwards all logs & metrics from your applications to NewRelic for ingestion.
           - type: string-input
