@@ -107,6 +107,7 @@ cloudsql:
   serviceAccountJSON: ""
 
 # Set this to add entries to the /etc/hosts file
+# Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
 hostAliases: []
 
 nodeSelector: {}

@@ -203,6 +203,7 @@ datadog:
   enabled: false
 
 # Set this to add entries to the /etc/hosts file
+# Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
 hostAliases: []
 
 nodeSelector: {}
