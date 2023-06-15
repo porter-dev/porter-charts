@@ -106,6 +106,9 @@ cloudsql:
   dbPort: 5432
   serviceAccountJSON: ""
 
+# Set this to add entries to the /etc/hosts file
+hostAliases: []
+
 nodeSelector: {}
 
 tolerations: []
