@@ -41,8 +41,6 @@ spec:
           {{ else }}
           serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
           {{- end }}
-          hostAliases:
-            {{- toYaml .Values.hostAliases | nindent 10 }}
           containers:
           - name: {{ .Chart.Name }}
             {{ if .Values.global}}
