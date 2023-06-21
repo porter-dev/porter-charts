@@ -80,7 +80,7 @@ privateIngress:
   custom_paths: []
   annotations: {}
   tls: false
-  # secretName: my-existing-secret
+  clusterIssuer: letsencrypt-prod-private
 
 container:
   port: 80
