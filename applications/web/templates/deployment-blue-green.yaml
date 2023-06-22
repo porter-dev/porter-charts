@@ -28,8 +28,6 @@ spec:
     spec:
       serviceAccountName: {{ include "docker-template.serviceAccountName" $ }}
       terminationGracePeriodSeconds: {{ $.Values.terminationGracePeriodSeconds }}
-      hostAliases:
-        {{- toYaml .Values.hostAliases | nindent 8 }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       containers:
