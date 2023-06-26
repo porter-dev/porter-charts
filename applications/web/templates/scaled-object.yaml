@@ -1,5 +1,5 @@
-{{- if .Values.keda.enabled -}}
-{{- $fullName := include "docker-template.fullname" . -}}
+{{- if and (not .Values.bluegreen.enabled) .Values.keda.enabled -}}
+{{- $fullName := include "docker-template.fullname" $ -}}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:

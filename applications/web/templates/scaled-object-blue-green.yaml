@@ -1,5 +1,5 @@
 {{- if and (not $.Values.statefulset.enabled) $.Values.bluegreen.enabled -}}
-{{- if .Values.keda.enabled -}}
+{{- if $.Values.keda.enabled -}}
 {{- range $v, $tag := $.Values.bluegreen.imageTags }}
 {{- $fullName := include "docker-template.fullname" $ -}}
 apiVersion: keda.sh/v1alpha1
