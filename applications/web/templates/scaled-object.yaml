@@ -34,7 +34,7 @@ spec:
             periodSeconds: {{ .Values.keda.hpa.scaleDown.policy.periodSeconds }}
   triggers:
     - type: prometheus
-      metricType: {{ .Values.keda.trigger.metricType | default "AverageValue" }}
+      metricType: {{ .Values.keda.trigger.metricType }}
       metadata:
         # Required fields:
         serverAddress: http://prometheus-server.monitoring.svc.cluster.local:80
