@@ -8,7 +8,11 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
+    {{- if and (not $.Values.statefulset.enabled) $.Values.bluegreen.enabled -}}
+    name: {{- printf "%s-%s" $fullName $tag -}}
+    {{- else }}
     name: {{ $fullName }}
+    {{- end }}
   pollingInterval: {{ .Values.keda.pollingInterval }}
   cooldownPeriod: {{ .Values.keda.cooldownPeriod }}
   minReplicaCount: {{ .Values.keda.minReplicaCount }}
