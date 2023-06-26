@@ -52,7 +52,9 @@ metadata:
     {{- end }}
     {{- end }}
 spec:
-{{- if ne "gce" (index .Values.ingress.annotations "kubernetes.io/ingress.class" ) }}
+{{- if hasKey .Values.ingress.annotations "kubernetes.io/ingress.class" }}
+  ingressClassName: {{ index .Values.ingress.annotations "kubernetes.io/ingress.class" }}
+{{- else }}
   ingressClassName: nginx
 {{- end }}
   {{- if .Values.ingress.tls }}
