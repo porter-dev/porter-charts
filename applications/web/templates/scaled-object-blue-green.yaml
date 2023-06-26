@@ -1,0 +1,48 @@
+{{- if and (not $.Values.statefulset.enabled) $.Values.bluegreen.enabled -}}
+{{- if $.Values.keda.enabled -}}
+{{- range $v, $tag := $.Values.bluegreen.imageTags }}
+{{- $fullName := include "docker-template.fullname" $ -}}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ $fullName }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $fullName }}-{{ $tag }}
+  pollingInterval: {{ $.Values.keda.pollingInterval }}
+  cooldownPeriod: {{ $.Values.keda.cooldownPeriod }}
+  minReplicaCount: {{ $.Values.keda.minReplicaCount }}
+  maxReplicaCount: {{ $.Values.keda.maxReplicaCount }}
+  fallback:
+    failureThreshold: {{ $.Values.keda.fallback.failureThreshold }}
+    replicas: {{ $.Values.keda.fallback.failureReplicas }}
+  advanced:
+    restoreToOriginalReplicaCount: false
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleUp:
+          stabilizationWindowSeconds: {{ $.Values.keda.hpa.scaleUp.stabilizationWindowSeconds }}
+          policies:
+          - type: {{ $.Values.keda.hpa.scaleUp.policy.type }}
+            value: {{ $.Values.keda.hpa.scaleUp.policy.value }}
+            periodSeconds: {{ $.Values.keda.hpa.scaleUp.policy.periodSeconds }}
+        scaleDown:
+          stabilizationWindowSeconds: {{ $.Values.keda.hpa.scaleDown.stabilizationWindowSeconds }}
+          policies:
+          - type: {{ $.Values.keda.hpa.scaleDown.policy.type }}
+            value: {{ $.Values.keda.hpa.scaleDown.policy.value }}
+            periodSeconds: {{ $.Values.keda.hpa.scaleDown.policy.periodSeconds }}
+  triggers:
+    - type: prometheus
+      metricType: {{ $.Values.keda.trigger.metricType | default "AverageValue" }}
+      metadata:
+        # Required fields:
+        serverAddress: http://prometheus-server.monitoring.svc.cluster.local:80
+        metricName: {{ $.Values.keda.trigger.metricName }}
+        query: {{ $.Values.keda.trigger.metricQuery }}
+        threshold: '{{ $.Values.keda.trigger.metricThreshold }}'
+{{- end }}
+{{- end }}
+{{- end }}
