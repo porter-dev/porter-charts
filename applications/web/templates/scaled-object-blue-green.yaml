@@ -38,7 +38,6 @@ spec:
     - type: prometheus
       metricType: {{ $.Values.keda.trigger.metricType }}
       metadata:
-        # Required fields:
         serverAddress: http://prometheus-server.monitoring.svc.cluster.local:80
         metricName: {{ $.Values.keda.trigger.metricName }}
         query: {{ $.Values.keda.trigger.metricQuery }}
