@@ -30,11 +30,11 @@ spec:
             value: {{ $.Values.keda.hpa.scaleUp.policy.value }}
             periodSeconds: {{ $.Values.keda.hpa.scaleUp.policy.periodSeconds }}
           {{ else }}
-          stabilizationWindowSeconds: 0
+          stabilizationWindowSeconds: {{ $.Values.keda.hpa.bluegreen.scaleUp.stabilizationWindowSeconds }}
           policies:
-          - type: Percent
-            value: 100
-            periodSeconds: 0
+          - type: {{ $.Values.keda.hpa.bluegreen.scaleUp.policy.type }}
+            value: {{ $.Values.keda.hpa.bluegreen.scaleUp.policy.value }}
+            periodSeconds: {{ $.Values.keda.hpa.bluegreen.scaleUp.policy.periodSeconds }}
           {{ end }}
         scaleDown:
           stabilizationWindowSeconds: {{ $.Values.keda.hpa.scaleDown.stabilizationWindowSeconds }}
