@@ -24,10 +24,10 @@ spec:
       behavior:
         scaleUp:
           {{ if eq $tag $.Values.bluegreen.activeImageTag }}
-          stabilizationWindowSeconds: 0
+          stabilizationWindowSeconds: {{ $.Values.keda.hpa.scaleUp.stabilizationWindowSeconds }}
           policies:
           - type: {{ $.Values.keda.hpa.scaleUp.policy.type }}
-            value: 10
+            value: {{ $.Values.keda.hpa.scaleUp.policy.value }}
             periodSeconds: {{ $.Values.keda.hpa.scaleUp.policy.periodSeconds }}
           {{ else }}
           stabilizationWindowSeconds: 0
