@@ -23,11 +23,19 @@ spec:
     horizontalPodAutoscalerConfig:
       behavior:
         scaleUp:
+          {{ if eq $tag $.Values.bluegreen.activeImageTag }}
           stabilizationWindowSeconds: {{ $.Values.keda.hpa.scaleUp.stabilizationWindowSeconds }}
           policies:
           - type: {{ $.Values.keda.hpa.scaleUp.policy.type }}
             value: {{ $.Values.keda.hpa.scaleUp.policy.value }}
             periodSeconds: {{ $.Values.keda.hpa.scaleUp.policy.periodSeconds }}
+          {{ else }}
+          stabilizationWindowSeconds: {{ $.Values.keda.hpa.bluegreen.scaleUp.stabilizationWindowSeconds }}
+          policies:
+          - type: {{ $.Values.keda.hpa.bluegreen.scaleUp.policy.type }}
+            value: {{ $.Values.keda.hpa.bluegreen.scaleUp.policy.value }}
+            periodSeconds: {{ $.Values.keda.hpa.bluegreen.scaleUp.policy.periodSeconds }}
+          {{ end }}
         scaleDown:
           stabilizationWindowSeconds: {{ $.Values.keda.hpa.scaleDown.stabilizationWindowSeconds }}
           policies:
