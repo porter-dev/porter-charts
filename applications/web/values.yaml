@@ -151,6 +151,7 @@ health:
     timeoutSeconds: 1
     successThreshold: 1
     failureThreshold: 3
+    httpHeaders: []
     auth:
       enabled: false
       username: ""
@@ -174,6 +175,7 @@ health:
     timeoutSeconds: 1
     successThreshold: 1
     failureThreshold: 3
+    httpHeaders: []
     auth:
       enabled: false
       username: ""
@@ -186,6 +188,7 @@ health:
     failureThreshold: 3
     periodSeconds: 5
     timeoutSeconds: 1
+    httpHeaders: []
     auth:
       enabled: false
       username: ""
