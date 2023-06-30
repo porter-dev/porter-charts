@@ -96,10 +96,16 @@ spec:
               path: {{ .Values.health.livenessProbe.path }}
               scheme: {{ .Values.health.livenessProbe.scheme }}
               port: {{ .Values.health.livenessProbe.port | default "http" }}
-              {{ if .Values.health.livenessProbe.auth.enabled }}
+              {{ if or (.Values.health.livenessProbe.httpHeaders) (.Values.health.livenessProbe.auth.enabled) }}
               httpHeaders:
+                {{ if .Values.health.livenessProbe.auth.enabled }}
                 - name: Authorization
                   value: Basic {{ printf "%s:%s" .Values.health.livenessProbe.auth.username .Values.health.livenessProbe.auth.password | b64enc }}
+                {{ end }}
+                {{- range .Values.health.livenessProbe.httpHeaders }}
+                - name: {{ .name }}
+                  value: {{ .value }}
+                {{- end }}
               {{ end }}
             initialDelaySeconds: {{ .Values.health.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
@@ -126,10 +132,16 @@ spec:
               path: {{ .Values.health.readinessProbe.path }}
               scheme: {{ .Values.health.readinessProbe.scheme }}
               port: {{ .Values.health.readinessProbe.port | default "http" }}
-              {{ if .Values.health.readinessProbe.auth.enabled }}
+              {{ if or (.Values.health.readinessProbe.httpHeaders) (.Values.health.readinessProbe.auth.enabled) }}
               httpHeaders:
+                {{ if .Values.health.readinessProbe.auth.enabled }}
                 - name: Authorization
                   value: Basic {{ printf "%s:%s" .Values.health.readinessProbe.auth.username .Values.health.readinessProbe.auth.password | b64enc }}
+                {{ end }}
+                {{- range .Values.health.readinessProbe.httpHeaders }}
+                - name: {{ .name }}
+                  value: {{ .value }}
+                {{- end }}
               {{ end }}
             initialDelaySeconds: {{ .Values.health.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
@@ -143,10 +155,16 @@ spec:
               path: {{ .Values.health.startupProbe.path }}
               scheme: {{ .Values.health.startupProbe.scheme }}
               port: {{ .Values.health.startupProbe.port | default "http" }}
-            {{ if .Values.health.startupProbe.auth.enabled }}
+              {{ if or (.Values.health.startupProbe.httpHeaders) (.Values.health.startupProbe.auth.enabled) }}
               httpHeaders:
+                {{ if .Values.health.startupProbe.auth.enabled }}
                 - name: Authorization
                   value: Basic {{ printf "%s:%s" .Values.health.startupProbe.auth.username .Values.health.startupProbe.auth.password | b64enc }}
+                {{ end }}
+                {{- range .Values.health.startupProbe.httpHeaders }}
+                - name: {{ .name }}
+                  value: {{ .value }}
+                {{- end }}
               {{ end }}
             initialDelaySeconds: {{ .Values.health.startupProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
