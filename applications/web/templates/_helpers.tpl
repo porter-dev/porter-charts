@@ -32,6 +32,13 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
+Generate a KEDA ScaledObject's HPA name(only meant for B/G deployments)
+*/}}
+{{- define "docker-template.kedaHpa" -}}
+{{- printf "keda-hpa-%s-%s" .name .tag }}
+{{- end }}
+
+{{/*
 Common labels
 */}}
 {{- define "docker-template.labels" -}}
