@@ -52,6 +52,9 @@ ingress:
   wildcard: false
   tls: true
   useDefaultIngressTLSSecret: false
+  customTls:
+    enabled: false
+    customTlsSecret:
 
 albIngress:
   enabled: false

@@ -57,7 +57,7 @@ spec:
 {{- else }}
   ingressClassName: nginx
 {{- end }}
-  {{- if .Values.ingress.tls }}
+  {{- if or (.Values.ingress.tls) (.Values.ingress.customTls.enabled) }}
   tls:
     - hosts:
         {{- range $allHosts }}
@@ -66,6 +66,8 @@ spec:
       {{- if not .Values.ingress.useDefaultIngressTLSSecret }}
       {{ if .Values.ingress.wildcard }}
       secretName: wildcard-cert-tls
+      {{ else if .Values.ingress.customTls.enabled }}
+      secretName: {{ .Values.ingress.customTls.customTlsSecret }}
       {{ else }}
       secretName: {{ include "docker-template.fullname" . }}  
       {{ end }}
