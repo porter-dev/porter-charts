@@ -13,8 +13,15 @@ spec:
     name: {{ $fullName }}-{{ $tag }}
   pollingInterval: {{ $.Values.keda.pollingInterval }}
   cooldownPeriod: {{ $.Values.keda.cooldownPeriod }}
+  {{- if eq $tag $.Values.bluegreen.activeImageTag }}
   minReplicaCount: {{ $.Values.keda.minReplicaCount }}
   maxReplicaCount: {{ $.Values.keda.maxReplicaCount }}
+  {{- else }}
+  {{- $kedaHpaData := dict "name" $fullName "tag" $.Values.bluegreen.activeImageTag }}
+  {{- $kedaHpa := include "docker-template.kedaHpa" $kedaHpaData }}
+  minReplicaCount: {{ (lookup "autoscaling/v2" "HorizontalPodAutoscaler" $.Release.Namespace $kedaHpa).status.currentReplicas }}
+  maxReplicaCount: {{ (lookup "autoscaling/v2" "HorizontalPodAutoscaler" $.Release.Namespace $kedaHpa).status.currentReplicas }}
+  {{- end }}
   fallback:
     failureThreshold: {{ $.Values.keda.fallback.failureThreshold }}
     replicas: {{ $.Values.keda.fallback.failureReplicas }}
@@ -23,19 +30,11 @@ spec:
     horizontalPodAutoscalerConfig:
       behavior:
         scaleUp:
-          {{ if eq $tag $.Values.bluegreen.activeImageTag }}
           stabilizationWindowSeconds: {{ $.Values.keda.hpa.scaleUp.stabilizationWindowSeconds }}
           policies:
           - type: {{ $.Values.keda.hpa.scaleUp.policy.type }}
             value: {{ $.Values.keda.hpa.scaleUp.policy.value }}
             periodSeconds: {{ $.Values.keda.hpa.scaleUp.policy.periodSeconds }}
-          {{ else }}
-          stabilizationWindowSeconds: {{ $.Values.keda.hpa.bluegreen.scaleUp.stabilizationWindowSeconds }}
-          policies:
-          - type: {{ $.Values.keda.hpa.bluegreen.scaleUp.policy.type }}
-            value: {{ $.Values.keda.hpa.bluegreen.scaleUp.policy.value }}
-            periodSeconds: {{ $.Values.keda.hpa.bluegreen.scaleUp.policy.periodSeconds }}
-          {{ end }}
         scaleDown:
           stabilizationWindowSeconds: {{ $.Values.keda.hpa.scaleDown.stabilizationWindowSeconds }}
           policies:
