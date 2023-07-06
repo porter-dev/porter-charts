@@ -49,6 +49,9 @@ loki:
         key: porter.run/workload-kind
         value: "monitoring"
         operator: Equal
+    persistence:
+      enabled: true
+      size: 100Gi
   limits_config:
     reject_old_samples: true
     # reject samples older than one week
