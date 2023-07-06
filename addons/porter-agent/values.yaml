@@ -28,8 +28,12 @@ loki:
   minio:
     enabled: false
   isDefault: true
+  gateway:
+    enabled: false
   monitoring:
     selfMonitoring:
+      enabled: false
+    lokiCanary:
       enabled: false
   test:
     enabled: false
