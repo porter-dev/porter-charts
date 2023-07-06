@@ -25,10 +25,13 @@ tolerations: []
 
 loki:
   enabled: true
-  minio:
+  compactor:
+    retention_enabled: true
+    retention_delete_delay: 0h
+  gateway:
     enabled: false
   isDefault: true
-  gateway:
+  minio:
     enabled: false
   monitoring:
     selfMonitoring:
@@ -46,10 +49,6 @@ loki:
         key: porter.run/workload-kind
         value: "monitoring"
         operator: Equal
-  #config:
-  compactor:
-    retention_enabled: true
-    retention_delete_delay: 0h
   limits_config:
     reject_old_samples: true
     # reject samples older than one week
