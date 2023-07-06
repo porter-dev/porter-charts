@@ -123,13 +123,6 @@ keda:
         type: Percent
         value: 10
         periodSeconds: 300
-    bluegreen:
-      scaleUp:
-        stabilizationWindowSeconds: 5
-        policy:
-          type: Percent
-          value: 100
-          periodSeconds: 5
     scaleDown:
       stabilizationWindowSeconds: 300
       policy:
