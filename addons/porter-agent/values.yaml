@@ -24,6 +24,10 @@ nodeSelector: {}
 tolerations: []
 
 loki:
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
   enabled: true
   compactor:
     retention_enabled: true
