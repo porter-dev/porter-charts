@@ -134,8 +134,7 @@ keda:
     metricType: AverageValue
     metricQuery: ""
     metricThreshold: ""
-  datadog:
-    enabled: false
+  triggers: []
 
 health:
   livenessProbe:
