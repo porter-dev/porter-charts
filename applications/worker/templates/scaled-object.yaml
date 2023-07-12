@@ -32,6 +32,7 @@ spec:
           - type: {{ or .Values.keda.hpa.scaleDown.policy.type "Percent" }}
             value: {{ .Values.keda.hpa.scaleDown.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleDown.policy.periodSeconds }}
+  {{- if .Values.keda.trigger }}
   triggers:
     - type: prometheus
       metricType: {{ .Values.keda.trigger.metricType | default "AverageValue" }}
@@ -41,4 +42,14 @@ spec:
         metricName: {{ .Values.keda.trigger.metricName }}
         query: {{ .Values.keda.trigger.metricQuery }}
         threshold: '{{ .Values.keda.trigger.metricThreshold }}'
+  {{- end }}
+  {{- if ne (.Values.keda.triggers) 0 }}
+  triggers:
+    {{- range $type, $value := .Values.keda.triggers}}
+    - type: $type
+      {{- with $value }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
