@@ -42,7 +42,7 @@ spec:
         query: {{ .Values.keda.trigger.metricQuery }}
         threshold: '{{ .Values.keda.trigger.metricThreshold }}'
   {{- end }}
-  {{- if ne (.Values.keda.triggers) 0 }}
+  {{- if ne (len .Values.keda.triggers) 0 }}
   triggers:
     {{- range $type, $value := .Values.keda.triggers}}
     - type: $type
