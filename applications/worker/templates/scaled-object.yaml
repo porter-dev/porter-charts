@@ -45,11 +45,6 @@ spec:
   {{- end }}
   {{- if ne (len .Values.keda.triggers) 0 }}
   triggers:
-    {{- range $type, $value := .Values.keda.triggers}}
-    - type: $type
-      {{- with $value }}
-      {{- toYaml . | nindent 6 }}
-      {{- end }}
-    {{- end }}
+  {{- toYaml .Values.triggers | nindent 4 }}
   {{- end }}
 {{- end }}
