@@ -32,6 +32,7 @@ spec:
           - type: {{ .Values.keda.hpa.scaleDown.policy.type }}
             value: {{ .Values.keda.hpa.scaleDown.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleDown.policy.periodSeconds }}
+  {{- if .Values.keda.trigger }}
   triggers:
     - type: prometheus
       metricType: {{ .Values.keda.trigger.metricType }}
@@ -40,4 +41,9 @@ spec:
         metricName: {{ .Values.keda.trigger.metricName }}
         query: {{ .Values.keda.trigger.metricQuery }}
         threshold: '{{ .Values.keda.trigger.metricThreshold }}'
+  {{- end }}
+  {{- if ne (len .Values.keda.triggers) 0 }}
+  triggers:
+  {{- toYaml .Values.triggers | nindent 4 }}
+  {{- end }}
 {{- end }}

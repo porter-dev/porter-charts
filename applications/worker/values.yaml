@@ -77,8 +77,7 @@ keda:
     metricName: ""
     metricQuery: ""
     metricThreshold: ""
-  datadog:
-    enabled: false
+  triggers: []
 
 health:
   enabled: false
