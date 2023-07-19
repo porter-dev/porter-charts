@@ -43,8 +43,8 @@ spec:
         query: {{ .Values.keda.trigger.metricQuery }}
         threshold: '{{ .Values.keda.trigger.metricThreshold }}'
   {{- end }}
-  {{- if len .Values.keda.triggers }}
+  {{- if .Values.keda.triggers }}
   triggers:
-  {{- toYaml .Values.triggers | nindent 4 }}
+  {{- toYaml .Values.keda.triggers | nindent 4 }}
   {{- end }}
 {{- end }}
