@@ -23,6 +23,9 @@ metadata:
     {{- if .Values.albIngress.certificate_arn }}
     alb.ingress.kubernetes.io/certificate-arn: {{ .Values.albIngress.certificate_arn }}
     {{- end }}
+    {{- if .Values.albIngress.external_dns }}
+    external-dns.alpha.kubernetes.io/hostname: '{{ join ", " $allHosts }}'
+    {{- end }}
     alb.ingress.kubernetes.io/target-type: {{ .Values.albIngress.target_type }}
     {{- if .Values.albIngress.security_groups }}
     alb.ingress.kubernetes.io/security-groups: {{ .Values.albIngress.security_groups }}

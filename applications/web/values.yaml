@@ -58,6 +58,7 @@ ingress:
 
 albIngress:
   enabled: false
+  external_dns: false
   hosts: []
   certificate_arn:
   custom_paths: []
