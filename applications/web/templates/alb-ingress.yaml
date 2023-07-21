@@ -80,7 +80,7 @@ spec:
           {{ else }}
           - path: /*
             {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-            pathType: {{ .pathType | default "ImplementationSpecific" }}
+            pathType: ImplementationSpecific
             {{- end }}
             backend:
             {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
