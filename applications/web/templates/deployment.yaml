@@ -269,6 +269,13 @@ spec:
             - "-credential_file=/secrets/service_account.json"
           securityContext:
             runAsNonRoot: true
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: 4
+            requests:
+              memory: 128Mi
+              cpu: 0.1
           volumeMounts:
           - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
             mountPath: /secrets/
