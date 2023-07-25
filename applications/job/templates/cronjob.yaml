@@ -55,6 +55,13 @@ spec:
             - {{ $command | quote }}
             {{- end }}
             {{- end }}
+            {{ if .Values.configMapRefs }}
+            envFrom:
+            {{ range $configMapName := .Values.configMapRefs }}
+              - configMapRef:
+                  name: {{ $configMapName }}
+            {{ end }}
+            {{ end }}            
             env:
               {{- range $key, $val := .Values.container.env.normal }}
               - name: {{ $key }}
