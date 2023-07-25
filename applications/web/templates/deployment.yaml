@@ -181,10 +181,12 @@ spec:
               memory: {{ .Values.resources.requests.memory }}
             limits:
               memory: {{ .Values.resources.requests.memory }}
-          {{ if .Values.configMapRef }}
+          {{ if .Values.configMapRefs }}
           envFrom:
+          {{ range $configMapName := .Values.configMapRefs }}
             - configMapRef:
-                name: {{ .Values.configMapRef }}
+                name: {{ $configMapName }}
+          {{ end }}
           {{ end }}
           env:
             # Porter default environment variables
