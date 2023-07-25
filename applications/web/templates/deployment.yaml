@@ -181,11 +181,15 @@ spec:
               memory: {{ .Values.resources.requests.memory }}
             limits:
               memory: {{ .Values.resources.requests.memory }}
-          {{ if .Values.configMapRefs }}
+          {{ if or .Values.configMapRefs .Values.secretRefs }}
           envFrom:
           {{ range $configMapName := .Values.configMapRefs }}
             - configMapRef:
                 name: {{ $configMapName }}
+          {{ end }}
+          {{ range $secretName := .Values.secretRefs }}
+            - secretRef:
+                name: {{ $secretName }}
           {{ end }}
           {{ end }}
           env:
