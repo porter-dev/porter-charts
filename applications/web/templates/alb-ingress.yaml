@@ -23,6 +23,12 @@ metadata:
     {{- if .Values.albIngress.certificate_arn }}
     alb.ingress.kubernetes.io/certificate-arn: {{ .Values.albIngress.certificate_arn }}
     {{- end }}
+    {{- if .Values.albIngress.wafv2_acl_arn }}
+    alb.ingress.kubernetes.io/wafv2-acl-arn: {{ .Values.albIngress.wafv2_acl_arn }}
+    {{- end }}
+    {{- if .Values.albIngress.external_dns }}
+    external-dns.alpha.kubernetes.io/hostname: '{{ join ", " $allHosts }}'
+    {{- end }}
     alb.ingress.kubernetes.io/target-type: {{ .Values.albIngress.target_type }}
     {{- if .Values.albIngress.security_groups }}
     alb.ingress.kubernetes.io/security-groups: {{ .Values.albIngress.security_groups }}
@@ -80,7 +86,7 @@ spec:
           {{ else }}
           - path: /*
             {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-            pathType: {{ .pathType | default "ImplementationSpecific" }}
+            pathType: ImplementationSpecific
             {{- end }}
             backend:
             {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
