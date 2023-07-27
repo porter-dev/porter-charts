@@ -31,7 +31,6 @@ spec:
         {{- if .Values.stack.enabled }}
         porter.run/stack-name: "{{ .Values.stack.name }}"
         {{- end }}
-        {{- include "docker-template.labels" . | nindent 8 }}
         {{- if .Values.labels }}
         {{- toYaml .Values.labels | nindent 8 }}
         {{- end }}
