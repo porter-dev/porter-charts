@@ -67,6 +67,7 @@ albIngress:
   target_type: ip
   scheme: internet-facing
   security_groups:
+  wafv2_acl_arn:
   healthcheck_path:
   healthcheck_interval_seconds:
   healthcheck_timeout_seconds:

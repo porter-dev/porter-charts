@@ -23,6 +23,9 @@ metadata:
     {{- if .Values.albIngress.certificate_arn }}
     alb.ingress.kubernetes.io/certificate-arn: {{ .Values.albIngress.certificate_arn }}
     {{- end }}
+    {{- if .Values.albIngress.wafv2_acl_arn }}
+    alb.ingress.kubernetes.io/wafv2-acl-arn: {{ .Values.albIngress.wafv2_acl_arn }}
+    {{- end }}
     {{- if .Values.albIngress.external_dns }}
     external-dns.alpha.kubernetes.io/hostname: '{{ join ", " $allHosts }}'
     {{- end }}
