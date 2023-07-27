@@ -7,6 +7,11 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: {{ include "docker-template.fullname" . }}
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+    {{- if .Values.labels }}
+    {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
 spec:
   successfulJobsHistoryLimit: {{ .Values.schedule.successfulHistory }}
   failedJobsHistoryLimit: {{ .Values.schedule.failedHistory }}
@@ -25,6 +30,10 @@ spec:
         meta.helm.sh/release-name: "{{ .Release.Name }}"
         {{- if .Values.stack.enabled }}
         porter.run/stack-name: "{{ .Values.stack.name }}"
+        {{- end }}
+        {{- include "docker-template.labels" . | nindent 4 }}
+        {{- if .Values.labels }}
+        {{- toYaml .Values.labels | nindent 4 }}
         {{- end }}
     spec:
       template:
