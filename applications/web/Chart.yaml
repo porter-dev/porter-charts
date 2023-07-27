@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 1.16.0
+appVersion: 1.25.0
 description: Web application that is exposed to external traffic.
 home: https://getporter.dev/
 icon: https://user-images.githubusercontent.com/65516095/111255214-07d3da80-85ed-11eb-99e2-fddcbdb99bdb.png
