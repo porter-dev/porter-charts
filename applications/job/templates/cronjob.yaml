@@ -44,6 +44,10 @@ spec:
             {{- else }}
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
             {{- end }}
+          labels:
+            {{- if .Values.podLabels }}
+            {{- toYaml .Values.podLabels | nindent 12 }}
+            {{- end }}
         spec:
           {{- if .Values.serviceAccount.create }}
           serviceAccountName: cronjob-{{ include "docker-template.serviceAccountName" . }}
