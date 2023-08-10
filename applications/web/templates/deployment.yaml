@@ -182,6 +182,9 @@ spec:
               memory: {{ .Values.resources.requests.memory }}
             limits:
               memory: {{ .Values.resources.requests.memory }}
+          {{ if .Values.resources.limits }}
+              nvidia.com/gpu: {{ .Values.resources.limits.nvidiaGpu }}
+          {{ end }}
           {{ if or .Values.configMapRefs .Values.secretRefs }}
           envFrom:
           {{ range $configMapName := .Values.configMapRefs }}
