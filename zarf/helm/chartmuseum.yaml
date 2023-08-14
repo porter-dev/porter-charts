@@ -1,0 +1,79 @@
+extraArgs: []
+  # - --storage-timestamp-tolerance 1s
+replicaCount: 1
+strategy:
+  type: RollingUpdate
+image:
+  repository: ghcr.io/helm/chartmuseum
+  tag: v0.16.0
+  pullPolicy: IfNotPresent
+secret:
+  labels: {}
+## Labels to apply to all resources
+##
+commonLabels: {}
+# team_name: dev
+env:
+  open:
+    STORAGE: local
+    STORAGE_LOCAL_ROOTDIR: /charts
+    DISABLE_API: false
+    DEBUG: true
+    LOG_JSON: true
+    ALLOW_OVERWRITE: true
+
+service:
+  servicename:
+  type: ClusterIP
+  externalTrafficPolicy: Local
+  ## Uses pre-assigned IP address from cloud provider
+  ## Only valid if service.type: LoadBalancer
+  externalPort: 8080
+
+serviceMonitor:
+  enabled: false
+
+resources: {}
+
+probes:
+  liveness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 3
+  livenessHttpGetConfig:
+    scheme: HTTP
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 3
+  readinessHttpGetConfig:
+    scheme: HTTP
+
+serviceAccount:
+  create: false
+
+# UID/GID 1000 is the default user "chartmuseum" used in
+# the container image starting in v0.8.0 and above. This
+# is required for local persistent storage. If your cluster
+# does not allow this, try setting securityContext: {}
+securityContext:
+  enabled: true
+  fsGroup: 1000
+  ## Optionally, specify supplementalGroups and/or
+  ## runAsNonRoot for security purposes
+  # runAsNonRoot: true
+  # supplementalGroups: [1000]
+
+persistence:
+  enabled: false
+  accessMode: ReadWriteOnce
+  size: 8Gi
+  labels: {}
+  path: /charts
+
+ingress:
+  enabled: false

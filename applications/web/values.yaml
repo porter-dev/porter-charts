@@ -58,6 +58,7 @@ ingress:
 
 albIngress:
   enabled: false
+  external_dns: false
   hosts: []
   certificate_arn:
   custom_paths: []
@@ -66,6 +67,7 @@ albIngress:
   target_type: ip
   scheme: internet-facing
   security_groups:
+  wafv2_acl_arn:
   healthcheck_path:
   healthcheck_interval_seconds:
   healthcheck_timeout_seconds:
@@ -74,7 +76,8 @@ albIngress:
   healthcheck_unhealthy_threshold_count:
   healthcheck_port:
   healthcheck_protocol:
-  target_node_labels: 
+  target_node_labels:
+  annotations:
 
 privateIngress:
   enabled: false
@@ -134,8 +137,7 @@ keda:
     metricType: AverageValue
     metricQuery: ""
     metricThreshold: ""
-  datadog:
-    enabled: false
+  triggers: []
 
 health:
   livenessProbe:

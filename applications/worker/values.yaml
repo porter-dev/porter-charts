@@ -77,23 +77,31 @@ keda:
     metricName: ""
     metricQuery: ""
     metricThreshold: ""
-  datadog:
-    enabled: false
+  triggers: []
 
 health:
   enabled: false
   command: "ls -l"
   periodSeconds: 5
   failureThreshold: 3
+  livenessProbe:
+    enabled: false
+    command: "ls -l"
+    failureThreshold: 3
+    periodSeconds: 5
+    initialDelaySeconds: 5
   readinessProbe:
     enabled: false
     command: "ls -l"
+    failureThreshold: 3
     periodSeconds: 5
+    initialDelaySeconds: 5
   startupProbe:
     enabled: false
     command: "ls -l"
     failureThreshold: 3
     periodSeconds: 5
+    initialDelaySeconds: 5
 
 pvc:
   enabled: false

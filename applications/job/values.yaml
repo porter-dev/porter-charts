@@ -70,3 +70,5 @@ stack:
   enabled: false
   name: ""
   revision: 0
+
+podLabels: {}

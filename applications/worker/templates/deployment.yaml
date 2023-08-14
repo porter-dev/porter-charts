@@ -4,6 +4,9 @@ metadata:
   name: {{ include "docker-template.fullname" . }}
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
+    {{- if .Values.labels }}
+    {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
 spec:
   {{- if and (not .Values.keda.enabled) (not .Values.autoscaling.enabled) }}
   replicas: {{ .Values.replicaCount }}
@@ -26,6 +29,7 @@ spec:
         {{- if .Values.stack.enabled }}
         porter.run/stack-name: "{{ .Values.stack.name }}"
         {{- end }}
+        porter.run/application-name: "{{ include "docker-template.fullname" . }}"
     spec:
       {{- if .Values.affinity }}
       affinity:
@@ -47,7 +51,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           {{ end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if or (and .Values.global .Values.container.command) (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")))) }}
+          {{- if or (and .Values.global .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")))) }}
           command:
           {{- range $command := trim .Values.container.command | splitList " " }}
           - {{ $command | quote }}
@@ -106,6 +110,8 @@ spec:
               - {{ $command | quote }}
               {{- end }}
             periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.health.startupProbe.initialDelaySeconds }}
           {{- end }}
           {{ if .Values.health.readinessProbe.enabled }}
           readinessProbe:
@@ -115,6 +121,19 @@ spec:
               - {{ $command | quote }}
               {{- end }}
             periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.health.readinessProbe.initialDelaySeconds }}
+          {{- end }}
+          {{ if .Values.health.livenessProbe.enabled }}
+          livenessProbe:
+            exec:
+              command:
+              {{- range $command := trim .Values.health.livenessProbe.command | splitList " " }}
+              - {{ $command | quote }}
+              {{- end }}
+            periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.health.livenessProbe.initialDelaySeconds }}
           {{- end }}
           resources:
             requests:
@@ -122,6 +141,22 @@ spec:
               memory: {{ .Values.resources.requests.memory }}
             limits:
               memory: {{ .Values.resources.requests.memory }}
+          {{ if .Values.resources.limits }}
+          {{ if .Values.resources.limits.nvidiaGpu }}
+              nvidia.com/gpu: {{ .Values.resources.limits.nvidiaGpu }}
+          {{ end }}
+          {{ end }}
+          {{ if or .Values.configMapRefs .Values.secretRefs }}
+          envFrom:
+          {{ range $configMapName := .Values.configMapRefs }}
+            - configMapRef:
+                name: {{ $configMapName }}
+          {{ end }}
+          {{ range $secretName := .Values.secretRefs }}
+            - secretRef:
+                name: {{ $secretName }}
+          {{ end }}
+          {{ end }}
           env:
             # Porter default environment variables
             - name: PORTER_RESOURCES_RAM

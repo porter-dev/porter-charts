@@ -7,6 +7,11 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: {{ include "docker-template.fullname" . }}
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+    {{- if .Values.labels }}
+    {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
 spec:
   successfulJobsHistoryLimit: {{ .Values.schedule.successfulHistory }}
   failedJobsHistoryLimit: {{ .Values.schedule.failedHistory }}
@@ -26,6 +31,10 @@ spec:
         {{- if .Values.stack.enabled }}
         porter.run/stack-name: "{{ .Values.stack.name }}"
         {{- end }}
+        porter.run/application-name: "{{ include "docker-template.fullname" . }}"
+        {{- if .Values.labels }}
+        {{- toYaml .Values.labels | nindent 8 }}
+        {{- end }}
     spec:
       template:
         metadata:
@@ -34,6 +43,10 @@ spec:
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
             {{- else }}
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+            {{- end }}
+          labels:
+            {{- if .Values.podLabels }}
+            {{- toYaml .Values.podLabels | nindent 12 }}
             {{- end }}
         spec:
           {{- if .Values.serviceAccount.create }}
@@ -49,12 +62,23 @@ spec:
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             {{ end }}
             imagePullPolicy: {{ .Values.image.pullPolicy }}
-            {{- if or (and .Values.global .Values.container.command) (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job")))) }}
+            {{- if or (and .Values.global .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job")))) }}
             command:
             {{- range $command := trim .Values.container.command | splitList " " }}
             - {{ $command | quote }}
             {{- end }}
             {{- end }}
+            {{ if or .Values.configMapRefs .Values.secretRefs }}
+            envFrom:
+            {{ range $configMapName := .Values.configMapRefs }}
+              - configMapRef:
+                  name: {{ $configMapName }}
+            {{ end }}
+            {{ range $secretName := .Values.secretRefs }}
+              - secretRef:
+                  name: {{ $secretName }}
+            {{ end }}
+            {{ end }}          
             env:
               {{- range $key, $val := .Values.container.env.normal }}
               - name: {{ $key }}

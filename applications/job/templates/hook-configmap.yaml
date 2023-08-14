@@ -17,6 +17,9 @@ data:
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         helm.sh/revision: "{{ .Release.Revision }}"
         meta.helm.sh/release-name: "{{ .Release.Name }}"
+        {{- if .Values.podLabels }}
+        {{- toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
     spec:
       backoffLimit: 0
       {{- if (.Values.sidecar.timeout) }}
@@ -30,6 +33,9 @@ data:
             helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
             helm.sh/revision: "{{ .Release.Revision }}"
             meta.helm.sh/release-name: "{{ .Release.Name }}"
+            {{- if .Values.podLabels }}
+            {{- toYaml .Values.podLabels | nindent 12 }}
+            {{- end }}
           annotations:
             {{- if .Values.safeToEvict }}
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
@@ -61,7 +67,7 @@ data:
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             {{ end }}
             imagePullPolicy: "{{ .Values.image.pullPolicy }}"
-            {{- if or (and .Values.global .Values.container.command) (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job")))) }}
+            {{- if or (and .Values.global .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job")))) }}
             command:
             {{- range $command := trim .Values.container.command | splitList " " }}
             - {{ $command | quote }}

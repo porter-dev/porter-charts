@@ -5,6 +5,9 @@ metadata:
   name: {{ include "docker-template.fullname" . }}
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
+    {{- if .Values.labels }}
+    {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   {{- if not .Values.keda.enabled }}
@@ -29,6 +32,7 @@ spec:
         {{- if .Values.stack.enabled }}
         porter.run/stack-name: "{{ .Values.stack.name }}"
         {{- end }}
+        porter.run/application-name: "{{ include "docker-template.fullname" . }}"
     spec:
       {{- if .Values.affinity }}
       affinity:
@@ -49,8 +53,8 @@ spec:
           {{ else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           {{ end }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if or (and .Values.global .Values.container.command) (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")))) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }} 
+          {{- if or (and .Values.global .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")))) }}
           command:
           {{- range $command := trim .Values.container.command | splitList " " }}
           - {{ $command | quote }}
@@ -178,6 +182,22 @@ spec:
               memory: {{ .Values.resources.requests.memory }}
             limits:
               memory: {{ .Values.resources.requests.memory }}
+          {{ if .Values.resources.limits }}
+          {{ if .Values.resources.limits.nvidiaGpu }}
+              nvidia.com/gpu: {{ .Values.resources.limits.nvidiaGpu }}
+          {{ end }}
+          {{ end }}
+          {{ if or .Values.configMapRefs .Values.secretRefs }}
+          envFrom:
+          {{ range $configMapName := .Values.configMapRefs }}
+            - configMapRef:
+                name: {{ $configMapName }}
+          {{ end }}
+          {{ range $secretName := .Values.secretRefs }}
+            - secretRef:
+                name: {{ $secretName }}
+          {{ end }}
+          {{ end }}
           env:
             # Porter default environment variables
             - name: PORTER_RESOURCES_RAM
@@ -269,6 +289,13 @@ spec:
             - "-credential_file=/secrets/service_account.json"
           securityContext:
             runAsNonRoot: true
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: 4
+            requests:
+              memory: 128Mi
+              cpu: 0.1
           volumeMounts:
           - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
             mountPath: /secrets/
