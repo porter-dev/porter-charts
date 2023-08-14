@@ -11,3 +11,5 @@ name: loki
 sources:
   - https://github.com/grafana/loki
 version: 0.3.0
+keywords:
+  - LOGGING

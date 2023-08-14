@@ -2,7 +2,7 @@ apiVersion: v2
 name: nri-bundle
 description: Groups together the individual charts for the New Relic Kubernetes solution for a more comfortable deployment.
 home: https://github.com/newrelic/helm-charts
-icon: https://newrelic.com/themes/custom/erno/assets/mediakit/new_relic_logo_vertical_clear_black.svg
+icon: https://companieslogo.com/img/orig/NEWR-de5fcb2e.png?t=1681801483
 sources:
   - https://github.com/newrelic/nri-bundle/
   - https://github.com/newrelic/nri-bundle/tree/master/charts/nri-bundle
@@ -93,3 +93,4 @@ keywords:
   - infrastructure
   - newrelic
   - monitoring
+  - MONITORING

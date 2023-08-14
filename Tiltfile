@@ -53,6 +53,20 @@ local_resource(
   helm cm-push addons/redis local && \
   helm cm-push addons/postgresql local && \
   helm cm-push addons/logdna local && \
+  helm cm-push addons/cert-manager local && \
+  helm cm-push addons/circleci-container-agent local && \
+  helm cm-push addons/ecr-secrets-updater local && \
+  helm cm-push addons/https-issuer local && \
+  helm cm-push addons/keda local && \
+  helm cm-push addons/local-dns-cache local && \
+  helm cm-push addons/loki local && \
+  helm cm-push addons/memcached local && \
+  helm cm-push addons/n8n local && \
+  helm cm-push addons/nri-bundle local && \
+  helm cm-push addons/postgres-toolbox local && \
+  helm cm-push addons/prometheus local && \
+  helm cm-push addons/rabbitmq local && \
+  helm cm-push addons/wallarm-ingress local && \
   helm repo update local
   ''',
   deps=[
