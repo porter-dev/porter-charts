@@ -24,6 +24,7 @@ local_resource(
   ''',
   deps=[
     "applications",
+    "addons"
   ],
   resource_deps=["chartmuseum"]
 )
@@ -38,6 +39,24 @@ local_resource(
   ''',
   deps=[
     "applications",
+  ],
+  resource_deps=["charts-setup-local-repo"]
+)
+
+local_resource(
+  name='charts-addons',
+  cmd='''helm cm-push addons/datadog local && \
+  helm cm-push addons/tailscale-relay local && \
+  helm cm-push addons/metabase local && \
+  helm cm-push addons/elasticsearch local && \
+  helm cm-push addons/mongodb local && \
+  helm cm-push addons/redis local && \
+  helm cm-push addons/postgresql local && \
+  helm cm-push addons/logdna local && \
+  helm repo update local
+  ''',
+  deps=[
+    "addons",
   ],
   resource_deps=["charts-setup-local-repo"]
 )

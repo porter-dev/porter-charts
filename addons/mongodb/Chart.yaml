@@ -19,6 +19,8 @@ keywords:
   - cluster
   - replicaset
   - replication
+  - DATA_STORE
+  - DATA_BASE
 maintainers:
   - email: containers@bitnami.com
     name: Bitnami

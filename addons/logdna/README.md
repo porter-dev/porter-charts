@@ -1,4 +1,4 @@
-# LogDNA
+# LogDNA Kubernetes Agent
 
 [LogDNA](https://logdna.com) - Easy, beautiful logging in the cloud.
 
