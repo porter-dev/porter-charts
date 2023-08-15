@@ -17,6 +17,8 @@ keywords:
   - sql
   - replication
   - cluster
+  - DATA_STORE
+  - DATA_BASE
 maintainers:
   - email: containers@bitnami.com
     name: Bitnami

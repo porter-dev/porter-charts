@@ -15,6 +15,7 @@ icon: https://bitnami.com/assets/stacks/memcached/img/memcached-stack-110x117.pn
 keywords:
   - memcached
   - cache
+  - CACHE
 maintainers:
   - email: containers@bitnami.com
     name: Bitnami

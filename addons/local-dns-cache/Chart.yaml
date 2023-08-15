@@ -5,3 +5,5 @@ icon: https://icon-library.com/images/dns-icon/dns-icon-13.jpg
 name: node-local
 type: application
 version: 0.16.0
+keywords:
+  - NETWORKING

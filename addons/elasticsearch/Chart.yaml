@@ -10,3 +10,6 @@ name: elasticsearch
 sources:
   - https://github.com/elastic/elasticsearch
 version: 0.10.0
+keywords:
+  - DATA_STORE
+  - SEARCH

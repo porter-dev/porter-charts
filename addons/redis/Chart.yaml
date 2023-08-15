@@ -9,13 +9,15 @@ dependencies:
     tags:
       - bitnami-common
     version: 2.x.x
-description: Redis(R) is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
+description: Redis is an in-memory database that persists on disk with a key-value data model.
 home: https://github.com/bitnami/charts/tree/main/bitnami/redis
 icon: https://bitnami.com/assets/stacks/redis/img/redis-stack-220x234.png
 keywords:
   - redis
   - keyvalue
   - database
+  - CACHE
+  - DATA_STORE
 maintainers:
   - name: Bitnami
     url: https://github.com/bitnami/charts
