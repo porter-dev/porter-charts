@@ -8,6 +8,7 @@ keywords:
   - ingress
   - nginx
   - wallarm
+  - NETWORKING
 sources:
   - https://github.com/wallarm/ingress-chart
 maintainers:
