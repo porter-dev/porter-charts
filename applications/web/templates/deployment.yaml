@@ -13,6 +13,7 @@ spec:
   {{- if not .Values.keda.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{ end }}
+  {{ end }}
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
