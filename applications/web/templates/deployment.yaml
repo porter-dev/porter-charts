@@ -79,7 +79,6 @@ spec:
           - {{ $args | quote }}
           {{- end }}
           {{- end }}
-          {{- end }}
           {{- if or (.Values.container.lifecycle.postStart) (.Values.container.lifecycle.preStop) }}
           lifecycle:
             {{- if .Values.container.lifecycle.postStart }}
