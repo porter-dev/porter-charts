@@ -71,7 +71,7 @@ data:
             imagePullPolicy: "{{ .Values.image.pullPolicy }}"
             {{- if .Values.global }}
             {{- if .Values.global.image }}
-            {{- if not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter") }}
+            {{- if and .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")) }}
             command:
             {{- range $command := trim .Values.container.command | splitList " " }}
             - {{ $command | quote }}
