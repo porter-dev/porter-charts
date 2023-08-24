@@ -48,11 +48,11 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-            {{ if and .Values.global .Values.global.image .Values.global.image.repository .Values.global.image.tag }}
-            image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag }}"
-            {{ else }}
-            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-            {{ end }}
+          {{ if .Values.global}}
+          image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag }}"
+          {{ else }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{ end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }} 
           {{- if or (and .Values.global .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")))) }}
           command:
