@@ -1,25 +1,25 @@
-{{- if .Values.ingress.enabled -}}
-{{- $fullName := include "docker-template.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
-{{- $allHosts := concat .Values.ingress.hosts .Values.ingress.porter_hosts -}}
-{{- $customPaths := .Values.ingress.custom_paths -}}
+{{- if $.Values.ingress.enabled -}}
+{{- $allHosts := concat $.Values.ingress.hosts $.Values.ingress.porter_hosts -}}
+{{- range $allHosts }}
+{{- $svcPort := $.Values.service.port -}}
+{{- $customPaths := $.Values.ingress.custom_paths -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: "{{ include "docker-template.fullname" $ }}-{{ . }}"
   labels:
-    {{- include "docker-template.labels" . | nindent 4 }}
+    {{- include "docker-template.labels" $ | nindent 4 }}
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
-    {{- if and (gt (len $customPaths) 0) .Values.ingress.rewriteCustomPathsEnabled }}
+    {{- if and (gt (len $customPaths) 0) $.Values.ingress.rewriteCustomPathsEnabled }}
     nginx.ingress.kubernetes.io/rewrite-target: /
     {{- end }}
-    {{- if .Values.ingress.tls }}
-    {{- if not (hasKey .Values.ingress.annotations "cert-manager.io/cluster-issuer")}}
-    {{- if .Values.ingress.wildcard }}
+    {{- if $.Values.ingress.tls }}
+    {{- if not (hasKey $.Values.ingress.annotations "cert-manager.io/cluster-issuer")}}
+    {{- if $.Values.ingress.wildcard }}
     cert-manager.io/cluster-issuer: letsencrypt-prod-wildcard
     {{- else }}
     cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -29,9 +29,9 @@ metadata:
     # provider-agnostic default annotations
     # if value is provided as "null" or null, it is unset
     # adding a fix for scenarios where ingress annotations are inside ingress.annotations.normal
-    {{- if not (hasKey .Values.ingress.annotations "normal")}} 
-    {{- if gt (len .Values.ingress.annotations) 0}}
-    {{- range $k, $v := .Values.ingress.annotations }}
+    {{- if not (hasKey $.Values.ingress.annotations "normal")}} 
+    {{- if gt (len $.Values.ingress.annotations) 0}}
+    {{- range $k, $v := $.Values.ingress.annotations }}
     {{- if $v}}
     {{- if and (not (eq $v "null")) $v}}
     {{ $k }}: {{ $v }}
@@ -40,9 +40,9 @@ metadata:
     {{- end }}
     {{- end }}
     {{- end }}
-    {{- if hasKey .Values.ingress.annotations "normal"}}
-    {{- if gt (len .Values.ingress.annotations.normal) 0}}
-    {{- range $k, $v := .Values.ingress.annotations.normal }}
+    {{- if hasKey $.Values.ingress.annotations "normal"}}
+    {{- if gt (len $.Values.ingress.annotations.normal) 0}}
+    {{- range $k, $v := $.Values.ingress.annotations.normal }}
     {{- if $v}}
     {{- if and (not (eq $v "null")) $v}}
     {{ $k }}: {{ $v }}
@@ -52,49 +52,47 @@ metadata:
     {{- end }}
     {{- end }}
 spec:
-{{- if hasKey .Values.ingress.annotations "kubernetes.io/ingress.class" }}
-  ingressClassName: {{ index .Values.ingress.annotations "kubernetes.io/ingress.class" }}
+{{- if hasKey $.Values.ingress.annotations "kubernetes.io/ingress.class" }}
+  ingressClassName: {{ index $.Values.ingress.annotations "kubernetes.io/ingress.class" }}
 {{- else }}
   ingressClassName: nginx
 {{- end }}
-  {{- if or (.Values.ingress.tls) (.Values.ingress.customTls.enabled) }}
+  {{- if or ($.Values.ingress.tls) ($.Values.ingress.customTls.enabled) }}
   tls:
     - hosts:
-        {{- range $allHosts }}
         - {{ . | quote }}
-        {{- end }}
-      {{- if not .Values.ingress.useDefaultIngressTLSSecret }}
-      {{ if .Values.ingress.wildcard }}
+      {{- if not $.Values.ingress.useDefaultIngressTLSSecret }}
+      {{ if $.Values.ingress.wildcard }}
       secretName: wildcard-cert-tls
-      {{ else if .Values.ingress.customTls.enabled }}
-      secretName: {{ .Values.ingress.customTls.customTlsSecret }}
+      {{ else if $.Values.ingress.customTls.enabled }}
+      secretName: {{ $.Values.ingress.customTls.customTlsSecret }}
       {{ else }}
-      secretName: {{ include "docker-template.fullname" . }}  
+      secretName: {{ include "docker-template.fullname" $ }}  
       {{ end }}
       {{- end }}
   {{- end }}
   rules:
-    {{- range $allHosts }}
-      - host: {{ . | quote }}
-        http:
-          paths:
-            {{ if gt (len $customPaths) 0 }}
-            {{- range $customPaths }}
-            - path: {{ .path }}
-              pathType: ImplementationSpecific
-              backend:
-                service:
-                  name: {{ .serviceName }}
-                  port:
-                    number: {{ .servicePort }}
-            {{- end }}
-            {{ else }}
-            - pathType: ImplementationSpecific
-              backend:
-                service:
-                  name: {{ $fullName }}
-                  port:
-                    number: {{ $svcPort }}
-            {{ end }}
-    {{- end }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+          {{- if gt (len $customPaths) 0 }}
+          {{- range $customPaths }}
+          - path: {{ .path }}
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ .serviceName }}
+                port:
+                  number: {{ .servicePort }}
+          {{- end }}
+          {{- else }}
+          - pathType: ImplementationSpecific
+            backend:
+              service:
+                name: "{{ include "docker-template.fullname" $ }}-{{ . }}"
+                port:
+                  number: {{ $svcPort }}
+          {{- end }}
+---
+{{- end }}
 {{- end }}
