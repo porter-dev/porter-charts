@@ -1,5 +1,5 @@
 agent:
-  image: "public.ecr.aws/o1j4x7p4/porter-agent:v3.1.6"
+  image: "public.ecr.aws/o1j4x7p4/porter-agent:v3.1.7"
   cfAccessToken: ""
   porterHost: "dashboard.getporter.dev"
   porterPort: "80"
@@ -112,6 +112,8 @@ promtail:
         target_label: porter_pod_name
         action: replace
         separator: '_'
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
   resources:
     limits:
       memory: 256Mi
