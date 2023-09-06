@@ -41,6 +41,11 @@ spec:
         {{- toYaml .Values.hostAliases | nindent 8 }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.enableEDNS0 }}
+      dnsConfig:
+        options:
+          - name: edns0
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -93,11 +98,6 @@ spec:
             - name: http
               containerPort: {{ .Values.container.port }}
               protocol: TCP
-          {{ if .Values.enableEDNS0 }}
-          dnsConfig:
-            options:
-              - name: edns0
-          {{ end }}
           {{ if .Values.readinessProbe }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}

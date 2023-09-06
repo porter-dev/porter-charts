@@ -30,6 +30,11 @@ spec:
       terminationGracePeriodSeconds: {{ $.Values.terminationGracePeriodSeconds }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      {{- if $.Values.enableEDNS0 }}
+      dnsConfig:
+        options:
+          - name: edns0
+      {{- end }}
       containers:
         - name: {{ $.Chart.Name }}
           securityContext:
@@ -70,11 +75,6 @@ spec:
               containerPort: {{ .containerPort }}
               protocol: TCP
             {{- end }}
-          {{ if $.Values.enableEDNS0 }}
-          dnsConfig:
-            options:
-              - name: edns0
-          {{ end }}
           {{ if $.Values.health.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
