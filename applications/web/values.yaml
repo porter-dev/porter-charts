@@ -215,6 +215,9 @@ datadog:
 # Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
 hostAliases: []
 
+# Set this for enabling DNS extensions over TCP
+enableEDNS0: false
+
 nodeSelector: {}
 
 tolerations: []
