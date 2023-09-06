@@ -107,6 +107,11 @@ spec:
               containerPort: {{ .containerPort }}
               protocol: TCP
             {{- end }}
+          {{ if .Values.enableEDNS0 }}
+          dnsConfig:
+            options:
+              - name: edns0
+          {{ end }}
           {{ if .Values.health.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
