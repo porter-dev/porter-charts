@@ -28,6 +28,12 @@ loki:
     auth_enabled: false
     commonConfig:
       replication_factor: 1
+    limits_config:
+      reject_old_samples: true
+      # reject samples older than one week
+      reject_old_samples_max_age: 168h
+      max_concurrent_tail_requests: 50
+      retention_period: 168h
     storage:
       type: filesystem
   enabled: true
@@ -50,6 +56,13 @@ loki:
     replicas: 1
     nodeSelector:
       porter.run/workload-kind: monitoring
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2048Mi
+      requests:
+        cpu: 500m
+        memory: 1024Mi
     tolerations:
       - effect: NoSchedule
         key: porter.run/workload-kind
@@ -58,13 +71,7 @@ loki:
     persistence:
       enabled: true
       size: 100Gi
-  limits_config:
-    reject_old_samples: true
-    # reject samples older than one week
-    reject_old_samples_max_age: 168h
-    max_concurrent_tail_requests: 50
-    retention_period: 168h
-  table_manager:
+  tableManager:
     retention_deletes_enabled: true
     retention_period: 168h
   storage_config:
@@ -84,16 +91,6 @@ loki:
   datasource:
     jsonData: {}
     uid: ""
-  persistence:
-    enabled: true
-    size: 100Gi
-  resources:
-    limits:
-      cpu: 500m
-      memory: 1024Mi
-    requests:
-      cpu: 500m
-      memory: 1024Mi
 
 promtail:
   enabled: true
