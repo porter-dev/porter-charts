@@ -56,30 +56,11 @@ spec:
           {{- end }}
           containers:
           - name: {{ .Chart.Name }}
-            {{- if .Values.global }}
-            {{- if .Values.global.image }}
-            image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag }}"
-            {{- end }}
-            {{- else }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-            {{- end }}
             imagePullPolicy: {{ .Values.image.pullPolicy }}
-            {{- if .Values.global }}
-            {{- if .Values.global.image }}
-            {{- if and .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")) }}
             command:
             {{- range $command := trim .Values.container.command | splitList " " }}
             - {{ $command | quote }}
-            {{- end }}
-            {{- end }}
-            {{- end }}
-            {{- else }}
-            {{- if (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job")))) }}
-            command:
-            {{- range $command := trim .Values.container.command | splitList " " }}
-            - {{ $command | quote }}
-            {{- end }}
-            {{- end }}
             {{- end }}
             {{ if or .Values.configMapRefs .Values.secretRefs }}
             envFrom:
