@@ -4,6 +4,7 @@ name: 'Update ACK Charts'
 on:
   schedule:
     - cron:  '11 5 * * *'
+  workflow_dispatch: {}
 
 permissions:
   contents: write
