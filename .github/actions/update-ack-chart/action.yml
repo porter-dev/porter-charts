@@ -58,4 +58,4 @@ runs:
           gh pr create --title "Install ${{ inputs.service }}-chart@v${new_version}" --body "New chart" --head "$branch_name"
         fi
       env:
-        GITHUB_TOKEN: ${{ inpits.github_token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
