@@ -17,8 +17,8 @@ runs:
       shell: bash
       id: current
       run: |
-        if [[ -f "${{ inputs.service }}-chart/Chart.yaml" ]]; then
-          echo "current_version=$(cat ${{ inputs.service }}-chart/Chart.yaml | grep "^version:" | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+        if [[ -f "platform/${{ inputs.service }}-chart/Chart.yaml" ]]; then
+          echo "current_version=$(cat platform/${{ inputs.service }}-chart/Chart.yaml | grep "^version:" | awk '{print $2}')" >> "$GITHUB_OUTPUT"
         else
           echo "current_version=" >> "$GITHUB_OUTPUT"
         fi
@@ -53,7 +53,7 @@ runs:
           exit 0
         fi
 
-        new_version="$(cat ${{ inputs.service }}-chart/Chart.yaml | grep "^version:" | awk '{print $2}')"
+        new_version="$(cat platform/${{ inputs.service }}-chart/Chart.yaml | grep "^version:" | awk '{print $2}')"
         branch_name="update-${{ inputs.service }}-chart-from-${{ steps.current.outputs.current_version }}-to-${new_version}"
         git checkout -b ${{ inputs.service }}-chart
         git add "platform/${{ inputs.service }}-chart"
