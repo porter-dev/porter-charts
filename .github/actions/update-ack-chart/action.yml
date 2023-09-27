@@ -44,7 +44,7 @@ runs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
 
-        if ! git status -s "platform/${{ inputs.service }}-chart" | fgrep ' M '; then
+        if ! git status -s "platform/${{ inputs.service }}-chart" | grep -E '^ M |^\?\? '; then
           echo "====> No chart changes detected for platform/${{ inputs.service }}-chart"
           echo "----> chart status:"
           git status -s "platform/${{ inputs.service }}-chart"
