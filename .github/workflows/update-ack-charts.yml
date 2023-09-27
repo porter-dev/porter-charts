@@ -1,0 +1,32 @@
+---
+name: 'Update ACK Charts'
+
+on:
+  schedule:
+    - cron:  '11 5 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-ack-chart:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          # mysql, postgres
+          - rds
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: azure/setup-helm@v3
+        with:
+          version: 'v3.12.3'
+      - name: Update ACK Service Chart
+        uses: ./.github/actions/update-ack-chart
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          service: ${{ matrix.service }}
