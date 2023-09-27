@@ -9,7 +9,7 @@ metadata:
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
 spec:
-  maxUnavailable: "{{ .Values.podDisruptionBudget.minAvailablePercentage }}%"
+  minAvailable: "{{ .Values.podDisruptionBudget.minAvailablePercentage }}%"
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
