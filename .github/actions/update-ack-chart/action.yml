@@ -17,8 +17,8 @@ runs:
       shell: bash
       id: current
       run: |
-        if [[ -f "platform/${{ inputs.service }}-chart/Chart.yaml" ]]; then
-          echo "current_version=$(cat platform/${{ inputs.service }}-chart/Chart.yaml | grep "^version:" | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+        if [[ -f "addons/${{ inputs.service }}-chart/Chart.yaml" ]]; then
+          echo "current_version=$(cat addons/${{ inputs.service }}-chart/Chart.yaml | grep "^version:" | awk '{print $2}')" >> "$GITHUB_OUTPUT"
         else
           echo "current_version=" >> "$GITHUB_OUTPUT"
         fi
@@ -34,9 +34,9 @@ runs:
           exit 0
         fi
 
-        mkdir -p platform
-        rm -rf "platform/${{ inputs.service }}-chart"
-        helm pull "oci://public.ecr.aws/aws-controllers-k8s/${{ inputs.service }}-chart" --version "$RELEASE_VERSION" --untar --untardir platform
+        mkdir -p addons
+        rm -rf "addons/${{ inputs.service }}-chart"
+        helm pull "oci://public.ecr.aws/aws-controllers-k8s/${{ inputs.service }}-chart" --version "$RELEASE_VERSION" --untar --untardir addons
 
     - name: push chart
       shell: bash
@@ -44,22 +44,22 @@ runs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
 
-        if ! git status -s "platform/${{ inputs.service }}-chart" | grep -E '^ M |^\?\? '; then
-          echo "====> No chart changes detected for platform/${{ inputs.service }}-chart"
+        if ! git status -s "addons/${{ inputs.service }}-chart" | grep -E '^ M |^\?\? '; then
+          echo "====> No chart changes detected for addons/${{ inputs.service }}-chart"
           echo "----> chart status:"
-          git status -s "platform/${{ inputs.service }}-chart"
+          git status -s "addons/${{ inputs.service }}-chart"
           echo "----> git status:"
           git status
           exit 0
         fi
 
-        new_version="$(cat platform/${{ inputs.service }}-chart/Chart.yaml | grep "^version:" | awk '{print $2}')"
+        new_version="$(cat addons/${{ inputs.service }}-chart/Chart.yaml | grep "^version:" | awk '{print $2}')"
         branch_name="install-${{ inputs.service }}-chart"
         if [[ -n "${{ steps.current.outputs.current_version }}" ]]; then
           branch_name="update-${{ inputs.service }}-chart-from-${{ steps.current.outputs.current_version }}-to-${new_version}"
         fi
         git checkout -b "$branch_name"
-        git add "platform/${{ inputs.service }}-chart"
+        git add "addons/${{ inputs.service }}-chart"
         git commit -m "Update ${{ inputs.service }}-chart to version v${new_version}"
         git checkout -
         git push origin "$branch_name"
