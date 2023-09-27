@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
       - uses: azure/setup-helm@v3
         with:
-          version: 'v3.3.4'
+          version: 'v3.12.3'
       - name: Update ACK Service Chart
         uses: ./.github/actions/update-ack-chart
         with:
