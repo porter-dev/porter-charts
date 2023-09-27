@@ -28,4 +28,5 @@ jobs:
       - name: Update ACK Service Chart
         uses: ./.github/actions/update-ack-chart
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           service: ${{ matrix.service }}
