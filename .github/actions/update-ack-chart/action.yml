@@ -6,6 +6,9 @@ inputs:
   service:
     description: 'Name of service to mirror'
     required: true
+  github_token:
+    description: 'Github token to use when merging a pull request'
+    required: true
 
 runs:
   using: "composite"
@@ -55,4 +58,4 @@ runs:
           gh pr create --title "Install ${{ inputs.service }}-chart@v${new_version}" --body "New chart" --head "$branch_name"
         fi
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inpits.github_token }}
