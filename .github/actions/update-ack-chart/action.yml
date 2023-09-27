@@ -55,7 +55,7 @@ runs:
 
         new_version="$(cat platform/${{ inputs.service }}-chart/Chart.yaml | grep "^version:" | awk '{print $2}')"
         branch_name="install-${{ inputs.service }}-chart"
-        if [[ -n "{{ steps.current.outputs.current_version }}" ]]; then
+        if [[ -n "${{ steps.current.outputs.current_version }}" ]]; then
           branch_name="update-${{ inputs.service }}-chart-from-${{ steps.current.outputs.current_version }}-to-${new_version}"
         fi
         git checkout -b "$branch_name"
@@ -63,7 +63,7 @@ runs:
         git commit -m "Update ${{ inputs.service }}-chart to version v${new_version}"
         git checkout -
         git push origin "$branch_name"
-        if [[ -n "{{ steps.current.outputs.current_version }}" ]]; then
+        if [[ -n "${{ steps.current.outputs.current_version }}" ]]; then
           gh pr create --title "Update ${{ inputs.service }}-chart to version v${new_version}" --body "From ${{ steps.current.outputs.current_version }}" --head "$branch_name"
         else
           gh pr create --title "Install ${{ inputs.service }}-chart@v${new_version}" --body "New chart" --head "$branch_name"
