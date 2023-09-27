@@ -28,7 +28,7 @@ runs:
       run: |
         RELEASE_VERSION=$(curl -sL "https://api.github.com/repos/aws-controllers-k8s/${{ inputs.service }}-controller/releases/latest" | jq -r '.tag_name | ltrimstr("v")')
         if [[ "${{ steps.current.outputs.current_version }}" == "$RELEASE_VERSION" ]]; then
-          return
+          exit 0
         fi
 
         mkdir -p platform
@@ -42,7 +42,7 @@ runs:
         git config --local user.name "github-actions[bot]"
 
         if ! git status -s "platform/${{ inputs.service }}-chart" | fgrep ' M '; then
-          return
+          exit 0
         fi
 
         new_version="$(cat ${{ inputs.service }}-chart/Chart.yaml | grep "^version:" | awk '{print $2}')"
