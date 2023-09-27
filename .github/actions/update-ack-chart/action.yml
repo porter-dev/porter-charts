@@ -54,8 +54,11 @@ runs:
         fi
 
         new_version="$(cat platform/${{ inputs.service }}-chart/Chart.yaml | grep "^version:" | awk '{print $2}')"
-        branch_name="update-${{ inputs.service }}-chart-from-${{ steps.current.outputs.current_version }}-to-${new_version}"
-        git checkout -b ${{ inputs.service }}-chart
+        branch_name="install-${{ inputs.service }}-chart"
+        if [[ -n "{{ steps.current.outputs.current_version }}" ]]; then
+          branch_name="update-${{ inputs.service }}-chart-from-${{ steps.current.outputs.current_version }}-to-${new_version}"
+        fi
+        git checkout -b "$branch_name"
         git add "platform/${{ inputs.service }}-chart"
         git commit -m "Update ${{ inputs.service }}-chart to version v${new_version}"
         git checkout -
