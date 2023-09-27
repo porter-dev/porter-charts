@@ -28,6 +28,9 @@ runs:
       run: |
         RELEASE_VERSION=$(curl -sL "https://api.github.com/repos/aws-controllers-k8s/${{ inputs.service }}-controller/releases/latest" | jq -r '.tag_name | ltrimstr("v")')
         if [[ "${{ steps.current.outputs.current_version }}" == "$RELEASE_VERSION" ]]; then
+          echo "Current version matches latest version"
+          echo "- current: ${{ steps.current.outputs.current_version }}"
+          echo "- latest: $RELEASE_VERSION"
           exit 0
         fi
 
@@ -42,6 +45,7 @@ runs:
         git config --local user.name "github-actions[bot]"
 
         if ! git status -s "platform/${{ inputs.service }}-chart" | fgrep ' M '; then
+          echo "No chart changes detected for platform/${{ inputs.service }}-chart"
           exit 0
         fi
 
