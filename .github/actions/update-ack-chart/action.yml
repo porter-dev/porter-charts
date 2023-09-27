@@ -37,6 +37,7 @@ runs:
         mkdir -p platform
         rm -rf "platform/${{ inputs.service }}-chart"
         helm pull "oci://public.ecr.aws/aws-controllers-k8s/${{ inputs.service }}-chart" --version "$RELEASE_VERSION" --untar --untardir platform
+        git status
 
     - name: push chart
       shell: bash
@@ -46,6 +47,7 @@ runs:
 
         if ! git status -s "platform/${{ inputs.service }}-chart" | fgrep ' M '; then
           echo "No chart changes detected for platform/${{ inputs.service }}-chart"
+          git status
           exit 0
         fi
 
