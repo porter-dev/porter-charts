@@ -58,6 +58,7 @@ spec:
   ingressClassName: nginx
 {{- end }}
   {{- if or (.Values.ingress.tls) (.Values.ingress.customTls.enabled) }}
+  {{- if .Values.ingress.separateTlsPerCustomDomain}}
   tls:
     {{- range $allHosts }}
     - hosts:
@@ -72,6 +73,22 @@ spec:
       {{ end }}
       {{- end }}
     {{- end }}
+  {{- else }}
+  tls:
+    - hosts:
+        {{- range $allHosts }}
+        - {{ . | quote }}
+        {{- end }}
+      {{- if not .Values.ingress.useDefaultIngressTLSSecret }}
+      {{ if .Values.ingress.wildcard }}
+      secretName: wildcard-cert-tls
+      {{ else if .Values.ingress.customTls.enabled }}
+      secretName: {{ .Values.ingress.customTls.customTlsSecret }}
+      {{ else }}
+      secretName: {{ include "docker-template.fullname" . }}  
+      {{ end }}
+      {{- end }}
+  {{- end }}
   {{- end }}
   rules:
     {{- range $allHosts }}

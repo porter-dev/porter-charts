@@ -52,6 +52,7 @@ ingress:
   wildcard: false
   tls: true
   useDefaultIngressTLSSecret: false
+  separateTlsPerCustomDomain: true
   customTls:
     enabled: false
     customTlsSecret:
