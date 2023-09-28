@@ -1,4 +1,4 @@
-{{- if and (or (ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job") (.Values.global)) (not .Values.paused) (false) -}}
+{{- if and (or (ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job") (.Values.global)) (not .Values.paused) (not .Values.schedule.enabled) -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
