@@ -5,5 +5,5 @@ config:
   instanceClass: db.t4g.small
   allocatedStorage: 30
   awsRegion: ""
-  engineVersion: 15.4-R2
+  engineVersion: 15.4
   subnetsIDs: []
