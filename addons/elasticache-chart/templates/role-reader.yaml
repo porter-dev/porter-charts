@@ -3,17 +3,18 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   creationTimestamp: null
-  name: ack-iam-reader
+  name: ack-elasticache-reader
   namespace: {{ .Release.Namespace }}
 rules:
 - apiGroups:
-  - iam.services.k8s.aws
+  - elasticache.services.k8s.aws
   resources:
-  - groups
-  - openidconnectproviders
-  - policies
-  - roles
+  - cacheparametergroups
+  - cachesubnetgroups
+  - replicationgroups
+  - snapshots
   - users
+  - usergroups
   verbs:
   - get
   - list

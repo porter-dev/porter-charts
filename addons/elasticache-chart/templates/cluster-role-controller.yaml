@@ -3,7 +3,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: ack-iam-controller
+  name: ack-elasticache-controller
   labels:
   {{- range $key, $value := .Values.role.labels }}
     {{ $key }}: {{ $value | quote }}
@@ -12,7 +12,7 @@ metadata:
 kind: Role
 metadata:
   creationTimestamp: null
-  name: ack-iam-controller
+  name: ack-elasticache-controller
   labels:
   {{- range $key, $value := .Values.role.labels }}
     {{ $key }}: {{ $value | quote }}
@@ -47,9 +47,9 @@ rules:
   - patch
   - watch
 - apiGroups:
-  - iam.services.k8s.aws
+  - elasticache.services.k8s.aws
   resources:
-  - groups
+  - cacheparametergroups
   verbs:
   - create
   - delete
@@ -59,37 +59,17 @@ rules:
   - update
   - watch
 - apiGroups:
-  - iam.services.k8s.aws
+  - elasticache.services.k8s.aws
   resources:
-  - groups/status
+  - cacheparametergroups/status
   verbs:
   - get
   - patch
   - update
 - apiGroups:
-  - iam.services.k8s.aws
+  - elasticache.services.k8s.aws
   resources:
-  - openidconnectproviders
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - iam.services.k8s.aws
-  resources:
-  - openidconnectproviders/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - iam.services.k8s.aws
-  resources:
-  - policies
+  - cachesubnetgroups
   verbs:
   - create
   - delete
@@ -99,17 +79,17 @@ rules:
   - update
   - watch
 - apiGroups:
-  - iam.services.k8s.aws
+  - elasticache.services.k8s.aws
   resources:
-  - policies/status
+  - cachesubnetgroups/status
   verbs:
   - get
   - patch
   - update
 - apiGroups:
-  - iam.services.k8s.aws
+  - elasticache.services.k8s.aws
   resources:
-  - roles
+  - replicationgroups
   verbs:
   - create
   - delete
@@ -119,15 +99,55 @@ rules:
   - update
   - watch
 - apiGroups:
-  - iam.services.k8s.aws
+  - elasticache.services.k8s.aws
   resources:
-  - roles/status
+  - replicationgroups/status
   verbs:
   - get
   - patch
   - update
 - apiGroups:
-  - iam.services.k8s.aws
+  - elasticache.services.k8s.aws
+  resources:
+  - snapshots
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - elasticache.services.k8s.aws
+  resources:
+  - snapshots/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - elasticache.services.k8s.aws
+  resources:
+  - usergroups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - elasticache.services.k8s.aws
+  resources:
+  - usergroups/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - elasticache.services.k8s.aws
   resources:
   - users
   verbs:
@@ -139,7 +159,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - iam.services.k8s.aws
+  - elasticache.services.k8s.aws
   resources:
   - users/status
   verbs:

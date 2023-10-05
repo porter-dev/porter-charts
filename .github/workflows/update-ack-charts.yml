@@ -16,10 +16,12 @@ jobs:
     strategy:
       matrix:
         service:
-          # iam
-          - iam
+          # security groups
+          - ec2
           # mysql, postgres
           - rds
+          # memcached, redis
+          - elasticache
     steps:
       - uses: actions/checkout@v4
         with:

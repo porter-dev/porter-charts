@@ -1,10 +1,10 @@
 {{ .Chart.Name }} has been installed.
-This chart deploys "public.ecr.aws/aws-controllers-k8s/iam-controller:1.2.6".
+This chart deploys "public.ecr.aws/aws-controllers-k8s/elasticache-controller:0.0.27".
 
 Check its status by running:
   kubectl --namespace {{ .Release.Namespace }} get pods -l "app.kubernetes.io/instance={{ .Release.Name }}"
 
-You are now able to create AWS Identity & Access Management (IAM) resources!
+You are now able to create Amazon ElastiCache (ElastiCache) resources!
 
 The controller is running in "{{ .Values.installScope }}" mode.
 The controller is configured to manage AWS resources in region: "{{ .Values.aws.region }}"

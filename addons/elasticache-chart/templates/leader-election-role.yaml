@@ -2,7 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: iam-leader-election-role
+  name: elasticache-leader-election-role
 {{ if .Values.leaderElection.namespace }}
   namespace: {{ .Values.leaderElection.namespace }}
 {{ else }}
