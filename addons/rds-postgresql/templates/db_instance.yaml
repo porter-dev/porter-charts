@@ -23,6 +23,7 @@ spec:
     namespace: porter-env-group
     name: {{ .Values.config.name }}.1
     key: DB_PASS
+  multiAZ: {{ .Values.config.multiAZ }}
   tags:
     - key: "porter.run/managed"
       value: "true"
