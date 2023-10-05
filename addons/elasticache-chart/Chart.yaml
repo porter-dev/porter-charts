@@ -4,15 +4,15 @@ description: A Helm chart for the ACK service controller for Amazon ElastiCache 
 home: https://github.com/aws-controllers-k8s/elasticache-controller
 icon: https://raw.githubusercontent.com/aws/eks-charts/master/docs/logo/aws.png
 keywords:
-- aws
-- kubernetes
-- elasticache
+  - aws
+  - kubernetes
+  - elasticache
 maintainers:
-- name: ACK Admins
-  url: https://github.com/orgs/aws-controllers-k8s/teams/ack-admin
-- name: ElastiCache Admins
-  url: https://github.com/orgs/aws-controllers-k8s/teams/elasticache-maintainer
+  - name: ACK Admins
+    url: https://github.com/orgs/aws-controllers-k8s/teams/ack-admin
+  - name: ElastiCache Admins
+    url: https://github.com/orgs/aws-controllers-k8s/teams/elasticache-maintainer
 name: elasticache-chart
 sources:
-- https://github.com/aws-controllers-k8s/elasticache-controller
-version: 0.0.27
+  - https://github.com/aws-controllers-k8s/elasticache-controller
+version: 0.1.0
