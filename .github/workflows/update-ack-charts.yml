@@ -16,8 +16,6 @@ jobs:
     strategy:
       matrix:
         service:
-          # iam
-          - iam
           # mysql, postgres
           - rds
           # memcached, redis
