@@ -16,6 +16,8 @@ jobs:
     strategy:
       matrix:
         service:
+          # security groups
+          - ec2
           # mysql, postgres
           - rds
           # memcached, redis
