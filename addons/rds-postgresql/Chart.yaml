@@ -1,0 +1,23 @@
+annotations:
+  category: Database
+apiVersion: v2
+appVersion: "15.4"
+description: A object-relational database management system (ORDBMS) with an emphasis on extensibility, standards-compliance and high-availability.
+home: https://github.com/porter-dev/porter-charts/tree/master/addons/rds-postgresql
+icon: https://raw.githubusercontent.com/aws/eks-charts/master/docs/logo/aws.png
+keywords:
+  - postgresql
+  - postgres
+  - db
+  - database
+  - sql
+  - replication
+  - cluster
+  - rds
+  - DATA_STORE
+  - DATA_BASE
+maintainers:
+  - name: Porter Technologies, Inc.
+    email: support@porter.run
+name: rds-postgresql
+version: 0.1.0

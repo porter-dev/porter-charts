@@ -1,0 +1,19 @@
+---
+apiVersion: rds.services.k8s.aws/v1alpha1
+kind: DBInstance
+metadata:
+  name: {{ .Values.config.name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    services.k8s.aws/region: {{ .Values.config.awsRegion }}
+spec:
+  allocatedStorage: {{ .Values.config.allocatedStorage }}
+  dbInstanceClass: {{ .Values.config.instanceClass }}
+  dbInstanceIdentifier: {{ .Values.config.name }}
+  engine: postgres
+  engineVersion: "{{ .Values.config.engineVersion }}"
+  masterUsername: "{{ .Values.config.masterUsername }}"
+  masterUserPassword:
+    namespace: porter-env-group
+    name: {{ .Values.config.name }}.1
+    key: DB_PASS
