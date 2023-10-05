@@ -13,3 +13,6 @@ spec:
     - {{ toYaml . }}
   {{- end}}
 {{- end }}
+  tags:
+    - key: "porter.run/managed"
+      value: "true"
