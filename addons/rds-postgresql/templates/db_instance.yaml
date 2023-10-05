@@ -13,6 +13,9 @@ spec:
   dbSubnetGroupRef:
     from:
       name: {{ .Values.config.name }}
+  dbParameterGroupRef:
+    from:
+      name: {{ .Values.config.name }}
   engine: postgres
   engineVersion: "{{ .Values.config.engineVersion }}"
   masterUsername: "{{ .Values.config.masterUsername }}"

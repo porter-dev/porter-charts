@@ -1,0 +1,15 @@
+---
+apiVersion: rds.services.k8s.aws/v1alpha1
+kind: DBClusterParameterGroup
+metadata:
+  name: {{ .Values.config.name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    services.k8s.aws/region: {{ .Values.config.awsRegion }}
+spec:
+  description: "Parameter group for {{ .Values.config.name }}"
+  family: postgres{{ .Values.config.engineMajorVersion }}
+  name: {{ .Values.config.name }}
+  tags:
+    - key: "porter.run/managed"
+      value: "true"
