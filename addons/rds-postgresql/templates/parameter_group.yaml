@@ -1,6 +1,6 @@
 ---
 apiVersion: rds.services.k8s.aws/v1alpha1
-kind: DBClusterParameterGroup
+kind: DBParameterGroup
 metadata:
   name: {{ .Values.config.name }}
   namespace: {{ .Release.Namespace }}
