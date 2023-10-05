@@ -8,6 +8,9 @@ metadata:
     services.k8s.aws/region: {{ .Values.config.awsRegion }}
 spec:
   allocatedStorage: {{ .Values.config.allocatedStorage }}
+  autoMinorVersionUpgrade: true
+  backupRetentionPeriod: 14
+  copyTagsToSnapshot: true
   dbInstanceClass: {{ .Values.config.instanceClass }}
   dbInstanceIdentifier: {{ .Values.config.name }}
   dbSubnetGroupRef:
@@ -16,6 +19,9 @@ spec:
   dbParameterGroupRef:
     from:
       name: {{ .Values.config.name }}
+  enableCloudwatchLogsExports:
+    - postgresql
+    - upgrade
   engine: postgres
   engineVersion: "{{ .Values.config.engineVersion }}"
   masterUsername: "{{ .Values.config.masterUsername }}"
@@ -24,6 +30,10 @@ spec:
     name: {{ .Values.config.name }}.1
     key: DB_PASS
   multiAZ: {{ .Values.config.multiAZ }}
+  performanceInsightsEnabled: true
+  performanceInsightsRetentionPeriod: 7
+  storageEncrypted: true
+  storageType: gp3
   tags:
     - key: "porter.run/managed"
       value: "true"
