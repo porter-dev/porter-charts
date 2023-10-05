@@ -13,6 +13,7 @@ spec:
   copyTagsToSnapshot: true
   dbInstanceClass: {{ .Values.config.instanceClass }}
   dbInstanceIdentifier: {{ .Values.config.name }}
+  dbName: {{ .Values.config.name | lower | nospace | replace "-" " " }}
   dbSubnetGroupRef:
     from:
       name: {{ .Values.config.name }}
