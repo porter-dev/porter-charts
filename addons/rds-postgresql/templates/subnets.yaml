@@ -8,7 +8,7 @@ spec:
   name: {{ .Values.config.name }}
   description: "{{ .Values.config.name }} Subnet Group"
 {{- if .Values.config.subnetsIDs }}
-  imagePullSecrets:
+  subnetIDs:
   {{- range .Values.config.subnetsIDs }}
     - {{ toYaml . }}
   {{- end}}
