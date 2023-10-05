@@ -27,3 +27,6 @@ tabs:
     - type: string-input
       label: AWS Region
       variable: config.awsRegion
+    - type: string-input
+      label: Cluster Subnet IDs (comma-delimited)
+      variable: config.subnetsIDs

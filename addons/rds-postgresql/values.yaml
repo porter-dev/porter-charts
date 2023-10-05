@@ -6,3 +6,4 @@ config:
   allocatedStorage: 30
   awsRegion: ""
   engineVersion: 15.4-R2
+  subnetsIDs: []

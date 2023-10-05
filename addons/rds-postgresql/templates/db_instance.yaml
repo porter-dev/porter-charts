@@ -10,6 +10,9 @@ spec:
   allocatedStorage: {{ .Values.config.allocatedStorage }}
   dbInstanceClass: {{ .Values.config.instanceClass }}
   dbInstanceIdentifier: {{ .Values.config.name }}
+  dbSubnetGroupRef:
+    from:
+      name: {{ .Values.config.name }}
   engine: postgres
   engineVersion: "{{ .Values.config.engineVersion }}"
   masterUsername: "{{ .Values.config.masterUsername }}"

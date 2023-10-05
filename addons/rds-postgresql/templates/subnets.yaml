@@ -1,0 +1,15 @@
+---
+apiVersion: rds.services.k8s.aws/v1alpha1
+kind: DBSubnetGroup
+metadata:
+  name: {{ .Values.config.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  name: {{ .Values.config.name }}
+  description: "{{ .Values.config.name }} Subnet Group"
+{{- if .Values.config.subnetsIDs }}
+  imagePullSecrets:
+  {{- range .Values.config.subnetsIDs }}
+    - {{ toYaml . }}
+  {{- end}}
+{{- end }}
