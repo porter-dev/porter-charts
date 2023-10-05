@@ -4,6 +4,8 @@ kind: DBSubnetGroup
 metadata:
   name: {{ .Values.config.name }}
   namespace: {{ .Release.Namespace }}
+  annotations:
+    services.k8s.aws/region: {{ .Values.config.awsRegion }}
 spec:
   name: {{ .Values.config.name }}
   description: "{{ .Values.config.name }} Subnet Group"
