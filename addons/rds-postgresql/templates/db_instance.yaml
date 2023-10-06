@@ -38,3 +38,6 @@ spec:
   tags:
     - key: "porter.run/managed"
       value: "true"
+  vpcSecurityGroupRefs:
+    - from:
+        name: {{ .Values.config.name }}-postgresql

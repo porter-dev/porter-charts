@@ -9,3 +9,4 @@ config:
   multiAZ: true
   name: ""
   subnetsIDs: []
+  vpcID: ""

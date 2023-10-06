@@ -1,0 +1,19 @@
+---
+apiVersion: ec2.services.k8s.aws/v1alpha1
+kind: SecurityGroup
+metadata:
+  name: {{ .Values.config.name }}-postgresql
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: SecurityGroup
+  name: {{ .Values.config.name }}-postgresql
+  vpcID: {{ .Values.config.vpcID }}
+  ingressRules:
+  - ipProtocol: tcp
+    ipRanges:
+    - cidrIP: "{{ .Values.config.vpcID }}"
+    fromPort: 5432
+    toPort: 5432Z
+  tags:
+    - key: "porter.run/managed"
+      value: "true"
