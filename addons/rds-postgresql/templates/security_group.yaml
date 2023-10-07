@@ -15,7 +15,7 @@ spec:
     ipRanges:
     - cidrIP: "{{ .Values.config.vpcID }}"
     fromPort: 5432
-    toPort: 5432Z
+    toPort: 5432
   tags:
     - key: "porter.run/managed"
       value: "true"
