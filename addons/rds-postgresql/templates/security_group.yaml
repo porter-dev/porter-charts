@@ -13,7 +13,7 @@ spec:
   ingressRules:
   - ipProtocol: tcp
     ipRanges:
-    - cidrIP: "{{ .Values.config.vpcID }}"
+    - cidrIP: "0.0.0.0/0"
     fromPort: 5432
     toPort: 5432
   tags:
