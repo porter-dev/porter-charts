@@ -4,6 +4,8 @@ kind: SecurityGroup
 metadata:
   name: {{ .Values.config.name }}-postgresql
   namespace: {{ .Release.Namespace }}
+  annotations:
+    services.k8s.aws/region: {{ .Values.config.awsRegion }}
 spec:
   description: SecurityGroup
   name: {{ .Values.config.name }}-postgresql
