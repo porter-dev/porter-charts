@@ -17,5 +17,7 @@ spec:
     fromPort: 5432
     toPort: 5432
   tags:
+    - key: "Name"
+      value: "{{ .Values.config.name }}-postgresql"
     - key: "porter.run/managed"
       value: "true"
