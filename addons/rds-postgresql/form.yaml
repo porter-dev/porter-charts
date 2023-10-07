@@ -30,3 +30,9 @@ tabs:
     - type: string-input
       label: Cluster Subnet IDs (comma-delimited)
       variable: config.subnetsIDs
+    - type: string-input
+      label: VPC ID
+      variable: config.vpcID
+    - type: string-input
+      label: Engine Version
+      variable: config.engineVersion
