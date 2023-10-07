@@ -10,6 +10,7 @@ spec:
   allocatedStorage: {{ .Values.config.allocatedStorage }}
   autoMinorVersionUpgrade: true
   backupRetentionPeriod: 14
+  caCertificateIdentifier: rds-ca-rsa2048-g1
   copyTagsToSnapshot: true
   dbInstanceClass: {{ .Values.config.instanceClass }}
   dbInstanceIdentifier: {{ .Values.config.name }}
