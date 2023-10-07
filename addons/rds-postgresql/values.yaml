@@ -1,7 +1,6 @@
 config:
   allocatedStorage: 30
   awsRegion: ""
-  engineMajorVersion: 15
   engineVersion: 15.4
   instanceClass: db.t4g.small
   masterUsername: root

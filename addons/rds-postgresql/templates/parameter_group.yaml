@@ -8,7 +8,7 @@ metadata:
     services.k8s.aws/region: {{ .Values.config.awsRegion }}
 spec:
   description: "Parameter group for {{ .Values.config.name }}"
-  family: postgres{{ .Values.config.engineMajorVersion }}
+  family: postgres{{ (semver (toString .Values.config.engineVersion)).Major }}
   name: {{ .Values.config.name }}
   tags:
     - key: "porter.run/managed"
