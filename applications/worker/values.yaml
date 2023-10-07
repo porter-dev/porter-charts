@@ -103,6 +103,9 @@ health:
     periodSeconds: 5
     initialDelaySeconds: 5
 
+podDisruptionBudget:
+  enabled: false
+
 pvc:
   enabled: false
   storage: 20Gi
