@@ -14,7 +14,7 @@ spec:
   copyTagsToSnapshot: true
   dbInstanceClass: {{ .Values.config.instanceClass }}
   dbInstanceIdentifier: {{ .Values.config.name }}
-  dbName: {{ .Values.config.name | lower | nospace | replace "-" " " }}
+  dbName: {{ .Values.config.name | snakecase | nospace }}
   dbSubnetGroupRef:
     from:
       name: {{ .Values.config.name }}
