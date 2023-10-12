@@ -34,7 +34,7 @@ runs:
       shell: bash
       run: |
         git add ${{ inputs.target_directory }}
-        git commit -m "Syncing: ${{${{ inputs.remote_owner }}/${{ inputs.remote_repository }}}}"
+        git commit -m "Syncing: ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}"
         gh pr create --fill --auto-push
 
 
