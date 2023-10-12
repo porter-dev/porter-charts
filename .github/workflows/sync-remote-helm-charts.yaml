@@ -2,10 +2,10 @@ name: "Sync remote charts in PR"
 on:
   push:
     branches: ["sms/cloudwatch-sync"]
-
-      update-ack-chart:
-    runs-on: ubuntu-latest
-    strategy:
+    
+jobs:
+  sync-chart:
+      strategy:
       matrix:
         charts:
         - remote_owner: aws
@@ -17,8 +17,6 @@ on:
           remote_directory: stable/aws-vpc-cni
           target_directory: addons/aws-vpc-cni
 
-jobs:
-  sync-chart:
     permissions:
       contents: write
       pull-requests: write
