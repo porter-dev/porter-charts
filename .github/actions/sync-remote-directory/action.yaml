@@ -30,5 +30,11 @@ runs:
     - name: Copy require directory
       shell: bash
       run: rsync -av ${{ inputs.remote_repository }}/${{ inputs.remote_directory }} ${{ inputs.target_directory }}
+    - name: Create PR
+      shell: bash
+      run: |
+        git add ${{ inputs.target_directory }}
+        git commit -m "Syncing: ${{${{ inputs.remote_owner }}/${{ inputs.remote_repository }}}}"
+        gh pr create --fill --auto-push
 
 
