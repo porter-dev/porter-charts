@@ -7,7 +7,7 @@ inputs:
     description: Remote owner of the repository e.g. porter-dev
     required: true
   remote_repository:
-    description: Remote repository in the form owner/repo e.g. porter-dev/porter
+    description: Remote repository name e.g. porter
     required: true
   remote_directory:
     description: Remote directory within the remote_repository to sync
