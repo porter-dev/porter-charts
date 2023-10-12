@@ -30,9 +30,6 @@ runs:
     - name: Copy require directory
       shell: bash
       run: rsync -av ${{ inputs.remote_repository }}/${{ inputs.remote_directory }} ${{ inputs.target_directory }}
-    - name: test touch 
-      shell: bash
-      run: echo stefan > ${{ inputs.target_directory }}/stefan 
     - name: Create PR
       uses: peter-evans/create-pull-request@v5
       with:
