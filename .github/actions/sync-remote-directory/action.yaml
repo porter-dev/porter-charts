@@ -34,7 +34,7 @@ runs:
       uses: peter-evans/create-pull-request@v5
       with:
         add-paths: ${{ inputs.target_directory }}
-        title: "Sync: ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}"
-        branch: "sync/${{ inputs.remote_owner }}/${{ inputs.remote_repository }}"
+        title: "Sync: ${{ inputs.remote_owner }}/${{ inputs.remote_repository }} - ${{ inputs.remote_directory }}" 
+        branch: "sync/${{ inputs.remote_owner }}/${{ inputs.remote_repository }}/${{ inputs.remote_directory }}"
 
 
