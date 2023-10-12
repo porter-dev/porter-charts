@@ -2,21 +2,20 @@ name: "Sync remote charts in PR"
 on:
   push:
     branches: ["sms/cloudwatch-sync"]
-    
+
 jobs:
   sync-chart:
-      strategy:
+    strategy:
       matrix:
         charts:
-        - remote_owner: aws
-          remote_repository: eks-charts
-          remote_directory: stable/aws-cloudwatch-metrics
-          target_directory: addons/aws-cloudwatch-metrics
-        - remote_owner: aws
-          remote_repository: eks-charts
-          remote_directory: stable/aws-vpc-cni
-          target_directory: addons/aws-vpc-cni
-
+          - remote_owner: aws
+            remote_repository: eks-charts
+            remote_directory: stable/aws-cloudwatch-metrics
+            target_directory: addons/aws-cloudwatch-metrics
+          - remote_owner: aws
+            remote_repository: eks-charts
+            remote_directory: stable/aws-vpc-cni
+            target_directory: addons/aws-vpc-cni
     permissions:
       contents: write
       pull-requests: write
