@@ -1,0 +1,31 @@
+name: "Sync remote charts in PR"
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  sync-chart:
+    strategy:
+      matrix:
+        charts:
+          - remote_owner: aws
+            remote_repository: eks-charts
+            remote_directory: stable/aws-cloudwatch-metrics
+            target_directory: addons/aws-cloudwatch-metrics
+
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout porter-charts
+        uses: actions/checkout@v4
+      - name: Update remote chart
+        uses: ./.github/actions/sync-remote-directory
+        with:
+          remote_owner: ${{ matrix.charts.remote_owner }}
+          remote_repository: ${{ matrix.charts.remote_repository }}
+          remote_directory: ${{ matrix.charts.remote_directory }}
+          target_directory: ${{ matrix.charts.target_directory }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,40 @@
+---
+name: 'Sync remote directory'
+description: 'Sync remote directory to a local directory'
+
+inputs:
+  remote_owner:
+    description: Remote owner of the repository e.g. porter-dev
+    required: true
+  remote_repository:
+    description: Remote repository name e.g. porter
+    required: true
+  remote_directory:
+    description: Remote directory within the remote_repository to sync
+    required: true
+  target_directory:
+    description: Directory within the current repo, where we would like to copy the files
+    required: true
+  github_token:
+    description: 'Github token to use to pull and push the remote'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}
+      shell: bash
+      env: 
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: gh repo clone ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}
+    - name: Copy required directory
+      shell: bash
+      run: rsync -av ${{ inputs.remote_repository }}/${{ inputs.remote_directory }} ${{ inputs.target_directory }}
+    - name: Create PR
+      uses: peter-evans/create-pull-request@v5
+      with:
+        add-paths: ${{ inputs.target_directory }}
+        title: "Sync: ${{ inputs.remote_owner }}/${{ inputs.remote_repository }} - ${{ inputs.remote_directory }}" 
+        branch: "${{ inputs.target_directory }}"
+
+
