@@ -2,7 +2,7 @@ name: "Sync remote charts in PR"
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   sync-chart:
