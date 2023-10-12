@@ -3,6 +3,20 @@ on:
   push:
     branches: ["sms/cloudwatch-sync"]
 
+      update-ack-chart:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        charts:
+        - remote_owner: aws
+          remote_repository: eks-charts
+          remote_directory: stable/aws-cloudwatch-metrics
+          target_directory: addons/aws-cloudwatch-metrics
+        - remote_owner: aws
+          remote_repository: eks-charts
+          remote_directory: stable/aws-vpc-cni
+          target_directory: addons/aws-vpc-cni
+
 jobs:
   sync-chart:
     permissions:
@@ -15,8 +29,8 @@ jobs:
       - name: Update remote chart
         uses: ./.github/actions/sync-remote-directory
         with:
-          remote_owner: aws
-          remote_repository: eks-charts
-          remote_directory: stable/aws-cloudwatch-metrics
-          target_directory: addons/aws-cloudwatch-metrics
+          remote_owner: ${{ matrix.charts.remote_owner }}
+          remote_repository: ${{ matrix.charts.remote_repository }}
+          remote_directory: ${{ matrix.charts.remote_directory }}
+          target_directory: ${{ matrix.charts.target_directory }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
