@@ -3,6 +3,9 @@ name: 'Sync remote directory'
 description: 'Sync remote directory to a local directory'
 
 inputs:
+  remote_owner:
+    description: Remote owner of the repository e.g. porter-dev
+    required: true
   remote_repository:
     description: Remote repository in the form owner/repo e.g. porter-dev/porter
     required: true
@@ -23,9 +26,9 @@ runs:
       shell: bash
       env: 
         GITHUB_TOKEN: ${{ inputs.github_token }}
-      run: gh repo clone ${{ inputs.remote_repository }}
+      run: gh repo clone ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}
     - name: Copy require directory
       shell: bash
-      run: rsync -av 
+      run: rsync -av ${{ inputs.remote_repository }}/${{ inputs.remote_directory }} ${{ inputs.target_directory }}
 
 
