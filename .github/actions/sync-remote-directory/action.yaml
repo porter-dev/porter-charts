@@ -22,12 +22,12 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Checkout porter-charts
+    - name: Checkout ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}
       shell: bash
       env: 
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: gh repo clone ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}
-    - name: Copy require directory
+    - name: Copy required directory
       shell: bash
       run: rsync -av ${{ inputs.remote_repository }}/${{ inputs.remote_directory }} ${{ inputs.target_directory }}
     - name: Create PR

@@ -15,8 +15,8 @@ jobs:
       - name: Update remote chart
         uses: ./.github/actions/sync-remote-directory
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           remote_owner: aws
           remote_repository: eks-charts
           remote_directory: stable/aws-cloudwatch-metrics
           target_directory: addons/aws-cloudwatch-metrics
+          github_token: ${{ secrets.GITHUB_TOKEN }}
