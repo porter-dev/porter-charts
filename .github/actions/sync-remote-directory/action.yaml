@@ -35,6 +35,6 @@ runs:
       with:
         add-paths: ${{ inputs.target_directory }}
         title: "Sync: ${{ inputs.remote_owner }}/${{ inputs.remote_repository }} - ${{ inputs.remote_directory }}" 
-        branch: "${{ inputs.remote_owner }}/${{ inputs.remote_repository }}/${{ inputs.remote_directory }}"
+        branch: "${{ inputs.target_directory }}"
 
 
