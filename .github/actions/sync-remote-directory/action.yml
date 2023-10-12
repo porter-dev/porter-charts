@@ -1,0 +1,28 @@
+---
+name: 'Sync remote directory'
+description: 'Sync remote directory to a local directory'
+
+inputs:
+  remote_repository:
+    description: Remote repository in the form owner/repo e.g. porter-dev/porter
+    required: true
+  github_token:
+    description: 'Github token to use to pull and push the remote'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set Github Token Env var
+      shell: bash
+      run: echo "GITHUB_TOKEN=$ {{ inputs.github_token }}"  >> $GITHUB_ENV
+    - name: Checkout porter-charts
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.remote_repository }}
+        fetch-depth: 0
+    - name: Copy require directory
+      shell: bash
+      run: rsync --help
+
+

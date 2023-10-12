@@ -10,11 +10,13 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout porter-charts
         uses: actions/checkout@v4
-      - name: Run GitHub File Sync
-        uses: BetaHuhn/repo-file-sync-action@v1
         with:
-          GH_PAT: ${{ secrets.GH_TOKEN_SUPPORT_SYNC_REMOTE_HELM_CHARTS }}
-          TEAM_REVIEWERS: engineering
-          CONFIG_PATH: .github/charts-to-sync.yml
+          repository: porter-dev/porter-charts
+          path: porter-charts
+      - name: Update remote chart
+        uses: ./.github/actions/sync-remote-directory
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          remote_repository: aws/eks-charts
