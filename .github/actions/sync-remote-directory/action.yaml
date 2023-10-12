@@ -31,10 +31,10 @@ runs:
       shell: bash
       run: rsync -av ${{ inputs.remote_repository }}/${{ inputs.remote_directory }} ${{ inputs.target_directory }}
     - name: Create PR
-      shell: bash
-      run: |
-        git add ${{ inputs.target_directory }}
-        git commit -m "Syncing: ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}"
-        gh pr create --fill --auto-push
+      uses: peter-evans/create-pull-request@v5
+      with:
+        add-paths: ${{ inputs.target_directory }}
+        title: "Sync: ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}"
+        team-reviewers: engineering
 
 
