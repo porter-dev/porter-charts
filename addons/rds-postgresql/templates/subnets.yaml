@@ -1,0 +1,20 @@
+---
+apiVersion: rds.services.k8s.aws/v1alpha1
+kind: DBSubnetGroup
+metadata:
+  name: {{ .Values.config.name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    services.k8s.aws/region: {{ .Values.config.awsRegion }}
+spec:
+  name: {{ .Values.config.name }}
+  description: "{{ .Values.config.name }} Subnet Group"
+{{- if .Values.config.subnetsIDs }}
+  subnetIDs:
+  {{- range .Values.config.subnetsIDs }}
+    - {{ toYaml . }}
+  {{- end}}
+{{- end }}
+  tags:
+    - key: "porter.run/managed"
+      value: "true"

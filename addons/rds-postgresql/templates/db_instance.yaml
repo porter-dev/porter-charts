@@ -1,0 +1,44 @@
+---
+apiVersion: rds.services.k8s.aws/v1alpha1
+kind: DBInstance
+metadata:
+  name: {{ .Values.config.name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    services.k8s.aws/region: {{ .Values.config.awsRegion }}
+spec:
+  allocatedStorage: {{ .Values.config.allocatedStorage }}
+  autoMinorVersionUpgrade: true
+  backupRetentionPeriod: 14
+  caCertificateIdentifier: rds-ca-rsa2048-g1
+  copyTagsToSnapshot: true
+  dbInstanceClass: {{ .Values.config.instanceClass }}
+  dbInstanceIdentifier: {{ .Values.config.name }}
+  dbName: {{ .Values.config.name | snakecase | nospace }}
+  dbSubnetGroupRef:
+    from:
+      name: {{ .Values.config.name }}
+  dbParameterGroupRef:
+    from:
+      name: {{ .Values.config.name }}
+  enableCloudwatchLogsExports:
+    - postgresql
+    - upgrade
+  engine: postgres
+  engineVersion: "{{ .Values.config.engineVersion }}"
+  masterUsername: "{{ .Values.config.masterUsername }}"
+  masterUserPassword:
+    namespace: porter-env-group
+    name: {{ .Values.config.name }}.1
+    key: DB_PASS
+  multiAZ: {{ .Values.config.multiAZ }}
+  performanceInsightsEnabled: true
+  performanceInsightsRetentionPeriod: 7
+  storageEncrypted: true
+  storageType: gp3
+  tags:
+    - key: "porter.run/managed"
+      value: "true"
+  vpcSecurityGroupRefs:
+    - from:
+        name: {{ .Values.config.name }}-postgresql

@@ -1,0 +1,11 @@
+config:
+  allocatedStorage: 30
+  awsRegion: ""
+  engineVersion: 15.4
+  instanceClass: db.t4g.small
+  masterUsername: root
+  masterUserPassword: ""
+  multiAZ: true
+  name: ""
+  subnetsIDs: []
+  vpcID: ""
