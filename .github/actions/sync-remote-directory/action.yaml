@@ -38,6 +38,6 @@ runs:
       with:
         add-paths: ${{ inputs.target_directory }}
         title: "Sync: ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}"
-        team-reviewers: engineering
+        team-reviewers: "@porter-dev/engineering"
 
 
