@@ -1,0 +1,3 @@
+aws/eks-charts:
+  - source: stable/aws-cloudwatch-metrics/
+    dest: addons/aws-cloudwatch-metrics/
