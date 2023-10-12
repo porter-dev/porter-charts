@@ -6,6 +6,12 @@ inputs:
   remote_repository:
     description: Remote repository in the form owner/repo e.g. porter-dev/porter
     required: true
+  remote_directory:
+    description: Remote directory within the remote_repository to sync
+    required: true
+  target_directory:
+    description: Directory within the current repo, where we would like to copy the files
+    required: true
   github_token:
     description: 'Github token to use to pull and push the remote'
     required: true
@@ -20,6 +26,6 @@ runs:
       run: gh repo clone ${{ inputs.remote_repository }}
     - name: Copy require directory
       shell: bash
-      run: rsync --help
+      run: rsync -av 
 
 

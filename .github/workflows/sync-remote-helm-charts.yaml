@@ -17,3 +17,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           remote_repository: aws/eks-charts
+          remote_directory: stable/aws-cloudwatch-metrics
+          target_directory: addons/aws-cloudwatch-metrics
