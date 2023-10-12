@@ -17,10 +17,8 @@ runs:
       shell: bash
       run: echo "GITHUB_TOKEN=$ {{ inputs.github_token }}"  >> $GITHUB_ENV
     - name: Checkout porter-charts
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ inputs.remote_repository }}
-        fetch-depth: 0
+      shell: bash
+      run: gh repo clone ${{ inputs.remote_repository }}
     - name: Copy require directory
       shell: bash
       run: rsync --help
