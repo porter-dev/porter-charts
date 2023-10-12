@@ -2,16 +2,12 @@ name: "Sync remote charts in PR"
 on:
   push:
     branches: ["sms/cloudwatch-sync"]
-  # schedule:
-  #   - cron: "11 5 * * *"
-  # workflow_dispatch: {}
-
-permissions:
-  contents: write
-  pull-requests: write
 
 jobs:
   sync-chart:
+    permissions:
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
