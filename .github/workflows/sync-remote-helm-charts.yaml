@@ -1,7 +1,8 @@
 name: "Sync remote charts in PR"
 on:
   push:
-    branches: ["sms/cloudwatch-sync"]
+    branches:
+      - main
 
 jobs:
   sync-chart:
