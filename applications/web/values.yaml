@@ -159,11 +159,11 @@ health:
   livenessCommand:
     enabled: false
     command: "ls -l"
-    initialDelaySeconds: 5
+    initialDelaySeconds: 10
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
-    failureThreshold: 3
+    failureThreshold: 8
 
   readinessProbe:
     enabled: false
@@ -173,7 +173,7 @@ health:
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
-    failureThreshold: 3
+    failureThreshold: 6
     httpHeaders: []
     auth:
       enabled: false
