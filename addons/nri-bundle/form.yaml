@@ -20,10 +20,10 @@ tabs:
             label: NewRelic Insights Key
             variable: global.insightsKey
           - type: string-input
-            label: NewRelic Personal API Key(required for using the Metrics Adapter)
+            label: NewRelic Personal API Key (required for using the Metrics Adapter)
             variable: newrelic-k8s-metrics-adapter.personalAPIKey
           - type: string-input
-            label: NewRelic Account ID(required for using the Metrics Adapter)
+            label: NewRelic Account ID (required for using the Metrics Adapter)
             variable: newrelic-k8s-metrics-adapter.config.accountID
           - type: heading
             label: Logging
