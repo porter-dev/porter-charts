@@ -13,6 +13,10 @@ jobs:
             remote_repository: eks-charts
             remote_directory: stable/aws-cloudwatch-metrics
             target_directory: addons/aws-cloudwatch-metrics
+          - remote_owner: aws-controllers-k8s
+            remote_repository: ack-chart
+            remote_directory: .
+            target_directory: addons/ack-chart
 
     permissions:
       contents: write

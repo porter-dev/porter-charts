@@ -1,0 +1,42 @@
+apigatewayv2:
+  enabled: false
+applicationautoscaling:
+  enabled: false
+cloudtrail:
+  enabled: false
+dynamodb:
+  enabled: false
+ec2:
+  enabled: false
+ecr:
+  enabled: false
+eks:
+  enabled: false
+emrcontainers:
+  enabled: false
+eventbridge:
+  enabled: false
+iam:
+  enabled: false
+kms:
+  enabled: false
+lambda:
+  enabled: false
+memorydb:
+  enabled: false
+pipes:
+  enabled: false
+prometheusservice:
+  enabled: false
+rds:
+  enabled: false
+s3:
+  enabled: false
+sagemaker:
+  enabled: false
+sfn:
+  enabled: false
+sns:
+  enabled: false
+sqs:
+  enabled: false

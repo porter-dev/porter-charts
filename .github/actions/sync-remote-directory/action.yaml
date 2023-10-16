@@ -29,7 +29,7 @@ runs:
       run: gh repo clone ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}
     - name: Copy required directory
       shell: bash
-      run: rsync -av ${{ inputs.remote_repository }}/${{ inputs.remote_directory }} ${{ inputs.target_directory }}
+      run: rsync -av --cvs-exclude ${{ inputs.remote_repository }}/${{ inputs.remote_directory }} ${{ inputs.target_directory }}
     - name: Create PR
       uses: peter-evans/create-pull-request@v5
       with:
