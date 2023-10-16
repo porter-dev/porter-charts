@@ -5,7 +5,7 @@ metadata:
   name: {{ .Values.config.name }}-postgresql
   namespace: {{ .Release.Namespace }}
   annotations:
-    services.k8s.aws/region: {{ .Values.config.awsRegion }}
+    services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
 spec:
   description: SecurityGroup
   name: {{ .Values.config.name }}-postgresql
