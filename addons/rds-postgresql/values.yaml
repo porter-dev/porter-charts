@@ -7,5 +7,7 @@ config:
   masterUserPassword: ""
   multiAZ: true
   name: ""
+
+vpcConfig:
   subnetsIDs: []
   vpcID: ""
