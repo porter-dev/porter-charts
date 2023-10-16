@@ -26,7 +26,7 @@ tabs:
       variable: config.allocatedStorage
     - type: string-input
       label: AWS Region
-      variable: config.awsRegion
+      variable: vpcConfig.awsRegion
     - type: string-input
       label: Cluster Subnet IDs (comma-delimited)
       variable: vpcConfig.subnetsIDs

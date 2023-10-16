@@ -5,7 +5,7 @@ metadata:
   name: {{ .Values.config.name }}
   namespace: {{ .Release.Namespace }}
   annotations:
-    services.k8s.aws/region: {{ .Values.config.awsRegion }}
+    services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
 spec:
   description: "Parameter group for {{ .Values.config.name }}"
   family: postgres{{ (semver (toString .Values.config.engineVersion)).Major }}
