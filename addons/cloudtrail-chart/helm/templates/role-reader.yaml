@@ -1,0 +1,17 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: ack-cloudtrail-reader
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups:
+  - cloudtrail.services.k8s.aws
+  resources:
+  - eventdatastores
+  - trails
+  verbs:
+  - get
+  - list
+  - watch
