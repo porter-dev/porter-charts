@@ -1,0 +1,44 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: ack-memorydb-writer
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups:
+  - memorydb.services.k8s.aws
+  resources:
+  - acls
+
+  - clusters
+
+  - parametergroups
+
+  - snapshots
+
+  - subnetgroups
+
+  - users
+
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - memorydb.services.k8s.aws
+  resources:
+  - acls
+  - clusters
+  - parametergroups
+  - snapshots
+  - subnetgroups
+  - users
+  verbs:
+  - get
+  - patch
+  - update
