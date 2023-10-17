@@ -90,7 +90,7 @@ jobs:
             remote_directory: helm
             target_directory: addons/sagemaker-chart
           - remote_owner: aws-controllers-k8s
-            remote_repository: sfn-chart
+            remote_repository: sfn-controller
             remote_directory: helm
             target_directory: addons/sfn-chart
           - remote_owner: aws-controllers-k8s
