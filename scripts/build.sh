@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eo pipefail
 
 versionJQ='
 def handle: .[] | [.version] | sort_by( split(".") | map(tonumber) ) | last ;
