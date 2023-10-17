@@ -82,8 +82,7 @@ package_helm() {
   yq e '.version = "'"$new_version"'"' -i "$chart_path"
 
   if [[ "$chart_name" == "ack-chart" ]]; then
-    return
-    yq -i '.dependencies[].repository = env(CHARTMUSEUM_URL)' ack-chart/Chart.yaml
+    yq -i '.dependencies[].repository = env(CHARTMUSEUM_URL)' "$chart_path"
     helm dependency update "$helm_dir"
   fi
 
