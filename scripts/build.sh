@@ -61,13 +61,13 @@ increment_version () {
 }
 
 package_helm() {
-  local helm_dir=$1
+  declare helm_dir="$1" chart_path="$2"
 
-  echo "Packaging chart found in directory $1"
+  echo "Packaging chart found in directory $helm_dir"
 
   # get latest version from chartmuseum
-  name=$(yq e '.name' $2)
-  version=$(curl -s "$CHARTMUSEUM_URL/api/charts/$name" | jq -r "$versionJQ")
+  chart_name=$(yq e '.name' "$chart_path")
+  version=$(curl -s "$CHARTMUSEUM_URL/api/charts/$chart_name" | jq -r "$versionJQ")
 
   if [ -z $version ]
   then
@@ -77,19 +77,23 @@ package_helm() {
   # increment version
   new_version=$(increment_version -m $version)
 
-  echo "Upgrading $name from $version to $new_version"
+  echo "Upgrading $chart_name from $version to $new_version"
 
-  yq e '.version = "'"$new_version"'"' -i $2
+  yq e '.version = "'"$new_version"'"' -i "$chart_path"
 
-  helm package $helm_dir
+  helm package "$helm_dir"
 }
 
-for d in $1/*/Chart.yaml ; do
-  helm_dir=$(echo "$d" | sed 's|\(.*\)/.*|\1|')
-
-  echo "Checking diffs for $helm_dir"
-  
-  git diff --quiet $2 $3 -- $helm_dir || package_helm $helm_dir $d
+for chart_path in $1/*/Chart.yaml ; do
+  helm_dir=$(echo "$chart_path" | sed 's|\(.*\)/.*|\1|')
+  chart_name=$(yq e '.name' "$chart_path")
+  if curl -s --fail "$CHARTMUSEUM_URL/api/charts/$chart_name"; then
+    echo "Checking diffs for $helm_dir"
+    git diff --quiet $2 $3 -- "$helm_dir" || package_helm "$helm_dir" "$chart_path"
+  else
+    echo "Missing $helm_dir chart in chartmuseum"
+    package_helm "$helm_dir" "$chart_path"
+  fi
 done
 
 if ls *.tgz 1> /dev/null 2>&1; then
