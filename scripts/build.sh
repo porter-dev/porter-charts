@@ -81,6 +81,7 @@ package_helm() {
 
   yq e '.version = "'"$new_version"'"' -i "$chart_path"
 
+  helm dependency build "$helm_dir"
   helm package "$helm_dir"
 }
 
