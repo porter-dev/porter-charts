@@ -46,6 +46,10 @@ jobs:
             remote_directory: helm
             target_directory: addons/eks-chart
           - remote_owner: aws-controllers-k8s
+            remote_repository: elasticache-controller
+            remote_directory: helm
+            target_directory: addons/elasticache-chart
+          - remote_owner: aws-controllers-k8s
             remote_repository: emrcontainers-controller
             remote_directory: helm
             target_directory: addons/emrcontainers-chart
