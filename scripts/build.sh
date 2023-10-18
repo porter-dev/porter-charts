@@ -67,19 +67,19 @@ package_helm() {
 
   # get latest version from chartmuseum
   chart_name=$(yq e '.name' "$chart_path")
-  version=$(curl -s "$CHARTMUSEUM_URL/api/charts/$chart_name" | jq -r "$versionJQ")
 
-  if [ -z $version ]
-  then
-    version="0.0.0"
+  if grep -qE "^${helm_dir}\$" vendored-charts; then
+    echo "Using version in mirrored chart"
+  else
+    echo "Upgrading $chart_name from $version to $new_version"
+    version=$(curl -s "$CHARTMUSEUM_URL/api/charts/$chart_name" | jq -r "$versionJQ")
+    if [[ -z "$version" ]]; then
+      version="0.0.0"
+    fi
+
+    new_version="$(increment_version -m "$version")"
+    yq e '.version = "'"$new_version"'"' -i "$chart_path"
   fi
-
-  # increment version
-  new_version=$(increment_version -m $version)
-
-  echo "Upgrading $chart_name from $version to $new_version"
-
-  yq e '.version = "'"$new_version"'"' -i "$chart_path"
 
   if [[ "$chart_name" == "ack-chart" ]]; then
     echo "Force setting repository for all dependencies"
@@ -95,15 +95,24 @@ package_helm() {
   helm package "$helm_dir"
 }
 
+failures=0
+
 for chart_path in $1/*/Chart.yaml ; do
   helm_dir=$(echo "$chart_path" | sed 's|\(.*\)/.*|\1|')
   chart_name=$(yq e '.name' "$chart_path")
+  must_package=false
   if curl -s --fail "$CHARTMUSEUM_URL/api/charts/$chart_name"; then
     echo "Checking diffs for $helm_dir"
-    git diff --quiet $2 $3 -- "$helm_dir" || package_helm "$helm_dir" "$chart_path"
+    git diff --quiet $2 $3 -- "$helm_dir" || must_package=true
   else
     echo "Missing $helm_dir chart in chartmuseum"
-    package_helm "$helm_dir" "$chart_path"
+    must_package=true
+  fi
+  if [[ "$must_package" == true ]]; then
+    package_helm "$helm_dir" "$chart_path" || {
+      echo "Failed to package $helm_dir"
+      failures=$((failures+1))
+    }
   fi
 done
 
@@ -111,11 +120,19 @@ if ls *.tgz 1> /dev/null 2>&1; then
   for file in *.tgz ; do
     echo "Uploading package $file to chartmuseum"
 
-    curl -s -u $CHARTMUSEUM_USERNAME:$CHARTMUSEUM_PASSWORD --data-binary "@$file" "$CHARTMUSEUM_URL/api/charts"
+    curl -s -u "$CHARTMUSEUM_USERNAME:$CHARTMUSEUM_PASSWORD" --data-binary "@$file" "$CHARTMUSEUM_URL/api/charts" || {
+      echo "Failed to upload $helm_dir"
+      failures=$((failures+1))
+    }
   done
 
   # cleanup files 
   rm *.tgz
 else
   echo "No tgz files found"
+fi
+
+if [[ "$failures" -gt 0 ]]; then
+  echo "Failed run due to ${failures} failures"
+  exit 1
 fi
