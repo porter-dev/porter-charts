@@ -15,7 +15,7 @@ sources:
   - https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-logging
   - https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-pixie
   - https://github.com/newrelic/newrelic-infra-operator/tree/master/charts/newrelic-infra-operator
-version: 0.8.0
+version: 0.11.0
 appVersion: 5.0.15
 dependencies:
   - name: newrelic-infrastructure
@@ -92,5 +92,5 @@ maintainers:
 keywords:
   - infrastructure
   - newrelic
-  - monitoring
   - MONITORING
+  - APP
