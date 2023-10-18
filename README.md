@@ -10,7 +10,7 @@ The [`/addons`](/addons) folder contains templates for deploying everything that
 
 ## Syncing a remote add-on
 
-In order to add new charts to Porter's addon lists, you can sync a chart from a remote repository go to open the [sync charts workflow](porter-charts/.github/workflows/sync-remote-helm-charts.yaml) and add the following information to `.sync-chart.matrix.charts`. This will create a new PR for the remote chart which will be synced on a schedule.
+In order to add new charts to Porter's addon lists, you can sync a chart from a remote repository go to open the [sync charts workflow](.github/workflows/sync-remote-helm-charts.yaml) and add the following information to `.sync-chart.matrix.charts`. This will create a new PR for the remote chart which will be synced on a schedule.
 
 ```yaml
 - remote_owner: aws
