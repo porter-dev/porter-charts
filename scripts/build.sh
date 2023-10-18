@@ -84,7 +84,6 @@ package_helm() {
   if [[ "$chart_name" == "ack-chart" ]]; then
     echo "Force setting repository for all dependencies"
     yq e '.dependencies[].repository = env(CHARTMUSEUM_URL)' -i "$chart_path"
-    cat "$chart_path"
     echo "Updating dependencies"
     helm dependency update "$helm_dir"
     echo "Building dependencies"
