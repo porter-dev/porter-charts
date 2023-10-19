@@ -9,7 +9,7 @@ metadata:
 spec:
   description: SecurityGroup
   name: {{ .Values.config.name }}-postgresql
-  vpcID: {{ .Values.config.vpcID }}
+  vpcID: {{ .Values.vpcConfig.vpcID }}
   ingressRules:
   - ipProtocol: tcp
     ipRanges:

@@ -9,9 +9,9 @@ metadata:
 spec:
   name: {{ .Values.config.name }}
   description: "{{ .Values.config.name }} Subnet Group"
-{{- if .Values.vpcConfig.subnetsIDs }}
+{{- if .Values.vpcConfig.subnetIDs }}
   subnetIDs:
-  {{- range .Values.vpcConfig.subnetsIDs }}
+  {{- range .Values.vpcConfig.subnetIDs }}
     - {{ toYaml . }}
   {{- end}}
 {{- end }}

@@ -29,7 +29,7 @@ tabs:
       variable: vpcConfig.awsRegion
     - type: string-input
       label: Cluster Subnet IDs (comma-delimited)
-      variable: vpcConfig.subnetsIDs
+      variable: vpcConfig.subnetIDs
     - type: string-input
       label: VPC ID
       variable: vpcConfig.vpcID
