@@ -5,10 +5,15 @@
 {{- end -}}
 {{- /* Some random ID of this password, in case there will be other random values alongside this instance. */ -}}
 {{- $key := printf "%s_%s" .Release.Name "DB_PASS" -}}
-{{- /* If $key does not yet exist in .Release.tmp_vars, then... */ -}}
+{{- /* If a password isn't set and the $key does not yet exist in .Release.tmp_vars, then... */ -}}
+{{- if .Values.config.masterUserPassword -}}
+{{- /* ... set the specified password as $key */ -}}
+{{-   $_ := set .Release.tmp_vars $key (.Values.config.masterUserPassword) -}}
+{{- else -}}
 {{- if not (index .Release.tmp_vars $key) -}}
 {{- /* ... store random password under the $key */ -}}
 {{-   $_ := set .Release.tmp_vars $key (randAlphaNum 20) -}}
+{{- end -}}
 {{- end -}}
 {{- /* Retrieve previously generated value. */ -}}
 {{- index .Release.tmp_vars $key -}}

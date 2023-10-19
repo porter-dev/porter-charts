@@ -3,6 +3,7 @@ config:
   engineVersion: 15.4
   instanceClass: db.t4g.small
   masterUsername: root
+  masterUserPassword: ""
   multiAZ: true
   name: ""
 
