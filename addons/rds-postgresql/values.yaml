@@ -9,5 +9,5 @@ config:
 
 vpcConfig:
   awsRegion: ""
-  subnetsIDs: []
+  subnetIDs: []
   vpcID: ""
