@@ -1,6 +1,6 @@
 ---
 apiVersion: rds.services.k8s.aws/v1alpha1
-kind: DBParameterGroup
+kind: DBSubnetGroup
 metadata:
   name: {{ .Values.config.name }}
   namespace: {{ .Release.Namespace }}
@@ -8,10 +8,13 @@ metadata:
     services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
 spec:
   name: {{ .Values.config.name }}
-  description: "Parameter group for {{ .Values.config.name }}"
-  family: postgres{{ (semver (toString .Values.config.engineVersion)).Major }}
-  parameterOverrides:
-    max_wal_senders: "20"
+  description: "{{ .Values.config.name }} PostgresQL Aurora Subnet Group"
+{{- if .Values.vpcConfig.subnetIDs }}
+  subnetIDs:
+  {{- range .Values.vpcConfig.subnetIDs }}
+    - {{ toYaml . }}
+  {{- end}}
+{{- end }}
   tags:
     - key: "porter.run/managed"
       value: "true"

@@ -1,11 +1,12 @@
 config:
-  allocatedStorage: 30
   engineVersion: 15.4
-  instanceClass: db.t4g.small
+  instanceClass: db.t4g.medium
   masterUsername: root
   masterUserPassword: ""
-  multiAZ: true
   name: ""
+  instanceCount: 2
+  serverlessMinCapacity: 0.5
+  serverlessMaxCapacity: 128
 
 vpcConfig:
   awsRegion: ""

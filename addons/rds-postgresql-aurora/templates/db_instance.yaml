@@ -1,0 +1,72 @@
+---
+apiVersion: rds.services.k8s.aws/v1alpha1
+kind: DBCluster
+metadata:
+  name: {{ .Values.config.name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
+spec:
+  autoMinorVersionUpgrade: true
+  backupRetentionPeriod: 14
+  databaseName: {{ .Values.config.name | snakecase | nospace }}
+  dbSubnetGroupRef:
+    from:
+      name: {{ .Values.config.name }}
+  copyTagsToSnapshot: true
+  dbClusterIdentifier: {{ .Values.config.name }}
+  enableCloudwatchLogsExports:
+    - postgresql
+  engine: aurora-postgresql
+  engineVersion: "{{ .Values.config.engineVersion }}"
+  masterUsername: adminer
+  masterUsername: "{{ .Values.config.masterUsername }}"
+{{ if eq .Values.config.instanceClass "db.serverless" }}
+  serverlessV2ScalingConfiguration:
+    maxCapacity: {{ .Values.config.serverlessMaxCapacity }}
+    minCapacity: {{ .Values.config.serverlessMinCapacity }}
+{{ end }}
+  masterUserPassword:
+    namespace: porter-env-group
+    name: {{ .Values.config.name }}.1
+    key: DB_PASS
+  monitoringInterval: 60
+  storageEncrypted: true
+  tags:
+    - key: "porter.run/managed"
+      value: "true"
+  vpcSecurityGroupRefs:
+    - from:
+        name: {{ .Values.config.name }}-rds
+{{ $name := .Values.config.name }}
+{{ $namespace := .Release.Namespace }}
+{{ $awsRegion := .Values.vpcConfig.awsRegion }}
+{{ $instanceClass := .Values.config.instanceClass }}
+{{ $engineVersion := .Values.config.engineVersion }}
+{{ $instanceCount := (.Values.config.instanceCount | int) }}
+{{ if eq .Values.config.instanceClass "db.serverless" }}
+{{ $instanceCount = 1}}
+{{ end }}
+{{ range $i, $e := until $instanceCount }}
+---
+apiVersion: rds.services.k8s.aws/v1alpha1
+kind: DBInstance
+metadata:
+  name: "{{ $name }}-{{ add1 $e }}"
+  namespace: "{{ $namespace }}"
+  annotations:
+    services.k8s.aws/region: "{{ $awsRegion }}"
+spec:
+  caCertificateIdentifier: rds-ca-rsa2048-g1
+  dbInstanceIdentifier: "{{ $name }}-{{ add1 $e }}"
+  dbClusterIdentifier: "{{ $name }}"
+  dbInstanceClass: "{{ $instanceClass }}"
+  engine: aurora-postgresql
+  engineVersion: "{{ $engineVersion }}"
+  performanceInsightsEnabled: true
+  performanceInsightsRetentionPeriod: 7
+  publiclyAccessible: false
+  tags:
+    - key: "porter.run/managed"
+      value: "true"
+{{ end }}

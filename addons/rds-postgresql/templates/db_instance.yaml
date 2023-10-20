@@ -31,6 +31,7 @@ spec:
     namespace: porter-env-group
     name: {{ .Values.config.name }}.1
     key: DB_PASS
+  monitoringInterval: 60
   multiAZ: {{ .Values.config.multiAZ }}
   performanceInsightsEnabled: true
   performanceInsightsRetentionPeriod: 7
@@ -41,4 +42,4 @@ spec:
       value: "true"
   vpcSecurityGroupRefs:
     - from:
-        name: {{ .Values.config.name }}-postgresql
+        name: {{ .Values.config.name }}-rds

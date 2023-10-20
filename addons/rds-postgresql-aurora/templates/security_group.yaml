@@ -7,8 +7,8 @@ metadata:
   annotations:
     services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
 spec:
-  description: SecurityGroup
   name: {{ .Values.config.name }}-rds
+  description: "Security Group for {{ .Values.config.name }} PostgresQL Aurora"
   vpcID: {{ .Values.vpcConfig.vpcID }}
   ingressRules:
   - ipProtocol: tcp

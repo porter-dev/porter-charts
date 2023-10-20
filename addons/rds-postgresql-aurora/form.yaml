@@ -1,4 +1,4 @@
-name: RDS PostgreSQL
+name: RDS PostgreSQL Aurora
 tabs:
 - name: main
   label: Main Settings
@@ -8,7 +8,7 @@ tabs:
     - type: heading
       label: RDS Resources
     - type: subtitle
-      label: Configure resources assigned to this RDS PostgreSQL instance.
+      label: Configure resources assigned to this RDS PostgreSQL Aurora instance.
     - type: string-input
       label: Database 
       variable: config.name
@@ -24,6 +24,9 @@ tabs:
     - type: string-input
       label: Storage Capacity (GB)
       variable: config.allocatedStorage
+    - type: string-input
+      label: Instance Count
+      variable: config.instanceCount
     - type: string-input
       label: AWS Region
       variable: vpcConfig.awsRegion
