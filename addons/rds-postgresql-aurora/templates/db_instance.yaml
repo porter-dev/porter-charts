@@ -6,6 +6,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
+  labels:
+    porter.run/helm-release-name: "{{ .Release.Name }}"
 spec:
   autoMinorVersionUpgrade: true
   backupRetentionPeriod: 14
@@ -44,6 +46,7 @@ spec:
 {{ $instanceClass := .Values.config.instanceClass }}
 {{ $engineVersion := .Values.config.engineVersion }}
 {{ $instanceCount := (.Values.config.instanceCount | int) }}
+{{ $releaseName := .Release.Name }}
 {{ if eq .Values.config.instanceClass "db.serverless" }}
 {{ $instanceCount = 1}}
 {{ end }}
@@ -56,6 +59,8 @@ metadata:
   namespace: "{{ $namespace }}"
   annotations:
     services.k8s.aws/region: "{{ $awsRegion }}"
+  labels:
+    porter.run/helm-release-name: "{{ $releaseName }}"
 spec:
   caCertificateIdentifier: rds-ca-rsa2048-g1
   dbInstanceIdentifier: "{{ $name }}-{{ add1 $e }}"
