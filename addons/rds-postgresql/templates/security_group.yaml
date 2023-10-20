@@ -2,13 +2,13 @@
 apiVersion: ec2.services.k8s.aws/v1alpha1
 kind: SecurityGroup
 metadata:
-  name: {{ .Values.config.name }}-postgresql
+  name: {{ .Values.config.name }}-rds
   namespace: {{ .Release.Namespace }}
   annotations:
     services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
 spec:
   description: SecurityGroup
-  name: {{ .Values.config.name }}-postgresql
+  name: {{ .Values.config.name }}-rds
   vpcID: {{ .Values.vpcConfig.vpcID }}
   ingressRules:
   - ipProtocol: tcp
@@ -18,6 +18,6 @@ spec:
     toPort: 5432
   tags:
     - key: "Name"
-      value: "{{ .Values.config.name }}-postgresql"
+      value: "{{ .Values.config.name }}-rds"
     - key: "porter.run/managed"
       value: "true"
