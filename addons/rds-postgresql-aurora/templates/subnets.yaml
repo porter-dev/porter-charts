@@ -1,0 +1,20 @@
+---
+apiVersion: rds.services.k8s.aws/v1alpha1
+kind: DBSubnetGroup
+metadata:
+  name: {{ .Values.config.name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
+spec:
+  name: {{ .Values.config.name }}
+  description: "{{ .Values.config.name }} PostgresQL Aurora Subnet Group"
+{{- if .Values.vpcConfig.subnetIDs }}
+  subnetIDs:
+  {{- range .Values.vpcConfig.subnetIDs }}
+    - {{ toYaml . }}
+  {{- end}}
+{{- end }}
+  tags:
+    - key: "porter.run/managed"
+      value: "true"
