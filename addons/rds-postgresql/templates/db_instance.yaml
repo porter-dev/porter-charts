@@ -41,4 +41,4 @@ spec:
       value: "true"
   vpcSecurityGroupRefs:
     - from:
-        name: {{ .Values.config.name }}-postgresql
+        name: {{ .Values.config.name }}-rds
