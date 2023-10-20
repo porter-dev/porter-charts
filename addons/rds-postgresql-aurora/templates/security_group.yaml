@@ -6,6 +6,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
+  labels:
+    porter.run/helm-release-name: "{{ .Release.Name }}"
 spec:
   name: {{ .Values.config.name }}-rds
   description: "Security Group for {{ .Values.config.name }} PostgresQL Aurora"
