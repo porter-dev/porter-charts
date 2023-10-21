@@ -32,7 +32,7 @@ spec:
     namespace: porter-env-group
     name: {{ .Values.config.name }}.1
     key: DB_PASS
-  monitoringInterval: 60
+  monitoringInterval: 0
   storageEncrypted: true
   tags:
     - key: "porter.run/managed"
