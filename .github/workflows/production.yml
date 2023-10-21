@@ -39,13 +39,13 @@ jobs:
       - name: Set matrix for applications publishing
         id: applications-matrix
         run: |
-          matrix="$(git status --porcelain | awk '{print $2}' | xargs -n 1 dirname | uniq | grep "applications/" | jq --compact-output --monochrome-output --raw-input --slurp 'split("\n") | map(select(. != ""))')"
+          matrix="$(git diff --name-only ${{ github.sha }} ${{ github.event.before }} | cut -f1,2,3 -d'/' | xargs -n 1 dirname | uniq | grep "applications/" | jq --compact-output --monochrome-output --raw-input --slurp 'split("\n") | map(select(. != ""))')"
           variable="{\"index\":$matrix}"
           echo "matrix=$variable" >> $GITHUB_OUTPUT
       - name: Set matrix for addons publishing
         id: addons-matrix
         run: |
-          matrix="$(git status --porcelain | awk '{print $2}' | xargs -n 1 dirname | uniq | grep "addons/" | jq --compact-output --monochrome-output --raw-input --slurp 'split("\n") | map(select(. != ""))')"
+          matrix="$(git diff --name-only ${{ github.sha }} ${{ github.event.before }} | cut -f1,2,3 -d'/' | xargs -n 1 dirname | uniq | grep "addons/" | jq --compact-output --monochrome-output --raw-input --slurp 'split("\n") | map(select(. != ""))')"
           variable="{\"index\": $matrix}"
           echo "matrix=$variable" >> $GITHUB_OUTPUT
       - uses: stefanzweifel/git-auto-commit-action@v4
@@ -72,8 +72,7 @@ jobs:
       - name: Update remote chart
         uses: ./.github/actions/publish-chart
         with:
-          chart_name: ${{ matrix.index }}
-          remote_owner: ${{ matrix.charts.remote_owner }}
+          chart_path: ${{ matrix.index }}
           chartmuseum_username: ${{ secrets.CHARTMUSEUM_ADDON_USERNAME }}
           chartmuseum_password: ${{ secrets.CHARTMUSEUM_ADDON_PASSWORD }}
           chartmuseum_url: ${{ secrets.CHARTMUSEUM_ADDON_URL }}
