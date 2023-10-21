@@ -72,8 +72,7 @@ jobs:
       - name: Update remote chart
         uses: ./.github/actions/publish-chart
         with:
-          chart_name: ${{ matrix.index }}
-          remote_owner: ${{ matrix.charts.remote_owner }}
+          chart_path: ${{ matrix.index }}
           chartmuseum_username: ${{ secrets.CHARTMUSEUM_ADDON_USERNAME }}
           chartmuseum_password: ${{ secrets.CHARTMUSEUM_ADDON_PASSWORD }}
           chartmuseum_url: ${{ secrets.CHARTMUSEUM_ADDON_URL }}
