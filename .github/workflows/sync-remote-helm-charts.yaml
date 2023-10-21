@@ -6,7 +6,6 @@ on:
 
 jobs:
   sync-chart:
-    environment: production
     strategy:
       matrix:
         charts:
@@ -123,4 +122,4 @@ jobs:
           target_directory: ${{ matrix.charts.target_directory }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
-          CHARTMUSEUM_URL: ${{ secrets.CHARTMUSEUM_ADDON_URL }}
+          CHARTMUSEUM_URL: ${{ vars.PUBLIC_CHARTMUSEUM_ADDONS_URL }}
