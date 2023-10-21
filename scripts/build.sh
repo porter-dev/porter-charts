@@ -84,7 +84,7 @@ package_helm() {
     yq e '.version = "'"$new_version"'"' -i "$chart_path"
   fi
 
-  script/rebuild-ack-chart
+  scripts/rebuild-ack-chart
 }
 
 failures=0
