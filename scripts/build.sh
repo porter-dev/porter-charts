@@ -71,13 +71,13 @@ package_helm() {
   if grep -qE "^${helm_dir}\$" vendored-charts; then
     echo "Using version in vendored chart"
   else
-    echo "Upgrading $chart_name from $version to $new_version"
     version=$(curl -s "$CHARTMUSEUM_URL/api/charts/$chart_name" | jq -r "$versionJQ")
     if [[ -z "$version" ]]; then
       version="0.0.0"
     fi
 
     new_version="$(increment_version -m "$version")"
+    echo "Upgrading $chart_name from $version to $new_version"
     yq e '.version = "'"$new_version"'"' -i "$chart_path"
   fi
 
