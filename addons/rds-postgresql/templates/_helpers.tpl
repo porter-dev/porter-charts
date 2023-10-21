@@ -21,7 +21,7 @@
 
 {{- define "random_pw_reusable" -}}
   {{- if .Release.IsUpgrade -}}
-    {{- $data := default dict (lookup "v1" "Secret" .Release.Namespace (printf "%s.1" .Values.config.name)).data -}}
+    {{- $data := default dict (lookup "v1" "Secret" "porter-env-group" (printf "%s.1" .Values.config.name)).data -}}
     {{- if $data -}}
       {{- index $data "DB_PASS" | b64dec -}}
     {{- end -}}

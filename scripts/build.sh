@@ -69,7 +69,7 @@ package_helm() {
   chart_name=$(yq e '.name' "$chart_path")
 
   if grep -qE "^${helm_dir}\$" vendored-charts; then
-    echo "Using version in mirrored chart"
+    echo "Using version in vendored chart"
   else
     echo "Upgrading $chart_name from $version to $new_version"
     version=$(curl -s "$CHARTMUSEUM_URL/api/charts/$chart_name" | jq -r "$versionJQ")
@@ -89,9 +89,6 @@ package_helm() {
     echo "Building dependencies"
     helm dependency build "$helm_dir"
   fi
-
-  echo "Packaging helm chart"
-  helm package "$helm_dir"
 }
 
 failures=0
@@ -114,22 +111,6 @@ for chart_path in $1/*/Chart.yaml ; do
     }
   fi
 done
-
-if ls *.tgz 1> /dev/null 2>&1; then
-  for file in *.tgz ; do
-    echo "Uploading package $file to chartmuseum"
-
-    curl -s -u "$CHARTMUSEUM_USERNAME:$CHARTMUSEUM_PASSWORD" --data-binary "@$file" "$CHARTMUSEUM_URL/api/charts" || {
-      echo "Failed to upload $helm_dir"
-      failures=$((failures+1))
-    }
-  done
-
-  # cleanup files 
-  rm *.tgz
-else
-  echo "No tgz files found"
-fi
 
 if [[ "$failures" -gt 0 ]]; then
   echo "Failed run due to ${failures} failures"
