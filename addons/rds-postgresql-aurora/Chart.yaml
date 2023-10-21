@@ -21,3 +21,4 @@ maintainers:
   - name: Porter Technologies, Inc.
     email: support@porter.run
 name: rds-postgresql-aurora
+version: 'usage: build.sh [-Mmp] major.minor.patch'
