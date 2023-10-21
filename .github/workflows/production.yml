@@ -41,11 +41,17 @@ jobs:
         run: |
           matrix="$(git diff --name-only ${{ github.sha }} ${{ github.event.before }} | cut -f1,2,3 -d'/' | xargs -n 1 dirname | uniq | grep "applications/" | jq --compact-output --monochrome-output --raw-input --slurp 'split("\n") | map(select(. != ""))')"
           variable="{\"index\":$matrix}"
+          if [[ "$matrix" == "[]" ]]; then
+            matrix='["null-chart"]'
+          fi
           echo "matrix=$variable" >> $GITHUB_OUTPUT
       - name: Set matrix for addons publishing
         id: addons-matrix
         run: |
           matrix="$(git diff --name-only ${{ github.sha }} ${{ github.event.before }} | cut -f1,2,3 -d'/' | xargs -n 1 dirname | uniq | grep "addons/" | jq --compact-output --monochrome-output --raw-input --slurp 'split("\n") | map(select(. != ""))')"
+          if [[ "$matrix" == "[]" ]]; then
+            matrix='["null-chart"]'
+          fi
           variable="{\"index\": $matrix}"
           echo "matrix=$variable" >> $GITHUB_OUTPUT
       - uses: stefanzweifel/git-auto-commit-action@v4
@@ -91,6 +97,7 @@ jobs:
           ref: ${{ needs.build.outputs.ref }}
       - name: Update remote chart
         uses: ./.github/actions/publish-chart
+        if: ${{ matrix.index }} != "null-chart"
         with:
           chart_name: ${{ matrix.index }}
           remote_owner: ${{ matrix.charts.remote_owner }}
