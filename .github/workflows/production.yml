@@ -77,7 +77,7 @@ jobs:
           ref: ${{ needs.build.outputs.ref }}
       - name: Update remote chart
         uses: ./.github/actions/publish-chart
-        if: ${{ matrix.index }} != "null-chart"
+        if: ${{ matrix.index != 'null-chart' }}
         with:
           chart_path: ${{ matrix.index }}
           chartmuseum_username: ${{ secrets.CHARTMUSEUM_ADDON_USERNAME }}
@@ -98,7 +98,7 @@ jobs:
           ref: ${{ needs.build.outputs.ref }}
       - name: Update remote chart
         uses: ./.github/actions/publish-chart
-        if: ${{ matrix.index }} != "null-chart"
+        if: ${{ matrix.index != 'null-chart' }}
         with:
           chart_name: ${{ matrix.index }}
           remote_owner: ${{ matrix.charts.remote_owner }}
