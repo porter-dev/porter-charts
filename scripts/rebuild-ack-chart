@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+main() {
+  declare CHART_DIR="$1"
+  if [[ "$CHART_DIR" != "addons/ack-chart" ]]; then
+    return
+  fi
+
+  echo "Force setting repository for all dependencies"
+  yq e '.dependencies[].repository = env(CHARTMUSEUM_URL)' -i "$CHART_DIR/Chart.yml"
+  echo "Updating dependencies"
+  helm dependency update "$CHART_DIR"
+  echo "Building dependencies"
+  helm dependency build "$CHART_DIR"
+}
+
+main "$@"

@@ -33,6 +33,9 @@ runs:
         rsync -av --cvs-exclude ${{ inputs.remote_repository }}/${{ inputs.remote_directory }}/ ${{ inputs.target_directory }}
         echo "${{ inputs.target_directory }}" >>vendored-charts
         sort -uo vendored-charts vendored-charts
+    - name: Modify ack-chart if necessary
+      shell: bash
+      run: scripts/rebuild-ack-chart "${{ inputs.target_directory }}"
     - name: Create PR
       uses: peter-evans/create-pull-request@v5
       with:
