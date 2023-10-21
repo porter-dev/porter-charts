@@ -1,66 +1,66 @@
 dependencies:
 - name: apigatewayv2-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.6
 - name: applicationautoscaling-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.8
 - name: cloudtrail-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.5
 - name: dynamodb-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.2.3
 - name: ec2-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.7
 - name: ecr-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.9
 - name: eks-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.5
 - name: emrcontainers-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.4
 - name: eventbridge-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.4
 - name: iam-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.2.6
 - name: kms-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.7
 - name: lambda-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.3.4
 - name: memorydb-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.2
 - name: pipes-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.2
 - name: prometheusservice-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.2.5
 - name: rds-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.1.7
 - name: s3-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.6
 - name: sagemaker-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.2.4
 - name: sfn-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.5
 - name: sns-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.5
 - name: sqs-chart
-  repository: oci://public.ecr.aws/aws-controllers-k8s
+  repository: https://chart-addons.getporter.dev
   version: 1.0.6
-digest: sha256:22ab59df151805c27c2b382f05ca0a149fc4c258177b7d3a8ff35a1ddfb1c93e
-generated: "2023-09-29T19:31:50.53214604Z"
+digest: sha256:5952da9d2455bff8918872f4704d264ecff88ef9044e7f1c248eafedf452f6cc
+generated: "2023-10-21T05:51:31.769660409Z"

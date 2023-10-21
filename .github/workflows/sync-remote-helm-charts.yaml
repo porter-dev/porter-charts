@@ -113,6 +113,9 @@ jobs:
     steps:
       - name: Checkout porter-charts
         uses: actions/checkout@v4
+      - uses: azure/setup-helm@v3
+        with:
+          version: 'v3.3.4'
       - name: Update remote chart
         uses: ./.github/actions/sync-remote-directory
         with:
@@ -121,3 +124,5 @@ jobs:
           remote_directory: ${{ matrix.charts.remote_directory }}
           target_directory: ${{ matrix.charts.target_directory }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CHARTMUSEUM_URL: ${{ vars.PUBLIC_CHARTMUSEUM_ADDONS_URL }}

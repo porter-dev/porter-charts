@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -eo pipefail
 main() {
   declare CHART_DIR="$1"
   if [[ "$CHART_DIR" != "addons/ack-chart" ]]; then
@@ -7,7 +7,8 @@ main() {
   fi
 
   echo "Force setting repository for all dependencies"
-  yq e '.dependencies[].repository = env(CHARTMUSEUM_URL)' -i "$CHART_DIR/Chart.yml"
+  helm repo add porter-addons "$CHARTMUSEUM_URL"
+  yq e '.dependencies[].repository = env(CHARTMUSEUM_URL)' -i "$CHART_DIR/Chart.yaml"
   echo "Updating dependencies"
   helm dependency update "$CHART_DIR"
   echo "Building dependencies"
