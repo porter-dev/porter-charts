@@ -7,6 +7,7 @@ main() {
   fi
 
   echo "Force setting repository for all dependencies"
+  helm repo add porter-addons "$CHARTMUSEUM_URL"
   yq e '.dependencies[].repository = env(CHARTMUSEUM_URL)' -i "$CHART_DIR/Chart.yaml"
   echo "Updating dependencies"
   helm dependency update "$CHART_DIR"

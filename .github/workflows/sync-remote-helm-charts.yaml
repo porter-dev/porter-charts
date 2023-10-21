@@ -113,6 +113,9 @@ jobs:
     steps:
       - name: Checkout porter-charts
         uses: actions/checkout@v4
+      - uses: azure/setup-helm@v3
+        with:
+          version: 'v3.3.4'
       - name: Update remote chart
         uses: ./.github/actions/sync-remote-directory
         with:
