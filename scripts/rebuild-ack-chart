@@ -13,6 +13,9 @@ main() {
   helm dependency update "$CHART_DIR"
   echo "Building dependencies"
   helm dependency build "$CHART_DIR"
+  if [[ "$(git diff --name-only)" == "addons/ack-chart/Chart.lock" ]]; then
+    git checkout -- "addons/ack-chart/Chart.lock"
+  fi
 }
 
 main "$@"
