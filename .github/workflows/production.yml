@@ -6,6 +6,10 @@ jobs:
   build:
     environment: production
     runs-on: ubuntu-latest
+    outputs:
+      addons-matrix: ${{ steps.addons-matrix.outputs.matrix }}
+      applications-matrix: ${{ steps.applications-matrix.outputs.matrix }}
+      ref: ${{ steps.auto-commit-action.outputs.commit_hash }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,10 +36,65 @@ jobs:
           CHARTMUSEUM_USERNAME: ${{ secrets.CHARTMUSEUM_ADDON_USERNAME }}
           CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_ADDON_PASSWORD }}
           CHARTMUSEUM_URL: ${{ secrets.CHARTMUSEUM_ADDON_URL }}
+      - name: Set matrix for applications publishing
+        id: applications-matrix
+        run: |
+          matrix="$(git status --porcelain | awk '{print $2}' | xargs -n 1 dirname | uniq | grep "applications/" | jq --compact-output --monochrome-output --raw-input --slurp 'split("\n") | map(select(. != ""))')"
+          variable="{\"index\":$matrix}"
+          echo "matrix=$variable" >> $GITHUB_OUTPUT
+      - name: Set matrix for addons publishing
+        id: addons-matrix
+        run: |
+          matrix="$(git status --porcelain | awk '{print $2}' | xargs -n 1 dirname | uniq | grep "addons/" | jq --compact-output --monochrome-output --raw-input --slurp 'split("\n") | map(select(. != ""))')"
+          variable="{\"index\": $matrix}"
+          echo "matrix=$variable" >> $GITHUB_OUTPUT
       - uses: stefanzweifel/git-auto-commit-action@v4
+        id: auto-commit-action
         with:
           commit_message: Update Chart.yaml versions
           commit_options: '--allow-empty'
           file_pattern: "*/*/Chart.yaml"
           commit_user_name: Porter Bot
           commit_user_email: contact@getporter.dev
+
+  publish-addons:
+    environment: production
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix: ${{fromJson(needs.build.outputs.addons-matrix)}}
+    steps:
+      - name: Checkout porter-charts
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.ref }}
+      - name: Update remote chart
+        uses: ./.github/actions/publish-chart
+        with:
+          chart_name: ${{ matrix.index }}
+          remote_owner: ${{ matrix.charts.remote_owner }}
+          chartmuseum_username: ${{ secrets.CHARTMUSEUM_ADDON_USERNAME }}
+          chartmuseum_password: ${{ secrets.CHARTMUSEUM_ADDON_PASSWORD }}
+          chartmuseum_url: ${{ secrets.CHARTMUSEUM_ADDON_URL }}
+
+  publish-applications:
+    environment: production
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix: ${{fromJson(needs.build.outputs.applications-matrix)}}
+    steps:
+      - name: Checkout porter-charts
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.ref }}
+      - name: Update remote chart
+        uses: ./.github/actions/publish-chart
+        with:
+          chart_name: ${{ matrix.index }}
+          remote_owner: ${{ matrix.charts.remote_owner }}
+          chartmuseum_username: ${{ secrets.CHARTMUSEUM_USERNAME }}
+          chartmuseum_password: ${{ secrets.CHARTMUSEUM_PASSWORD }}
+          chartmuseum_url: ${{ secrets.CHARTMUSEUM_URL }}
