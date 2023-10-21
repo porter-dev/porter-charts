@@ -1,6 +1,8 @@
 #!/bin/bash
 set -eo pipefail
 
+export REPO_NAME="$1"
+
 versionJQ='
 def handle: .[] | [.version] | sort_by( split(".") | map(tonumber) ) | last ;
 def error: "" ;
@@ -71,7 +73,7 @@ package_helm() {
   if grep -qE "^${helm_dir}\$" vendored-charts; then
     echo "Using version in vendored chart"
   else
-    version="$(helm show chart "porter/$chart_name" 2>/dev/null| yq '.version' || true)"
+    version="$(helm show chart "$REPO_NAME/$chart_name" 2>/dev/null| yq '.version' || true)"
     if [[ -z "$version" ]] || [[ "$version" == "null" ]]; then
       version="0.0.0"
     fi
@@ -93,7 +95,7 @@ package_helm() {
 
 failures=0
 
-helm repo add porter "$CHARTMUSEUM_URL" --username "$CHARTMUSEUM_USERNAME" --password "$CHARTMUSEUM_PASSWORD"
+helm repo add "$REPO_NAME" "$CHARTMUSEUM_URL" --username "$CHARTMUSEUM_USERNAME" --password "$CHARTMUSEUM_PASSWORD"
 
 for chart_path in $1/*/Chart.yaml ; do
   helm_dir=$(echo "$chart_path" | sed 's|\(.*\)/.*|\1|')
