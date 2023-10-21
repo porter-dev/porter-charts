@@ -35,7 +35,7 @@ runs:
         sort -uo vendored-charts vendored-charts
     - name: Modify ack-chart if necessary
       shell: bash
-      run: script/rebuild-ack-cart "${{ inputs.target_directory }}"
+      run: scripts/rebuild-ack-chart "${{ inputs.target_directory }}"
     - name: Create PR
       uses: peter-evans/create-pull-request@v5
       with:
