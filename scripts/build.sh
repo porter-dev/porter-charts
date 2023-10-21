@@ -97,7 +97,7 @@ for chart_path in $1/*/Chart.yaml ; do
   helm_dir=$(echo "$chart_path" | sed 's|\(.*\)/.*|\1|')
   chart_name=$(yq e '.name' "$chart_path")
   must_package=false
-  if curl -sS --fail "$CHARTMUSEUM_URL/api/charts/$chart_name"; then
+  if curl -s -o /dev/null --fail "$CHARTMUSEUM_URL/api/charts/$chart_name"; then
     echo "Checking diffs for $helm_dir"
     git diff --quiet $2 $3 -- "$helm_dir" || must_package=true
   else
