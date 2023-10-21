@@ -1,5 +1,5 @@
 config:
-  engineVersion: 15.4
+  engineVersion: 15.3
   instanceClass: db.t4g.medium
   masterUsername: root
   masterUserPassword: ""

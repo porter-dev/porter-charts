@@ -1,7 +1,7 @@
 annotations:
   category: Database
 apiVersion: v2
-appVersion: "15.4"
+appVersion: "15.3"
 description: Amazon Aurora is a relational database management system (RDBMS) built for the cloud with full MySQL and PostgreSQL compatibility.
 home: https://github.com/porter-dev/porter-charts/tree/master/addons/rds-postgresql-aurora
 icon: https://raw.githubusercontent.com/aws/eks-charts/master/docs/logo/aws.png
