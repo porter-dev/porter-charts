@@ -145,7 +145,7 @@ health:
     enabled: false
     path: "/livez"
     scheme: "HTTP"
-    initialDelaySeconds: 0
+    initialDelaySeconds: 10
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
@@ -169,7 +169,7 @@ health:
     enabled: false
     path: "/readyz"
     scheme: "HTTP"
-    initialDelaySeconds: 0
+    initialDelaySeconds: 10
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
