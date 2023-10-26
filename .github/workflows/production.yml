@@ -1,7 +1,8 @@
 name: Push to production Helm chart repo
 on:
   push:
-    branches: [ production ]
+    tags:
+      - production
 jobs:
   build:
     environment: production
@@ -16,7 +17,7 @@ jobs:
           fetch-depth: 0
       - uses: azure/setup-helm@v3
         with:
-          version: 'v3.3.4'
+          version: "v3.3.4"
       - name: Install yq
         run: |
           wget https://github.com/mikefarah/yq/releases/download/v4.35.2/yq_linux_amd64 -O ./yq
@@ -58,7 +59,7 @@ jobs:
         id: auto-commit-action
         with:
           commit_message: Update Chart.yaml versions
-          commit_options: '--allow-empty'
+          commit_options: "--allow-empty"
           file_pattern: "*/*/Chart.yaml"
           commit_user_name: Porter Bot
           commit_user_email: contact@getporter.dev
