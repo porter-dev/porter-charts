@@ -28,7 +28,7 @@ dependencies:
   version: 1.0.4
 - name: iam-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.2.6
+  version: 1.3.0
 - name: kms-chart
   repository: https://chart-addons.getporter.dev
   version: 1.0.7
@@ -62,5 +62,5 @@ dependencies:
 - name: sqs-chart
   repository: https://chart-addons.getporter.dev
   version: 1.0.6
-digest: sha256:5952da9d2455bff8918872f4704d264ecff88ef9044e7f1c248eafedf452f6cc
-generated: "2023-10-21T05:51:31.769660409Zs"
+digest: sha256:6edb27f38550600c0b2cce3b45f6b1116fa3433ee5d4db8d4053845aaaa3c7d5
+generated: "2023-10-27T21:44:28.472881523Z"
