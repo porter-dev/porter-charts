@@ -66,6 +66,8 @@ local_resource(
   helm cm-push addons/postgres-toolbox local && \
   helm cm-push addons/prometheus local && \
   helm cm-push addons/rabbitmq local && \
+  helm cm-push addons/rds-postgresql local && \
+  helm cm-push addons/rds-postgresql-aurora local && \
   helm cm-push addons/wallarm-ingress local && \
   helm repo update local
   ''',
