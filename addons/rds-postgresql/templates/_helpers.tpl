@@ -29,3 +29,11 @@
     {{- (include "generate_static_password" .) -}}
   {{- end -}}
 {{- end -}}
+
+{{- define "database_name" -}}
+{{- if .Values.config.databaseName -}}
+{{ .Values.config.databaseName }}
+{{- else -}}
+{{ .Values.config.name | snakecase | nospace }}
+{{- end -}}
+{{- end -}}
