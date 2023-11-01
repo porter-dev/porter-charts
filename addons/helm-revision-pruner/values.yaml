@@ -30,6 +30,7 @@ container:
   env:
     normal:
       MAX_REVISIONS: '20'
+      MAX_JOB_AGE: '48'
 
 schedule:
   enabled: true
