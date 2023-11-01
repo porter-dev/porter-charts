@@ -11,7 +11,7 @@ metadata:
 spec:
   autoMinorVersionUpgrade: true
   backupRetentionPeriod: 14
-  databaseName: {{- include "database_name" . }}
+  databaseName: "{{- include "database_name" . }}"
   dbSubnetGroupRef:
     from:
       name: {{ .Values.config.name }}
