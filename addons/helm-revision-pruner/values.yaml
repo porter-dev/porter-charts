@@ -31,6 +31,7 @@ container:
     normal:
       MAX_REVISIONS: '20'
       MAX_JOB_AGE: '48'
+      MAX_JOB_AGE_SECONDS: '48'
 
 schedule:
   enabled: true
