@@ -284,6 +284,13 @@ spec:
             - name: PORT
               value: {{ .Values.container.port | quote }}
             {{- end }}
+        {{ if .Values.awsEfsStorage }}
+          volumeMounts:
+        {{- range $v := .Values.awsEfsStorage }}
+          - name: efs-{{ $.Values.fullnameOverride }}
+            mountPath: /data/efs/{{ $.Values.fullnameOverride }}
+        {{ end }}   
+        {{ end }}  
           {{ if .Values.pvc.enabled }}
           volumeMounts:
             - name: "{{ include "docker-template.fullname" . }}-storage"
@@ -319,6 +326,7 @@ spec:
             mountPath: /secrets/
             readOnly: true
         {{ end }}
+     
       {{- if gt (len .Values.nodeSelector) 0}}
       nodeSelector:
         {{- range $k, $v := .Values.nodeSelector }}
@@ -346,6 +354,15 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
+      {{ if .Values.awsEfsStorage }}
+      volumes:
+      {{- range $v := .Values.awsEfsStorage }}
+      - name: efs-{{ $.Values.fullnameOverride }}
+        persistentVolumeClaim:
+          claimName: efs-{{ $.Values.fullnameOverride }}
+      {{ end }}
+      {{ end }}
+
       {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled }}
       volumes:
         {{ if .Values.cloudsql.enabled }}
