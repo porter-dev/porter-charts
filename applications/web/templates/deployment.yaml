@@ -284,7 +284,7 @@ spec:
             - name: PORT
               value: {{ .Values.container.port | quote }}
             {{- end }}
-        {{ if gt (len .Values.awsEfsStorage) 0}}
+        {{ if .Values.awsEfsStorage }}
           volumeMounts:
         {{- range $v := .Values.awsEfsStorage }}
           - name: efs-{{ $.Values.fullnameOverride }}
@@ -354,7 +354,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if gt (len .Values.awsEfsStorage) 0}}
+      {{ if .Values.awsEfsStorage }}
       volumes:
       {{- range $v := .Values.awsEfsStorage }}
       - name: efs-{{ $.Values.fullnameOverride }}
