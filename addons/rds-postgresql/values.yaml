@@ -11,3 +11,7 @@ vpcConfig:
   awsRegion: ""
   subnetIDs: []
   vpcID: ""
+  cidrBlock: ""
+  subnetConfig: []
+    # - availabilityZone: ""
+    #   cidrBlock: ""
