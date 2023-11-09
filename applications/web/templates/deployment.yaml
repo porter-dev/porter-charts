@@ -198,6 +198,11 @@ spec:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}
               memory: {{ .Values.resources.requests.memory }}
+          {{ if .Values.resources.requests }}
+          {{ if .Values.resources.requests.nvidiaGpu }}
+              nvidia.com/gpu: {{ .Values.resources.requests.nvidiaGpu }}
+          {{ end }}
+          {{ end }}
             limits:
               memory: {{ .Values.resources.requests.memory }}
           {{ if .Values.resources.limits }}
