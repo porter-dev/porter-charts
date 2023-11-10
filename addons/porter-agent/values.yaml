@@ -1,5 +1,5 @@
 agent:
-  image: "public.ecr.aws/o1j4x7p4/porter-agent:v3.2.1"
+  image: "public.ecr.aws/o1j4x7p4/porter-agent:v3.2.2"
   cfAccessToken: ""
   porterHost: "dashboard.getporter.dev"
   porterPort: "80"
