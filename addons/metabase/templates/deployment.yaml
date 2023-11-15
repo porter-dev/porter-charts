@@ -65,7 +65,7 @@ spec:
               value: {{ quote $val }}
             {{- end }}
             {{- end }}
-            {{- if or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter") }}
+            {{- if or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "ghcr.io/porter-dev/porter/hello-porter") }}
             - name: PORT
               value: {{ .Values.container.port | quote }}
             {{- end }}

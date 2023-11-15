@@ -1,4 +1,4 @@
-{{- if or (ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job") (.Values.global) }}
+{{- if or (ne .Values.image.repository "ghcr.io/porter-dev/porter/hello-porter-job") (.Values.global) }}
 {{- if $.Capabilities.APIVersions.Has "batch/v1/CronJob" }}
 apiVersion: batch/v1
 {{- else }}
@@ -66,7 +66,7 @@ spec:
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             {{- if .Values.global }}
             {{- if .Values.global.image }}
-            {{- if and .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")) }}
+            {{- if and .Values.container.command (not (eq .Values.global.image.repository "ghcr.io/porter-dev/porter/hello-porter")) }}
             command:
             {{- range $command := trim .Values.container.command | splitList " " }}
             - {{ $command | quote }}
@@ -74,7 +74,7 @@ spec:
             {{- end }}
             {{- end }}
             {{- else }}
-            {{- if (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job")))) }}
+            {{- if (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "ghcr.io/porter-dev/porter/hello-porter-job")))) }}
             command:
             {{- range $command := trim .Values.container.command | splitList " " }}
             - {{ $command | quote }}

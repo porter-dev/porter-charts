@@ -16,7 +16,7 @@ topology:
 terminationGracePeriodSeconds: 30
 
 image:
-  repository: public.ecr.aws/o1j4x7p4/hello-porter
+  repository: ghcr.io/porter-dev/porter/hello-porter
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest

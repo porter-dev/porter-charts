@@ -1,4 +1,4 @@
-{{- if or (ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job") (.Values.global) -}}
+{{- if or (ne .Values.image.repository "ghcr.io/porter-dev/porter/hello-porter-job") (.Values.global) -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:

@@ -10,7 +10,7 @@ terminationGracePeriodSeconds: 30
 allowConcurrency: true
 
 image:
-  repository: public.ecr.aws/o1j4x7p4/hello-porter-job
+  repository: ghcr.io/porter-dev/porter/hello-porter-job
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
