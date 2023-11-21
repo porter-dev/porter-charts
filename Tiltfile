@@ -13,7 +13,7 @@ helm_resource(
     port_forwards=["8888:8080"],
     labels=["z_infra"],
     namespace="default",
-    flags=["--values", "zarf/helm/chartmuseum.yaml"]
+    flags=["--values", "zarf/helm/chartmuseum.yaml"],
 )
 
 # Setup ChartMuseum as local repo
@@ -26,7 +26,8 @@ local_resource(
     "applications",
     "addons"
   ],
-  resource_deps=["chartmuseum"]
+  resource_deps=["chartmuseum"],
+  labels=["chartmuseum"],
 )
 
 ## Upload charts to chartmuseum
@@ -40,7 +41,8 @@ local_resource(
   deps=[
     "applications",
   ],
-  resource_deps=["charts-setup-local-repo"]
+  resource_deps=["charts-setup-local-repo"],
+  labels=["chartmuseum"],
 )
 
 local_resource(
@@ -74,5 +76,6 @@ local_resource(
   deps=[
     "addons",
   ],
-  resource_deps=["charts-setup-local-repo"]
+  resource_deps=["charts-setup-local-repo"],
+  labels=["chartmuseum"],
 )
