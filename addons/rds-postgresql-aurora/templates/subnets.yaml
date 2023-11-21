@@ -70,7 +70,7 @@ metadata:
     porter.run/helm-release-name: "{{ .Release.Name }}"
 spec:
   name: {{ .Values.config.name }}
-  description: "{{ .Values.config.name }} RDS PostgresQL Aurora Subnet Group"
+  description: "{{ .Values.config.name }} PostgresQL Aurora Subnet Group"
 {{- if .Values.vpcConfig.subnetIDs }}
   subnetIDs:
   {{- range .Values.vpcConfig.subnetIDs }}
