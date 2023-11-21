@@ -42,6 +42,10 @@ spec:
   tags:
     - key: "porter.run/managed"
       value: "true"
+    - key: "porter.run/service"
+      value: "rds-postgresql"
+    - key: "porter.run/service-name"
+      value: "{{ $.Values.config.name }}"
   vpcSecurityGroupRefs:
     - from:
         name: {{ .Values.config.name }}-rds

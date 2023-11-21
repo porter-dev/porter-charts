@@ -2,14 +2,14 @@
 apiVersion: rds.services.k8s.aws/v1alpha1
 kind: DBParameterGroup
 metadata:
-  name: {{ .Values.config.name }}
-  namespace: {{ .Release.Namespace }}
+  name: "{{ .Values.config.name }}"
+  namespace: "{{ .Release.Namespace }}"
   annotations:
-    services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
+    services.k8s.aws/region: "{{ .Values.vpcConfig.awsRegion }}"
   labels:
     porter.run/helm-release-name: "{{ .Release.Name }}"
 spec:
-  name: {{ .Values.config.name }}
+  name: "{{ .Values.config.name }}"
   description: "Parameter group for {{ .Values.config.name }}"
   family: postgres{{ (semver (toString .Values.config.engineVersion)).Major }}
   parameterOverrides:
@@ -17,3 +17,7 @@ spec:
   tags:
     - key: "porter.run/managed"
       value: "true"
+    - key: "porter.run/service"
+      value: "rds-postgresql-aurora"
+    - key: "porter.run/service-name"
+      value: "{{ $.Values.config.name }}"
