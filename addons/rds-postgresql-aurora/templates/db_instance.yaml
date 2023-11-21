@@ -2,10 +2,10 @@
 apiVersion: rds.services.k8s.aws/v1alpha1
 kind: DBCluster
 metadata:
-  name: {{ .Values.config.name }}
-  namespace: {{ .Release.Namespace }}
+  name: "{{ .Values.config.name }}"
+  namespace: "{{ .Release.Namespace }}"
   annotations:
-    services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
+    services.k8s.aws/region: "{{ .Values.vpcConfig.awsRegion }}"
   labels:
     porter.run/helm-release-name: "{{ .Release.Name }}"
 spec:
@@ -14,9 +14,9 @@ spec:
   databaseName: "{{- include "database_name" . }}"
   dbSubnetGroupRef:
     from:
-      name: {{ .Values.config.name }}
+      name: "{{ .Values.config.name }}"
   copyTagsToSnapshot: true
-  dbClusterIdentifier: {{ .Values.config.name }}
+  dbClusterIdentifier: "{{ .Values.config.name }}"
   enableCloudwatchLogsExports:
     - postgresql
   engine: aurora-postgresql
@@ -25,20 +25,24 @@ spec:
   masterUsername: "{{ .Values.config.masterUsername }}"
 {{ if eq .Values.config.instanceClass "db.serverless" }}
   serverlessV2ScalingConfiguration:
-    maxCapacity: {{ .Values.config.serverlessMaxCapacity }}
-    minCapacity: {{ .Values.config.serverlessMinCapacity }}
+    maxCapacity: "{{ .Values.config.serverlessMaxCapacity }}"
+    minCapacity: "{{ .Values.config.serverlessMinCapacity }}"
 {{ end }}
   masterUserPassword:
     namespace: porter-env-group
-    name: {{ .Values.config.name }}.1
+    name: "{{ .Values.config.name }}.1"
     key: DB_PASS
   storageEncrypted: true
   tags:
     - key: "porter.run/managed"
       value: "true"
+    - key: "porter.run/service"
+      value: "rds-postgresql-aurora"
+    - key: "porter.run/service-name"
+      value: "{{ $.Values.config.name }}"
   vpcSecurityGroupRefs:
     - from:
-        name: {{ .Values.config.name }}-rds
+        name: "{{ .Values.config.name }}-rds"
 {{ $name := .Values.config.name }}
 {{ $namespace := .Release.Namespace }}
 {{ $awsRegion := .Values.vpcConfig.awsRegion }}
@@ -73,4 +77,8 @@ spec:
   tags:
     - key: "porter.run/managed"
       value: "true"
+    - key: "porter.run/service"
+      value: "rds-postgresql-aurora"
+    - key: "porter.run/service-name"
+      value: "{{ $.Values.config.name }}"
 {{ end }}

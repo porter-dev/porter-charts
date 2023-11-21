@@ -4,40 +4,40 @@
 apiVersion: ec2.services.k8s.aws/v1alpha1
 kind: RouteTable
 metadata:
-  name: {{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}
-  namespace: {{ $.Release.Namespace }}
+  name: "{{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
+  namespace: "{{ $.Release.Namespace }}"
   annotations:
-    services.k8s.aws/region: {{ $.Values.vpcConfig.awsRegion }}
+    services.k8s.aws/region: "{{ $.Values.vpcConfig.awsRegion }}"
   labels:
     porter.run/helm-release-name: "{{ $.Release.Name }}"
 spec:
   routes:
-  - destinationCIDRBlock: {{ $.Values.vpcConfig.cidrBlock }}
+  - destinationCIDRBlock: "{{ $.Values.vpcConfig.cidrBlock }}"
     gatewayID: "local"
   tags:
     - key: "porter.run/managed"
       value: "true"
     - key: "porter.run/service"
-      value: "rds"
+      value: "rds-postgresql"
     - key: "porter.run/service-name"
       value: "{{ $.Values.config.name }}"
     - key: "Name"
       value: "{{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
-  vpcID: {{ $.Values.vpcConfig.vpcID }}
+  vpcID: "{{ $.Values.vpcConfig.vpcID }}"
 ---
 apiVersion: ec2.services.k8s.aws/v1alpha1
 kind: Subnet
 metadata:
-  name: {{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}
-  namespace: {{ $.Release.Namespace }}
+  name: "{{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
+  namespace: "{{ $.Release.Namespace }}"
   annotations:
-    services.k8s.aws/region: {{ $.Values.vpcConfig.awsRegion }}
+    services.k8s.aws/region: "{{ $.Values.vpcConfig.awsRegion }}"
   labels:
     porter.run/helm-release-name: "{{ $.Release.Name }}"
 spec:
   assignIPv6AddressOnCreation: false
-  availabilityZone: {{ $v.availabilityZone }}
-  cidrBlock: {{ $v.cidrBlock }}
+  availabilityZone: "{{ $v.availabilityZone }}"
+  cidrBlock: "{{ $v.cidrBlock }}"
   enableDNS64: false
   enableResourceNameDNSAAAARecord: false
   enableResourceNameDNSARecord: false
@@ -45,12 +45,12 @@ spec:
   mapPublicIPOnLaunch: false
   routeTableRefs:
     - from:
-        name: {{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}
+        name: "{{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
   tags:
     - key: "porter.run/managed"
       value: "true"
     - key: "porter.run/service"
-      value: "rds"
+      value: "rds-postgresql"
     - key: "porter.run/service-name"
       value: "{{ $.Values.config.name }}"
     - key: "Name"
@@ -62,15 +62,15 @@ spec:
 apiVersion: rds.services.k8s.aws/v1alpha1
 kind: DBSubnetGroup
 metadata:
-  name: {{ .Values.config.name }}
-  namespace: {{ .Release.Namespace }}
+  name: "{{ .Values.config.name }}"
+  namespace: "{{ .Release.Namespace }}"
   annotations:
-    services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
+    services.k8s.aws/region: "{{ .Values.vpcConfig.awsRegion }}"
   labels:
     porter.run/helm-release-name: "{{ .Release.Name }}"
 spec:
-  name: {{ .Values.config.name }}
-  description: "{{ .Values.config.name }} Subnet Group"
+  name: "{{ .Values.config.name }}"
+  description: "{{ .Values.config.name }} PostgresQL Subnet Group"
 {{- if .Values.vpcConfig.subnetIDs }}
   subnetIDs:
   {{- range .Values.vpcConfig.subnetIDs }}
@@ -81,9 +81,13 @@ spec:
   subnetRefs:
   {{- range $k, $v := .Values.vpcConfig.subnetConfig }}
     - from:
-        name: {{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}
+        name: "{{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
   {{- end }}
 {{- end }}
   tags:
     - key: "porter.run/managed"
       value: "true"
+    - key: "porter.run/service"
+      value: "rds-postgresql"
+    - key: "porter.run/service-name"
+      value: "{{ $.Values.config.name }}"
