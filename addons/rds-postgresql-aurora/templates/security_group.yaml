@@ -2,24 +2,28 @@
 apiVersion: ec2.services.k8s.aws/v1alpha1
 kind: SecurityGroup
 metadata:
-  name: {{ .Values.config.name }}-rds
-  namespace: {{ .Release.Namespace }}
+  name: "{{ .Values.config.name }}-rds"
+  namespace: "{{ .Release.Namespace }}"
   annotations:
-    services.k8s.aws/region: {{ .Values.vpcConfig.awsRegion }}
+    services.k8s.aws/region: "{{ .Values.vpcConfig.awsRegion }}"
   labels:
     porter.run/helm-release-name: "{{ .Release.Name }}"
 spec:
-  name: {{ .Values.config.name }}-rds
+  name: "{{ .Values.config.name }}-rds"
   description: "Security Group for {{ .Values.config.name }} PostgresQL Aurora"
-  vpcID: {{ .Values.vpcConfig.vpcID }}
+  vpcID: "{{ .Values.vpcConfig.vpcID }}"
   ingressRules:
-  - ipProtocol: tcp
-    ipRanges:
-    - cidrIP: "0.0.0.0/0"
-    fromPort: 5432
-    toPort: 5432
+    - ipProtocol: tcp
+      ipRanges:
+        - cidrIP: "0.0.0.0/0"
+      fromPort: 5432
+      toPort: 5432
   tags:
     - key: "Name"
       value: "{{ .Values.config.name }}-rds"
     - key: "porter.run/managed"
       value: "true"
+    - key: "porter.run/service"
+      value: "rds-postgresql-aurora"
+    - key: "porter.run/service-name"
+      value: "{{ $.Values.config.name }}"
