@@ -1,0 +1,18 @@
+annotations:
+  category: cache
+apiVersion: v2
+appVersion: "7.0"
+description: A fast nosql datastore used for caching, real-time interactions, and more.
+home: https://github.com/porter-dev/porter-charts/tree/master/addons/elasticache-redis
+icon: https://raw.githubusercontent.com/aws/eks-charts/master/docs/logo/aws.png
+keywords:
+  - redis
+  - cache
+  - nosql
+  - elasticache
+  - DATA_STORE
+maintainers:
+  - name: Porter Technologies, Inc.
+    email: support@porter.run
+name: elasticache-redis
+version: 0.0.0
