@@ -140,6 +140,19 @@ spec:
                   \n - To create a Redis (cluster mode enabled) replication group,
                   use CacheParameterGroupName=default.redis3.2.cluster.on."
                 type: string
+              cacheParameterGroupRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference type to provide more user friendly syntax
+                  for references using 'from' field Ex: APIIDRef: \n from: name: my-api"
+                properties:
+                  from:
+                    description: AWSResourceReference provides all the values necessary
+                      to reference another k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                    type: object
+                type: object
               cacheSecurityGroupNames:
                 description: A list of cache security group names to associate with
                   this replication group.
@@ -153,6 +166,19 @@ spec:
                   creating a cluster. For more information, see Subnets and Subnet
                   Groups (https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/SubnetGroups.html)."
                 type: string
+              cacheSubnetGroupRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference type to provide more user friendly syntax
+                  for references using 'from' field Ex: APIIDRef: \n from: name: my-api"
+                properties:
+                  from:
+                    description: AWSResourceReference provides all the values necessary
+                      to reference another k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                    type: object
+                type: object
               dataTieringEnabled:
                 description: Enables data tiering. Data tiering is only supported
                   for replication groups using the r6gd node type. This parameter
@@ -325,6 +351,22 @@ spec:
                   (Amazon VPC)."
                 items:
                   type: string
+                type: array
+              securityGroupRefs:
+                items:
+                  description: "AWSResourceReferenceWrapper provides a wrapper around
+                    *AWSResourceReference type to provide more user friendly syntax
+                    for references using 'from' field Ex: APIIDRef: \n from: name:
+                    my-api"
+                  properties:
+                    from:
+                      description: AWSResourceReference provides all the values necessary
+                        to reference another k8s resource for finding the identifier(Id/ARN/Name)
+                      properties:
+                        name:
+                          type: string
+                      type: object
+                  type: object
                 type: array
               snapshotARNs:
                 description: "A list of Amazon Resource Names (ARN) that uniquely
