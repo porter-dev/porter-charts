@@ -13,11 +13,13 @@ spec:
   authToken:
     namespace: porter-env-group
     name: "{{ .Values.config.name }}.1"
-    key: DB_PASS
+    key: REDIS_PASS
   automaticFailoverEnabled: true
   cacheNodeType: "{{ .Values.config.instanceClass }}"
-  cacheParameterGroupName: "{{ .Values.config.name }}"
   cacheSubnetGroupName: "{{ .Values.config.name }}"
+  cacheParameterGroupRef:
+    from:
+      name: "{{ .Values.config.name }}"
   description: "{{ .Values.config.name }} Redis Replication Group"
   engine: redis
   engineVersion: "{{ .Values.config.engineVersion }}"
@@ -25,10 +27,9 @@ spec:
   multiAZEnabled: {{ .Values.config.multiAZ }}
   numNodeGroups: 1
   port: 6379
-  preferredMaintenanceWindow: string
   replicasPerNodeGroup: 1
   replicationGroupID: "{{ .Values.config.name }}"
-  securityGroupIDs:
+  securityGroupRefs:
     - from:
         name: "{{ .Values.config.name }}-elasticache"
   snapshotRetentionLimit: 7

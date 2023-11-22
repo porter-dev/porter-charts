@@ -9,8 +9,8 @@ metadata:
   labels:
     porter.run/helm-release-name: "{{ .Release.Name }}"
 spec:
-  cacheParameterGroupName: "redis{{ (semver (toString .Values.config.engineVersion)).Major }}"
-  cacheParameterGroupFamily: "redis{{ .Values.config.engineVersion }}"
+  cacheParameterGroupName: "{{ .Values.config.name }}-redis{{ (semver (toString .Values.config.engineVersion)).Major }}"
+  cacheParameterGroupFamily: "redis{{ (semver (toString .Values.config.engineVersion)).Major }}"
   description: "Parameter group for {{ .Values.config.name }}"
   tags:
     - key: "porter.run/managed"
