@@ -1,7 +1,7 @@
 apiVersion: v1
 name: datadog
 version: 0.21.0
-appVersion: "7"
+appVersion: "7.0.0"
 description: Datadog agent provides observability into cloud-scale applications
 keywords:
   - APP
