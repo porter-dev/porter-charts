@@ -1,0 +1,21 @@
+---
+apiVersion: elasticache.services.k8s.aws/v1alpha1
+kind: CacheParameterGroup
+metadata:
+  name: "{{ .Values.config.name }}"
+  namespace: "{{ .Release.Namespace }}"
+  annotations:
+    services.k8s.aws/region: "{{ .Values.vpcConfig.awsRegion }}"
+  labels:
+    porter.run/helm-release-name: "{{ .Release.Name }}"
+spec:
+  cacheParameterGroupName: "{{ .Values.config.name }}-redis{{ (semver (toString .Values.config.engineVersion)).Major }}"
+  cacheParameterGroupFamily: "redis{{ (semver (toString .Values.config.engineVersion)).Major }}"
+  description: "Parameter group for {{ .Values.config.name }}"
+  tags:
+    - key: "porter.run/managed"
+      value: "true"
+    - key: "porter.run/service"
+      value: "elasticache"
+    - key: "porter.run/service-name"
+      value: "{{ $.Values.config.name }}"
