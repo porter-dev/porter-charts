@@ -19,7 +19,9 @@ spec:
   cacheParameterGroupRef:
     from:
       name: "{{ .Values.config.name }}"
-  cacheSubnetGroupName: "{{ .Values.config.name }}"
+  cacheSubnetGroupRef:
+    from:
+      name: "{{ .Values.config.name }}"
   description: "{{ .Values.config.name }} Redis Replication Group"
   engine: redis
   engineVersion: "{{ .Values.config.engineVersion }}"
