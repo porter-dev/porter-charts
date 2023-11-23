@@ -42,7 +42,7 @@ spec:
   tags:
     - key: "porter.run/managed"
       value: "true"
-    - key: "porter.run/service"
+    - key: "porter.run/service-type"
       value: "rds-postgresql"
     - key: "porter.run/service-name"
       value: "{{ $.Values.config.name }}"
