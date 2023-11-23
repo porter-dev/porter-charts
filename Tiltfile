@@ -50,6 +50,7 @@ local_resource(
   cmd='''helm cm-push addons/datadog local && \
   helm cm-push addons/tailscale-relay local && \
   helm cm-push addons/metabase local && \
+  helm cm-push addons/elasticache-redis local && \
   helm cm-push addons/elasticsearch local && \
   helm cm-push addons/mongodb local && \
   helm cm-push addons/redis local && \
