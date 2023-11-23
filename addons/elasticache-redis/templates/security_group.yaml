@@ -2,7 +2,7 @@
 apiVersion: ec2.services.k8s.aws/v1alpha1
 kind: SecurityGroup
 metadata:
-  name: "{{ .Values.config.name }}-rds"
+  name: "{{ .Values.config.name }}-elasticache"
   namespace: "{{ .Release.Namespace }}"
   annotations:
     services.k8s.aws/region: "{{ .Values.vpcConfig.awsRegion }}"
@@ -10,20 +10,20 @@ metadata:
     porter.run/helm-release-name: "{{ .Release.Name }}"
 spec:
   description: SecurityGroup
-  name: "{{ .Values.config.name }}-rds"
+  name: "{{ .Values.config.name }}-elasticache"
   vpcID: "{{ .Values.vpcConfig.vpcID }}"
   ingressRules:
     - ipProtocol: tcp
       ipRanges:
         - cidrIP: "0.0.0.0/0"
-      fromPort: 5432
-      toPort: 5432
+      fromPort: 6379
+      toPort: 6379
   tags:
     - key: "Name"
-      value: "{{ .Values.config.name }}-rds"
+      value: "{{ .Values.config.name }}-elasticache"
     - key: "porter.run/managed"
       value: "true"
     - key: "porter.run/service-type"
-      value: "rds-postgresql"
+      value: "elasticache"
     - key: "porter.run/service-name"
       value: "{{ $.Values.config.name }}"

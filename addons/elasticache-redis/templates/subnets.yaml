@@ -4,7 +4,7 @@
 apiVersion: ec2.services.k8s.aws/v1alpha1
 kind: RouteTable
 metadata:
-  name: "{{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
+  name: "{{ $.Values.vpcConfig.awsRegion }}-cache-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
   namespace: "{{ $.Release.Namespace }}"
   annotations:
     services.k8s.aws/region: "{{ $.Values.vpcConfig.awsRegion }}"
@@ -18,17 +18,17 @@ spec:
     - key: "porter.run/managed"
       value: "true"
     - key: "porter.run/service-type"
-      value: "rds-postgresql"
+      value: "elasticache"
     - key: "porter.run/service-name"
       value: "{{ $.Values.config.name }}"
     - key: "Name"
-      value: "{{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
+      value: "{{ $.Values.vpcConfig.awsRegion }}-cache-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
   vpcID: "{{ $.Values.vpcConfig.vpcID }}"
 ---
 apiVersion: ec2.services.k8s.aws/v1alpha1
 kind: Subnet
 metadata:
-  name: "{{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
+  name: "{{ $.Values.vpcConfig.awsRegion }}-cache-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
   namespace: "{{ $.Release.Namespace }}"
   annotations:
     services.k8s.aws/region: "{{ $.Values.vpcConfig.awsRegion }}"
@@ -45,22 +45,22 @@ spec:
   mapPublicIPOnLaunch: false
   routeTableRefs:
     - from:
-        name: "{{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
+        name: "{{ $.Values.vpcConfig.awsRegion }}-cache-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
   tags:
     - key: "porter.run/managed"
       value: "true"
     - key: "porter.run/service-type"
-      value: "rds-postgresql"
+      value: "elasticache"
     - key: "porter.run/service-name"
       value: "{{ $.Values.config.name }}"
     - key: "Name"
-      value: "{{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
-  vpcID: {{ $.Values.vpcConfig.vpcID }}
+      value: "{{ $.Values.vpcConfig.awsRegion }}-cache-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
+  vpcID: "{{ $.Values.vpcConfig.vpcID }}"
 {{- end }}
 {{- end }}
 ---
-apiVersion: rds.services.k8s.aws/v1alpha1
-kind: DBSubnetGroup
+apiVersion: elasticache.services.k8s.aws/v1alpha1
+kind: CacheSubnetGroup
 metadata:
   name: "{{ .Values.config.name }}"
   namespace: "{{ .Release.Namespace }}"
@@ -69,8 +69,8 @@ metadata:
   labels:
     porter.run/helm-release-name: "{{ .Release.Name }}"
 spec:
-  name: "{{ .Values.config.name }}"
-  description: "{{ .Values.config.name }} PostgresQL Subnet Group"
+  cacheSubnetGroupName: "{{ .Values.config.name }}"
+  cacheSubnetGroupDescription: "{{ .Values.config.name }} Subnet Group"
 {{- if .Values.vpcConfig.subnetIDs }}
   subnetIDs:
   {{- range .Values.vpcConfig.subnetIDs }}
@@ -81,13 +81,13 @@ spec:
   subnetRefs:
   {{- range $k, $v := .Values.vpcConfig.subnetConfig }}
     - from:
-        name: "{{ $.Values.vpcConfig.awsRegion }}-rds-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
+        name: "{{ $.Values.vpcConfig.awsRegion }}-cache-{{ $.Values.config.name }}-private-{{ $v.availabilityZone }}"
   {{- end }}
 {{- end }}
   tags:
     - key: "porter.run/managed"
       value: "true"
     - key: "porter.run/service-type"
-      value: "rds-postgresql"
+      value: "elasticache"
     - key: "porter.run/service-name"
       value: "{{ $.Values.config.name }}"

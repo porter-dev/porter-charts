@@ -1,6 +1,6 @@
 ---
-apiVersion: rds.services.k8s.aws/v1alpha1
-kind: DBParameterGroup
+apiVersion: elasticache.services.k8s.aws/v1alpha1
+kind: CacheParameterGroup
 metadata:
   name: "{{ .Values.config.name }}"
   namespace: "{{ .Release.Namespace }}"
@@ -9,15 +9,13 @@ metadata:
   labels:
     porter.run/helm-release-name: "{{ .Release.Name }}"
 spec:
-  name: "{{ .Values.config.name }}"
+  cacheParameterGroupName: "{{ .Values.config.name }}-redis{{ (semver (toString .Values.config.engineVersion)).Major }}"
+  cacheParameterGroupFamily: "redis{{ (semver (toString .Values.config.engineVersion)).Major }}"
   description: "Parameter group for {{ .Values.config.name }}"
-  family: postgres{{ (semver (toString .Values.config.engineVersion)).Major }}
-  parameterOverrides:
-    max_wal_senders: "20"
   tags:
     - key: "porter.run/managed"
       value: "true"
     - key: "porter.run/service-type"
-      value: "rds-postgresql"
+      value: "elasticache"
     - key: "porter.run/service-name"
       value: "{{ $.Values.config.name }}"
