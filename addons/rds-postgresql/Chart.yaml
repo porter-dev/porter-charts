@@ -20,4 +20,4 @@ maintainers:
   - name: Porter Technologies, Inc.
     email: support@porter.run
 name: rds-postgresql
-version: '0.9.0'
+version: '0.10.0'
