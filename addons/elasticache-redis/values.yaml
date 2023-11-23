@@ -1,5 +1,5 @@
 config:
-  engineVersion: 7
+  engineVersion: 7.1
   instanceClass: cache.t4g.small
   masterUserPassword: ""
   multiAZ: true
