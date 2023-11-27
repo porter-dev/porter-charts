@@ -149,7 +149,7 @@ health:
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
-    failureThreshold: 6
+    failureThreshold: 10
     httpHeaders: []
     auth:
       enabled: false
@@ -173,7 +173,7 @@ health:
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
-    failureThreshold: 6
+    failureThreshold: 10
     httpHeaders: []
     auth:
       enabled: false
