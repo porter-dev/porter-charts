@@ -15,4 +15,4 @@ maintainers:
   - name: Porter Technologies, Inc.
     email: support@porter.run
 name: elasticache-redis
-version: 0.4.0
+version: 0.5.0
