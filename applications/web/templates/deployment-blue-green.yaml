@@ -162,6 +162,7 @@ spec:
               cpu: {{ $.Values.resources.requests.cpu }}
               memory: {{ $.Values.resources.requests.memory }}
             limits:
+              cpu: {{ $.Values.resources.requests.cpu }}
               memory: {{ $.Values.resources.requests.memory }}
           env:
             # Porter default environment variables

@@ -167,6 +167,7 @@ spec:
           {{ end }}
           {{ end }}
             limits:
+              cpu: {{ .Values.resources.requests.cpu }}
               memory: {{ .Values.resources.requests.memory }}
           {{ if .Values.resources.limits }}
           {{ if .Values.resources.limits.nvidiaGpu }}
