@@ -145,11 +145,11 @@ health:
     enabled: false
     path: "/livez"
     scheme: "HTTP"
-    initialDelaySeconds: 10
+    initialDelaySeconds: 15
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
-    failureThreshold: 10
+    failureThreshold: 15
     httpHeaders: []
     auth:
       enabled: false
@@ -169,11 +169,11 @@ health:
     enabled: false
     path: "/readyz"
     scheme: "HTTP"
-    initialDelaySeconds: 10
+    initialDelaySeconds: 15
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
-    failureThreshold: 10
+    failureThreshold: 15
     httpHeaders: []
     auth:
       enabled: false
