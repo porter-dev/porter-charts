@@ -204,7 +204,9 @@ spec:
           {{ end }}
           {{ end }}
             limits:
+              {{- if (.Values.resources.setCPULimits) }}
               cpu: {{ .Values.resources.requests.cpu }}
+              {{ end }}
               memory: {{ .Values.resources.requests.memory }}
           {{ if .Values.resources.limits }}
           {{ if .Values.resources.limits.nvidiaGpu }}
