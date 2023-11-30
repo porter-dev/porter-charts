@@ -1,4 +1,4 @@
-name: "Sync remote charts in PR"
+name: 'Sync remote charts in PR'
 on:
   push:
     branches:
@@ -9,6 +9,10 @@ jobs:
     strategy:
       matrix:
         charts:
+          - remote_owner: bitnami
+            remote_repository: bitnamicharts
+            remote_directory: bitnami/postgresql
+            target_directory: addons/postgresql-managed
           - remote_owner: aws
             remote_repository: eks-charts
             remote_directory: stable/aws-cloudwatch-metrics
