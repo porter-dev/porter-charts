@@ -10,7 +10,7 @@ jobs:
       matrix:
         charts:
           - remote_owner: bitnami
-            remote_repository: bitnamicharts
+            remote_repository: charts
             remote_directory: bitnami/postgresql
             target_directory: addons/postgresql-managed
           - remote_owner: aws
