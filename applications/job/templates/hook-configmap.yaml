@@ -129,7 +129,9 @@ data:
                 cpu: {{ .Values.resources.requests.cpu }}
                 memory: {{ .Values.resources.requests.memory }}
               limits:
+                {{- if (.Values.resources.setCPULimits) }}
                 cpu: {{ .Values.resources.requests.cpu }}
+                {{ end }}
                 memory: {{ .Values.resources.requests.memory }}
           - name: sidecar
             image: public.ecr.aws/o1j4x7p4/job-sidecar:latest
@@ -139,7 +141,9 @@ data:
                 cpu: {{ .Values.sidecar.resources.requests.cpu }}
                 memory: {{ .Values.sidecar.resources.requests.memory }}
               limits:
+                {{- if (.Values.resources.setCPULimits) }}
                 cpu: {{ .Values.sidecar.resources.requests.cpu }}
+                {{ end }}
                 memory: {{ .Values.sidecar.resources.requests.memory }}
             {{- if (.Values.sidecar.timeout) }}
             env:

@@ -45,6 +45,7 @@ resources:
   requests:
     cpu: 100m
     memory: 256Mi
+  setCPULimits: false
 
 autoscaling:
   enabled: false
