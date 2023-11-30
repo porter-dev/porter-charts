@@ -41,7 +41,9 @@ spec:
             cpu: 10m
             memory: 32Mi
           limits:
+            {{- if (.Values.resources.setCPULimits) }}
             cpu: 10m
+            {{ end }}
             memory: 32Mi
         volumeMounts:
         - name: manifest-data
