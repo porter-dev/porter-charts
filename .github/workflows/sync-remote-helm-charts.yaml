@@ -12,7 +12,7 @@ jobs:
           - remote_owner: bitnami
             remote_repository: charts
             remote_directory: bitnami/postgresql
-            target_directory: addons/postgresql-managed
+            target_directory: addons/postgresql
           - remote_owner: aws
             remote_repository: eks-charts
             remote_directory: stable/aws-cloudwatch-metrics
