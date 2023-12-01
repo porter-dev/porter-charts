@@ -162,7 +162,7 @@ spec:
               cpu: {{ $.Values.resources.requests.cpu }}
               memory: {{ $.Values.resources.requests.memory }}
             limits:
-              {{- if (.Values.resources.setCPULimits) }}
+              {{- if ($.Values.resources.setCPULimits) }}
               cpu: {{ $.Values.resources.requests.cpu }}
               {{ end }}
               memory: {{ $.Values.resources.requests.memory }}
