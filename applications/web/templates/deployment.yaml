@@ -194,6 +194,9 @@ spec:
             successThreshold: {{ .Values.health.startupProbe.successThreshold }}
             failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
           {{ end }}
+          {{ if .Values.health.overrides }}
+            {{- toYaml .Values.health.overrides.probes | nindent 10 }}
+          {{ end }}
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}
