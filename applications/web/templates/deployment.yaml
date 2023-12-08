@@ -194,8 +194,8 @@ spec:
             successThreshold: {{ .Values.health.startupProbe.successThreshold }}
             failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
           {{ end }}
-          {{ if .Values.health.overrides.enabled }}
-            {{- toYaml .Values.overrides.probes | nindent 10 }}
+          {{ if .Values.health.overrides }}
+            {{- toYaml .Values.health.overrides.probes | nindent 10 }}
           {{ end }}
           resources:
             requests:
