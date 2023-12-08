@@ -202,35 +202,7 @@ spec:
               value: {{ .Values.postgresqlDataDir | quote }}
             {{- end }}
             # Authentication
-            {{- if or (eq $customUser "postgres") (empty $customUser) }}
-            {{- if .Values.auth.enablePostgresUser }}
-            {{- if .Values.auth.usePasswordFiles }}
-            - name: POSTGRES_PASSWORD_FILE
-              value: {{ printf "/opt/bitnami/postgresql/secrets/%s" (include "postgresql.v1.adminPasswordKey" .) }}
-            {{- else }}
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "postgresql.v1.secretName" . }}
-                  key: {{ include "postgresql.v1.adminPasswordKey" . }}
-            {{- end }}
-            {{- else }}
-            - name: ALLOW_EMPTY_PASSWORD
-              value: "true"
-            {{- end }}
-            {{- else }}
-            - name: POSTGRES_USER
-              value: {{ $customUser | quote }}
-            {{- if .Values.auth.usePasswordFiles }}
-            - name: POSTGRES_PASSWORD_FILE
-              value: {{ printf "/opt/bitnami/postgresql/secrets/%s" (include "postgresql.v1.userPasswordKey" .) }}
-            {{- else }}
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "postgresql.v1.secretName" . }}
-                  key: {{ include "postgresql.v1.userPasswordKey" . }}
-            {{- end }}
+            # setting POSTGRES_USER and POSTGRES_PASSWORD is delegated to configmaps/secrets
             {{- if .Values.auth.enablePostgresUser }}
             {{- if .Values.auth.usePasswordFiles }}
             - name: POSTGRES_POSTGRES_PASSWORD_FILE
@@ -242,7 +214,9 @@ spec:
                   name: {{ include "postgresql.v1.secretName" . }}
                   key: {{ include "postgresql.v1.adminPasswordKey" . }}
             {{- end }}
-            {{- end }}
+            {{- else }}
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "true"
             {{- end }}
             {{- if (include "postgresql.v1.database" .) }}
             - name: POSTGRES_DATABASE
@@ -384,16 +358,16 @@ spec:
             {{- if .Values.primary.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.primary.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
-          {{- if or .Values.primary.extraEnvVarsCM .Values.primary.extraEnvVarsSecret }}
+          {{- if or .Values.primary.configMapRefs .Values.primary.secretRefs }}
           envFrom:
-            {{- if .Values.primary.extraEnvVarsCM }}
+          {{ range $configMapName := .Values.primary.configMapRefs }}
             - configMapRef:
-                name: {{ .Values.primary.extraEnvVarsCM }}
-            {{- end }}
-            {{- if .Values.primary.extraEnvVarsSecret }}
+                name: {{ $configMapName }}
+          {{ end }}
+          {{ range $secretName := .Values.primary.secretRefs }}
             - secretRef:
-                name: {{ .Values.primary.extraEnvVarsSecret }}
-            {{- end }}
+                name: {{ $secretName }}
+          {{ end }}
           {{- end }}
           ports:
             - name: tcp-postgresql
