@@ -148,6 +148,19 @@ spec:
             successThreshold: {{ .Values.health.livenessCommand.successThreshold }}
             failureThreshold: {{ .Values.health.livenessCommand.failureThreshold }}
           {{ end }}
+          {{ if .Values.health.readinessCommand.enabled }}
+          readinessProbe:
+            exec:
+              command:
+                {{- range $command := trim .Values.health.readinessCommand.command | splitList " " }}
+                - {{ $command | quote }}
+                {{- end }}
+            initialDelaySeconds: {{ .Values.health.readinessCommand.initialDelaySeconds }}
+            periodSeconds: {{ .Values.health.readinessCommand.periodSeconds }}
+            timeoutSeconds: {{ .Values.health.readinessCommand.timeoutSeconds }}
+            successThreshold: {{ .Values.health.readinessCommand.successThreshold }}
+            failureThreshold: {{ .Values.health.readinessCommand.failureThreshold }}
+          {{ end }}
           {{ if .Values.health.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
@@ -193,6 +206,9 @@ spec:
             timeoutSeconds: {{ .Values.health.startupProbe.timeoutSeconds }}
             successThreshold: {{ .Values.health.startupProbe.successThreshold }}
             failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
+          {{ end }}
+          {{ if .Values.health.overrides.enabled }}
+            {{- toYaml .Values.overrides.probes | nindent 10 }}
           {{ end }}
           resources:
             requests:
