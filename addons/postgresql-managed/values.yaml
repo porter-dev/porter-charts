@@ -369,12 +369,12 @@ primary:
   ##     value: "bar"
   ##
   extraEnvVars: []
-  ## @param primary.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for PostgreSQL Primary nodes
+  ## @param primary.configMapRefs Name of existing ConfigMaps containing extra env vars for PostgreSQL Primary nodes
   ##
-  extraEnvVarsCM: ""
-  ## @param primary.extraEnvVarsSecret Name of existing Secret containing extra env vars for PostgreSQL Primary nodes
+  configMapRefs: []
+  ## @param primary.secretRefs Name of existing Secrets containing extra env vars for PostgreSQL Primary nodes
   ##
-  extraEnvVarsSecret: ""
+  secretRefs: []
   ## @param primary.command Override default container command (useful when using custom images)
   ##
   command: []
