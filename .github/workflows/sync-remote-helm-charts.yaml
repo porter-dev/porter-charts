@@ -1,4 +1,4 @@
-name: 'Sync remote charts in PR'
+name: "Sync remote charts in PR"
 on:
   push:
     branches:
@@ -33,6 +33,10 @@ jobs:
             remote_repository: cloudtrail-controller
             remote_directory: helm
             target_directory: addons/cloudtrail-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: cloudwatch-controller
+            remote_directory: helm
+            target_directory: addons/cloudwatch-chart
           - remote_owner: aws-controllers-k8s
             remote_repository: dynamodb-controller
             remote_directory: helm
@@ -119,7 +123,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: azure/setup-helm@v3
         with:
-          version: 'v3.3.4'
+          version: "v3.3.4"
       - name: Update remote chart
         uses: ./.github/actions/sync-remote-directory
         with:

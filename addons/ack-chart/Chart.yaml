@@ -2,7 +2,7 @@ apiVersion: v2
 name: ack-chart
 description: A Helm chart containing all ACK charts as sub-charts
 type: application
-version: 46.1.4
+version: 46.2.1
 appVersion: "0.0.0"
 dependencies:
   - name: apigatewayv2-chart
@@ -22,12 +22,12 @@ dependencies:
     condition: cloudtrail.enabled
   - name: dynamodb-chart
     alias: dynamodb
-    version: 1.2.4
+    version: 1.2.5
     repository: https://chart-addons.getporter.dev
     condition: dynamodb.enabled
   - name: ec2-chart
     alias: ec2
-    version: 1.0.7
+    version: 1.1.0
     repository: https://chart-addons.getporter.dev
     condition: ec2.enabled
   - name: ecr-chart

@@ -3,6 +3,7 @@ addons/apigatewayv2-chart
 addons/applicationautoscaling-chart
 addons/aws-cloudwatch-metrics
 addons/cloudtrail-chart
+addons/cloudwatch-chart
 addons/dynamodb-chart
 addons/ec2-chart
 addons/ecr-chart
