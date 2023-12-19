@@ -70,8 +70,8 @@ spec:
                     type: object
                 type: object
               eventPattern:
-                description: The event pattern. For more information, see EventBridge
-                  event patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html.html)
+                description: The event pattern. For more information, see Amazon EventBridge
+                  event patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html)
                   in the Amazon EventBridge User Guide.
                 type: string
               name:
@@ -90,7 +90,23 @@ spec:
                   * ? *)" or "rate(5 minutes)".
                 type: string
               state:
-                description: Indicates whether the rule is enabled or disabled.
+                description: "The state of the rule. \n Valid values include: \n -
+                  DISABLED: The rule is disabled. EventBridge does not match any events
+                  against the rule. \n - ENABLED: The rule is enabled. EventBridge
+                  matches events against the rule, except for Amazon Web Services
+                  management events delivered through CloudTrail. \n - ENABLED_WITH_ALL_CLOUDTRAIL_MANAGEMENT_EVENTS:
+                  The rule is enabled for all events, including Amazon Web Services
+                  management events delivered through CloudTrail. Management events
+                  provide visibility into management operations that are performed
+                  on resources in your Amazon Web Services account. These are also
+                  known as control plane operations. For more information, see Logging
+                  management events (https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-management-events-with-cloudtrail.html#logging-management-events)
+                  in the CloudTrail User Guide, and Filtering management events from
+                  Amazon Web Services services (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-service-event.html#eb-service-event-cloudtrail)
+                  in the Amazon EventBridge User Guide. This value is only valid for
+                  rules on the default (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is-how-it-works-concepts.html#eb-bus-concepts-buses)
+                  event bus or custom event buses (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-event-bus.html).
+                  It does not apply to partner event buses (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas.html)."
                 type: string
               tags:
                 description: The list of key-value pairs to associate with the rule.
@@ -259,7 +275,7 @@ spec:
                       type: object
                     httpParameters:
                       description: These are custom parameter to be used when the
-                        target is an API Gateway REST APIs or EventBridge ApiDestinations.
+                        target is an API Gateway APIs or EventBridge ApiDestinations.
                         In the latter case, these are merged with any InvocationParameters
                         specified on the Connection, with any values from the Connection
                         taking precedence.
@@ -312,14 +328,26 @@ spec:
                         Data API ExecuteStatement based on EventBridge events.
                       properties:
                         database:
+                          description: Redshift Database
                           type: string
                         dbUser:
+                          description: Database user name
                           type: string
                         secretManagerARN:
+                          description: Optional SecretManager ARN which stores the
+                            database credentials
                           type: string
                         sql:
+                          description: A single Redshift SQL
                           type: string
+                        sqls:
+                          description: A list of SQLs.
+                          items:
+                            type: string
+                          type: array
                         statementName:
+                          description: A name for Redshift DataAPI statement which
+                            can be used as filter of ListStatement.
                           type: string
                         withEvent:
                           type: boolean
