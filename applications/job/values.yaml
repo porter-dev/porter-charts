@@ -49,6 +49,7 @@ cloudsql:
   connectionName: ""
   dbPort: 5432
   serviceAccountJSON: ""
+  secretRef: ""
 
 sidecar:
   signalChildProcesses: true

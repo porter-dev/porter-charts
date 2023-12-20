@@ -176,7 +176,11 @@ spec:
           volumes:
             - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
               secret:
+                {{ if $.Values.cloudsql.secretRef }}
+                secretName: {{ .Values.cloudsql.secretRef }}
+                {{ else }}
                 secretName: "cloudsql-secret-{{ include "docker-template.fullname" . }}"
+                {{ end }}
           {{ end }}
           restartPolicy: Never
           shareProcessNamespace: true
