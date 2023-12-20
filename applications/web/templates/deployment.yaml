@@ -323,6 +323,9 @@ spec:
             - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
             {{- end }}
             - "-credential_file=/secrets/service_account.json"
+            {{ if .Values.terminationGracePeriodSeconds }}
+            - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
+            {{ end }}
           securityContext:
             runAsNonRoot: true
           resources:
