@@ -25,8 +25,8 @@ spec:
   masterUsername: "{{ .Values.config.masterUsername }}"
 {{ if eq .Values.config.instanceClass "db.serverless" }}
   serverlessV2ScalingConfiguration:
-    maxCapacity: "{{ .Values.config.serverlessMaxCapacity }}"
-    minCapacity: "{{ .Values.config.serverlessMinCapacity }}"
+    maxCapacity: {{ .Values.config.serverlessMaxCapacity }}
+    minCapacity: {{ .Values.config.serverlessMinCapacity }}
 {{ end }}
   masterUserPassword:
     namespace: porter-env-group

@@ -47,12 +47,12 @@ spec:
           metadata:
             type: object
           spec:
-            description: "EndpointSpec defines the desired state of Endpoint. \n An
+            description: "EndpointSpec defines the desired state of Endpoint. \n A
               global endpoint used to improve your application's availability by making
               it regional-fault tolerant. For more information about global endpoints,
               see Making applications Regional-fault tolerant with global endpoints
               and event replication (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-global-endpoints.html)
-              in the Amazon EventBridge User Guide.."
+              in the Amazon EventBridge User Guide."
             properties:
               description:
                 description: A description of the global endpoint.
@@ -71,7 +71,10 @@ spec:
                 description: The name of the global endpoint. For example, "Name":"us-east-2-custom_bus_A-endpoint".
                 type: string
               replicationConfig:
-                description: Enable or disable event replication.
+                description: Enable or disable event replication. The default state
+                  is ENABLED which means you must supply a RoleArn. If you don't have
+                  a RoleArn or you don't want event replication enabled, set the state
+                  to DISABLED.
                 properties:
                   state:
                     type: string
