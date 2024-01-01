@@ -138,3 +138,4 @@ stack:
 emptyDir:
   enabled: false
   mountPath: /mypath
+  volumeOptions: {}
