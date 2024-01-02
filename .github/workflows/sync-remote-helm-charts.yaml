@@ -1,4 +1,4 @@
-name: "Sync remote charts in PR"
+name: 'Sync remote charts in PR'
 on:
   push:
     branches:
@@ -13,6 +13,10 @@ jobs:
             remote_repository: charts
             remote_directory: bitnami/postgresql
             target_directory: addons/postgresql-managed
+          - remote_owner: bitnami
+            remote_repository: charts
+            remote_directory: bitnami/redis
+            target_directory: addons/redis-managed
           - remote_owner: aws
             remote_repository: eks-charts
             remote_directory: stable/aws-cloudwatch-metrics
@@ -123,7 +127,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: azure/setup-helm@v3
         with:
-          version: "v3.3.4"
+          version: 'v3.3.4'
       - name: Update remote chart
         uses: ./.github/actions/sync-remote-directory
         with:
