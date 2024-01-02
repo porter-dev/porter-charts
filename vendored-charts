@@ -18,8 +18,8 @@ addons/memorydb-chart
 addons/pipes-chart
 addons/postgresql-managed
 addons/prometheusservice-chart
-addons/redis-managed
 addons/rds-chart
+addons/redis-managed
 addons/s3-chart
 addons/sagemaker-chart
 addons/sfn-chart
