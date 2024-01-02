@@ -7,22 +7,22 @@ dependencies:
   version: 1.0.8
 - name: cloudtrail-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.0.5
+  version: 1.0.6
 - name: dynamodb-chart
   repository: https://chart-addons.getporter.dev
   version: 1.2.6
 - name: ec2-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.1.1
+  version: 1.1.2
 - name: ecr-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.0.9
+  version: 1.0.10
 - name: eks-chart
   repository: https://chart-addons.getporter.dev
   version: 1.1.1
 - name: emrcontainers-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.0.4
+  version: 1.0.5
 - name: eventbridge-chart
   repository: https://chart-addons.getporter.dev
   version: 1.0.5
@@ -31,36 +31,36 @@ dependencies:
   version: 1.3.2
 - name: kms-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.0.7
+  version: 1.0.8
 - name: lambda-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.3.4
+  version: 1.3.5
 - name: memorydb-chart
   repository: https://chart-addons.getporter.dev
   version: 1.0.2
 - name: pipes-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.0.2
+  version: 1.0.3
 - name: prometheusservice-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.2.5
+  version: 1.2.6
 - name: rds-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.1.8
+  version: 1.1.9
 - name: s3-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.0.6
+  version: 1.0.7
 - name: sagemaker-chart
   repository: https://chart-addons.getporter.dev
   version: 1.2.4
 - name: sfn-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.0.5
+  version: 1.0.6
 - name: sns-chart
   repository: https://chart-addons.getporter.dev
   version: 1.0.6
 - name: sqs-chart
   repository: https://chart-addons.getporter.dev
-  version: 1.0.6
-digest: sha256:fb4b92272c3ad92b171bc392cc726bab8a87e0d732cc9758f181116a3a956fbe
-generated: "2023-12-20T21:51:34.962629858Z"
+  version: 1.0.7
+digest: sha256:fb3570bc8c5f564133af3ce8d3a3b0c325da5231eff2667c09d06ef1b10bc6ac
+generated: "2024-01-02T23:12:34.901448738Z"
