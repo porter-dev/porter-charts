@@ -64,7 +64,7 @@ spec:
     - hosts:
         - {{ . | quote }}
       {{- if not $.Values.ingress.useDefaultIngressTLSSecret }}
-      {{ if $.Values.ingress.wildcard }}
+      {{ if and $.Values.ingress.wildcard (hasPrefix "*" .) }}
       secretName: wildcard-cert-tls
       {{ else if $.Values.ingress.customTls.enabled }}
       secretName: {{ $.Values.ingress.customTls.customTlsSecret }}
@@ -85,7 +85,7 @@ spec:
       {{ else if .Values.ingress.customTls.enabled }}
       secretName: {{ .Values.ingress.customTls.customTlsSecret }}
       {{ else }}
-      secretName: {{ include "docker-template.fullname" . }}  
+      secretName: {{ include "docker-template.fullname" . }}
       {{ end }}
       {{- end }}
   {{- end }}
