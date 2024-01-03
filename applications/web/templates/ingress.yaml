@@ -64,7 +64,7 @@ spec:
     - hosts:
         - {{ . | quote }}
       {{- if not $.Values.ingress.useDefaultIngressTLSSecret }}
-      {{ if and $.Values.ingress.wildcard (hasPrefix "*" .) }}
+      {{ if $.Values.ingress.wildcard }}
       secretName: wildcard-cert-tls
       {{ else if $.Values.ingress.customTls.enabled }}
       secretName: {{ $.Values.ingress.customTls.customTlsSecret }}
