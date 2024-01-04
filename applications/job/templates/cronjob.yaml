@@ -49,6 +49,11 @@ spec:
             {{- toYaml .Values.podLabels | nindent 12 }}
             {{- end }}
         spec:
+          {{- if .Values.enableEDNS0 }}
+          dnsConfig:
+            options:
+              - name: edns0
+          {{- end }}
           {{- if .Values.serviceAccount.create }}
           serviceAccountName: cronjob-{{ include "docker-template.serviceAccountName" . }}
           {{ else }}
