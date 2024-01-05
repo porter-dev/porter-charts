@@ -8,7 +8,7 @@ SPDX-License-Identifier: APACHE-2.0
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 kind: {{ .Values.master.kind }}
 metadata:
-  name: {{ printf "%s-master" (include "common.names.fullname" .) }}
+  name: {{ printf "%s" (include "common.names.fullname" .) }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: master
@@ -24,7 +24,7 @@ spec:
     matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
       app.kubernetes.io/component: master
   {{- if (eq .Values.master.kind "StatefulSet") }}
-  serviceName: {{ printf "%s-headless" (include "common.names.fullname" .) }}
+  serviceName: {{ printf "%s" (include "common.names.fullname" .) }}
   {{- end }}
   {{- if .Values.master.updateStrategy }}
   {{- if (eq .Values.master.kind "Deployment") }}
@@ -134,18 +134,6 @@ spec:
               value: master
             - name: ALLOW_EMPTY_PASSWORD
               value: {{ ternary "no" "yes" .Values.auth.enabled | quote }}
-            {{- if .Values.auth.enabled }}
-            {{- if .Values.auth.usePasswordFiles }}
-            - name: REDIS_PASSWORD_FILE
-              value: "/opt/bitnami/redis/secrets/redis-password"
-            {{- else }}
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "redis.secretName" . }}
-                  key: {{ template "redis.secretPasswordKey" . }}
-            {{- end }}
-            {{- end }}
             - name: REDIS_TLS_ENABLED
               value: {{ ternary "yes" "no" .Values.tls.enabled | quote }}
             {{- if .Values.tls.enabled }}
@@ -170,16 +158,16 @@ spec:
             {{- if .Values.master.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.master.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
-          {{- if or .Values.master.extraEnvVarsCM .Values.master.extraEnvVarsSecret }}
+          {{- if or .Values.master.configMapRefs .Values.master.secretRefs }}
           envFrom:
-            {{- if .Values.master.extraEnvVarsCM }}
+          {{ range $configMapName := .Values.master.configMapRefs }}
             - configMapRef:
-                name: {{ .Values.master.extraEnvVarsCM }}
-            {{- end }}
-            {{- if .Values.master.extraEnvVarsSecret }}
+                name: {{ $configMapName }}
+          {{ end }}
+          {{ range $secretName := .Values.master.secretRefs }}
             - secretRef:
-                name: {{ .Values.master.extraEnvVarsSecret }}
-            {{- end }}
+                name: {{ $secretName }}
+          {{ end }}
           {{- end }}
           ports:
             - name: redis
