@@ -50,6 +50,10 @@ cloudsql:
   dbPort: 5432
   serviceAccountJSON: ""
 
+# Set this for enabling DNS extensions over TCP
+# We enable this by default.
+enableEDNS0: true
+
 sidecar:
   signalChildProcesses: true
   # The timeout value in seconds for the job run
