@@ -59,6 +59,11 @@ data:
           {{ else }}
           serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
           {{- end }}
+          {{- if .Values.enableEDNS0 }}
+          dnsConfig:
+            options:
+              - name: edns0
+          {{- end }}
           containers:
           - name: {{ .Chart.Name }}
             {{- if .Values.global }}
