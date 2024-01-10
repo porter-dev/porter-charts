@@ -237,6 +237,26 @@ rules:
   - patch
   - update
 - apiGroups:
+  - lambda.services.k8s.aws
+  resources:
+  - versions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - lambda.services.k8s.aws
+  resources:
+  - versions/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - mq.services.k8s.aws
   resources:
   - brokers

@@ -15,6 +15,7 @@ rules:
   - functions
   - functionurlconfigs
   - layerversions
+  - versions
   verbs:
   - get
   - list
