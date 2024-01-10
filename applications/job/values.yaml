@@ -73,3 +73,5 @@ stack:
   revision: 0
 
 podLabels: {}
+
+priorityClassName: ""
