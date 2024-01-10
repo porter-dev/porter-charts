@@ -21,6 +21,8 @@ rules:
 
   - layerversions
 
+  - versions
+
   verbs:
   - create
   - delete
@@ -38,6 +40,7 @@ rules:
   - functions
   - functionurlconfigs
   - layerversions
+  - versions
   verbs:
   - get
   - patch
