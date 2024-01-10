@@ -256,3 +256,5 @@ emptyDir:
   enabled: false
   mountPath: /mypath
   volumeOptions: {}
+
+priorityClassName: ""

@@ -347,6 +347,9 @@ spec:
         {{ $k }}: {{ $v }}
         {{- end }}
       {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
       tolerations:
         - key: "removable"
           operator: "Equal"
