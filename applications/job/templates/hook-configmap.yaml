@@ -46,6 +46,9 @@ data:
           restartPolicy: Never
           shareProcessNamespace: true
           nodeSelector: {{- toYaml .Values.nodeSelector | nindent 12 }}
+          {{- if .Values.priorityClassName }}
+          priorityClassName: {{ .Values.priorityClassName }}
+          {{- end }}
           tolerations: 
           {{ if .Values.tolerations}}
           {{ toYaml .Values.tolerations | nindent 12 }}
