@@ -251,6 +251,8 @@ spec:
               value: "{{ .Values.image.tag }}"
             - name: PORTER_POD_REVISION
               value: "{{ .Release.Revision }}"
+            - name: PORTER_APP_SERVICE_NAME
+              value: "{{ include "docker-template.fullname" . }}"
             {{- if .Values.stack.enabled }}
             - name: PORTER_STACK_NAME
               value: "{{ .Values.stack.name }}"
