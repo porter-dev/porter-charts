@@ -162,10 +162,18 @@ spec:
               cpu: {{ $.Values.resources.requests.cpu }}
               memory: {{ $.Values.resources.requests.memory }}
             limits:
-              {{- if ($.Values.resources.setCPULimits) }}
-              cpu: {{ $.Values.resources.requests.cpu }}
-              {{ end }}
-              memory: {{ $.Values.resources.requests.memory }}
+              {{- if .Values.resources.setCPULimits }}
+                {{- if .Values.resources.limits.cpu }}
+              cpu: {{ .Values.resources.limits.cpu }}
+                {{- else }}
+              cpu: {{ .Values.resources.requests.cpu }}
+                {{- end }}
+              {{- end }}
+              {{- if .Values.resources.limits.memory }}
+              memory: {{ .Values.resources.limits.memory }}
+              {{- else }}
+              memory: {{ .Values.resources.requests.memory }}
+              {{- end }}
           env:
             # Porter default environment variables
             - name: PORTER_NODE_NAME
