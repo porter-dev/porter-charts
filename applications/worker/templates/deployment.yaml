@@ -167,15 +167,21 @@ spec:
           {{ end }}
           {{ end }}
             limits:
-              {{- if (.Values.resources.setCPULimits) }}
+              {{- if .Values.resources.setCPULimits }}
+                {{- if .Values.resources.limits.cpu }}
+              cpu: {{ .Values.resources.limits.cpu }}
+                {{- else }}
               cpu: {{ .Values.resources.requests.cpu }}
-              {{ end }}
+                {{- end }}
+              {{- end }}
+              {{- if .Values.resources.limits.memory }}
+              memory: {{ .Values.resources.limits.memory }}
+              {{- else }}
               memory: {{ .Values.resources.requests.memory }}
-          {{ if .Values.resources.limits }}
-          {{ if .Values.resources.limits.nvidiaGpu }}
+              {{- end }}
+              {{- if .Values.resources.limits.nvidiaGpu }}
               nvidia.com/gpu: {{ .Values.resources.limits.nvidiaGpu }}
-          {{ end }}
-          {{ end }}
+              {{- end }}
           {{ if or .Values.configMapRefs .Values.secretRefs }}
           envFrom:
           {{ range $configMapName := .Values.configMapRefs }}
