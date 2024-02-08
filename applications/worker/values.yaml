@@ -46,6 +46,7 @@ resources:
     cpu: 100m
     memory: 256Mi
   setCPULimits: false
+  limits: {}
 
 autoscaling:
   enabled: false
