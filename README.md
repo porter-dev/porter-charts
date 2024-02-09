@@ -30,3 +30,11 @@ If chart-specific bugs are encountered while using Porter, or you would like a c
 We welcome all contributors! Consult the [contributing guide](CONTRIBUTING.md) to understand the contributing process.
 
 > **Note:** please file an issue or comment on an existing issue to be assigned. **Only start working on the issue once assigned**.
+
+## Building Chart Dependencies
+
+Certain charts may have dependencies on other charts. To build these dependencies, you can use the `helm dependency build` command. For example, to build the dependencies for the `addons/redis-managed` chart, you can run:
+
+```bash
+helm dependency build addons/redis-managed
+```
