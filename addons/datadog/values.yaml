@@ -51,7 +51,17 @@ datadog:
   # agents.secretAnnotations -- Annotations to add to the Secrets
   secretAnnotations: {}
   #   key: "value"
+  
+  containerLifecycle:
+    # datadog.containerLifecycle.enabled -- Enable container lifecycle events collection
+    enabled: true
+  
+  containerImageCollection:
+    # datadog.containerImageCollection.enabled -- Enable collection of container image metadata
 
+    # This parameter requires Agent version 7.46+
+    enabled: true
+  
   ## Configure the secret backend feature https://docs.datadoghq.com/agent/guide/secrets-management
   ## Examples: https://docs.datadoghq.com/agent/guide/secrets-management/#setup-examples-1
   secretBackend:
@@ -267,7 +277,23 @@ datadog:
 
   # datadog.expvarPort -- Specify the port to expose pprof and expvar to not interfer with the agentmetrics port from the cluster-agent, which defaults to 5000
   expvarPort: 6000
+  
+  # Software Bill of Materials configuration
+  sbom:
+    containerImage:
+      # datadog.sbom.containerImage.enabled -- Enable SBOM collection for container images
+      enabled: false
 
+      # datadog.sbom.containerImage.uncompressedLayersSupport -- Use container runtime snapshotter
+      # This should be set to true when using EKS, GKE or if containerd is configured to
+      # discard uncompressed layers.
+      # This feature will cause the SYS_ADMIN capability to be added to the Agent container.
+      uncompressedLayersSupport: false
+
+    host:
+      # datadog.sbom.host.enabled -- Enable SBOM collection for host filesystems
+      enabled: false
+  
   ## dogstatsd configuration
 
   ## ref: https://docs.datadoghq.com/agent/kubernetes/dogstatsd/
@@ -407,6 +433,18 @@ datadog:
 
   ## Enable apm agent and provide custom configs
   apm:
+    instrumentation:
+      # datadog.apm.instrumentation.enabled -- Enable injecting the Datadog APM libraries into all pods in the cluster (beta).
+      enabled: false
+
+      # datadog.apm.instrumentation.enabledNamespaces -- Enable injecting the Datadog APM libraries into pods in specific namespaces (beta).
+      enabledNamespaces: []
+
+      # datadog.apm.instrumentation.disabledNamespaces -- Disable injecting the Datadog APM libraries into pods in specific namespaces (beta).
+      disabledNamespaces: []
+
+      # datadog.apm.instrumentation.libVersions -- Inject specific version of tracing libraries with Single Step Instrumentation (beta).
+      libVersions: {}
     # datadog.apm.socketEnabled -- Enable APM over Socket (Unix Socket or windows named pipe)
 
     ## ref: https://docs.datadoghq.com/agent/kubernetes/apm/
@@ -622,6 +660,7 @@ datadog:
     ## turning this option off will improve the situation.
     container_scrubbing:
       enabled: true
+    customResources: []
 
   helmCheck:
     # datadog.helmCheck.enabled -- Set this to true to enable the Helm check (Requires Agent 7.35.0+ and Cluster Agent 1.19.0+)
@@ -659,6 +698,8 @@ datadog:
 
       # datadog.securityAgent.compliance.checkInterval -- Compliance check run interval
       checkInterval: 20m
+      xccdf:
+        enabled: false
 
     runtime:
       # datadog.securityAgent.runtime.enabled -- Set to true to enable Cloud Workload Security (CWS)
@@ -837,6 +878,9 @@ clusterAgent:
       securityContext:
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
+    initContainers:
+      # clusterAgent.containers.initContainer.securityContext -- Specify securityContext on the initContainers.
+      securityContext: {}
 
   # clusterAgent.command -- Command to run in the Cluster Agent container as entrypoint
   command: []
@@ -935,6 +979,9 @@ clusterAgent:
     # clusterAgent.admissionController.enabled -- Enable the admissionController to be able to inject APM/Dogstatsd config and standard tags (env, service, version) automatically into your pods
     enabled: true
 
+    # clusterAgent.admissionController.webhookName -- Name of the mutatingwebhookconfigurations created by the cluster-agent
+    webhookName: datadog-webhook
+
     # clusterAgent.admissionController.mutateUnlabelled -- Enable injecting config without having the pod label 'admission.datadoghq.com/enabled="true"'
     mutateUnlabelled: true
 
@@ -959,6 +1006,8 @@ clusterAgent:
       ## This feature is in beta, and enables Remote Config in the Cluster Agent. It also requires Cluster Agent version 7.43+.
       ## Enabling this feature grants the Cluster Agent the permissions to patch Deployment objects in the cluster.
       enabled: false
+    # clusterAgent.admissionController.port -- Set port of cluster-agent admission controller service
+    port: 8000
 
   # clusterAgent.confd -- Provide additional cluster check configurations. Each key will become a file in /conf.d.
 
@@ -1120,6 +1169,61 @@ existingClusterAgent:
 
   # existingClusterAgent.clusterchecksEnabled -- set this to false if you don’t want the agents to run the cluster checks of the joined external cluster agent
   clusterchecksEnabled: true
+
+# fips is used to enable the fips sidecar container for GOVCLOUD environments.
+fips:
+  # fips.enabled -- Enable fips sidecar
+  enabled: false
+
+  # TODO: Option to override config of the FIPS side car: /etc/datadog-fips-proxy/datadog-fips-proxy.cfg
+  # customConfig: false
+
+  # fips.port -- Specifies which port is used by the containers to communicate to the FIPS sidecar.
+  port: 9803
+
+  # fips.portRange -- Specifies the number of ports used, defaults to 13 https://github.com/DataDog/datadog-agent/blob/7.44.x/pkg/config/config.go#L1564-L1577
+  portRange: 15
+
+  # fips.use_https -- Option to enable https
+  use_https: false
+
+  # fips.resources -- Resource requests and limits for the FIPS sidecar container.
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 256Mi
+    # requests:
+    #   cpu: 20m
+    #   memory: 64Mi
+
+  # fips.local_address -- Set local IP address
+  local_address: "127.0.0.1"
+
+  ## Define the Datadog image to work with
+  image:
+    ## fips.image.name -- Define the FIPS sidecar container image name.
+    name: fips-proxy
+
+    # fips.image.tag -- Define the FIPS sidecar container version to use.
+    tag: 1.1.1
+
+    # fips.image.pullPolicy -- Datadog the FIPS sidecar image pull policy
+    pullPolicy: IfNotPresent
+
+    # fips.image.digest -- Define the FIPS sidecar image digest to use, takes precedence over `fips.image.tag` if specified.
+    digest: ""
+
+    # fips.image.repository -- Override default registry + image.name for the FIPS sidecar container.
+    repository:
+
+  # fips.customFipsConfig -- Configure a custom configMap to provide the FIPS configuration. Specify custom contents for the FIPS proxy sidecar container config (/etc/datadog-fips-proxy/datadog-fips-proxy.cfg). If empty, the default FIPS proxy sidecar container config is used.
+
+  ## Note: Use `|` to declare multi-line configuration.
+  ## ref: https://docs.datadoghq.com/agent/guide/agent-fips-proxy
+  customFipsConfig: {}  # |
+  #  foobar
+  #     foo bar baz
+
 
 agents:
   # agents.enabled -- You should keep Datadog DaemonSet enabled!
@@ -1863,3 +1967,9 @@ providers:
   aks:
     # providers.aks.enabled -- Activate all specifities related to AKS configuration. Required as currently we cannot auto-detect AKS.
     enabled: false
+
+remoteConfiguration:
+  # remoteConfiguration.enabled -- Set to true to enable remote configuration on the Cluster Agent (if set) and the node agent.
+  # Can be overridden if `datadog.remoteConfiguration.enabled` or `clusterAgent.admissionController.remoteInstrumentation.enabled` is set to `false`.
+  # Preferred way to enable Remote Configuration.
+  enabled: true
