@@ -12,6 +12,9 @@ rules:
 {{- if .Values.datadog.kubeStateMetricsCore.collectSecretMetrics }}
   - secrets
 {{- end }}
+{{- if .Values.datadog.kubeStateMetricsCore.collectConfigMaps }}
+  - configmaps
+{{- end }}
   - nodes
   - pods
   - services
@@ -83,7 +86,7 @@ rules:
   verbs:
   - list
   - watch
-{{- end }}    
+{{- end }}
 - apiGroups:
   - networking.k8s.io
   resources:
@@ -91,6 +94,22 @@ rules:
   verbs:
   - list
   - watch
+- apiGroups:
+    - apiextensions.k8s.io
+  resources:
+    - customresourcedefinitions
+  verbs:
+    - list
+    - watch
+{{- if .Values.datadog.kubeStateMetricsCore.collectApiServicesMetrics }}
+- apiGroups:
+    - apiregistration.k8s.io
+  resources:
+    - apiservices
+  verbs:
+    - list
+    - watch
+{{- end }}
 ---
 apiVersion: {{ template "rbac.apiVersion" . }}
 kind: ClusterRoleBinding

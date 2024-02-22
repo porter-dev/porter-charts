@@ -1,12 +1,10 @@
 apiVersion: v1
 name: datadog
-version: 0.22.0
-appVersion: "7.0.0"
-description: Datadog agent provides observability into cloud-scale applications
+version: 3.53.3
+appVersion: "7"
+description: Datadog Agent
 keywords:
-  - APP
-  - MONITORING
-  - POPULAR
+  - monitoring
   - alerting
   - metric
 home: https://www.datadoghq.com
