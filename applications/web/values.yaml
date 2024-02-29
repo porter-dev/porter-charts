@@ -92,7 +92,9 @@ privateIngress:
 container:
   port: 80
   command:
+  # Deprecated: use argList instead
   args:
+  argList: []
   env:
     normal:
   lifecycle:

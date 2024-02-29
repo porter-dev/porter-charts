@@ -86,6 +86,12 @@ spec:
             {{- end }}
             {{- end }}
             {{- end }}
+            {{- if .Values.container.args }}
+            args:
+            {{- range $arg := .Values.container.args }}
+            - {{ $arg | quote }}
+            {{- end }}
+            {{- end }}
             {{ if or .Values.configMapRefs .Values.secretRefs }}
             envFrom:
             {{ range $configMapName := .Values.configMapRefs }}
