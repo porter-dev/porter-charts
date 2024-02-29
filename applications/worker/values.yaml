@@ -35,6 +35,7 @@ serviceAccount:
 container:
   port: 80
   command:
+  args: []
   env:
     normal:
   lifecycle:

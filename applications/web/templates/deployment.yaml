@@ -78,7 +78,12 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}
-          {{- if .Values.container.args }}
+          {{- if .Values.container.argList }}
+          args:
+          {{- range $arg := .Values.container.argList }}
+          - {{ $arg | quote }}
+          {{- end }}
+          {{- else if .Values.container.args }}
           args:
           {{- range $args := trim .Values.container.args | splitList " " }}
           - {{ $args | quote }}
