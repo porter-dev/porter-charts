@@ -151,6 +151,7 @@ spec:
             periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
             failureThreshold: {{ .Values.health.readinessProbe.failureThreshold }}
             initialDelaySeconds: {{ .Values.health.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.health.readinessProbe.timeoutSeconds }}
           {{- end }}
           {{ if .Values.health.livenessProbe.enabled }}
           livenessProbe:
@@ -162,6 +163,7 @@ spec:
             periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
             failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
             initialDelaySeconds: {{ .Values.health.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.health.livenessProbe.timeoutSeconds }}
           {{- end }}
           resources:
             requests:

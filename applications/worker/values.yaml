@@ -93,12 +93,14 @@ health:
     failureThreshold: 3
     periodSeconds: 5
     initialDelaySeconds: 5
+    timeoutSeconds: 1
   readinessProbe:
     enabled: false
     command: "ls -l"
     failureThreshold: 3
     periodSeconds: 5
     initialDelaySeconds: 5
+    timeoutSeconds: 1
   startupProbe:
     enabled: false
     command: "ls -l"
