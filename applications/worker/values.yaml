@@ -120,7 +120,7 @@ cloudsql:
   enabled: false
   connectionName: ""
   dbPort: 5432
-  serviceAccountSecret: ""
+  serviceAccountJSON: ""
   serviceAccountJSONSecret: ""
 
 # Set this to add entries to the /etc/hosts file
