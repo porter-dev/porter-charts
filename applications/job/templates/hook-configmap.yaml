@@ -204,6 +204,6 @@ data:
           volumes:
             - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
               secret:
-                secretName: "cloudsql-secret-{{ include "docker-template.fullname" . }}"
+                secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
           {{ end }}
 {{- end }}
