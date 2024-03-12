@@ -63,7 +63,7 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Name of the service account json secret to use with the CloudSQL proxuy
+Name of the service account json secret to use with the CloudSQL proxy
 */}}
 {{- define "cloudsql.serviceAccountJSONSecret" -}}
 {{- default (printf "cloudsql-secret-%s" (include "docker-template.fullname" .)) .Values.cloudsql.serviceAccountJSONSecret }}
