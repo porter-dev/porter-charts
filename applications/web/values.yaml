@@ -211,6 +211,7 @@ cloudsql:
   connectionName: ""
   dbPort: 5432
   serviceAccountJSON: ""
+  serviceAccountJSONSecret: ""
   additionalConnection:
     enabled: false
     dbPort: 5432

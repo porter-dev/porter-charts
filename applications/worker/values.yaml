@@ -121,6 +121,7 @@ cloudsql:
   connectionName: ""
   dbPort: 5432
   serviceAccountJSON: ""
+  serviceAccountJSONSecret: ""
 
 # Set this to add entries to the /etc/hosts file
 # Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
