@@ -284,7 +284,7 @@ spec:
         {{ if $.Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" $ }}"
           secret:
-            secretName: "cloudsql-secret-{{ include "docker-template.fullname" $ }}"
+            secretName: "{{ include "cloudsql.serviceAccountJSONSecret" $ }}"
         {{ end }}
         {{ if $.Values.pvc.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-storage"
