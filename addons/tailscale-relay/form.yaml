@@ -21,17 +21,13 @@ tabs:
       value: |
         .items[] | {
           name: .metadata.labels["app.kubernetes.io/instance"],
-          release: .metadata.labels["release"],
           type: .metadata.labels["app.kubernetes.io/name"],
-          app: .metadata.labels["app"],
-          managedBy: .metadata.labels["app.kubernetes.io/managed-by"],
+          tailscale: .metadata.labels["porter.run/tailscale-svc"],
           namespace: .metadata.namespace,
           clusterIP: .spec.clusterIP,
-        } | select(.clusterIP!="None" and .managedBy=="Helm") | {
+        } | select(.clusterIP!="None" and .tailscale=="true") | {
           name: .name,
-          release: .release,
           type: .type,
-          app: .app,
           namespace: .namespace,
           clusterIP: .clusterIP,
         }
