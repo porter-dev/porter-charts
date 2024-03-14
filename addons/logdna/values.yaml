@@ -5,7 +5,6 @@ image:
 
 logdna:
   name: logdna-agent
-  key: ""
 
 resources:
   requests:
@@ -21,6 +20,7 @@ daemonset:
       operator: Equal
 
 priorityClassName: ""
+
 extraEnv:
   - name: LOGDNA_USE_K8S_LOG_ENRICHMENT
     value: "always"
