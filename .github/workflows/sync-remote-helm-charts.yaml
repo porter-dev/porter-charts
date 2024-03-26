@@ -1,0 +1,140 @@
+name: 'Sync remote charts in PR'
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-chart:
+    strategy:
+      matrix:
+        charts:
+          - remote_owner: bitnami
+            remote_repository: charts
+            remote_directory: bitnami/postgresql
+            target_directory: addons/postgresql-managed
+          - remote_owner: bitnami
+            remote_repository: charts
+            remote_directory: bitnami/redis
+            target_directory: addons/redis-managed
+          - remote_owner: aws
+            remote_repository: eks-charts
+            remote_directory: stable/aws-cloudwatch-metrics
+            target_directory: addons/aws-cloudwatch-metrics
+          - remote_owner: aws-controllers-k8s
+            remote_repository: ack-chart
+            remote_directory: .
+            target_directory: addons/ack-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: apigatewayv2-controller
+            remote_directory: helm
+            target_directory: addons/apigatewayv2-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: applicationautoscaling-controller
+            remote_directory: helm
+            target_directory: addons/applicationautoscaling-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: cloudtrail-controller
+            remote_directory: helm
+            target_directory: addons/cloudtrail-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: cloudwatch-controller
+            remote_directory: helm
+            target_directory: addons/cloudwatch-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: dynamodb-controller
+            remote_directory: helm
+            target_directory: addons/dynamodb-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: ec2-controller
+            remote_directory: helm
+            target_directory: addons/ec2-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: ecr-controller
+            remote_directory: helm
+            target_directory: addons/ecr-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: eks-controller
+            remote_directory: helm
+            target_directory: addons/eks-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: elasticache-controller
+            remote_directory: helm
+            target_directory: addons/elasticache-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: emrcontainers-controller
+            remote_directory: helm
+            target_directory: addons/emrcontainers-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: eventbridge-controller
+            remote_directory: helm
+            target_directory: addons/eventbridge-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: iam-controller
+            remote_directory: helm
+            target_directory: addons/iam-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: kms-controller
+            remote_directory: helm
+            target_directory: addons/kms-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: lambda-controller
+            remote_directory: helm
+            target_directory: addons/lambda-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: memorydb-controller
+            remote_directory: helm
+            target_directory: addons/memorydb-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: pipes-controller
+            remote_directory: helm
+            target_directory: addons/pipes-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: prometheusservice-controller
+            remote_directory: helm
+            target_directory: addons/prometheusservice-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: rds-controller
+            remote_directory: helm
+            target_directory: addons/rds-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: s3-controller
+            remote_directory: helm
+            target_directory: addons/s3-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: sagemaker-controller
+            remote_directory: helm
+            target_directory: addons/sagemaker-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: sfn-controller
+            remote_directory: helm
+            target_directory: addons/sfn-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: sns-controller
+            remote_directory: helm
+            target_directory: addons/sns-chart
+          - remote_owner: aws-controllers-k8s
+            remote_repository: sqs-controller
+            remote_directory: helm
+            target_directory: addons/sqs-chart
+
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout porter-charts
+        uses: actions/checkout@v4
+      - uses: azure/setup-helm@v3
+        with:
+          version: 'v3.3.4'
+      - name: Update remote chart
+        uses: ./.github/actions/sync-remote-directory
+        with:
+          remote_owner: ${{ matrix.charts.remote_owner }}
+          remote_repository: ${{ matrix.charts.remote_repository }}
+          remote_directory: ${{ matrix.charts.remote_directory }}
+          target_directory: ${{ matrix.charts.target_directory }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CHARTMUSEUM_URL: ${{ vars.PUBLIC_CHARTMUSEUM_ADDONS_URL }}

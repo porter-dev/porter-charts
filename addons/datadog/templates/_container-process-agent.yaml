@@ -3,30 +3,39 @@
   image: "{{ include "image-path" (dict "root" .Values "image" .Values.agents.image) }}"
   imagePullPolicy: {{ .Values.agents.image.pullPolicy }}
   {{- if eq .Values.targetSystem "linux" }}
-  command: ["process-agent", "-config={{ template "datadog.confPath" . }}/datadog.yaml"]
+  command: ["process-agent", "{{template "process-agent-config-file-flag" . }}={{ template "datadog.confPath" . }}/datadog.yaml"]
   {{- end }}
   {{- if eq .Values.targetSystem "windows" }}
-  command: ["process-agent", "-foreground", "-config={{ template "datadog.confPath" . }}/datadog.yaml"]
-  {{- end }}
-  {{- if .Values.agents.containers.processAgent.securityContext }}
-  securityContext:
-    {{ toYaml .Values.agents.containers.processAgent.securityContext | nindent 4 }}
-  {{- end }}
+  command: ["process-agent", "-foreground", "{{template "process-agent-config-file-flag" . }}={{ template "datadog.confPath" . }}/datadog.yaml"]
+  {{- end -}}
+{{ include "generate-security-context" (dict "securityContext" .Values.agents.containers.processAgent.securityContext "targetSystem" .Values.targetSystem "seccomp" "" "kubeversion" .Capabilities.KubeVersion.Version) | indent 2 }}
 {{- if .Values.agents.containers.processAgent.ports }}
   ports:
 {{ toYaml .Values.agents.containers.processAgent.ports | indent 2 }}
 {{- end }}
   resources:
 {{ toYaml .Values.agents.containers.processAgent.resources | indent 4 }}
-{{- if .Values.datadog.envFrom }}
+{{- if or .Values.datadog.envFrom .Values.agents.containers.processAgent.envFrom }}
   envFrom:
-{{ toYaml .Values.datadog.envFrom | indent 4 }}
+{{- if .Values.datadog.envFrom }}
+{{ .Values.datadog.envFrom | toYaml | indent 4 }}
+{{- end }}
+{{- if .Values.agents.containers.processAgent.envFrom }}
+{{ .Values.agents.containers.processAgent.envFrom | toYaml | indent 4 }}
+{{- end }}
 {{- end }}
   env:
     {{- include "containers-common-env" . | nindent 4 }}
     {{- include "containers-cluster-agent-env" . | nindent 4 }}
+    {{- include "fips-envvar" . | nindent 4 }}
     {{- if .Values.datadog.processAgent.processCollection }}
     - name: DD_PROCESS_AGENT_ENABLED
+      value: "true"
+    {{- end }}
+    - name: DD_PROCESS_AGENT_DISCOVERY_ENABLED
+      value: {{ .Values.datadog.processAgent.processDiscovery | quote }}
+    {{- if .Values.datadog.processAgent.stripProcessArguments }}
+    - name: DD_STRIP_PROCESS_ARGS
       value: "true"
     {{- end }}
     - name: DD_LOG_LEVEL
@@ -37,42 +46,53 @@
     - name: DD_SYSTEM_PROBE_NETWORK_ENABLED
       value: {{ .Values.datadog.networkMonitoring.enabled | quote }}
     {{- end }}
+    {{- if eq .Values.targetSystem "linux" }}
+    - name: DD_DOGSTATSD_SOCKET
+      value: {{ .Values.datadog.dogstatsd.socketPath | quote }}
+    {{- end }}
     - name: DD_ORCHESTRATOR_EXPLORER_ENABLED
       value: {{ (include "should-enable-k8s-resource-monitoring" .) | quote }}
-{{- if .Values.agents.containers.processAgent.env }}
-{{ toYaml .Values.agents.containers.processAgent.env | indent 4 }}
-{{- end }}
+    {{- include "additional-env-entries" .Values.agents.containers.processAgent.env | indent 4 }}
+    {{- include "additional-env-dict-entries" .Values.agents.containers.processAgent.envDict | indent 4 }}
   volumeMounts:
     - name: config
       mountPath: {{ template "datadog.confPath" . }}
-    {{- if eq .Values.targetSystem "linux" }}
-    - name: runtimesocketdir
-      mountPath: {{ print "/host/" (dir (include "datadog.dockerOrCriSocketPath" .)) | clean }}
-      mountPropagation: {{ .Values.datadog.hostVolumeMountPropagation }}
       readOnly: true
     - name: logdatadog
-      mountPath: /var/log/datadog
+      mountPath: {{ template "datadog.logDirectoryPath" . }}
+      readOnly: false # Need RW to write logs
+    {{- if eq .Values.targetSystem "linux" }}
+    {{- if (not .Values.providers.gke.autopilot) }}
+    - name: auth-token
+      mountPath: {{ template "datadog.confPath" . }}/auth
+      readOnly: true
+    - name: dsdsocket
+      mountPath: {{ (dir .Values.datadog.dogstatsd.socketPath) }}
+      readOnly: false # Need RW for UDS DSD socket
+    {{- end }}
     - name: tmpdir
       mountPath: /tmp
-      readOnly: false
+      readOnly: false # Need RW to write to tmp directory
+    {{- include "linux-container-host-release-volumemounts" . | nindent 4 }}
     {{- end }}
-    {{- if eq .Values.targetSystem "windows" }}
-    - name: runtimesocket
-      mountPath: {{ template "datadog.dockerOrCriSocketPath" . }}
-    {{- end }}
-    {{- if .Values.agents.useConfigMap }}
-    - name: {{ template "datadog.fullname" . }}-datadog-yaml
+    {{- include "container-crisocket-volumemounts" . | nindent 4 }}
+    {{- include "container-cloudinit-volumemounts" . | nindent 4 }}
+    {{- if and .Values.agents.useConfigMap (eq .Values.targetSystem "linux")}}
+    - name: datadog-yaml
       mountPath: {{ template "datadog.confPath" . }}/datadog.yaml
       subPath: datadog.yaml
+      readOnly: true
     {{- end }}
     {{- if eq .Values.targetSystem "linux" }}
     - name: cgroups
       mountPath: /host/sys/fs/cgroup
       mountPropagation: {{ .Values.datadog.hostVolumeMountPropagation }}
       readOnly: true
+    {{- if or .Values.datadog.processAgent.processCollection .Values.datadog.processAgent.processDiscovery}}
     - name: passwd
       mountPath: /etc/passwd
       readOnly: true
+    {{- end }}
     - name: procdir
       mountPath: /host/proc
       mountPropagation: {{ .Values.datadog.hostVolumeMountPropagation }}
@@ -84,6 +104,7 @@
     - name: sysprobe-config
       mountPath: /etc/datadog-agent/system-probe.yaml
       subPath: system-probe.yaml
+      readOnly: true
     {{- end }}
     {{- end }}
     {{- if .Values.datadog.kubelet.hostCAPath }}

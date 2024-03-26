@@ -1,0 +1,128 @@
+apiVersion: rbac.authorization.k8s.io/v1
+{{ if eq .Values.installScope "cluster" }}
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: ack-emrcontainers-controller
+  labels:
+  {{- range $key, $value := .Values.role.labels }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{ else }}
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: ack-emrcontainers-controller
+  labels:
+  {{- range $key, $value := .Values.role.labels }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  namespace: {{ .Release.Namespace }}
+{{ end }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - emrcontainers.services.k8s.aws
+  resources:
+  - jobruns
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - emrcontainers.services.k8s.aws
+  resources:
+  - jobruns/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - emrcontainers.services.k8s.aws
+  resources:
+  - virtualclusters
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - emrcontainers.services.k8s.aws
+  resources:
+  - virtualclusters/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - adoptedresources
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - adoptedresources/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - fieldexports
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - fieldexports/status
+  verbs:
+  - get
+  - patch
+  - update

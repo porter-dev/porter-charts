@@ -1,0 +1,9 @@
+apiVersion: v2
+appVersion: "3"
+description: For deploying a CircleCI Container Agent
+icon: https://images.crunchbase.com/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/kwaxnksiclrrzxan1qqu
+name: container-agent
+type: application
+version: 0.2.0
+keywords:
+  - MISC

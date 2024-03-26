@@ -4,7 +4,7 @@
   "properties": {
     "replicaCount": {
       "type": "integer",
-      "minimum": 1,
+      "minimum": 0,
       "default": 1
     },
     "container": {

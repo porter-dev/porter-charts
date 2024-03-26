@@ -32,13 +32,18 @@ spec:
           - type: {{ or .Values.keda.hpa.scaleDown.policy.type "Percent" }}
             value: {{ .Values.keda.hpa.scaleDown.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleDown.policy.periodSeconds }}
+  {{- if .Values.keda.trigger }}
   triggers:
+<<<<<<< HEAD
 <<<<<<< HEAD
     {{- if .Values.keda.trigger.prometheus.enabled -}}
 =======
     {{- if .Values.keda.trigger.enabled -}}
 >>>>>>> master
+=======
+>>>>>>> main
     - type: prometheus
+      metricType: {{ .Values.keda.trigger.metricType | default "AverageValue" }}
       metadata:
         # Required fields:
         serverAddress: http://prometheus-server.monitoring.svc.cluster.local:80
@@ -62,21 +67,10 @@ spec:
         metricName: {{ .Values.keda.trigger.metricName }}
         query: {{ .Values.keda.trigger.metricQuery }}
         threshold: '{{ .Values.keda.trigger.metricThreshold }}'
-    {{- end }}
-    {{- if .Values.keda.datadog.enabled -}}
-    - type: datadog
-      metricType: Value
-      metadata:
-        query: '{{ .Values.keda.datadog.query }}'
-        queryValue: '{{ .Values.keda.datadog.queryValue }}'
-        activationQueryValue: '{{ .Values.keda.datadog.activationQueryValue }}'
-        queryAggregator: '{{ .Values.keda.datadog.queryAggregator }}'
-        age: '{{ .Values.keda.datadog.age }}'
-        timeWindowOffset: '{{ .Values.keda.datadog.timeWindowOffset }}'
-        lastAvailablePointOffset: '{{ .Values.keda.datadog.lastAvailablePointOffset }}'
-        metricUnavailableValue: '{{ .Values.keda.datadog.metricUnavailableValue }}'
-      authenticationRef:
-        name: {{ $fullName }}-trigger-auth-datadog
-    {{- end }}
+  {{- end }}
+  {{- if .Values.keda.triggers }}
+  triggers:
+  {{- toYaml .Values.keda.triggers | nindent 4 }}
+  {{- end }}
 {{- end }}
 >>>>>>> master

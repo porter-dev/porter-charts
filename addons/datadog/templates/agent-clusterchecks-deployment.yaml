@@ -1,4 +1,4 @@
-{{- if and (eq (include "should-deploy-cluster-agent" .) "true") .Values.datadog.clusterChecks.enabled .Values.clusterChecksRunner.enabled -}}
+{{- if and (eq (include "should-deploy-cluster-agent" .) "true") (eq (include "should-enable-cluster-check-workers" .) "true") -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -11,8 +11,12 @@ metadata:
 {{ toYaml .Values.clusterChecksRunner.additionalLabels | indent 4 }}
     {{- end }}
 {{ include "provider-labels" . | indent 4 }}
+  {{- if .Values.clusterChecksRunner.deploymentAnnotations }}
+  annotations: {{ toYaml .Values.clusterChecksRunner.deploymentAnnotations | nindent 4 }}
+  {{- end }}
 spec:
   replicas: {{ .Values.clusterChecksRunner.replicas }}
+  revisionHistoryLimit: {{ .Values.clusterChecksRunner.revisionHistoryLimit }}
   strategy:
 {{ toYaml .Values.clusterChecksRunner.strategy | indent 4 }}
   selector:
@@ -42,10 +46,16 @@ spec:
 {{ toYaml .Values.clusterChecksRunner.podAnnotations | indent 8 }}
       {{- end }}
     spec:
-      {{- if .Values.clusterChecksRunner.rbac.dedicated }}
+      {{- if .Values.clusterChecksRunner.shareProcessNamespace }}
+      shareProcessNamespace: {{ .Values.clusterChecksRunner.shareProcessNamespace }}
+      {{- end }}
+      {{- if or (eq (include "should-enable-cluster-check-workers" .) "true") .Values.clusterChecksRunner.rbac.dedicated }}
       serviceAccountName: {{ if .Values.clusterChecksRunner.rbac.create }}{{ template "datadog.fullname" . }}-cluster-checks{{ else }}"{{ .Values.clusterChecksRunner.rbac.serviceAccountName }}"{{ end }}
       {{- else }}
       serviceAccountName: {{ if .Values.clusterChecksRunner.rbac.create }}{{ template "datadog.fullname" . }}{{ else }}"{{ .Values.clusterChecksRunner.rbac.serviceAccountName }}"{{ end }}
+      {{- end }}
+      {{- if .Values.clusterChecksRunner.rbac.create  }}
+      automountServiceAccountToken: {{ .Values.clusterChecksRunner.rbac.automountServiceAccountToken }}
       {{- end }}
       imagePullSecrets:
 {{ toYaml .Values.clusterChecksRunner.image.pullSecrets | indent 8 }}
@@ -70,6 +80,7 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /opt/datadog-agent
+            readOnly: false # Need RW for writing agent config files
         resources:
 {{ toYaml .Values.agents.containers.initContainers.resources | indent 10 }}
       - name: init-config
@@ -81,6 +92,7 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /etc/datadog-agent
+            readOnly: false # Need RW for writing datadog.yaml config file
           {{- if .Values.datadog.checksd }}
           - name: checksd
             mountPath: /checks.d
@@ -89,6 +101,9 @@ spec:
         resources:
 {{ toYaml .Values.agents.containers.initContainers.resources | indent 10 }}
       containers:
+        {{- if eq  (include "should-enable-fips" .) "true" }}
+          {{- include "fips-proxy" . | nindent 6 }}
+        {{- end }}
       - name: agent
         image: "{{ include "image-path" (dict "root" .Values "image" .Values.clusterChecksRunner.image) }}"
         command: ["bash", "-c"]
@@ -99,9 +114,14 @@ spec:
         ports:
 {{ toYaml .Values.clusterChecksRunner.ports | indent 10 }}
 {{- end }}
-{{- if .Values.datadog.envFrom }}
+{{- if or .Values.datadog.envFrom .Values.clusterChecksRunner.envFrom }}
         envFrom:
-{{ toYaml .Values.datadog.envFrom | indent 10 }}
+{{- if .Values.datadog.envFrom }}
+{{ .Values.datadog.envFrom | toYaml | indent 10 }}
+{{- end }}
+{{- if .Values.clusterChecksRunner.envFrom }}
+{{ .Values.clusterChecksRunner.envFrom | toYaml | indent 10 }}
+{{- end }}
 {{- end }}
         env:
           - name: DD_API_KEY
@@ -109,6 +129,18 @@ spec:
               secretKeyRef:
                 name: {{ template "datadog.apiSecretName" . }}
                 key: api-key
+          {{- if .Values.datadog.secretBackend.command }}
+          - name: DD_SECRET_BACKEND_COMMAND
+            value: {{ .Values.datadog.secretBackend.command | quote }}
+          {{- end }}
+          {{- if .Values.datadog.secretBackend.arguments }}
+          - name: DD_SECRET_BACKEND_ARGUMENTS
+            value: {{ .Values.datadog.secretBackend.arguments | quote }}
+          {{- end }}
+          {{- if .Values.datadog.secretBackend.timeout }}
+          - name: DD_SECRET_BACKEND_TIMEOUT
+            value: {{ .Values.datadog.secretBackend.timeout | quote }}
+          {{- end }}
           - name: KUBERNETES
             value: "yes"
           {{- if .Values.datadog.site }}
@@ -153,13 +185,21 @@ spec:
             value: "false"
           - name: DD_APM_ENABLED
             value: "false"
+          - name: DD_REMOTE_CONFIGURATION_ENABLED
+            value: "false"
           - name: DD_HOSTNAME
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-{{- if .Values.clusterChecksRunner.env }}
-{{ toYaml .Values.clusterChecksRunner.env | indent 10 }}
-{{- end }}
+          {{- if .Values.datadog.clusterName }}
+          {{- template "check-cluster-name" . }}
+          - name: DD_CLUSTER_NAME
+            value: {{ .Values.datadog.clusterName | quote }}
+          {{- end }}
+          {{- include "provider-env" . | nindent 10 }}
+          {{- include "fips-envvar" . | nindent 10 }}
+          {{- include "additional-env-entries" .Values.clusterChecksRunner.env | indent 10 }}
+          {{- include "additional-env-dict-entries" .Values.clusterChecksRunner.envDict | indent 10 }}
         resources:
 {{ toYaml .Values.clusterChecksRunner.resources | indent 10 }}
         volumeMounts:
@@ -173,6 +213,10 @@ spec:
             readOnly: true
           - name: config
             mountPath: {{ template "datadog.confPath" . }}
+            readOnly: false # Need RW for config path
+{{- if eq (include "should-mount-fips-configmap" .) "true" }}
+{{- include "linux-container-fips-proxy-cfg-volumemount" . | indent 10 }}
+{{- end }}
 {{- if .Values.clusterChecksRunner.volumeMounts }}
 {{ toYaml .Values.clusterChecksRunner.volumeMounts | indent 10 }}
 {{- end }}
@@ -185,7 +229,7 @@ spec:
       volumes:
         - name: installinfo
           configMap:
-            name: {{ template "datadog.fullname" . }}-installinfo
+            name: {{ include "agents-install-info-configmap-name" . }}
 {{- if .Values.clusterChecksRunner.volumes }}
 {{ toYaml .Values.clusterChecksRunner.volumes | indent 8 }}
 {{- end }}
@@ -194,7 +238,10 @@ spec:
 {{- if .Values.datadog.checksd }}
         - name: checksd
           configMap:
-            name: {{ template "datadog.fullname" . }}-checksd
+            name: {{ include "datadog-checksd-configmap-name" . }}
+{{- end }}
+{{- if eq (include "should-mount-fips-configmap" .) "true"}}
+{{ include "linux-container-fips-proxy-cfg-volume" . | indent 8}}
 {{- end }}
       affinity:
 {{- if .Values.clusterChecksRunner.affinity }}
@@ -219,5 +266,9 @@ spec:
       {{- if .Values.clusterChecksRunner.tolerations }}
       tolerations:
 {{ toYaml .Values.clusterChecksRunner.tolerations | indent 8 }}
+      {{- end }}
+      {{- with .Values.clusterChecksRunner.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
 {{ end }}

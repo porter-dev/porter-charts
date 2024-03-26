@@ -1,9 +1,14 @@
 apiVersion: v2
 name: tailscale-relay
-icon: https://img.stackshare.io/service/12662/Rdoemci7_400x400.jpg
-version: 0.9.0
-appVersion: v1.8.5
-description: Tailscale is a secure network between your servers, computers, and cloud instances.
+icon: https://images.crunchbase.com/image/upload/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/xkthebhmilwbyffilnfl
+version: 0.12.0
+appVersion: v1.56.1
+keywords:
+  - APP
+  - NETWORKING
+  - kubernetes
+  - helm
+description: Tailscale is a secure network between your servers and cloud instances.
 home: https://github.com/mvisonneau/tailscale-relay-over-k8s
 sources:
   - https://github.com/mvisonneau/helm-charts/tree/main/charts/tailscale-relay-over-k8s

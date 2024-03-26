@@ -1,0 +1,175 @@
+{{- if or (ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job") (.Values.global) }}
+{{- if $.Capabilities.APIVersions.Has "batch/v1/CronJob" }}
+apiVersion: batch/v1
+{{- else }}
+apiVersion: batch/v1beta1
+{{- end }}
+kind: CronJob
+metadata:
+  name: {{ include "docker-template.fullname" . }}
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+    {{- if .Values.labels }}
+    {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
+spec:
+  successfulJobsHistoryLimit: {{ .Values.schedule.successfulHistory }}
+  failedJobsHistoryLimit: {{ .Values.schedule.failedHistory }}
+  concurrencyPolicy: {{ ternary "Allow" "Forbid" .Values.allowConcurrency }}
+  startingDeadlineSeconds: 20
+  suspend: {{ not .Values.schedule.enabled }}
+  schedule: "{{ .Values.schedule.value }}"
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        app.kubernetes.io/version: {{ .Chart.AppVersion }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        helm.sh/revision: "{{ .Release.Revision }}"
+        meta.helm.sh/release-name: "{{ .Release.Name }}"
+        {{- if .Values.stack.enabled }}
+        porter.run/stack-name: "{{ .Values.stack.name }}"
+        {{- end }}
+        porter.run/application-name: "{{ .Release.Name }}"
+        {{- if .Values.labels }}
+        {{- toYaml .Values.labels | nindent 8 }}
+        {{- end }}
+    spec:
+      template:
+        metadata:
+          annotations:
+            {{- if .Values.safeToEvict }}
+            "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
+            {{- else }}
+            "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+            {{- end }}
+          labels:
+            {{- if .Values.podLabels }}
+            {{- toYaml .Values.podLabels | nindent 12 }}
+            {{- end }}
+        spec:
+          {{- if .Values.serviceAccount.create }}
+          serviceAccountName: cronjob-{{ include "docker-template.serviceAccountName" . }}
+          {{ else }}
+          serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
+          {{- end }}
+          containers:
+          - name: {{ .Chart.Name }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            command:
+            {{- range $command := trim .Values.container.command | splitList " " }}
+            - {{ $command | quote }}
+            {{- end }}
+            {{ if or .Values.configMapRefs .Values.secretRefs }}
+            envFrom:
+            {{ range $configMapName := .Values.configMapRefs }}
+              - configMapRef:
+                  name: {{ $configMapName }}
+            {{ end }}
+            {{ range $secretName := .Values.secretRefs }}
+              - secretRef:
+                  name: {{ $secretName }}
+            {{ end }}
+            {{ end }}          
+            env:
+              {{- range $key, $val := .Values.container.env.normal }}
+              - name: {{ $key }}
+              {{- $splVal := split "_" $val -}}
+              {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ $splVal._1 }}
+                    key: {{ $key }}
+              {{- else }}
+                value: {{ quote $val }}
+              {{- end }}
+              {{- end }}
+              {{- range $syncedEnv := .Values.container.env.synced }}
+              {{- range $key := $syncedEnv.keys }}
+              - name: {{ $key.name }}
+                {{- if $key.secret }}
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
+                    key: {{ $key.name }}
+                {{- else }}
+                valueFrom:
+                  configMapKeyRef:
+                    name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
+                    key: {{ $key.name }}
+                {{- end }}
+              {{- end }}
+              {{- end }}
+            resources:
+              requests:
+                cpu: {{ .Values.resources.requests.cpu }}
+                memory: {{ .Values.resources.requests.memory }}
+              limits:
+                cpu: {{ .Values.resources.limits.cpu }}
+                memory: {{ .Values.resources.limits.memory }}
+          - name: sidecar
+            image: ghcr.io/porter-dev/job_sidecar_container:latest
+            imagePullPolicy: Always
+            {{- if (.Values.sidecar.timeout) }}
+            env:
+            - name: TIMEOUT
+              value: {{ .Values.sidecar.timeout | quote }}
+            {{- end }}
+            resources:
+              requests:
+                cpu: {{ .Values.sidecar.resources.requests.cpu }}
+                memory: {{ .Values.sidecar.resources.requests.memory }}
+              limits:
+                memory: {{ .Values.sidecar.resources.requests.memory }}
+            command:
+            - "./job_killer.sh"
+            {{- if (.Values.sidecar.signalChildProcesses) }}
+            - "-c"
+            {{- end }}
+            - {{ .Values.terminationGracePeriodSeconds | quote }}
+            {{- $cmdSpl := trim .Values.container.command | splitList " " }}
+            - {{ $cmdSpl| first | quote }}
+            {{- if .Values.cloudsql.enabled }}
+            - "cloud_sql_proxy"
+            {{- end }}
+          {{- if .Values.cloudsql.enabled }}
+          - name: cloud-sql-proxy
+            image: gcr.io/cloudsql-docker/gce-proxy:1.17
+            command:
+              - "/cloud_sql_proxy"
+              - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
+              - "-credential_file=/secrets/service_account.json"
+              {{ if .Values.terminationGracePeriodSeconds }}
+              - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
+              {{ end }}
+            securityContext:
+              runAsNonRoot: true
+            volumeMounts:
+            - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+              mountPath: /secrets/
+              readOnly: true
+          {{ end }}
+          {{ if .Values.cloudsql.enabled }}
+          volumes:
+            - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+              secret:
+                secretName: "cloudsql-secret-{{ include "docker-template.fullname" . }}"
+          {{ end }}
+          restartPolicy: Never
+          shareProcessNamespace: true
+          nodeSelector: {{- toYaml .Values.nodeSelector | nindent 12 }}
+          tolerations: 
+          {{ if .Values.tolerations}}
+          {{ toYaml .Values.tolerations | nindent 12 }}
+          {{ end }}
+            - key: "removable"
+              operator: "Equal"
+              value: "true"
+              effect: "NoSchedule"
+      backoffLimit: 0
+      {{- if (.Values.sidecar.timeout) }}
+      activeDeadlineSeconds: {{ .Values.sidecar.timeout }}
+      {{- end }}
+{{ end }}

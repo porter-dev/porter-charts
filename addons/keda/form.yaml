@@ -1,0 +1,10 @@
+tabs:
+- name: main
+  label: KEDA
+  sections:
+  - name: Introduction
+    contents: 
+    - type: heading
+      label: KEDA - Kubernetes Event-driven Autoscaling 
+    - type: subtitle
+      label: KEDA is a Kubernetes-based Event Driven Autoscaler. With KEDA, you can drive the scaling of any workload based on the number of events needing to be processed.

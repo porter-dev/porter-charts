@@ -1,13 +1,15 @@
 apiVersion: v1
 name: datadog
-version: 0.25.0
+version: 3.53.3
 appVersion: "7"
 description: Datadog Agent
 keywords:
   - monitoring
   - alerting
   - metric
-  - metrics
+  - APP
+  - MONITORING
+  - POPULAR
 home: https://www.datadoghq.com
 icon: https://datadog-live.imgix.net/img/dd_logo_70x75.png
 sources:

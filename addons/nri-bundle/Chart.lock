@@ -1,33 +1,36 @@
 dependencies:
 - name: newrelic-infrastructure
   repository: https://newrelic.github.io/nri-kubernetes
-  version: 3.6.2
+  version: 3.17.0
 - name: nri-prometheus
   repository: https://newrelic.github.io/nri-prometheus
-  version: 2.1.6
+  version: 2.1.16
+- name: newrelic-prometheus-agent
+  repository: https://newrelic.github.io/newrelic-prometheus-configurator
+  version: 1.2.0
 - name: nri-metadata-injection
   repository: https://newrelic.github.io/k8s-metadata-injection
-  version: 3.0.4
+  version: 4.3.0
 - name: newrelic-k8s-metrics-adapter
   repository: https://newrelic.github.io/newrelic-k8s-metrics-adapter
-  version: 0.7.5
+  version: 1.2.0
 - name: kube-state-metrics
-  repository: https://kubernetes.github.io/kube-state-metrics
-  version: 2.13.2
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 4.23.0
 - name: nri-kube-events
   repository: https://newrelic.github.io/nri-kube-events
-  version: 2.2.4
+  version: 3.0.0
 - name: newrelic-logging
   repository: https://newrelic.github.io/helm-charts
-  version: 1.10.11
+  version: 1.14.1
 - name: newrelic-pixie
   repository: https://newrelic.github.io/helm-charts
-  version: 2.0.0
+  version: 2.1.0
 - name: pixie-operator-chart
   repository: https://pixie-operator-charts.storage.googleapis.com
-  version: 0.0.26
+  version: 0.1.0
 - name: newrelic-infra-operator
   repository: https://newrelic.github.io/newrelic-infra-operator
-  version: 1.0.3
-digest: sha256:ab631693482ea1566ff73cbaadaf4f35878378c2cb46e2fad589b72da3004963
-generated: "2022-06-21T11:59:31.535607335Z"
+  version: 2.2.0
+digest: sha256:0a1f51c3e283d5a873e74ef4994b8569b6b85a9d46adc7514447d4ce2399146d
+generated: "2023-05-16T17:44:36.052686458Z"

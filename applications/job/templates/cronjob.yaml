@@ -1,8 +1,17 @@
-{{- if ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job" }}
+{{- if or (ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job") (.Values.global) }}
+{{- if $.Capabilities.APIVersions.Has "batch/v1/CronJob" }}
+apiVersion: batch/v1
+{{- else }}
 apiVersion: batch/v1beta1
+{{- end }}
 kind: CronJob
 metadata:
   name: {{ include "docker-template.fullname" . }}
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+    {{- if .Values.labels }}
+    {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
 spec:
   successfulJobsHistoryLimit: {{ .Values.schedule.successfulHistory }}
   failedJobsHistoryLimit: {{ .Values.schedule.failedHistory }}
@@ -22,6 +31,10 @@ spec:
         {{- if .Values.stack.enabled }}
         porter.run/stack-name: "{{ .Values.stack.name }}"
         {{- end }}
+        porter.run/application-name: "{{ .Release.Name }}"
+        {{- if .Values.labels }}
+        {{- toYaml .Values.labels | nindent 8 }}
+        {{- end }}
     spec:
       template:
         metadata:
@@ -31,17 +44,65 @@ spec:
             {{- else }}
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
             {{- end }}
+          labels:
+            {{- if .Values.podLabels }}
+            {{- toYaml .Values.podLabels | nindent 12 }}
+            {{- end }}
         spec:
+          {{- if .Values.enableEDNS0 }}
+          dnsConfig:
+            options:
+              - name: edns0
+          {{- end }}
+          {{- if .Values.serviceAccount.create }}
+          serviceAccountName: cronjob-{{ include "docker-template.serviceAccountName" . }}
+          {{ else }}
+          serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
+          {{- end }}
           containers:
           - name: {{ .Chart.Name }}
+            {{- if .Values.global }}
+            {{- if .Values.global.image }}
+            image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag }}"
+            {{- end }}
+            {{- else }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            {{- end }}
             imagePullPolicy: {{ .Values.image.pullPolicy }}
-            {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter-job") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job"))) }}
+            {{- if .Values.global }}
+            {{- if .Values.global.image }}
+            {{- if and .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")) }}
             command:
             {{- range $command := trim .Values.container.command | splitList " " }}
             - {{ $command | quote }}
             {{- end }}
             {{- end }}
+            {{- end }}
+            {{- else }}
+            {{- if (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job")))) }}
+            command:
+            {{- range $command := trim .Values.container.command | splitList " " }}
+            - {{ $command | quote }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.container.args }}
+            args:
+            {{- range $arg := .Values.container.args }}
+            - {{ $arg | quote }}
+            {{- end }}
+            {{- end }}
+            {{ if or .Values.configMapRefs .Values.secretRefs }}
+            envFrom:
+            {{ range $configMapName := .Values.configMapRefs }}
+              - configMapRef:
+                  name: {{ $configMapName }}
+            {{ end }}
+            {{ range $secretName := .Values.secretRefs }}
+              - secretRef:
+                  name: {{ $secretName }}
+            {{ end }}
+            {{ end }}          
             env:
               {{- range $key, $val := .Values.container.env.normal }}
               - name: {{ $key }}
@@ -76,9 +137,20 @@ spec:
                 cpu: {{ .Values.resources.requests.cpu }}
                 memory: {{ .Values.resources.requests.memory }}
               limits:
+                {{- if .Values.resources.setCPULimits }}
+                  {{- if .Values.resources.limits.cpu }}
+                cpu: {{ .Values.resources.limits.cpu }}
+                  {{- else }}
+                cpu: {{ .Values.resources.requests.cpu }}
+                  {{- end }}
+                {{- end }}
+                {{- if .Values.resources.limits.memory }}
+                memory: {{ .Values.resources.limits.memory }}
+                {{- else }}
                 memory: {{ .Values.resources.requests.memory }}
+                {{- end }}
           - name: sidecar
-            image: public.ecr.aws/o1j4x7p4/job-sidecar:latest
+            image: ghcr.io/porter-dev/job_sidecar_container:latest
             imagePullPolicy: Always
             {{- if (.Values.sidecar.timeout) }}
             env:
@@ -90,6 +162,9 @@ spec:
                 cpu: {{ .Values.sidecar.resources.requests.cpu }}
                 memory: {{ .Values.sidecar.resources.requests.memory }}
               limits:
+                {{- if (.Values.resources.setCPULimits) }}
+                cpu: {{ .Values.sidecar.resources.requests.cpu }}
+                {{ end }}
                 memory: {{ .Values.sidecar.resources.requests.memory }}
             command:
             - "./job_killer.sh"
@@ -109,6 +184,9 @@ spec:
               - "/cloud_sql_proxy"
               - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
               - "-credential_file=/secrets/service_account.json"
+              {{ if .Values.terminationGracePeriodSeconds }}
+              - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
+              {{ end }}
             securityContext:
               runAsNonRoot: true
             volumeMounts:
@@ -120,11 +198,14 @@ spec:
           volumes:
             - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
               secret:
-                secretName: "cloudsql-secret-{{ include "docker-template.fullname" . }}"
+                secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
           {{ end }}
           restartPolicy: Never
           shareProcessNamespace: true
           nodeSelector: {{- toYaml .Values.nodeSelector | nindent 12 }}
+          {{- if .Values.priorityClassName }}
+          priorityClassName: {{ .Values.priorityClassName }}
+          {{- end }}
           tolerations: 
           {{ if .Values.tolerations}}
           {{ toYaml .Values.tolerations | nindent 12 }}

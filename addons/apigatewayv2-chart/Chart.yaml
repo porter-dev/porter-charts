@@ -1,0 +1,18 @@
+apiVersion: v1
+name: apigatewayv2-chart
+description: A Helm chart for the ACK service controller for Amazon API Gateway (APIGWv2)
+version: 1.0.7
+appVersion: 1.0.7
+home: https://github.com/aws-controllers-k8s/apigatewayv2-controller
+icon: https://raw.githubusercontent.com/aws/eks-charts/master/docs/logo/aws.png
+sources:
+  - https://github.com/aws-controllers-k8s/apigatewayv2-controller
+maintainers:
+  - name: ACK Admins
+    url: https://github.com/orgs/aws-controllers-k8s/teams/ack-admin
+  - name: APIGWv2 Admins
+    url: https://github.com/orgs/aws-controllers-k8s/teams/apigatewayv2-maintainer
+keywords:
+  - aws
+  - kubernetes
+  - apigatewayv2

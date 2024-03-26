@@ -1,0 +1,36 @@
+---
+name: 'Bump Chart'
+description: 'Publishes a helm chart to chartmuseum'
+
+inputs:
+  chart_path:
+    description: Path to chart
+    required: true
+  chartmuseum_username:
+    description: Chartmuseum username
+    required: true
+  chartmuseum_password:
+    description: Chartmuseum password
+    required: true
+  chartmuseum_url:
+    description: A chartmuseum url
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: azure/setup-helm@v3
+      with:
+        version: 'v3.3.4'
+    - name: Install helm cm-push plugin
+      run: helm plugin install https://github.com/chartmuseum/helm-push
+      shell: bash
+    - name: Add chartmuseum repository
+      run: helm repo add chartmuseum ${{ inputs.chartmuseum_url }} --username ${{ inputs.chartmuseum_username }} --password ${{ inputs.chartmuseum_password }}
+      shell: bash
+    - name: Update repo cache
+      run: helm repo update
+      shell: bash
+    - name: Publish chart
+      run: helm cm-push ${{ inputs.chart_path }}/ chartmuseum
+      shell: bash

@@ -1,286 +1,300 @@
 name: Worker
 hasSource: true
 tabs:
-- name: main
-  label: Main
-  sections:
-  - name: pre
-    contents:
-    - type: variable
-      variable: showStartCommand
-      settings:
-        default: true
-  - name: section_one
-    show_if: showStartCommand
-    contents: 
-    - type: heading
-      label: Container Settings
-    - type: subtitle
-      name: command_description
-      label: (Optional) Set a custom start command for this service.
-    - type: string-input
-      label: Start Command
-      variable: container.command
-      placeholder: "ex: sh ./script.sh"
-  - name: section_one_cont
-    contents:
-    - type: heading
-      label: Deploy Webhook
-    - type: checkbox
-      variable: auto_deploy
-      label: Auto-deploy when webhook is called.
-      settings:
-        default: true
-- name: resources
-  label: Resources
-  sections:
-  - name: main_section
-    contents:
-    - type: heading
-      label: Resources
-    - type: subtitle
-      label: Configure resources assigned to this container.
-    - type: number-input
-      label: RAM
-      variable: resources.requests.memory
-      placeholder: "ex: 256"
-      settings:
-        unit: Mi
-        default: 256
-    - type: number-input
-      label: CPU
-      variable: resources.requests.cpu
-      placeholder: "ex: 100"
-      settings:
-        unit: m
-        default: 100
-    - type: number-input
-      label: Replicas
-      variable: replicaCount
-      placeholder: "ex: 1"
-      settings:
-        default: 1
-    - type: checkbox
-      variable: autoscaling.enabled
-      label: Enable autoscaling
-      settings:
-        default: false
-  - name: autoscaler
-    show_if: autoscaling.enabled
-    contents:
-    - type: number-input
-      label: Minimum Replicas
-      variable: autoscaling.minReplicas
-      placeholder: "ex: 1"
-      settings:
-        default: 1
-    - type: number-input
-      label: Maximum Replicas
-      variable: autoscaling.maxReplicas
-      placeholder: "ex: 10"
-      settings:
-        default: 10
-    - type: number-input
-      label: Target CPU Utilization
-      variable: autoscaling.targetCPUUtilizationPercentage
-      placeholder: "ex: 50"
-      settings:
-        omitUnitFromValue: true
-        unit: "%"
-        default: 50
-    - type: number-input
-      label: Target RAM Utilization
-      variable: autoscaling.targetMemoryUtilizationPercentage
-      settings:
-        omitUnitFromValue: true
-        unit: "%"
-        default: 50
-- name: env
-  label: Environment
-  sections:
-  - name: env_vars
-    contents:
-    - type: heading
-      label: Environment Variables
-    - type: subtitle
-      label: Set environment variables for your secrets and environment-specific configuration.
-    - type: env-key-value-array
-      label: 
-      variable: container.env
-      settings: 
-        options:
-          enable_synced_env_groups: true
-- name: advanced
-  label: Advanced
-  sections:
-  - name: health_check
-    contents:
-    - type: heading
-      label: Custom Health Checks
-    - type: subtitle
-      label: Define custom health check tests to ensure zero down-time deployments.
-  - name: startup_check
-    contents:
-    - type: checkbox
-      label: Enable Startup Probe
-      variable: health.startupProbe.enabled
-      settings:
-        default: false
-  - name: startup_check_command
-    show_if: health.startupProbe.enabled
-    contents:
-    - type: heading
-      label: Startup Probe
-    - type: string-input
-      label: Startup Check Command
-      variable: health.startupProbe.command
-      placeholder: "ex: ls -l"
-      settings:
-        required: true
-        default: "ls -l"
-    - type: heading
-      label: Custom Health Check Rules
-    - type: subtitle
-      label: Configure how many times a startup check will be performed before deeming the container as failed.
-    - type: number-input
-      label: Failure Threshold
-      variable: health.startupProbe.failureThreshold
-      placeholder: "ex: 3"
-    - type: subtitle
-      label: Configure the interval at which health check is repeated in the case of failure.
-    - type: number-input
-      label: Repeat Interval
-      variable: health.startupProbe.periodSeconds
-      placeholder: "ex: 30"
-  - name: liveness_check
-    contents:
-    - type: checkbox
-      variable: health.enabled
-      label: Enable Liveness Checks
-      settings:
-        default: false
-  - name: health_check_command
-    show_if: health.enabled
-    contents:
-    - type: heading
-      label: Liveness Probe
-    - type: string-input
-      label: Liveness Check Command
-      variable: health.command
-      placeholder: "ex: ls -l"
-      settings:
-        required: true
-        default: "ls -l"
-    - type: heading
-      label: Custom Liveness Check Rules
-    - type: subtitle
-      label: Configure how many times a liveness check will be performed before deeming the container as failed.
-    - type: number-input
-      label: Failure Threshold
-      variable: health.failureThreshold
-      placeholder: "ex: 3"
-    - type: subtitle
-      label: Configure the interval at which liveness check is repeated in the case of failure.
-    - type: number-input
-      label: Repeat Interval
-      variable: health.periodSeconds
-      placeholder: "ex: 30"
-  - name: readiness_check
-    contents:
-    - type: checkbox
-      label: Enable Readiness Probe
-      variable: health.readinessProbe.enabled
-      settings:
-        default: false
-  - name: readiness_check_command
-    show_if: health.readinessProbe.enabled
-    contents:
-    - type: heading
-      label: Readiness Probe
-    - type: string-input
-      label: Startup Check Command
-      variable: health.readinessProbe.command
-      placeholder: "ex: ls -l"
-      settings:
-        required: true
-        default: "ls -l"
-    - type: heading
-      label: Custom Health Check Rules
-    - type: subtitle
-      label: Configure how many times a startup check will be performed before deeming the container as failed.
-    - type: number-input
-      label: Failure Threshold
-      variable: health.readinessProbe.failureThreshold
-      placeholder: "ex: 3"
-    - type: subtitle
-      label: Configure the interval at which health check is repeated in the case of failure.
-    - type: number-input
-      label: Repeat Interval
-      variable: health.readinessProbe.periodSeconds
-      placeholder: "ex: 30"
-  - name: persistence_toggle
-    contents:
-    - type: heading
-      label: Persistent Disks
-    - type: subtitle
-      label: Attach persistent disks to your deployment to retain data across releases.
-    - type: checkbox
-      label: Enable Persistence
-      variable: pvc.enabled
-  - name: persistent_storage
-    show_if: pvc.enabled
-    contents:
-    - type: number-input
-      label: Persistent Storage
-      variable: pvc.storage
-      placeholder: "ex: 20"
-      settings:
-        unit: Gi
-        default: 20
-    - type: string-input
-      label: Mount Path
-      variable: pvc.mountPath
-      placeholder: "ex: /mypath"
-      settings:
-        default: /mypath
-  - name: termination_grace_period
-    contents:
-    - type: heading
-      label: Termination Grace Period
-    - type: subtitle
-      label: Specify how much time app processes have to gracefully shut down on SIGTERM.
-    - type: number-input
-      label: Termination Grace Period (seconds)
-      variable: terminationGracePeriodSeconds
-      placeholder: "ex: 30"
-      settings:
-        default: 30
-  - name: cloud_sql_toggle
-    show_if: currentCluster.service.is_gcp
-    contents:
-    - type: heading
-      label: Google Cloud SQL
-    - type: subtitle
-      label: Securely connect to Google Cloud SQL (GKE only).
-    - type: checkbox
-      variable: cloudsql.enabled
-      label: Enable Google Cloud SQL Proxy
-      settings:
-        default: false
-  - name: cloud_sql_contents
-    show_if: cloudsql.enabled
-    contents:
-    - type: string-input
-      label: Instance Connection Name
-      variable: cloudsql.connectionName
-      placeholder: "ex: project-123:us-east1:pachyderm"
-    - type: number-input
-      label: DB Port
-      variable: cloudsql.dbPort
-      placeholder: "ex: 5432"
-      settings:
-        default: 5432
-    - type: string-input
-      label: Service Account JSON
-      variable: cloudsql.serviceAccountJSON
-      placeholder: "ex: { <SERVICE_ACCOUNT_JSON> }"
+  - name: main
+    label: Main
+    sections:
+      - name: pre
+        contents:
+          - type: variable
+            variable: showStartCommand
+            settings:
+              default: true
+      - name: section_one
+        show_if: showStartCommand
+        contents:
+          - type: heading
+            label: Container Settings
+          - type: subtitle
+            name: command_description
+            label: (Optional) Set a custom start command for this service.
+          - type: string-input
+            label: Start Command
+            variable: container.command
+            placeholder: "ex: sh ./script.sh"
+      - name: section_one_cont
+        contents:
+          - type: heading
+            label: Deploy Webhook
+          - type: checkbox
+            variable: auto_deploy
+            label: Auto-deploy when webhook is called.
+            settings:
+              default: true
+  - name: resources
+    label: Resources
+    sections:
+      - name: main_section
+        contents:
+          - type: heading
+            label: Resources
+          - type: subtitle
+            label: Configure resources assigned to this container.
+          - type: number-input
+            label: RAM
+            variable: resources.requests.memory
+            placeholder: "ex: 256"
+            settings:
+              unit: Mi
+              default: 256
+          - type: number-input
+            label: CPU
+            variable: resources.requests.cpu
+            placeholder: "ex: 100"
+            settings:
+              unit: m
+              default: 100
+          - type: number-input
+            label: Replicas
+            variable: replicaCount
+            placeholder: "ex: 1"
+            settings:
+              default: 1
+          - type: checkbox
+            variable: autoscaling.enabled
+            label: Enable autoscaling
+            settings:
+              default: false
+      - name: autoscaler
+        show_if: autoscaling.enabled
+        contents:
+          - type: number-input
+            label: Minimum Replicas
+            variable: autoscaling.minReplicas
+            placeholder: "ex: 1"
+            settings:
+              default: 1
+          - type: number-input
+            label: Maximum Replicas
+            variable: autoscaling.maxReplicas
+            placeholder: "ex: 10"
+            settings:
+              default: 10
+          - type: number-input
+            label: Target CPU Utilization
+            variable: autoscaling.targetCPUUtilizationPercentage
+            placeholder: "ex: 50"
+            settings:
+              omitUnitFromValue: true
+              unit: "%"
+              default: 50
+          - type: number-input
+            label: Target RAM Utilization
+            variable: autoscaling.targetMemoryUtilizationPercentage
+            settings:
+              omitUnitFromValue: true
+              unit: "%"
+              default: 50
+  - name: env
+    label: Environment
+    sections:
+      - name: env_vars
+        contents:
+          - type: heading
+            label: Environment Variables
+          - type: subtitle
+            label: Set environment variables for your secrets and environment-specific configuration.
+          - type: env-key-value-array
+            label:
+            variable: container.env
+            settings:
+              options:
+                enable_synced_env_groups: true
+  - name: advanced
+    label: Advanced
+    sections:
+      - name: health_check
+        contents:
+          - type: heading
+            label: Custom Health Checks
+          - type: subtitle
+            label: Define custom health check tests to ensure zero down-time deployments.
+      - name: startup_check
+        contents:
+          - type: checkbox
+            label: Enable Startup Probe
+            variable: health.startupProbe.enabled
+            settings:
+              default: false
+      - name: startup_check_command
+        show_if: health.startupProbe.enabled
+        contents:
+          - type: heading
+            label: Startup Probe
+          - type: string-input
+            label: Startup Check Command
+            variable: health.startupProbe.command
+            placeholder: "ex: ls -l"
+            settings:
+              required: true
+              default: "ls -l"
+          - type: heading
+            label: Custom Health Check Rules
+          - type: subtitle
+            label: Configure how many times a startup check will be performed before deeming the container as failed.
+          - type: number-input
+            label: Failure Threshold
+            variable: health.startupProbe.failureThreshold
+            placeholder: "ex: 3"
+          - type: subtitle
+            label: Configure the interval at which health check is repeated in the case of failure.
+          - type: number-input
+            label: Repeat Interval
+            variable: health.startupProbe.periodSeconds
+            placeholder: "ex: 30"
+      - name: liveness_check
+        contents:
+          - type: checkbox
+            variable: health.enabled
+            label: Enable Liveness Checks
+            settings:
+              default: false
+      - name: health_check_command
+        show_if: health.enabled
+        contents:
+          - type: heading
+            label: Liveness Probe
+          - type: string-input
+            label: Liveness Check Command
+            variable: health.command
+            placeholder: "ex: ls -l"
+            settings:
+              required: true
+              default: "ls -l"
+          - type: heading
+            label: Custom Liveness Check Rules
+          - type: subtitle
+            label: Configure how many times a liveness check will be performed before deeming the container as failed.
+          - type: number-input
+            label: Failure Threshold
+            variable: health.failureThreshold
+            placeholder: "ex: 3"
+          - type: subtitle
+            label: Configure the interval at which liveness check is repeated in the case of failure.
+          - type: number-input
+            label: Repeat Interval
+            variable: health.periodSeconds
+            placeholder: "ex: 30"
+      - name: readiness_check
+        contents:
+          - type: checkbox
+            label: Enable Readiness Probe
+            variable: health.readinessProbe.enabled
+            settings:
+              default: false
+      - name: readiness_check_command
+        show_if: health.readinessProbe.enabled
+        contents:
+          - type: heading
+            label: Readiness Probe
+          - type: string-input
+            label: Startup Check Command
+            variable: health.readinessProbe.command
+            placeholder: "ex: ls -l"
+            settings:
+              required: true
+              default: "ls -l"
+          - type: heading
+            label: Custom Health Check Rules
+          - type: subtitle
+            label: Configure how many times a startup check will be performed before deeming the container as failed.
+          - type: number-input
+            label: Failure Threshold
+            variable: health.readinessProbe.failureThreshold
+            placeholder: "ex: 3"
+          - type: subtitle
+            label: Configure the interval at which health check is repeated in the case of failure.
+          - type: number-input
+            label: Repeat Interval
+            variable: health.readinessProbe.periodSeconds
+            placeholder: "ex: 30"
+      - name: persistence_toggle
+        contents:
+          - type: heading
+            label: Persistent Disks
+          - type: subtitle
+            label: Attach persistent disks to your deployment to retain data across releases.
+          - type: checkbox
+            label: Enable Persistence
+            variable: pvc.enabled
+      - name: persistent_storage
+        show_if: pvc.enabled
+        contents:
+          - type: number-input
+            label: Persistent Storage
+            variable: pvc.storage
+            placeholder: "ex: 20"
+            settings:
+              unit: Gi
+              default: 20
+          - type: string-input
+            label: Mount Path
+            variable: pvc.mountPath
+            placeholder: "ex: /mypath"
+            settings:
+              default: /mypath
+      - name: termination_grace_period
+        contents:
+          - type: heading
+            label: Termination Grace Period
+          - type: subtitle
+            label: Specify how much time app processes have to gracefully shut down on SIGTERM.
+          - type: number-input
+            label: Termination Grace Period (seconds)
+            variable: terminationGracePeriodSeconds
+            placeholder: "ex: 30"
+            settings:
+              default: 30
+      - name: container_hooks
+        contents:
+          - type: heading
+            label: Container hooks
+          - type: subtitle
+            label: (Optional) Set post start or pre stop commands for this service.
+          - type: string-input
+            label: Post start command
+            placeholder: "ex: /bin/sh ./myscript.sh"
+            variable: container.lifecycle.postStart
+          - type: string-input
+            label: Pre stop command
+            placeholder: "ex: /bin/sh ./myscript.sh"
+            variable: container.lifecycle.preStop
+      - name: cloud_sql_toggle
+        show_if: currentCluster.service.is_gcp
+        contents:
+          - type: heading
+            label: Google Cloud SQL
+          - type: subtitle
+            label: Securely connect to Google Cloud SQL (GKE only).
+          - type: checkbox
+            variable: cloudsql.enabled
+            label: Enable Google Cloud SQL Proxy
+            settings:
+              default: false
+      - name: cloud_sql_contents
+        show_if: cloudsql.enabled
+        contents:
+          - type: string-input
+            label: Instance Connection Name
+            variable: cloudsql.connectionName
+            placeholder: "ex: project-123:us-east1:pachyderm"
+          - type: number-input
+            label: DB Port
+            variable: cloudsql.dbPort
+            placeholder: "ex: 5432"
+            settings:
+              default: 5432
+          - type: string-input
+            label: Service Account JSON
+            variable: cloudsql.serviceAccountJSON
+            placeholder: "ex: { <SERVICE_ACCOUNT_JSON> }"

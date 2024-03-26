@@ -28,7 +28,14 @@ If release name contains chart name it will be used as a full name.
 Create chart name and version as used by the chart label.
 */}}
 {{- define "docker-template.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" | trimSuffix "."}}
+{{- end }}
+
+{{/*
+Generate a KEDA ScaledObject's HPA name(only meant for B/G deployments)
+*/}}
+{{- define "docker-template.kedaHpa" -}}
+{{- printf "keda-hpa-%s-%s" .name .tag }}
 {{- end }}
 
 {{/*
@@ -60,4 +67,11 @@ Create the name of the service account to use
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
+{{- end }}
+
+{{/*
+Name of the service account json secret to use with the CloudSQL proxy
+*/}}
+{{- define "cloudsql.serviceAccountJSONSecret" -}}
+{{- default (printf "cloudsql-secret-%s" (include "docker-template.fullname" .)) .Values.cloudsql.serviceAccountJSONSecret }}
 {{- end }}

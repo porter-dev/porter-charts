@@ -3,19 +3,7 @@ tabs:
 - name: main
   label: Main Settings
   sections:
-  - name: network
-    contents:
-    - type: heading
-      label: Network Settings
-    - type: subtitle
-      label: For containers that you do not want to expose to external traffic (e.g. databases and add-on's), you may make them accessible only to other internal services running within the same cluster. 
-    - type: checkbox
-      variable: ingress.enabled
-      label: Expose to external traffic
-      settings:
-        default: true
   - name: domain_toggle
-    show_if: ingress.enabled
     contents:
     - type: subtitle
       label: Assign custom domain to your deployment. You must first create an A/CNAME record in your domain provider that points to your cluster load balancer's IP address for this.
@@ -30,19 +18,6 @@ tabs:
     - type: array-input
       variable: ingress.hosts
       label: Domain Name
-  - name: ingress_tls_enabled
-    show_if: ingress.custom_domain
-    contents:
-      - type: checkbox
-        variable: ingress.tls
-        label: Enable TLS and automatically create certificates
-        settings:
-          default: true
-  - name: do_wildcard
-    show_if:
-      and:
-        - ingress.custom_domain
-        - currentCluster.service.is_do
 - name: resources
   label: Computing resources
   sections:
@@ -57,13 +32,13 @@ tabs:
       variable: resources.requests.memory
       settings:
         unit: Mi
-        default: 2048
+        default: 512
     - type: number-input
       label: CPU
       variable: resources.requests.cpu
       settings:
         unit: m
-        default: 100
+        default: 500
 - name: env
   label: Environment
   sections:

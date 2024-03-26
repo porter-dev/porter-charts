@@ -58,5 +58,5 @@ container:
 
 resources:
   requests:
-    cpu: 1000m
-    memory: 2048Mi
+    cpu: 500m
+    memory: 512Mi

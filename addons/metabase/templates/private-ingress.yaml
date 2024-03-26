@@ -23,6 +23,11 @@ metadata:
     {{- if and (gt (len $customPaths) 0) .Values.ingress.rewriteCustomPathsEnabled }}
     nginx.ingress.kubernetes.io/rewrite-target: /
     {{- end }}
+    {{- if .Values.privateIngress.tls }}
+    {{- if not (hasKey .Values.privateIngress.annotations "cert-manager.io/cluster-issuer")}}
+    cert-manager.io/cluster-issuer: {{ .Values.privateIngress.clusterIssuer }}
+    {{- end }}
+    {{- end }}
     # provider-agnostic default annotations
     # if value is provided as "null" or null, it is unset
     # adding a fix for scenarios where ingress annotations are inside ingress.annotations.normal
@@ -56,7 +61,7 @@ spec:
         {{- range $allPrivateHosts }}
         - {{ . | quote }}
         {{- end }}
-      secretName: {{ include "docker-template.fullname" . }}-private
+      secretName: {{ include "docker-template.fullname" . }}
   {{- end }}
   rules:
   {{- range $allPrivateHosts }}

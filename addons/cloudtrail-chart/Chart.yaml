@@ -1,0 +1,18 @@
+apiVersion: v1
+name: cloudtrail-chart
+description: A Helm chart for the ACK service controller for AWS CloudTrail (CloudTrail)
+version: 1.0.6
+appVersion: 1.0.6
+home: https://github.com/aws-controllers-k8s/cloudtrail-controller
+icon: https://raw.githubusercontent.com/aws/eks-charts/master/docs/logo/aws.png
+sources:
+  - https://github.com/aws-controllers-k8s/cloudtrail-controller
+maintainers:
+  - name: ACK Admins
+    url: https://github.com/orgs/aws-controllers-k8s/teams/ack-admin
+  - name: CloudTrail Admins
+    url: https://github.com/orgs/aws-controllers-k8s/teams/cloudtrail-maintainer
+keywords:
+  - aws
+  - kubernetes
+  - cloudtrail
