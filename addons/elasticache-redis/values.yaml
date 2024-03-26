@@ -1,0 +1,11 @@
+config:
+  engineVersion: 7.1
+  instanceClass: cache.t4g.small
+  masterUserPassword: ""
+  multiAZ: true
+  name: ""
+
+vpcConfig:
+  awsRegion: ""
+  subnetIDs: []
+  vpcID: ""

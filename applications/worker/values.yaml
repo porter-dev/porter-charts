@@ -4,15 +4,15 @@
 
 replicaCount: 1
 
-topology: 
+topology:
   enabled: false
   maxSkew:
   topologyKey:
   whenUnsatisfiable:
-  labelSelector: 
+  labelSelector:
     enabled: false
     matchLabels: {}
-  
+
 terminationGracePeriodSeconds: 30
 
 image:
@@ -20,6 +20,8 @@ image:
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
+
+podLabels: {}
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -33,13 +35,19 @@ serviceAccount:
 container:
   port: 80
   command:
+  args: []
   env:
     normal:
+  lifecycle:
+    postStart:
+    preStop:
 
 resources:
   requests:
     cpu: 100m
     memory: 256Mi
+  setCPULimits: false
+  limits: {}
 
 autoscaling:
   enabled: false
@@ -71,6 +79,7 @@ keda:
         value: 10
         periodSeconds: 300
   trigger:
+<<<<<<< HEAD
 <<<<<<< HEAD
     prometheus:
       enabled: false
@@ -106,21 +115,41 @@ keda:
     lastAvailablePointOffset: "0"
     metricUnavailableValue: ""
 >>>>>>> master
+=======
+    metricName: ""
+    metricQuery: ""
+    metricThreshold: ""
+  triggers: []
+>>>>>>> main
 
 health:
   enabled: false
   command: "ls -l"
   periodSeconds: 5
   failureThreshold: 3
+  livenessProbe:
+    enabled: false
+    command: "ls -l"
+    failureThreshold: 3
+    periodSeconds: 5
+    initialDelaySeconds: 5
+    timeoutSeconds: 1
   readinessProbe:
     enabled: false
     command: "ls -l"
+    failureThreshold: 3
     periodSeconds: 5
+    initialDelaySeconds: 5
+    timeoutSeconds: 1
   startupProbe:
     enabled: false
     command: "ls -l"
     failureThreshold: 3
     periodSeconds: 5
+    initialDelaySeconds: 5
+
+podDisruptionBudget:
+  enabled: false
 
 pvc:
   enabled: false
@@ -132,6 +161,15 @@ cloudsql:
   connectionName: ""
   dbPort: 5432
   serviceAccountJSON: ""
+  serviceAccountJSONSecret: ""
+
+# Set this to add entries to the /etc/hosts file
+# Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
+hostAliases: []
+
+# Set this for enabling DNS extensions over TCP
+# We enable this by default.
+enableEDNS0: true
 
 nodeSelector: {}
 
@@ -145,3 +183,7 @@ stack:
 emptyDir:
   enabled: false
   mountPath: /mypath
+  volumeOptions: {}
+  
+priorityClassName: ""
+

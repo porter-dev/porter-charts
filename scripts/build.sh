@@ -1,4 +1,7 @@
 #!/bin/bash
+set -eo pipefail
+
+export REPO_NAME="$1"
 
 versionJQ='
 def handle: .[] | [.version] | sort_by( split(".") | map(tonumber) ) | last ;
@@ -60,46 +63,54 @@ increment_version () {
 }
 
 package_helm() {
-  local helm_dir=$1
+  declare helm_dir="$1" chart_path="$2"
 
-  echo "Packaging chart found in directory $1"
+  echo "Packaging chart found in directory $helm_dir"
 
-  # get latest version from chartmuseum
-  name=$(yq e '.name' $2)
-  version=$(curl -s "$CHARTMUSEUM_URL/api/charts/$name" | jq -r "$versionJQ")
+  chart_name=$(yq e '.name' "$chart_path")
 
-  if [ -z $version ]
-  then
-    version="0.0.0"
+  if grep -qE "^${helm_dir}\$" vendored-charts; then
+    echo "Using version in vendored chart"
+  else
+    helm show chart "${REPO_NAME}-remote/$chart_name"
+
+    version="$(helm show chart "${REPO_NAME}-remote/$chart_name" 2>/dev/null| yq '.version' || true)"
+    if [[ -z "$version" ]] || [[ "$version" == "null" ]]; then
+      version="0.0.0"
+    fi
+
+    new_version="$(increment_version -m "$version")"
+    echo "Upgrading $chart_name from '$version' to '$new_version'"
+    yq e '.version = "'"$new_version"'"' -i "$chart_path"
   fi
 
-  # increment version
-  new_version=$(increment_version -m $version)
-
-  echo "Upgrading $name from $version to $new_version"
-
-  yq e '.version = "'"$new_version"'"' -i $2
-
-  helm package $helm_dir
+  scripts/rebuild-ack-chart
 }
 
-for d in $1/*/Chart.yaml ; do
-  helm_dir=$(echo "$d" | sed 's|\(.*\)/.*|\1|')
+failures=0
 
-  echo "Checking diffs for $helm_dir"
-  
-  git diff --quiet $2 $3 -- $helm_dir || package_helm $helm_dir $d
+helm repo add "${REPO_NAME}-remote" "$CHARTMUSEUM_URL" --username "$CHARTMUSEUM_USERNAME" --password "$CHARTMUSEUM_PASSWORD"
+
+for chart_path in $1/*/Chart.yaml ; do
+  helm_dir=$(echo "$chart_path" | sed 's|\(.*\)/.*|\1|')
+  chart_name=$(yq e '.name' "$chart_path")
+  must_package=false
+  if curl -s -o /dev/null --fail "$CHARTMUSEUM_URL/api/charts/$chart_name"; then
+    echo "Checking diffs for $helm_dir"
+    git diff --quiet $2 $3 -- "$helm_dir" || must_package=true
+  else
+    echo "Missing $helm_dir chart in chartmuseum"
+    must_package=true
+  fi
+  if [[ "$must_package" == true ]]; then
+    package_helm "$helm_dir" "$chart_path" || {
+      echo "Failed to package $helm_dir"
+      failures=$((failures+1))
+    }
+  fi
 done
 
-if ls *.tgz 1> /dev/null 2>&1; then
-  for file in *.tgz ; do
-    echo "Uploading package $file to chartmuseum"
-
-    curl -s -u $CHARTMUSEUM_USERNAME:$CHARTMUSEUM_PASSWORD --data-binary "@$file" "$CHARTMUSEUM_URL/api/charts"
-  done
-
-  # cleanup files 
-  rm *.tgz
-else
-  echo "No tgz files found"
+if [[ "$failures" -gt 0 ]]; then
+  echo "Failed run due to ${failures} failures"
+  exit 1
 fi

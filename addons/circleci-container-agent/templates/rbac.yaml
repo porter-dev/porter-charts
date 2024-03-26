@@ -1,0 +1,94 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "container-agent.roleName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/exec", "pods/log"]
+    verbs: ["get", "watch", "list", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "create", "delete"]
+  - apiGroups: ["", "events.k8s.io/v1"]
+    resources: ["events"]
+    verbs: ["watch"]
+{{- if .Values.rbac.role.rules }}
+  {{- toYaml .Values.rbac.role.rules | indent 2 }}
+{{- end }} # if rbac.role.rules
+{{- if .Values.agent.autodetectPlatform }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "container-agent.clusterRoleName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list"]
+{{- if .Values.rbac.clusterRole.rules }}
+  {{- toYaml .Values.rbac.cluster.rules | indent 2 }}
+{{- end }} # if .Values.agent.autodetectPlatform
+{{- end }} # if rbac.clusterRole.rules
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "container-agent.roleBindingName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "container-agent.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace | quote }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "container-agent.roleName" . }}
+{{- if .Values.agent.autodetectPlatform }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "container-agent.clusterRoleBindingName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "container-agent.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace | quote }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "container-agent.clusterRoleName" . }}
+{{- end }} # if .Values.agent.autodetectPlatform
+{{- end }}
+{{- if .Values.logging.rbac.create }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Values.logging.rbac.role.name }}
+  namespace: {{ .Release.Namespace | quote }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["watch"]
+{{- if .Values.logging.rbac.role.rules }}
+  {{- toYaml .Values.logging.rbac.role.rules | indent 2 }}
+{{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.logging.rbac.roleBinding.name }}
+  namespace: {{ .Release.Namespace | quote }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.logging.serviceAccount.name }}
+    namespace: {{ .Release.Namespace | quote }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.logging.rbac.role.name }}
+{{- end }}

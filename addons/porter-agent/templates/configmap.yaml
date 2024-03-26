@@ -5,6 +5,7 @@ metadata:
   namespace: porter-agent-system
 data:
   PORTER_HOST: "{{ .Values.agent.porterHost }}"
+  CF_ACCESS_TOKEN: "{{ .Values.agent.cfAccessToken }}"
   PORTER_PORT: "{{ .Values.agent.porterPort }}"
   PORTER_TOKEN: "{{ .Values.agent.porterToken }}"
   CLUSTER_ID: "{{ .Values.agent.clusterID }}"

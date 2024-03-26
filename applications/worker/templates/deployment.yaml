@@ -4,13 +4,20 @@ metadata:
   name: {{ include "docker-template.fullname" . }}
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
+    {{- if .Values.labels }}
+    {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
+  {{- if and (not .Values.keda.enabled) (not .Values.autoscaling.enabled) }}
   replicas: {{ .Values.replicaCount }}
   {{ end }}
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
+  {{- if .Values.strategy }}
+  strategy:
+    type: {{ .Values.strategy }}
+  {{- end }}
   template:
     metadata:
       annotations:
@@ -20,9 +27,13 @@ spec:
         {{- end }}
       labels:
         {{- include "docker-template.selectorLabels" . | nindent 8 }}
+        {{- if .Values.podLabels }}
+        {{- toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
         {{- if .Values.stack.enabled }}
         porter.run/stack-name: "{{ .Values.stack.name }}"
         {{- end }}
+        porter.run/application-name: "{{ .Release.Name }}"
     spec:
       {{- if .Values.affinity }}
       affinity:
@@ -30,19 +41,68 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      hostAliases:
+        {{- toYaml .Values.hostAliases | nindent 8 }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.enableEDNS0 }}
+      dnsConfig:
+        options:
+          - name: edns0
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- if .Values.global }}
+          {{- if .Values.global.image }}
+          image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag }}"
+          {{- end }}
+          {{- else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter"))) }}
+          {{- if .Values.global }}
+          {{- if .Values.global.image }}
+          {{- if and .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")) }}
           command:
           {{- range $command := trim .Values.container.command | splitList " " }}
           - {{ $command | quote }}
           {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- else }}
+          {{- if (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")))) }}
+          command:
+          {{- range $command := trim .Values.container.command | splitList " " }}
+          - {{ $command | quote }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.container.args }}
+          args:
+          {{- range $arg := .Values.container.args }}
+          - {{ $arg | quote }}
+          {{- end }}
+          {{- end }}
+          {{- if or (.Values.container.lifecycle.postStart) (.Values.container.lifecycle.preStop) }}
+          lifecycle:
+            {{- if .Values.container.lifecycle.postStart }}
+            postStart:
+              exec:
+                command:
+                {{- range $command := trim .Values.container.lifecycle.postStart | splitList " " }}
+                - {{ $command | quote }}
+                {{- end }}
+            {{- end }}
+            {{- if .Values.container.lifecycle.preStop }}
+            preStop:
+              exec:
+                command:
+                {{- range $command := trim .Values.container.lifecycle.preStop | splitList " " }}
+                - {{ $command | quote }}
+                {{- end }}
+            {{- end }}
           {{- end }}
           ports:
             - name: http
@@ -78,6 +138,8 @@ spec:
               - {{ $command | quote }}
               {{- end }}
             periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.health.startupProbe.initialDelaySeconds }}
           {{- end }}
           {{ if .Values.health.readinessProbe.enabled }}
           readinessProbe:
@@ -87,15 +149,66 @@ spec:
               - {{ $command | quote }}
               {{- end }}
             periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.health.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.health.readinessProbe.timeoutSeconds }}
+          {{- end }}
+          {{ if .Values.health.livenessProbe.enabled }}
+          livenessProbe:
+            exec:
+              command:
+              {{- range $command := trim .Values.health.livenessProbe.command | splitList " " }}
+              - {{ $command | quote }}
+              {{- end }}
+            periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.health.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.health.livenessProbe.timeoutSeconds }}
           {{- end }}
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}
               memory: {{ .Values.resources.requests.memory }}
+          {{ if .Values.resources.requests }}
+          {{ if .Values.resources.requests.nvidiaGpu }}
+              nvidia.com/gpu: {{ .Values.resources.requests.nvidiaGpu }}
+          {{ end }}
+          {{ end }}
             limits:
+              {{- if .Values.resources.setCPULimits }}
+                {{- if .Values.resources.limits.cpu }}
+              cpu: {{ .Values.resources.limits.cpu }}
+                {{- else }}
+              cpu: {{ .Values.resources.requests.cpu }}
+                {{- end }}
+              {{- end }}
+              {{- if .Values.resources.limits.memory }}
+              memory: {{ .Values.resources.limits.memory }}
+              {{- else }}
               memory: {{ .Values.resources.requests.memory }}
+              {{- end }}
+              {{- if .Values.resources.limits.nvidiaGpu }}
+              nvidia.com/gpu: {{ .Values.resources.limits.nvidiaGpu }}
+              {{- end }}
+          {{ if or .Values.configMapRefs .Values.secretRefs }}
+          envFrom:
+          {{ range $configMapName := .Values.configMapRefs }}
+            - configMapRef:
+                name: {{ $configMapName }}
+          {{ end }}
+          {{ range $secretName := .Values.secretRefs }}
+            - secretRef:
+                name: {{ $secretName }}
+          {{ end }}
+          {{ end }}
           env:
             # Porter default environment variables
+            - name: PORTER_RESOURCES_RAM
+              value: "{{ .Values.resources.requests.memory }}"
+            - name: PORTER_RESOURCES_CPU
+              value: "{{ .Values.resources.requests.cpu }}"
+            - name: PORTER_RESOURCES_REPLICAS
+              value: "{{ .Values.replicaCount }}"          
             - name: PORTER_NODE_NAME
               valueFrom:
                 fieldRef:
@@ -110,6 +223,8 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
+            - name: PORTER_APP_SERVICE_NAME
+              value: "{{ include "docker-template.fullname" . }}"
             {{- if .Values.stack.enabled }}
             - name: PORTER_STACK_NAME
               value: "{{ .Values.stack.name }}"
@@ -161,6 +276,9 @@ spec:
             - "/cloud_sql_proxy"
             - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
             - "-credential_file=/secrets/service_account.json"
+            {{ if .Values.terminationGracePeriodSeconds }}
+            - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
+            {{ end }}
           securityContext:
             runAsNonRoot: true
           volumeMounts:
@@ -173,6 +291,9 @@ spec:
         {{- range $k, $v := .Values.nodeSelector }}
         {{ $k }}: {{ $v }}
         {{- end }}
+      {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
       {{- end }}
       tolerations:
         - key: "removable"
@@ -200,7 +321,7 @@ spec:
         {{ if .Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
           secret:
-            secretName: "cloudsql-secret-{{ include "docker-template.fullname" . }}"
+            secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
         {{ end }}
         {{ if .Values.pvc.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-storage"
@@ -209,6 +330,7 @@ spec:
         {{ end }}
         {{ if .Values.emptyDir.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
-          emptyDir: {}
+          emptyDir:
+            {{- toYaml .Values.emptyDir.volumeOptions | nindent 8 }}
         {{ end }}
       {{ end }}

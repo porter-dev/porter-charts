@@ -3,13 +3,7 @@
 {{- $svcPort := .Values.service.port -}}
 {{- $allPrivateHosts := concat .Values.privateIngress.hosts  -}}
 {{- $customPaths := .Values.privateIngress.custom_paths -}}
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
 apiVersion: networking.k8s.io/v1
-{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1/Ingress" -}}
-apiVersion: networking.k8s.io/v1beta1
-{{- else -}}
-apiVersion: extensions/v1beta1
-{{- end }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}-private
@@ -22,6 +16,11 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
     {{- if and (gt (len $customPaths) 0) .Values.ingress.rewriteCustomPathsEnabled }}
     nginx.ingress.kubernetes.io/rewrite-target: /
+    {{- end }}
+    {{- if .Values.privateIngress.tls }}
+    {{- if not (hasKey .Values.privateIngress.annotations "cert-manager.io/cluster-issuer")}}
+    cert-manager.io/cluster-issuer: {{ .Values.privateIngress.clusterIssuer }}
+    {{- end }}
     {{- end }}
     # provider-agnostic default annotations
     # if value is provided as "null" or null, it is unset

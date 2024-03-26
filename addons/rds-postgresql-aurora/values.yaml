@@ -1,0 +1,19 @@
+config:
+  databaseName: ""
+  engineVersion: 15.3
+  instanceClass: db.t4g.medium
+  masterUsername: root
+  masterUserPassword: ""
+  name: ""
+  instanceCount: 2
+  serverlessMinCapacity: 0.5
+  serverlessMaxCapacity: 128
+
+vpcConfig:
+  awsRegion: ""
+  subnetIDs: []
+  vpcID: ""
+  cidrBlock: ""
+  subnetConfig: []
+    # - availabilityZone: ""
+    #   cidrBlock: ""

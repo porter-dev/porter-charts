@@ -23,6 +23,8 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
 
+podLabels: {}
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -50,16 +52,23 @@ ingress:
   wildcard: false
   tls: true
   useDefaultIngressTLSSecret: false
+  separateTlsPerCustomDomain: true
+  customTls:
+    enabled: false
+    customTlsSecret:
 
 albIngress:
   enabled: false
+  external_dns: false
   hosts: []
   certificate_arn:
   custom_paths: []
   group_name:
+  group_order:
   target_type: ip
   scheme: internet-facing
   security_groups:
+  wafv2_acl_arn:
   healthcheck_path:
   healthcheck_interval_seconds:
   healthcheck_timeout_seconds:
@@ -68,6 +77,8 @@ albIngress:
   healthcheck_unhealthy_threshold_count:
   healthcheck_port:
   healthcheck_protocol:
+  target_node_labels:
+  annotations:
 
 privateIngress:
   enabled: false
@@ -76,12 +87,14 @@ privateIngress:
   custom_paths: []
   annotations: {}
   tls: false
-  # secretName: my-existing-secret
+  clusterIssuer: letsencrypt-prod-private
 
 container:
   port: 80
   command:
+  # Deprecated: use argList instead
   args:
+  argList: []
   env:
     normal:
   lifecycle:
@@ -92,6 +105,8 @@ resources:
   requests:
     cpu: 100m
     memory: 256Mi
+  setCPULimits: false
+  limits: {}
 
 autoscaling:
   enabled: false
@@ -123,34 +138,23 @@ keda:
         value: 10
         periodSeconds: 300
   trigger:
-    enabled: true
     metricName: ""
+    metricType: AverageValue
     metricQuery: ""
     metricThreshold: ""
-  datadog:
-    enabled: false
-    apiKey: ""
-    appKey: ""
-    datadogSite: datadoghq.com
-    query: ""
-    queryValue: ""
-    activationQueryValue: "0"
-    queryAggregator: "max"
-    age: "90"
-    timeWindowOffset: "0"
-    lastAvailablePointOffset: "0"
-    metricUnavailableValue: ""
+  triggers: []
 
 health:
   livenessProbe:
     enabled: false
     path: "/livez"
     scheme: "HTTP"
-    initialDelaySeconds: 0
+    initialDelaySeconds: 15
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
-    failureThreshold: 3
+    failureThreshold: 15
+    httpHeaders: []
     auth:
       enabled: false
       username: ""
@@ -159,21 +163,22 @@ health:
   livenessCommand:
     enabled: false
     command: "ls -l"
-    initialDelaySeconds: 5
+    initialDelaySeconds: 10
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
-    failureThreshold: 3
+    failureThreshold: 8
 
   readinessProbe:
     enabled: false
     path: "/readyz"
     scheme: "HTTP"
-    initialDelaySeconds: 0
+    initialDelaySeconds: 15
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
-    failureThreshold: 3
+    failureThreshold: 15
+    httpHeaders: []
     auth:
       enabled: false
       username: ""
@@ -186,10 +191,14 @@ health:
     failureThreshold: 3
     periodSeconds: 5
     timeoutSeconds: 1
+    httpHeaders: []
     auth:
       enabled: false
       username: ""
       password: ""
+
+podDisruptionBudget:
+  enabled: false
 
 pvc:
   enabled: false
@@ -202,6 +211,7 @@ cloudsql:
   connectionName: ""
   dbPort: 5432
   serviceAccountJSON: ""
+  serviceAccountJSONSecret: ""
   additionalConnection:
     enabled: false
     dbPort: 5432
@@ -209,6 +219,14 @@ cloudsql:
 
 datadog:
   enabled: false
+
+# Set this to add entries to the /etc/hosts file
+# Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
+hostAliases: []
+
+# Set this for enabling DNS extensions over TCP
+# We enable this by default.
+enableEDNS0: true
 
 nodeSelector: {}
 
@@ -241,3 +259,6 @@ stack:
 emptyDir:
   enabled: false
   mountPath: /mypath
+  volumeOptions: {}
+
+priorityClassName: ""

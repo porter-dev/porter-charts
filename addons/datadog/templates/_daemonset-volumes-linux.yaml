@@ -9,11 +9,42 @@
 - hostPath:
     path: /sys/fs/cgroup
   name: cgroups
-{{- if .Values.datadog.dogstatsd.useSocketVolume }}
+{{- if and (not .Values.providers.gke.autopilot) (or .Values.datadog.systemProbe.osReleasePath .Values.datadog.osReleasePath .Values.datadog.sbom.host.enabled) }}
+- hostPath:
+    path: {{ .Values.datadog.systemProbe.osReleasePath | default .Values.datadog.osReleasePath }}
+  name: os-release-file
+{{- end }}
+{{- if or (and (eq (include "should-enable-system-probe" .) "true") .Values.datadog.systemProbe.enableDefaultOsReleasePaths) .Values.datadog.sbom.host.enabled }}
+- hostPath:
+    path: /etc/redhat-release
+  name: etc-redhat-release
+- hostPath:
+    path: /etc/fedora-release
+  name: etc-fedora-release
+- hostPath:
+    path: /etc/lsb-release
+  name: etc-lsb-release
+- hostPath:
+    path: /etc/system-release
+  name: etc-system-release
+{{- end -}}
+{{- if eq (include "should-enable-fips" . ) "true" }}
+{{ include "linux-container-fips-proxy-cfg-volume" . }}
+{{- end }}
+{{- if eq (include "should-mount-hostPath-for-dsd-socket" .) "true" }}
 - hostPath:
     path: {{ .Values.datadog.dogstatsd.hostSocketPath }}
     type: DirectoryOrCreate
   name: dsdsocket
+{{- else }}
+- emptyDir: {}
+  name: dsdsocket
+{{- end }}
+{{- if .Values.providers.eks.ec2.useHostnameFromFile }}
+- hostPath:
+    path: /var/lib/cloud/data/instance-id
+    type: File
+  name: cloudinit-instance-id-file
 {{- end }}
 {{- if .Values.datadog.kubelet.hostCAPath }}
 - hostPath:
@@ -21,7 +52,7 @@
     type: File
   name: kubelet-ca
 {{- end }}
-{{- if .Values.datadog.apm.useSocketVolume }}
+{{- if eq (include "trace-agent-use-uds" .) "true" }}
 - hostPath:
     path: {{ .Values.datadog.apm.hostSocketPath }}
     type: DirectoryOrCreate
@@ -32,7 +63,7 @@
 {{- if (or (.Values.datadog.confd) (.Values.datadog.autoconf)) }}
 - name: confd
   configMap:
-    name: {{ template "datadog.fullname" . }}-confd
+    name: {{ include "agents.confd-configmap-name" . }}
 {{- end }}
 {{- if eq (include "should-enable-system-probe" .) "true" }}
 - name: sysprobe-config
@@ -51,13 +82,59 @@
   name: debugfs
 - name: sysprobe-socket-dir
   emptyDir: {}
-{{- if or .Values.datadog.systemProbe.enableTCPQueueLength .Values.datadog.systemProbe.enableOOMKill }}
+{{- if and (eq (include "runtime-compilation-enabled" .) "true") .Values.datadog.systemProbe.enableDefaultKernelHeadersPaths }}
 - hostPath:
     path: /lib/modules
   name: modules
+{{- if eq (include "can-mount-host-usr-src" .) "false" }}
 - hostPath:
     path: /usr/src
   name: src
+{{- end }}
+{{- end }}
+{{- if eq (include "runtime-compilation-enabled" .) "true" }}
+- hostPath:
+    path: {{ .Values.datadog.systemProbe.runtimeCompilationAssetDir }}/build
+    type: DirectoryOrCreate
+  name: runtime-compiler-output-dir
+- hostPath:
+    path: {{ .Values.datadog.systemProbe.runtimeCompilationAssetDir }}/kernel-headers
+    type: DirectoryOrCreate
+  name: kernel-headers-download-dir
+{{- if not .Values.datadog.systemProbe.mountPackageManagementDirs }}
+- hostPath:
+    path: /etc/apt
+  name: apt-config-dir
+- hostPath:
+    path: /etc/yum.repos.d
+  name: yum-repos-dir
+- hostPath:
+    path: /etc/zypp
+  name: opensuse-repos-dir
+- hostPath:
+    path: /etc/pki
+  name: public-key-dir
+- hostPath:
+    path: /etc/yum/vars
+  name: yum-vars-dir
+- hostPath:
+    path: /etc/dnf/vars
+  name: dnf-vars-dir
+- hostPath:
+    path: /etc/rhsm
+  name: rhel-subscription-dir
+{{- else }}
+{{- range .Values.datadog.systemProbe.mountPackageManagementDirs }}
+- hostPath:
+    path: {{ .hostPath }}
+  name: {{ .name }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if .Values.datadog.systemProbe.btfPath }}
+- hostPath:
+    path: {{ .Values.datadog.systemProbe.btfPath }}
+  name: btf-path
 {{- end }}
 {{- end }}
 {{- if or .Values.datadog.processAgent.enabled (eq (include "should-enable-system-probe" .) "true") (eq (include "should-enable-security-agent" .) "true") }}
@@ -65,21 +142,39 @@
     path: /etc/passwd
   name: passwd
 {{- end }}
+{{- if or (and (eq (include "should-enable-system-probe" .) "true") .Values.datadog.serviceMonitoring.enabled) (and (eq (include "should-enable-security-agent" .) "true") .Values.datadog.securityAgent.compliance.enabled) }}
+- hostPath:
+    path: /
+  name: hostroot
+{{- end }}
+{{- if .Values.datadog.sbom.containerImage.uncompressedLayersSupport }}
+- hostPath:
+    path: /var/lib/containerd
+  name: host-containerd-dir
+{{- end }}
+{{- if .Values.datadog.sbom.host.enabled }}
+- hostPath:
+    path: /var/lib/apk
+  name: host-apk-dir
+- hostPath:
+    path: /var/lib/dpkg
+  name: host-dpkg-dir
+- hostPath:
+    path: /var/lib/rpm
+  name: host-rpm-dir
+{{- end }}
 {{- if eq  (include "should-enable-security-agent" .) "true" }}
 {{- if .Values.datadog.securityAgent.compliance.enabled }}
 - hostPath:
     path: /etc/group
   name: group
-- hostPath:
-    path: /
-  name: hostroot
 {{- if .Values.datadog.securityAgent.compliance.configMap }}
 - name: complianceconfigdir
   configMap:
     name: {{ .Values.datadog.securityAgent.compliance.configMap }}
 {{- end }}
 {{- end }}
-{{- if and .Values.datadog.securityAgent.runtime.enabled .Values.datadog.securityAgent.runtime.policies.configMap }}
+{{- if and (or .Values.datadog.securityAgent.runtime.enabled .Values.datadog.securityAgent.runtime.fimEnabled) .Values.datadog.securityAgent.runtime.policies.configMap }}
 - name: runtimepoliciesdir
   configMap:
     name: {{ .Values.datadog.securityAgent.runtime.policies.configMap }}
@@ -90,7 +185,7 @@
     path: {{ template "datadog.hostMountRoot" . }}/logs
   name: pointerdir
 - hostPath:
-    path: /var/log/pods
+    path: {{ .Values.datadog.kubelet.podLogsPath | default "/var/log/pods" }}
   name: logpodpath
 - hostPath:
     path: /var/log/containers
@@ -100,5 +195,10 @@
     path: /var/lib/docker/containers
   name: logdockercontainerpath
 {{- end }}
+{{- end }}
+{{- if .Values.datadog.containerRuntimeSupport.enabled }}
+- hostPath:
+    path: {{ dir (include "datadog.dockerOrCriSocketPath" .) }}
+  name: runtimesocketdir
 {{- end }}
 {{- end -}}

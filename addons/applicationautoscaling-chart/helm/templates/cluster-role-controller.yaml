@@ -1,0 +1,128 @@
+apiVersion: rbac.authorization.k8s.io/v1
+{{ if eq .Values.installScope "cluster" }}
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: ack-applicationautoscaling-controller
+  labels:
+  {{- range $key, $value := .Values.role.labels }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{ else }}
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: ack-applicationautoscaling-controller
+  labels:
+  {{- range $key, $value := .Values.role.labels }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  namespace: {{ .Release.Namespace }}
+{{ end }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - applicationautoscaling.services.k8s.aws
+  resources:
+  - scalabletargets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - applicationautoscaling.services.k8s.aws
+  resources:
+  - scalabletargets/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - applicationautoscaling.services.k8s.aws
+  resources:
+  - scalingpolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - applicationautoscaling.services.k8s.aws
+  resources:
+  - scalingpolicies/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - adoptedresources
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - adoptedresources/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - fieldexports
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - fieldexports/status
+  verbs:
+  - get
+  - patch
+  - update

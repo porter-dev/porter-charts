@@ -1,24 +1,25 @@
 apiVersion: v2
-appVersion: 3.1.0
+appVersion: 3.8.2
 description: LogDNA collector agent daemonset for Kubernetes.
 home: https://logdna.com
-icon: https://user-images.githubusercontent.com/65516095/118185526-a2447480-b40a-11eb-9bdb-82aa0a306f26.png
+icon: https://avatars.githubusercontent.com/u/17461937?s=200&v=4
 keywords:
   - logs
   - logging
   - log-management
   - agent
   - alerts
-  - metric
   - metrics
   - events
   - daemonset
   - logger
+  - APP
+  - LOGGING
 maintainers:
   - email: help@logdna.com
-    name: LogDNA
+    name: logdna
 name: logdna
 sources:
   - https://github.com/logdna/logdna-agent-v2
 type: application
-version: 0.13.0
+version: 0.1.0

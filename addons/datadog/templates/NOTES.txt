@@ -1,12 +1,11 @@
-{{- if (or (.Values.datadog.apiKeyExistingSecret) (not (eq .Values.datadog.apiKey "<DATADOG_API_KEY>"))) }}
+{{- if (or (.Values.datadog.apiKeyExistingSecret) (.Values.datadog.apiKey)) }}
 Datadog agents are spinning up on each node in your cluster. After a few
 minutes, you should see your agents starting in your event stream:
-    https://app.datadoghq.com/event/stream
+    https://app.datadoghq.com/event/explorer
 
   {{- if .Values.datadog.apiKeyExistingSecret }}
 You disabled creation of Secret containing API key, therefore it is expected
 that you create Secret named '{{ .Values.datadog.apiKeyExistingSecret }}' which includes a key called 'api-key' containing the API key.
-  {{- else if not (eq .Values.datadog.apiKey "<DATADOG_API_KEY>") }}
   {{- end }}
 
 {{- else }}
@@ -86,7 +85,7 @@ Cluster Agent liveness probe port ({{ $liveness.port }}) is different from the c
 Cluster Agent readiness probe port ({{ $readiness.port }}) is different from the configured health port ({{ $healthPort }}).
   {{- end }}
   {{- end }}
-  {{- if and .Values.datadog.clusterChecks.enabled .Values.clusterChecksRunner.enabled }}
+  {{- if (eq (include "should-enable-cluster-check-workers" .) "true") }}
     {{- $healthPort := .Values.clusterChecksRunner.healthPort }}
     {{- with $liveness := .Values.clusterChecksRunner.livenessProbe.httpGet }}
     {{- if and $liveness.port (ne $healthPort $liveness.port) }}
@@ -110,7 +109,7 @@ Cluster Checks Runner readiness probe port ({{ $readiness.port }}) is different 
     {{- end }}
   {{- end }}
 {{- end }}
-{{- if .Values.datadog.apm.enabled }}
+{{- if or .Values.datadog.apm.enabled .Values.datadog.apm.portEnabled }}
   {{- $apmPort := .Values.datadog.apm.port }}
   {{- with $liveness := .Values.agents.containers.traceAgent.livenessProbe.tcpSocket }}
   {{- if and $liveness.port (ne $apmPort $liveness.port) }}
@@ -124,6 +123,99 @@ Trace Agent liveness probe port ({{ $liveness.port }}) is different from the con
   {{- end }}
 
 The Datadog Agent is listening on port {{ $apmPort }} for APM service.
+{{- end }}
+
+{{- if and .Values.datadog.apm.instrumentation.enabledNamespaces .Values.datadog.apm.instrumentation.disabledNamespaces }}
+
+###################################################################################
+####               ERROR: APM Single Step Instrumentation misconfiguration     ####
+###################################################################################
+
+{{- fail "The options `datadog.apm.instrumentation.enabledNamespaces` and `datadog.apm.instrumentation.disabledNamespaces` cannot be set together." }}
+
+{{- end }}
+
+{{- if and .Values.datadog.apm.instrumentation.enabled (eq (include "cluster-agent-enabled" .) "false")}}
+
+#################################################################
+####               WARNING: Configuration notice             ####
+#################################################################
+
+{{- fail "You are using datadog.apm.instrumentation.enabled but you disabled the cluster agent. This configuration is unsupported and Kubernetes resource monitoring has been turned off. To enable it please set clusterAgent.enabled to 'true'." }}
+
+{{- end }}
+
+{{- if and .Values.datadog.apm.instrumentation.enabled (not .Values.clusterAgent.admissionController.enabled)}}
+
+#################################################################
+####               WARNING: Configuration notice             ####
+#################################################################
+
+{{- fail "You are using datadog.apm.instrumentation.enabled but you disabled the admission controller. This configuration is unsupported. To enable it please set clusterAgent.admissionController.enabled to 'true'." }}
+
+{{- end }}
+
+{{- if and .Values.datadog.apm.instrumentation.enabled_namespaces (eq (include "cluster-agent-enabled" .) "false")}}
+
+#################################################################
+####               WARNING: Configuration notice             ####
+#################################################################
+
+You are using datadog.apm.instrumentation.enabledNamespaces but you disabled the cluster agent. This configuration is unsupported and Kubernetes resource monitoring has been turned off.
+To enable it please set clusterAgent.enabled to 'true'.
+{{- end }}
+
+{{- if and .Values.datadog.apm.instrumentation.enabled .Values.datadog.apm.instrumentation.enabledNamespaces }}
+
+#################################################################
+####               WARNING: Configuration notice             ####
+#################################################################
+
+The options `datadog.apm.instrumentation.enabled` and `datadog.apm.instrumentation.enabledNamespaces` are set together.
+APM Single Step Instrumentation will be enabled in the whole cluster.
+
+{{- end }}
+
+{{- if and .Values.datadog.apm.instrumentation.disabledNamespaces (not .Values.datadog.apm.instrumentation.enabled) }}
+
+#################################################################
+####               WARNING: Configuration notice             ####
+#################################################################
+
+The option `datadog.apm.instrumentation.disabledNamespaces` is set while `datadog.apm.instrumentation.enabled` is disabled.
+APM Single Step Instrumentation will be disabled in the whole cluster.
+
+{{- end }}
+
+{{- if .Values.datadog.apm.enabled }}
+
+#################################################################
+####               WARNING: Deprecation notice               ####
+#################################################################
+
+The option `datadog.apm.enabled` is deprecated, please use `datadog.apm.portEnabled` to enable TCP communication to the trace-agent.
+The option `datadog.apm.socketEnabled` is enabled by default and can be used to rely on unix socket or name-pipe communication.
+
+{{- end }}
+
+{{- if or .Values.datadog.systemProbe.enableKernelHeaderDownload .Values.datadog.systemProbe.enableRuntimeCompiler }}
+
+#################################################################
+####               WARNING: Deprecation notice               ####
+#################################################################
+
+The `enableKernelHeaderDownload` and `enableRuntimeCompiler` options are not supported anymore, in order to enable the runtime compiler, set the environment variable `DD_ENABLE_KERNEL_HEADER_DOWNLOAD` and `DD_ENABLE_RUNTIME_COMPILER` in the system probe.
+
+{{- end }}
+
+{{- if .Values.datadog.apm.useSocketVolume }}
+
+#################################################################
+####               WARNING: Deprecation notice               ####
+#################################################################
+
+The option `datadog.apm.useSocketVolume` is deprecated, please use `datadog.apm.socketEnabled` instead.
+
 {{- end }}
 
 {{- if .Values.datadog.autoconf }}
@@ -189,32 +281,62 @@ You are using datadog.orchestratorExplorer.enabled but you disabled the cluster 
 To enable it please set clusterAgent.enabled to 'true'.
 {{- end }}
 
-{{- if .Values.datadog.serviceTopology.enabled }}
-
-#################################################################
-####               NOTE: Configuration notice             ####
-#################################################################
-
-datadog.serviceTopology.enabled is enabled. Please make sure the Service Topology feature is enabled in your Kubernetes cluster.
-Enabling datadog.serviceTopology.enabled without enabling the Service Topology in the cluster will result in wrong tagging for traces and custom metrics.
-Ref: https://kubernetes.io/docs/concepts/services-networking/service-topology/
-
-{{- end }}
-
 {{- if .Values.providers.gke.autopilot}}
+
+###########################################################################################
+####   WARNING: Only one Datadog chart release allowed by namespace on GKE Autopilot   ####
+###########################################################################################
+
+On GKE Autopilot, only one "datadog" Helm chart release is allowed by Kubernetes namespace due to the following new constraints on the Agent DaemonSet:
+* The serviceAccountName must be "datadog-agent".
+* All ConfigMap names mounted must be hardcode.
+
 {{- if eq (include "system-probe-feature" .) "true" }}
 
-##################################################################################
-####               WARNING: System Probe is not supported on GKE Autopilot    ####
-##################################################################################
+#####################################################################
+####   WARNING: System Probe is not supported on GKE Autopilot   ####
+#####################################################################
+{{- fail "On GKE Autopilot environments, System Probe is not supported. The option 'datadog.securityAgent.runtime.enabled' must be set 'false'" }}
 
 {{- end }}
 
-{{- if or .Values.datadog.securityAgent.runtime.enabled .Values.datadog.securityAgent.compliance.enabled }}
+{{- if and .Values.providers.gke.cos .Values.datadog.systemProbe.enableDefaultKernelHeadersPaths }}
+#################################################################################
+####   WARNING: Mounting kernel headers' default paths  is disabled on COS   ####
+#################################################################################
 
-###################################################################################
-####               WARNING: Security Agent is not supported on GKE Autopilot   ####
-###################################################################################
+On GKE environments using COS, users cannot choose whether to mount the default kernel headers paths.
+The option is overriden to avoid mounting volumes that are not allowed which would block the deployment of the agent.
+
+{{- end }}
+
+{{- if or .Values.datadog.securityAgent.runtime.enabled .Values.datadog.securityAgent.runtime.fimEnabled }}
+
+######################################################################################
+####   WARNING: Cloud Workload Security (CWS) is not supported on GKE Autopilot   ####
+######################################################################################
+
+{{- fail "On GKE Autopilot environments, Cloud Workload Security (CWS) is not supported. The options 'datadog.securityAgent.runtime.enabled' and 'datadog.securityAgent.runtime.fimEnabled' must be set 'false'" }}
+
+{{- end }}
+
+{{- if .Values.agents.containers.initContainers.securityContext }}
+
+######################################################################################################
+####   WARNING: Overwriting security contexts at container level not supported on GKE autopilot   ####
+######################################################################################################
+
+{{- fail "On GKE autopilot environments, overwriting default security context is not supported, these options will be ignored" }}
+
+{{- end }}
+
+{{- if .Values.datadog.securityAgent.compliance.enabled }}
+
+#################################################################################################
+####   WARNING: Cloud Security Posture Management (CSPM) is not supported on GKE Autopilot   ####
+#################################################################################################
+
+{{- fail "On GKE autopilot environments, Cloud Security Posture Management (CSPM) is not supported. The option 'datadog.securityAgent.compliance.enabled' must be set to 'false'" }}
 
 {{- end }}
 
@@ -225,6 +347,73 @@ Ref: https://kubernetes.io/docs/concepts/services-networking/service-topology/
 ###################################################################################
 
 {{- end }}
+
+{{- if .Values.datadog.apm.socketEnabled }}
+
+##############################################################################
+####   WARNING: APM with Unix socket is not supported on GKE Autopilot   ####
+##############################################################################
+
+{{- end }}
+
+{{- if .Values.datadog.networkMonitoring.enabled }}
+
+#######################################################################################
+####   WARNING: Network Performance Monitoring is not supported on GKE Autopilot   ####
+#######################################################################################
+
+{{- fail "On GKE Autopilot environments, Network Performance Monitoring is not supported. The option 'datadog.networkMonitoring.enabled' must be set to 'false'" }}
+
+{{- end }}
+
+{{- end }}
+
+{{- if and (.Values.datadog.dogstatsd.useSocketVolume) (eq .Values.targetSystem "windows") }}
+
+###################################################################################
+####   WARNING: dogstatsd with Unix socket is not supported on Windows         ####
+###################################################################################
+
+Refer to the Dogstatsd configuration section of the documentation for more details.
+https://github.com/DataDog/helm-charts/tree/master/charts/datadog#dsd-config
+
+{{- end }}
+
+
+{{- if and (or .Values.clusterAgent.admissionController.enabled .Values.clusterAgent.metricsProvider.enabled) (or (le (int .Values.clusterAgent.replicas) 1) (not .Values.clusterAgent.createPodDisruptionBudget)) }}
+
+###################################################################################
+####   WARNING: Cluster-Agent should be deployed in high availability mode     ####
+###################################################################################
+
+The Cluster-Agent should be in high availability mode because the following features
+are enabled:
+{{- if .Values.clusterAgent.admissionController.enabled }}
+* Admission Controller
+{{- end }}
+{{- if .Values.clusterAgent.metricsProvider.enabled }}
+* External Metrics Provider
+{{- end }}
+{{- if eq .Values.clusterAgent.admissionController.failurePolicy "Fail" }}
+* Failure policy of the Admission Controller is set to "Fail"
+{{- end }}
+
+To run in high availability mode, our recommendation is to update the chart
+configuration with:
+* set `clusterAgent.replicas` value to `2` replicas .
+* set `clusterAgent.createPodDisruptionBudget` to `true`.
+
+{{- end }}
+
+
+{{- if and .Values.datadog.kubeStateMetricsEnabled (not .Values.datadog.kubeStateMetricsCore.enabled)}}
+
+#################################################################
+####               WARNING: Deprecation notice               ####
+#################################################################
+
+The legacy option to run the Kubernetes States Metrics check is deprecated and will be removed in the next major version update of the Chart.
+Use the Kubernetes State Metrics Core option instead, find the documentation here: https://docs.datadoghq.com/integrations/kubernetes_state_core.
 
 {{- end }}
 
@@ -256,6 +445,18 @@ You are using datadog.kubeStateMetricsCore.enabled but you disabled the cluster 
 To enable it please set clusterAgent.enabled to 'true'.
 {{- end }}
 
+{{- if and .Values.datadog.kubeStateMetricsCore.useClusterCheckRunners (not .Values.clusterChecksRunner.enabled)}}
+
+###################################################################################
+####               WARNING: Suboptimal Cluster Checks Runner configuration     ####
+###################################################################################
+
+You have `datadog.kubeStateMetricsCore.useClusterCheckRunners` enabled and `clusterChecksRunner.enabled` disabled.
+This configuration will create a Cluster Checks Runner deployment but some of the cluster checks may still run on Node Agents.
+To make sure all cluster checks run on Cluster Checks Runners set `clusterChecksRunner.enabled` to 'true'.
+
+{{- end }}
+
 
 {{- if or .Values.datadog.acInclude .Values.datadog.acExclude }}
 #################################################################
@@ -263,4 +464,87 @@ To enable it please set clusterAgent.enabled to 'true'.
 #################################################################
 
 You are using the datadog.acInclude or datadog.acExclude parameters, which have been deprecated since Datadog Agent 7.20. Please use datadog.containerInclude and datadog.containerExclude instead.
+{{- end }}
+
+{{- if and .Values.datadog.systemProbe.osReleasePath (eq (include "system-probe-feature" .) "true") }}
+
+#################################################################
+####               WARNING: Deprecation notice               ####
+#################################################################
+
+You are using the datadog.systemProbe.osReleasePath parameter, which has been renamed datadog.osReleasePath.
+This version still supports datadog.systemProbe.osReleasePath parameter, but it will be removed in the next major version of our Helm chart.
+More information about this change: https://github.com/DataDog/helm-charts/pull/717
+{{- end }}
+
+
+{{- $hasContainerIncludeEnv := false }}
+{{- range $key := .Values.datadog.env }}
+  {{- if eq $key.name "DD_CONTAINER_INCLUDE" }}
+    {{- $hasContainerIncludeEnv = true }}
+  {{- end }}
+{{- end }}
+
+{{- $hasContainerInclude := false }}
+{{- if or .Values.datadog.containerInclude $hasContainerIncludeEnv }}
+  {{- $hasContainerInclude = true }}
+{{- end }}
+
+{{- $hasContainerExcludeEnv := false }}
+{{- range $key := .Values.datadog.env }}
+  {{- if eq $key.name "DD_CONTAINER_EXCLUDE" }}
+    {{- $hasContainerExcludeEnv = true }}
+  {{- end }}
+{{- end }}
+
+{{- $hasContainerExclude := false }}
+{{- if or .Values.datadog.containerExclude $hasContainerExcludeEnv }}
+  {{- $hasContainerExclude = true }}
+{{- end }}
+
+{{- if and $hasContainerInclude (not $hasContainerExclude) }}
+
+#################################################################
+####               WARNING: Configuration notice             ####
+#################################################################
+
+You are using datadog.containerInclude or DD_CONTAINER_INCLUDE but you haven't excluded any containers. The default behavior is to include everything; if the intent is to exclude all other containers, set datadog.containerExclude to 'name:.*' .
+
+{{- end }}
+
+{{- if and .Values.datadog.otlp.receiver.protocols.grpc.enabled (not .Values.datadog.otlp.receiver.protocols.grpc.useHostPort) }}
+#################################################################
+####               WARNING: Configuration notice             ####
+#################################################################
+You have enabled OTLP Ingest for the gRPC port without the Host Port enabled.
+
+To send OTLP data to the Agent use the Service created by specifying "http://{{ template "localService.name" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.datadog.otlp.receiver.protocols.grpc.endpoint | regexFind ":[0-9]+$" | trimPrefix ":" }}" as the endpoint.
+{{- end }}
+
+{{- if and .Values.datadog.otlp.receiver.protocols.http.enabled (not .Values.datadog.otlp.receiver.protocols.http.useHostPort) }}
+#################################################################
+####               WARNING: Configuration notice             ####
+#################################################################
+You have enabled OTLP Ingest for the HTTP port without the Host Port enabled.
+
+To send OTLP data to the Agent use the Service created by specifying "http://{{ template "localService.name" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.datadog.otlp.receiver.protocols.http.endpoint | regexFind ":[0-9]+$" | trimPrefix ":" }}" as the endpoint.
+{{- end }}
+
+{{- if and (or .Values.clusterAgent.podSecurity.podSecurityPolicy.create .Values.agents.podSecurity.podSecurityPolicy.create) (not (.Capabilities.APIVersions.Has "policy/v1beta1/PodSecurityPolicy")) }}
+#################################################################
+####               WARNING: Incompatibility                  ####
+#################################################################
+You have enabled creataion of PodSecurityPolicy, however PSP have been removed from Kubernetes >= 1.25, thus PSP will not be created.
+
+You should deactivate these options: clusterAgent.podSecurity.podSecurityPolicy.create and/or agents.podSecurity.podSecurityPolicy.create
+{{- end }}
+
+{{- if .Values.datadog.securityAgent.compliance.xccdf.enabled }}
+#################################################################
+####               WARNING: Deprecation notice               ####
+#################################################################
+
+You are using the datadog.securityAgent.compliance.xccdf.enabled parameter which has been replaced by datadog.securityAgent.compliance.host_benchmarks.enabled.
+This version still supports both but the support of the old name will be dropped in the next major version of our Helm chart.
+More information about this change: https://github.com/DataDog/helm-charts/pull/1161
 {{- end }}

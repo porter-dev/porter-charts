@@ -1,9 +1,11 @@
-{{- if and .Values.crds.datadogMonitors (not (.Capabilities.APIVersions.Has "apiextensions.k8s.io/v1/CustomResourceDefinition")) }}
+{{- if and .Values.crds.datadogMonitors (semverCompare "<=1.21-0" .Capabilities.KubeVersion.GitVersion ) }}
+
+---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.1
+    controller-gen.kubebuilder.io/version: v0.6.1
   creationTimestamp: null
   name: datadogmonitors.datadoghq.com
   labels:
@@ -20,11 +22,11 @@ spec:
       name: monitor state
       type: string
     - JSONPath: .status.monitorStateLastTransitionTime
-      name: last transition
+      name: last state transition
       type: string
     - JSONPath: .status.monitorStateLastUpdateTime
       format: date
-      name: last sync
+      name: last state sync
       type: string
     - JSONPath: .status.syncStatus
       name: sync status
@@ -56,6 +58,13 @@ spec:
         spec:
           description: DatadogMonitorSpec defines the desired state of DatadogMonitor
           properties:
+            controllerOptions:
+              description: ControllerOptions are the optional parameters in the DatadogMonitor controller
+              properties:
+                disableRequiredTags:
+                  description: DisableRequiredTags disables the automatic addition of required tags to monitors.
+                  type: boolean
+              type: object
             message:
               description: Message is a message to include with notifications for this monitor
               type: string
@@ -65,6 +74,9 @@ spec:
             options:
               description: Options are the optional parameters associated with your monitor
               properties:
+                enableLogsSample:
+                  description: A Boolean indicating whether to send a log sample when the log monitor triggers.
+                  type: boolean
                 escalationMessage:
                   description: A message to include with a re-notification.
                   type: string
@@ -78,7 +90,7 @@ spec:
                 locked:
                   description: Whether or not the monitor is locked (only editable by creator and admins).
                   type: boolean
-                newHostDelay:
+                newGroupDelay:
                   description: Time (in seconds) to allow a host to boot and applications to fully start before starting the evaluation of monitor results. Should be a non negative integer.
                   format: int64
                   type: integer
@@ -143,11 +155,18 @@ spec:
             query:
               description: Query is the Datadog monitor query
               type: string
+            restrictedRoles:
+              description: RestrictedRoles is a list of unique role identifiers to define which roles are allowed to edit the monitor. `restricted_roles` is the successor of `locked`. For more information about `locked` and `restricted_roles`, see the [monitor options docs](https://docs.datadoghq.com/monitors/guide/monitor_api_options/#permissions-options).
+              items:
+                type: string
+              type: array
+              x-kubernetes-list-type: set
             tags:
               description: Tags is the monitor tags associated with your monitor
               items:
                 type: string
               type: array
+              x-kubernetes-list-type: set
             type:
               description: Type is the monitor type
               type: string
@@ -185,6 +204,9 @@ spec:
                   - type
                 type: object
               type: array
+              x-kubernetes-list-map-keys:
+                - type
+              x-kubernetes-list-type: map
             created:
               description: Created is the time the monitor was created
               format: date-time
@@ -206,6 +228,10 @@ spec:
             id:
               description: ID is the monitor ID generated in Datadog
               type: integer
+            monitorLastForceSyncTime:
+              description: MonitorLastForceSyncTime is the last time the API monitor was last force synced with the DatadogMonitor resource
+              format: date-time
+              type: string
             monitorState:
               description: MonitorState is the overall state of monitor
               type: string
@@ -221,7 +247,7 @@ spec:
               description: Primary defines whether the monitor is managed by the Kubernetes custom resource (true) or outside Kubernetes (false)
               type: boolean
             syncStatus:
-              description: SyncStatus shows the health of syncing the monitor state to Datadog
+              description: MonitorStateSyncStatus shows the health of syncing the monitor state to Datadog
               type: string
             triggeredState:
               description: TriggeredState only includes details for monitor groups that are triggering
@@ -237,8 +263,13 @@ spec:
                   state:
                     description: DatadogMonitorState represents the overall DatadogMonitor state
                     type: string
+                required:
+                  - monitorGroup
                 type: object
               type: array
+              x-kubernetes-list-map-keys:
+                - monitorGroup
+              x-kubernetes-list-type: map
           type: object
       type: object
   version: v1alpha1

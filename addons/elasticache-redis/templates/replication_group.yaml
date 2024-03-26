@@ -1,0 +1,45 @@
+---
+apiVersion: elasticache.services.k8s.aws/v1alpha1
+kind: ReplicationGroup
+metadata:
+  name: "{{ .Values.config.name }}"
+  namespace: "{{ .Release.Namespace }}"
+  annotations:
+    services.k8s.aws/region: "{{ .Values.vpcConfig.awsRegion }}"
+  labels:
+    porter.run/helm-release-name: "{{ .Release.Name }}"
+spec:
+  atRestEncryptionEnabled: true
+  authToken:
+    namespace: porter-env-group
+    name: "{{ .Values.config.name }}.1"
+    key: REDIS_PASS
+  automaticFailoverEnabled: true
+  cacheNodeType: "{{ .Values.config.instanceClass }}"
+  cacheParameterGroupRef:
+    from:
+      name: "{{ .Values.config.name }}"
+  cacheSubnetGroupRef:
+    from:
+      name: "{{ .Values.config.name }}"
+  description: "{{ .Values.config.name }} Redis Replication Group"
+  engine: redis
+  engineVersion: "{{ .Values.config.engineVersion }}"
+  # prettier-ignore
+  multiAZEnabled: {{ .Values.config.multiAZ }}
+  numNodeGroups: 1
+  port: 6379
+  replicasPerNodeGroup: 1
+  replicationGroupID: "{{ .Values.config.name }}"
+  securityGroupRefs:
+    - from:
+        name: "{{ .Values.config.name }}-elasticache"
+  snapshotRetentionLimit: 7
+  tags:
+    - key: "porter.run/managed"
+      value: "true"
+    - key: "porter.run/service-type"
+      value: "elasticache"
+    - key: "porter.run/service-name"
+      value: "{{ $.Values.config.name }}"
+  transitEncryptionEnabled: true

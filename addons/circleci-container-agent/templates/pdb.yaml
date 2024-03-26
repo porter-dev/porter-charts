@@ -1,0 +1,16 @@
+{{- if .Values.agent.pdb.create }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "container-agent.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+{{- if .Values.agent.pdb.minAvailable }}
+  minAvailable: {{ .Values.agent.pdb.minAvailable }}
+{{- end }}
+{{- if .Values.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.agent.pdb.maxUnavailable }}
+{{- end }}
+  selector:
+    matchLabels: {{- toYaml .Values.agent.matchLabels | indent 6 }}
+{{- end }}

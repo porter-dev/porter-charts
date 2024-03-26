@@ -11,13 +11,23 @@ allowConcurrency: true
 
 image:
   repository: public.ecr.aws/o1j4x7p4/hello-porter-job
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
 
 container:
   port: 80
   command: ""
+  args: []
   env:
     normal:
 
@@ -31,6 +41,8 @@ resources:
   requests:
     cpu: 100m
     memory: 256Mi
+  setCPULimits: false
+  limits: {}
 
 paused: false
 
@@ -39,6 +51,11 @@ cloudsql:
   connectionName: ""
   dbPort: 5432
   serviceAccountJSON: ""
+  serviceAccountJSONSecret: ""
+
+# Set this for enabling DNS extensions over TCP
+# We enable this by default.
+enableEDNS0: true
 
 sidecar:
   signalChildProcesses: true
@@ -49,6 +66,10 @@ sidecar:
       cpu: 10m
       memory: 10Mi
 
+# Set this to add entries to the /etc/hosts file
+# Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
+hostAliases: []
+
 retainFailedHooks: false
 nodeSelector: {}
 tolerations: []
@@ -57,3 +78,7 @@ stack:
   enabled: false
   name: ""
   revision: 0
+
+podLabels: {}
+
+priorityClassName: ""

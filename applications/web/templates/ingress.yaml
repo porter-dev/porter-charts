@@ -3,25 +3,13 @@
 {{- $svcPort := .Values.service.port -}}
 {{- $allHosts := concat .Values.ingress.hosts .Values.ingress.porter_hosts -}}
 {{- $customPaths := .Values.ingress.custom_paths -}}
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
 apiVersion: networking.k8s.io/v1
-{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1/Ingress" -}}
-apiVersion: networking.k8s.io/v1beta1
-{{- else -}}
-apiVersion: extensions/v1beta1
-{{- end }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
   annotations:
-  {{- if not (.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress") }}
-    kubernetes.io/ingress.class: "nginx"
-  {{- end }}
-  {{- if eq .Values.ingress.provider "azure" }}
-    kubernetes.io/ingress.class: addon-http-application-routing
-  {{- end }}
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
@@ -64,12 +52,28 @@ metadata:
     {{- end }}
     {{- end }}
 spec:
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-{{- if ne .Values.ingress.provider "azure" }}
+{{- if hasKey .Values.ingress.annotations "kubernetes.io/ingress.class" }}
+  ingressClassName: {{ index .Values.ingress.annotations "kubernetes.io/ingress.class" }}
+{{- else }}
   ingressClassName: nginx
 {{- end }}
-{{- end }}
-  {{- if .Values.ingress.tls }}
+  {{- if or (.Values.ingress.tls) (.Values.ingress.customTls.enabled) }}
+  {{- if .Values.ingress.separateTlsPerCustomDomain}}
+  tls:
+    {{- range $allHosts }}
+    - hosts:
+        - {{ . | quote }}
+      {{- if not $.Values.ingress.useDefaultIngressTLSSecret }}
+      {{ if $.Values.ingress.wildcard }}
+      secretName: wildcard-cert-tls
+      {{ else if $.Values.ingress.customTls.enabled }}
+      secretName: {{ $.Values.ingress.customTls.customTlsSecret }}
+      {{ else }}
+      secretName: '{{ include "docker-template.fullname" $ }}-{{ . | replace "." "-" }}'
+      {{ end }}
+      {{- end }}
+    {{- end }}
+  {{- else }}
   tls:
     - hosts:
         {{- range $allHosts }}
@@ -78,12 +82,14 @@ spec:
       {{- if not .Values.ingress.useDefaultIngressTLSSecret }}
       {{ if .Values.ingress.wildcard }}
       secretName: wildcard-cert-tls
+      {{ else if .Values.ingress.customTls.enabled }}
+      secretName: {{ .Values.ingress.customTls.customTlsSecret }}
       {{ else }}
       secretName: {{ include "docker-template.fullname" . }}
       {{ end }}
       {{- end }}
   {{- end }}
-
+  {{- end }}
   rules:
     {{- range $allHosts }}
       - host: {{ . | quote }}
@@ -92,34 +98,20 @@ spec:
             {{ if gt (len $customPaths) 0 }}
             {{- range $customPaths }}
             - path: {{ .path }}
-              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               pathType: ImplementationSpecific
-              {{- end }}
               backend:
-                {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
                 service:
                   name: {{ .serviceName }}
                   port:
                     number: {{ .servicePort }}
-                {{- else }}
-                serviceName: {{ .serviceName }}
-                servicePort: {{ .servicePort }}
-                {{- end }}
             {{- end }}
             {{ else }}
-            - {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-              pathType: ImplementationSpecific
-              {{- end }}
+            - pathType: ImplementationSpecific
               backend:
-              {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
                 service:
                   name: {{ $fullName }}
                   port:
                     number: {{ $svcPort }}
-              {{- else }}
-                serviceName: {{ $fullName }}
-                servicePort: {{ $svcPort }}
-              {{- end }}
             {{ end }}
     {{- end }}
 {{- end }}
