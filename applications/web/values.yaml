@@ -60,6 +60,7 @@ ingress:
 albIngress:
   enabled: false
   external_dns: false
+  ssl_policy: ELBSecurityPolicy-2016-08
   hosts: []
   certificate_arn:
   custom_paths: []
