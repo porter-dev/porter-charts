@@ -10,17 +10,11 @@ rules:
   - elasticache.services.k8s.aws
   resources:
   - cacheparametergroups
-
   - cachesubnetgroups
-
   - replicationgroups
-
   - snapshots
-
   - users
-
   - usergroups
-
   verbs:
   - create
   - delete
