@@ -23,7 +23,7 @@ spec:
     spec:
       serviceAccountName: {{ include "docker-template.fullname" . }}
       restartPolicy: Never
-      {{- if .Values.image.imagePullSecret }}
+      {{- if and (.Values.image) (.Values.image.imagePullSecret) }}
       imagePullSecrets:
         - name: {{ .Values.image.imagePullSecret }}
       {{- end }}

@@ -286,7 +286,7 @@ spec:
             mountPath: /secrets/
             readOnly: true
         {{ end }}
-      {{- if .Values.image.imagePullSecret }}
+      {{- if and (.Values.image) (.Values.image.imagePullSecret) }}
       imagePullSecrets:
         - name: {{ .Values.image.imagePullSecret }}
       {{- end }}
