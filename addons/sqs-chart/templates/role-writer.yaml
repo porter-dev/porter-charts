@@ -10,7 +10,6 @@ rules:
   - sqs.services.k8s.aws
   resources:
   - queues
-
   verbs:
   - create
   - delete
