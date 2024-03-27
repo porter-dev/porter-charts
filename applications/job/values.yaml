@@ -14,6 +14,8 @@ image:
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
+  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank. 
+  imagePullSecret:
 
 serviceAccount:
   # Specifies whether a service account should be created

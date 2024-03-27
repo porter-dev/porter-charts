@@ -353,7 +353,10 @@ spec:
             mountPath: /secrets/
             readOnly: true
         {{ end }}
-     
+      {{- if .Values.image.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.image.imagePullSecret }}
+      {{- end }}
       {{- if gt (len .Values.nodeSelector) 0}}
       nodeSelector:
         {{- range $k, $v := .Values.nodeSelector }}
