@@ -23,6 +23,10 @@ spec:
     spec:
       serviceAccountName: {{ include "docker-template.fullname" . }}
       restartPolicy: Never
+      {{- if and .Values.image .Values.image.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.image.imagePullSecret }}
+      {{- end }}
       containers:
       - name: job-manager
         image: public.ecr.aws/o1j4x7p4/job-manager:latest

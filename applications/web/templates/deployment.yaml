@@ -49,6 +49,10 @@ spec:
         options:
           - name: edns0
       {{- end }}
+      {{- if and .Values.image .Values.image.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.image.imagePullSecret }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -353,7 +357,6 @@ spec:
             mountPath: /secrets/
             readOnly: true
         {{ end }}
-     
       {{- if gt (len .Values.nodeSelector) 0}}
       nodeSelector:
         {{- range $k, $v := .Values.nodeSelector }}

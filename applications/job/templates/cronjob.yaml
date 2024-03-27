@@ -59,6 +59,10 @@ spec:
           {{ else }}
           serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
           {{- end }}
+          {{- if and .Values.image .Values.image.imagePullSecret }}
+          imagePullSecrets:
+            - name: {{ .Values.image.imagePullSecret }}
+          {{- end }}
           containers:
           - name: {{ .Chart.Name }}
             {{- if .Values.global }}
