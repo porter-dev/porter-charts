@@ -415,7 +415,7 @@ spec:
         {{ if .Values.emptyDir.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
           emptyDir:
-            {{- toYaml .Values.emptyDir.volumeOptions | nindent 8 }}
+            {{- toYaml .Values.emptyDir.volumeOptions | nindent 12 }}
         {{ end }}
       {{ end }}
 {{- end }}
