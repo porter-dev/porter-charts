@@ -1,16 +1,18 @@
 agent:
-  image: "public.ecr.aws/o1j4x7p4/porter-agent:v3.2.7"
-  cfAccessToken: ""
-  porterHost: "dashboard.getporter.dev"
-  porterPort: "80"
-  porterToken: ""
+  image: 'public.ecr.aws/o1j4x7p4/porter-agent:v3.2.7'
+  cfAccessToken: ''
+  porterHost: 'dashboard.getporter.dev'
+  porterPort: '80'
+  porterToken: ''
   privateRegistry:
     enabled: false
-    secret: ""
-  clusterID: ""
-  projectID: ""
+    secret: ''
+  clusterID: ''
+  projectID: ''
   lokiURL: porter-agent-loki.porter-agent-system:9095
   lokiHTTPURL: http://porter-agent-loki.porter-agent-system:3100
+  prometheusURL: ''
+  metronomeKey: ''
 
 resources:
   limits:
@@ -53,7 +55,7 @@ loki:
     tolerations:
       - effect: NoSchedule
         key: porter.run/workload-kind
-        value: "monitoring"
+        value: 'monitoring'
         operator: Equal
     persistence:
       enabled: true
@@ -83,7 +85,7 @@ loki:
     initialDelaySeconds: 45
   datasource:
     jsonData: {}
-    uid: ""
+    uid: ''
   persistence:
     enabled: true
     size: 100Gi
@@ -105,15 +107,15 @@ promtail:
     # See https://github.com/grafana/helm-charts/blob/18282f1780c73130a89ba5e0ee0f8c5721f08b13/charts/promtail/values.yaml#L343
     snippets:
       extraRelabelConfigs:
-      - source_labels:
-          - __meta_kubernetes_namespace
-          - __meta_kubernetes_pod_name
-          - __meta_kubernetes_pod_annotation_helm_sh_revision
-        target_label: porter_pod_name
-        action: replace
-        separator: '_'
-      - action: labelmap
-        regex: __meta_kubernetes_pod_label_(.+)
+        - source_labels:
+            - __meta_kubernetes_namespace
+            - __meta_kubernetes_pod_name
+            - __meta_kubernetes_pod_annotation_helm_sh_revision
+          target_label: porter_pod_name
+          action: replace
+          separator: '_'
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
   resources:
     limits:
       memory: 256Mi
