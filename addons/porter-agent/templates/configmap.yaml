@@ -4,16 +4,16 @@ metadata:
   name: porter-agent-config
   namespace: porter-agent-system
 data:
-  PORTER_HOST: '{{ .Values.agent.porterHost }}'
-  CF_ACCESS_TOKEN: '{{ .Values.agent.cfAccessToken }}'
-  PORTER_PORT: '{{ .Values.agent.porterPort }}'
-  PORTER_TOKEN: '{{ .Values.agent.porterToken }}'
-  CLUSTER_ID: '{{ .Values.agent.clusterID }}'
-  PROJECT_ID: '{{ .Values.agent.projectID }}'
-  LOG_STORE_KIND: 'loki'
-  LOG_STORE_ADDRESS: '{{ .Values.agent.lokiURL }}'
-  LOG_STORE_HTTP_ADDRESS: '{{ .Values.agent.lokiHTTPURL }}'
-  SQL_LITE: 'true'
-  SQL_LITE_PATH: '/porter/sqlite/agent.db'
-  PROMETHEUS_URL: '{{ .Values.agent.prometheusURL }}'
-  METRONOME_API_KEY: '{{ .Values.agent.metronomeKey }}'
+  PORTER_HOST: "{{ .Values.agent.porterHost }}"
+  CF_ACCESS_TOKEN: "{{ .Values.agent.cfAccessToken }}"
+  PORTER_PORT: "{{ .Values.agent.porterPort }}"
+  PORTER_TOKEN: "{{ .Values.agent.porterToken }}"
+  CLUSTER_ID: "{{ .Values.agent.clusterID }}"
+  PROJECT_ID: "{{ .Values.agent.projectID }}"
+  LOG_STORE_KIND: "loki"
+  LOG_STORE_ADDRESS: "{{ .Values.agent.lokiURL }}"
+  LOG_STORE_HTTP_ADDRESS: "{{ .Values.agent.lokiHTTPURL }}"
+  SQL_LITE: "true"
+  SQL_LITE_PATH: "/porter/sqlite/agent.db"
+  PROMETHEUS_URL: "{{ .Values.agent.prometheusURL }}"
+  METRONOME_API_KEY: "{{ .Values.agent.metronomeKey }}"
