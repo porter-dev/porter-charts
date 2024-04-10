@@ -82,8 +82,7 @@ config:
   ipRange: ""
 
   # Other variables to use during the tailscale up command
-  variables: 
-    TAILSCALE_ADVERTISE_EXIT_NODES: "false"
+  variables: {}
     # eg:
     # TAILSCALE_ACCEPT_DNS: "true"
     # TAILSCALE_ACCEPT_ROUTES: "false"
