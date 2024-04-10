@@ -11,4 +11,6 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data: 
   TAILSCALE_ADVERTISE_ROUTES: {{ .Values.config.ipRange }}
-  {{ toYaml .Values.config.variables | indent 2 }}
+{{ if .Values.config.variables -}}
+{{ toYaml .Values.config.variables | indent 2 }}
+{{ end }}
