@@ -16,4 +16,3 @@ data:
   SQL_LITE: "true"
   SQL_LITE_PATH: "/porter/sqlite/agent.db"
   PROMETHEUS_URL: "{{ .Values.agent.prometheusURL }}"
-  METRONOME_API_KEY: "{{ .Values.agent.metronomeKey }}"
