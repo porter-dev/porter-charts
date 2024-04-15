@@ -92,6 +92,16 @@ tolerations: []
 # Annotations to be added to the pod
 podAnnotations: {}
 
+# Comma-separated list of additional Kubernetes label keys that will be used in the resource's
+# labels metric. By default the metric contains only name and namespace labels.
+# To include additional labels, provide a list of resource names in their plural form and Kubernetes
+# label keys you would like to allow for them (Example: '=namespaces=[k8s-label-1,k8s-label-n,...],pods=[app],...)'.
+# A single '*' can be provided per resource instead to allow any labels, but that has
+# severe performance implications (Example: '=pods=[*]').
+metricLabelsAllowlist:
+  # This label is used by the porter agent to group and aggregate resource usage metrics for billing
+  - pods[porter.run/project-id]
+
 ## Assign a PriorityClassName to pods if set
 # priorityClassName: ""
 
