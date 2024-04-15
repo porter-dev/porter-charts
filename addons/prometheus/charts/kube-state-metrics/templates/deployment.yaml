@@ -156,6 +156,9 @@ spec:
 {{ if .Values.kubeconfig.enabled }}
         - --kubeconfig=/opt/k8s/.kube/config
 {{ end }}
+{{- if .Values.metricLabelsAllowlist }}
+        - --metric-labels-allowlist={{ .Values.metricLabelsAllowlist | join "," }}
+{{- end }}
 {{- if .Values.kubeconfig.enabled }}
         volumeMounts:
         - name: kubeconfig
