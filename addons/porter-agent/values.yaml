@@ -1,5 +1,5 @@
 agent:
-  image: "public.ecr.aws/o1j4x7p4/porter-agent:v3.2.7"
+  image: "public.ecr.aws/o1j4x7p4/porter-agent:v3.2.11"
   cfAccessToken: ""
   porterHost: "dashboard.getporter.dev"
   porterPort: "80"
@@ -11,6 +11,7 @@ agent:
   projectID: ""
   lokiURL: porter-agent-loki.porter-agent-system:9095
   lokiHTTPURL: http://porter-agent-loki.porter-agent-system:3100
+  prometheusURL: http://prometheus-server.monitoring.svc
 
 resources:
   limits:
