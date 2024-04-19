@@ -5,6 +5,9 @@ metadata:
   labels:
     porter.run/tailscale-svc: "true"
     {{- include "docker-template.labels" . | nindent 4 }}
+    {{- if .Values.labels }}
+    {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
   {{- if .Values.service.annotations }}
   {{- if gt (len .Values.service.annotations) 0}}
   annotations:
