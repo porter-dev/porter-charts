@@ -35,12 +35,12 @@ spec:
         resources:
           requests:
             cpu: 10m
-            memory: 32Mi
+            memory: 128Mi
           limits:
             {{- if (.Values.resources.setCPULimits) }}
             cpu: 10m
             {{ end }}
-            memory: 32Mi
+            memory: 128Mi
       tolerations:
         - key: "removable"
           operator: "Equal"
