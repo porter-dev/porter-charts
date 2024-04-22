@@ -6,12 +6,12 @@ auto_deploy: true
 
 replicaCount: 1
 
-topology: 
+topology:
   enabled: false
   maxSkew:
   topologyKey:
   whenUnsatisfiable:
-  labelSelector: 
+  labelSelector:
     enabled: false
     matchLabels: {}
 
@@ -22,7 +22,7 @@ image:
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
-  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank. 
+  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank.
   imagePullSecret:
 
 podLabels: {}
@@ -34,7 +34,7 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: ''
 
 service:
   port: 80
@@ -141,17 +141,17 @@ keda:
         value: 10
         periodSeconds: 300
   trigger:
-    metricName: ""
+    metricName: ''
     metricType: AverageValue
-    metricQuery: ""
-    metricThreshold: ""
+    metricQuery: ''
+    metricThreshold: ''
   triggers: []
 
 health:
   livenessProbe:
     enabled: false
-    path: "/livez"
-    scheme: "HTTP"
+    path: '/livez'
+    scheme: 'HTTP'
     initialDelaySeconds: 15
     periodSeconds: 5
     timeoutSeconds: 1
@@ -160,12 +160,12 @@ health:
     httpHeaders: []
     auth:
       enabled: false
-      username: ""
-      password: ""
+      username: ''
+      password: ''
 
   livenessCommand:
     enabled: false
-    command: "ls -l"
+    command: 'ls -l'
     initialDelaySeconds: 10
     periodSeconds: 5
     timeoutSeconds: 1
@@ -174,8 +174,8 @@ health:
 
   readinessProbe:
     enabled: false
-    path: "/readyz"
-    scheme: "HTTP"
+    path: '/readyz'
+    scheme: 'HTTP'
     initialDelaySeconds: 15
     periodSeconds: 5
     timeoutSeconds: 1
@@ -184,21 +184,21 @@ health:
     httpHeaders: []
     auth:
       enabled: false
-      username: ""
-      password: ""
+      username: ''
+      password: ''
 
   startupProbe:
     enabled: false
-    path: "/startupz"
-    scheme: "HTTP"
+    path: '/startupz'
+    scheme: 'HTTP'
     failureThreshold: 3
     periodSeconds: 5
     timeoutSeconds: 1
     httpHeaders: []
     auth:
       enabled: false
-      username: ""
-      password: ""
+      username: ''
+      password: ''
 
 podDisruptionBudget:
   enabled: false
@@ -207,18 +207,18 @@ pvc:
   enabled: false
   storage: 20Gi
   mountPath: /mypath
-  existingVolume: ""
+  existingVolume: ''
 
 cloudsql:
   enabled: false
-  connectionName: ""
+  connectionName: ''
   dbPort: 5432
-  serviceAccountJSON: ""
-  serviceAccountJSONSecret: ""
+  serviceAccountJSON: ''
+  serviceAccountJSONSecret: ''
   additionalConnection:
     enabled: false
     dbPort: 5432
-    connectionName: ""
+    connectionName: ''
 
 datadog:
   enabled: false
@@ -256,7 +256,7 @@ customNodePort:
 
 stack:
   enabled: false
-  name: ""
+  name: ''
   revision: 0
 
 emptyDir:
@@ -264,4 +264,10 @@ emptyDir:
   mountPath: /mypath
   volumeOptions: {}
 
-priorityClassName: ""
+priorityClassName: ''
+
+# set this to mount files from a secret into the container at /etc/secrets/<mountPath>
+# Format: fileSecretMounts: [{secretName: <SECRET_NAME>, mountPath: <MOUNT_PATH>},..]
+fileSecretMounts:
+  enabled: true
+  mounts: []
