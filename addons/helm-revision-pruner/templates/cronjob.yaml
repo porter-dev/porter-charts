@@ -110,7 +110,7 @@ spec:
                 cpu: {{ .Values.resources.limits.cpu }}
                 memory: {{ .Values.resources.limits.memory }}
           - name: sidecar
-            image: ghcr.io/porter-dev/job_sidecar_container:latest
+            image: ghcr.io/porter-dev/job_sidecar_container:31e471f4d
             imagePullPolicy: Always
             {{- if (.Values.sidecar.timeout) }}
             env:
