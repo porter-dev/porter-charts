@@ -160,7 +160,7 @@ data:
                 memory: {{ .Values.resources.requests.memory }}
                 {{- end }}
           - name: sidecar
-            image: ghcr.io/porter-dev/job_sidecar_container:latest
+            image: ghcr.io/porter-dev/job_sidecar_container:31e471f4d
             imagePullPolicy: Always
             resources:
               requests:
