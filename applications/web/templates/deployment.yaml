@@ -395,16 +395,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if .Values.awsEfsStorage }}
-      volumes:
-      {{- range $v := .Values.awsEfsStorage }}
-      - name: efs-{{ $.Values.fullnameOverride }}
-        persistentVolumeClaim:
-          claimName: efs-{{ $.Values.fullnameOverride }}
-      {{ end }}
-      {{ end }}
-
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage }}
       volumes:
         {{ if .Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
@@ -425,7 +416,14 @@ spec:
           emptyDir:
             {{- toYaml .Values.emptyDir.volumeOptions | nindent 12 }}
         {{ end }}
-        {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
+        {{ if .Values.awsEfsStorage }}
+        {{- range $v := .Values.awsEfsStorage }}
+        - name: efs-{{ $.Values.fullnameOverride }}
+          persistentVolumeClaim:
+            claimName: efs-{{ $.Values.fullnameOverride }}
+        {{ end }}
+        {{ end }}
+        {{ if .Values.fileSecretMounts.enabled }}
         {{ range .Values.fileSecretMounts.mounts }}
         - name: {{ .mountPath }}
           secret:
