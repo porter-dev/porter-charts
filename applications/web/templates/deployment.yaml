@@ -395,7 +395,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts .Values.awsEfsStorage }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage }}
       volumes:
         {{ if .Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
@@ -423,7 +423,7 @@ spec:
             claimName: efs-{{ $.Values.fullnameOverride }}
         {{ end }}
         {{ end }}
-        {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
+        {{ if .Values.fileSecretMounts.enabled }}
         {{ range .Values.fileSecretMounts.mounts }}
         - name: {{ .mountPath }}
           secret:
