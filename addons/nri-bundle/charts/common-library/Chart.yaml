@@ -1,0 +1,18 @@
+apiVersion: v2
+name: common-library
+description: Provides helpers to provide consistency on all the charts
+
+type: library
+version: 1.1.1
+
+keywords:
+  - newrelic
+  - chart-library
+
+maintainers:
+  - name: juanjjaramillo
+    url: https://github.com/juanjjaramillo
+  - name: csongnr
+    url: https://github.com/csongnr
+  - name: dbudziwojskiNR
+    url: https://github.com/dbudziwojskiNR

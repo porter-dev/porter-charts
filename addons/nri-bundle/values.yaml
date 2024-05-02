@@ -24,8 +24,6 @@ nri-kube-events:
 newrelic-logging:
   # newrelic-logging.enabled -- Install the [`newrelic-logging` chart](https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-logging)
   enabled: false
-  fluentBit:
-    k8sBufferSize: 100k
 
 newrelic-pixie:
   # newrelic-pixie.enabled -- Install the [`newrelic-pixie`](https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-pixie)
@@ -46,7 +44,7 @@ newrelic-prometheus-agent:
 newrelic-k8s-metrics-adapter:
   # newrelic-k8s-metrics-adapter.enabled -- Install the [`newrelic-k8s-metrics-adapter.` chart](https://github.com/newrelic/newrelic-k8s-metrics-adapter/tree/main/charts/newrelic-k8s-metrics-adapter) (Beta)
   enabled: false
-  personalAPIKey: ""
+
 
 # -- change the behaviour globally to all the supported helm charts.
 # See [user's guide of the common library](https://github.com/newrelic/helm-charts/blob/master/library/common-library/README.md) for further information.
@@ -101,10 +99,7 @@ global:
   # -- Sets pod's node selector
   nodeSelector: {}
   # -- Sets pod's tolerations to node taints
-  tolerations:
-    - key: porter.run/workload-kind
-      effect: NoSchedule
-      operator: Exists
+  tolerations: []
 
   # -- Adds extra attributes to the cluster and all the metrics emitted to the backend
   customAttributes: {}
