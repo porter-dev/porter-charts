@@ -1,0 +1,197 @@
+suite: test securityContext
+templates:
+  - templates/controlplane/daemonset.yaml
+  - templates/controlplane/scraper-configmap.yaml
+  - templates/controlplane/agent-configmap.yaml
+  - templates/kubelet/daemonset.yaml
+  - templates/kubelet/scraper-configmap.yaml
+  - templates/kubelet/agent-configmap.yaml
+  - templates/kubelet/integrations-configmap.yaml
+  - templates/ksm/deployment.yaml
+  - templates/ksm/scraper-configmap.yaml
+  - templates/ksm/agent-configmap.yaml
+  - templates/agent-configmap.yaml
+  - templates/secret.yaml
+tests:
+  - it: securityContext.runAsUser is populated with defaults
+    set:
+      licenseKey: test
+      cluster: test
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 1000
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext.runAsUser
+          value: 1000
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 1000
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext.runAsUser
+          value: 1000
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 1000
+        template: templates/kubelet/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext.runAsUser
+          value: 0  # Note that by defaults privileged is true
+        template: templates/kubelet/daemonset.yaml
+
+  - it: securityContext.runAsUser is populated with unprivileged defaults
+    set:
+      licenseKey: test
+      cluster: test
+      privileged: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 1000
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext.runAsUser
+          value: 1000
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 1000
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext.runAsUser
+          value: 1000
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 1000
+        template: templates/kubelet/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext.runAsUser
+          value: 1000
+        template: templates/kubelet/daemonset.yaml
+
+  - it: securityContext from the common library is templated
+    set:
+      licenseKey: test
+      cluster: test
+      global.containerSecurityContext:
+        runAsUser: 200
+        runAsGroup: 2000
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            runAsUser: 200
+            runAsGroup: 2000
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext
+          value:
+            runAsUser: 200
+            runAsGroup: 2000
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            runAsUser: 200
+            runAsGroup: 2000
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext
+          value:
+            runAsUser: 200
+            runAsGroup: 2000
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            runAsUser: 200
+            runAsGroup: 2000
+        template: templates/kubelet/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext
+          value:
+            runAsUser: 200
+            runAsGroup: 2000
+        template: templates/kubelet/daemonset.yaml
+
+  - it: securityContext from the common library is overridden by the compatibility layer
+    set:
+      licenseKey: test
+      cluster: test
+      global.containerSecurityContext:
+        runAsUser: 200
+        runAsGroup: 2000
+      runAsUser: 3000
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            runAsUser: 3000
+            runAsGroup: 2000
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext
+          value:
+            runAsUser: 3000
+            runAsGroup: 2000
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            runAsUser: 3000
+            runAsGroup: 2000
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext
+          value:
+            runAsUser: 3000
+            runAsGroup: 2000
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            runAsUser: 3000
+            runAsGroup: 2000
+        template: templates/kubelet/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext
+          value:
+            runAsUser: 3000
+            runAsGroup: 2000
+        template: templates/kubelet/daemonset.yaml
+
+  - it: legacy runAsUser is respected
+    set:
+      licenseKey: test
+      cluster: test
+      runAsUser: 1111
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 1111
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext.runAsUser
+          value: 1111
+        template: templates/ksm/deployment.yaml
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 1111
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext.runAsUser
+          value: 1111
+        template: templates/controlplane/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 1111
+        template: templates/kubelet/daemonset.yaml
+      - equal:
+          path: spec.template.spec.containers[1].securityContext.runAsUser
+          value: 1111
+        template: templates/kubelet/daemonset.yaml

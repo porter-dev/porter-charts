@@ -6,15 +6,12 @@ home: https://hub.docker.com/r/newrelic/newrelic-infra-operator
 sources:
   - https://github.com/newrelic/newrelic-infra-operator
   - https://github.com/newrelic/newrelic-infra-operator/tree/main/charts/newrelic-infra-operator
-
-version: 2.2.0
-appVersion: 0.10.0
-
+version: 2.10.0
+appVersion: 0.18.0
 dependencies:
   - name: common-library
     version: 1.1.1
     repository: "https://helm-charts.newrelic.com"
-
 maintainers:
   - name: alvarocabanas
     url: https://github.com/alvarocabanas
@@ -32,7 +29,6 @@ maintainers:
     url: https://github.com/paologallinaharbur
   - name: roobre
     url: https://github.com/roobre
-
 keywords:
   - infrastructure
   - newrelic

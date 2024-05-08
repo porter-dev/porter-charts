@@ -47,7 +47,7 @@ tabs:
     - type: heading
       label: Environment Variables
     - type: subtitle
-      label: Set environment variables for your secrets and environment-specific configuration. For configuring Metabase to use an external database to store its metadata, use the MB_DB_TYPE, MB_DB_DBNAME, MB_DB_PORT, MB_DB_USER, MB_DB_PASS and MB_DB_HOST environment variables.
+      label: Set environment variables for your secrets and environment-specific configuration. Please note that Metabase uses an ephemeral in-memory database which can be lost if the addon is restarted. For configuring Metabase to use an external database to store its metadata, use the MB_DB_TYPE, MB_DB_DBNAME, MB_DB_PORT, MB_DB_USER, MB_DB_PASS and MB_DB_HOST environment variables.
     - type: env-key-value-array
       label: 
       variable: container.env.normal

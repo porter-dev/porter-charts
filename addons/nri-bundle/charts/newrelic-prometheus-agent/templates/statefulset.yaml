@@ -56,6 +56,9 @@ spec:
             {{- if include "newrelic.common.verboseLog" . }}
             - --verbose=true
             {{- end }}
+          {{- with .Values.resources.configurator }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: configurator-config
               mountPath: /etc/configurator/
@@ -137,10 +140,9 @@ spec:
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- with include "newrelic.common.nodeSelector" . }}
       nodeSelector:
-        {{- . | nindent 8 }}
-      {{- end }}
+        kubernetes.io/os: linux
+        {{ include "newrelic.common.nodeSelector" . | nindent 8 }}
       {{- with include "newrelic.common.affinity" . }}
       affinity:
         {{- . | nindent 8 }}
