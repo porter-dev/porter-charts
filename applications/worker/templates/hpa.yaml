@@ -8,6 +8,19 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "docker-template.fullname" . }}
 spec:
+  {{- if .Values.autoscaling.behavior.enabled }}
+  behavior:
+    scaleDown:
+      policies:
+      - type: {{ .Values.autoscaling.behavior.scaleDown.type }}
+        value: {{ .Values.autoscaling.behavior.scaleDown.value }}
+        periodSeconds: {{ .Values.autoscaling.behavior.scaleDown.periodSeconds }}
+    scaleUp:
+      policies:
+      - type: {{ .Values.autoscaling.behavior.scaleUp.type }}
+        value: {{ .Values.autoscaling.behavior.scaleUp.value }}
+        periodSeconds: {{ .Values.autoscaling.behavior.scaleUp.periodSeconds }}
+  {{- end }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
