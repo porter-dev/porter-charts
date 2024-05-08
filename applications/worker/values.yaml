@@ -57,6 +57,16 @@ autoscaling:
   maxReplicas: 10
   targetCPUUtilizationPercentage: 50
   targetMemoryUtilizationPercentage: 50
+  behavior:
+    enabled: false
+    scaleDown:
+      periodSeconds: 600
+      type: Pods
+      value: 1
+    scaleUp:
+      periodSeconds: 60
+      type: Pods
+      value: 1
 
 keda:
   enabled: false
