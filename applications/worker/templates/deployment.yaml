@@ -227,8 +227,10 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
+            {{ if .Values.global }}
             - name: PORTER_IMAGE_TAG
               value: "{{ .Values.global.image.tag }}"
+            {{ end }}
             - name: PORTER_APP_SERVICE_NAME
               value: "{{ include "docker-template.fullname" . }}"
             {{- if .Values.stack.enabled }}

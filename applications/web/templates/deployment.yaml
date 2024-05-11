@@ -264,8 +264,10 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
+            {{ if .Values.global }}
             - name: PORTER_IMAGE_TAG
               value: "{{ .Values.global.image.tag }}"
+            {{ end }}
             - name: PORTER_POD_REVISION
               value: "{{ .Release.Revision }}"
             - name: PORTER_APP_SERVICE_NAME
