@@ -2,7 +2,7 @@ apiVersion: v2
 name: tailscale-relay
 icon: https://images.crunchbase.com/image/upload/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/xkthebhmilwbyffilnfl
 version: 0.12.0
-appVersion: v1.56.1
+appVersion: v1.62.0
 keywords:
   - APP
   - NETWORKING
