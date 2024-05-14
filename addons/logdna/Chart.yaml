@@ -16,10 +16,10 @@ keywords:
   - APP
   - LOGGING
 maintainers:
-- email: help@logdna.com
-  name: LogDNA
+  - email: help@logdna.com
+    name: LogDNA
 name: agent
 sources:
-- https://github.com/logdna/logdna-agent-v2
+  - https://github.com/logdna/logdna-agent-v2
 type: application
-version: 203.9.1
+version: 0.2.0
