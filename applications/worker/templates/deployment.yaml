@@ -291,6 +291,13 @@ spec:
             {{ if .Values.terminationGracePeriodSeconds }}
             - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
             {{ end }}
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: 2
+            requests:
+              memory: 128Mi
+              cpu: 0.1
           securityContext:
             runAsNonRoot: true
           volumeMounts:
