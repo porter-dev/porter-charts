@@ -1,0 +1,127 @@
+quivr-backend:
+  image:
+    repository: stangirard/quivr-backend-prebuilt
+    pullPolicy: Always
+    tag: latest
+  resources:
+    requests:
+      cpu: 200m
+      memory: 240Mi
+    limits:
+      cpu: 200m
+      memory: 240Mi
+  container:
+    command:
+    port: 3000
+    env:
+      normal:
+        OPENAI_API_KEY:
+        SUPABASE_URL:
+        SUPABASE_SERVICE_KEY:
+        PG_DATABASE_URL:
+        JWT_SECRET_KEY:
+        CELERY_BROKER_URL:
+        QUIVR_DOMAIN:
+        ANTHROPIC_API_KEY:
+        COHERE_API_KEY:
+  service:
+    port: 3000
+  ingress:
+    enabled: false
+    hosts: []
+    porter_hosts: []
+    provider: aws
+    annotations: {}
+    wildcard: false
+    tls: true
+    separateTlsPerCustomDomain: true
+quivr-flower:
+  image:
+    repository: stangirard/quivr-backend-prebuilt
+    pullPolicy: Always
+    tag: latest
+  resources:
+    requests:
+      cpu: 200m
+      memory: 240Mi
+    limits:
+      cpu: 200m
+      memory: 240Mi
+  container:
+    command:
+    port: 3000
+    env:
+      normal:
+        OPENAI_API_KEY:
+        SUPABASE_URL:
+        SUPABASE_SERVICE_KEY:
+        PG_DATABASE_URL:
+        JWT_SECRET_KEY:
+        CELERY_BROKER_URL:
+        QUIVR_DOMAIN:
+        ANTHROPIC_API_KEY:
+        COHERE_API_KEY:
+  service:
+    port: 3000
+  ingress:
+    enabled: false
+    hosts: []
+    porter_hosts: []
+    provider: aws
+    annotations: {}
+    wildcard: false
+    tls: true
+    separateTlsPerCustomDomain: true
+quivr-worker:
+  image:
+    repository: stangirard/quivr-backend-prebuilt
+    pullPolicy: Always
+    tag: latest
+  resources:
+    requests:
+      cpu: 200m
+      memory: 240Mi
+    limits:
+      cpu: 200m
+      memory: 240Mi
+  container:
+    command:
+    env:
+      normal:
+        OPENAI_API_KEY:
+        SUPABASE_URL:
+        SUPABASE_SERVICE_KEY:
+        PG_DATABASE_URL:
+        JWT_SECRET_KEY:
+        CELERY_BROKER_URL:
+        QUIVR_DOMAIN:
+        ANTHROPIC_API_KEY:
+        COHERE_API_KEY:
+quivr-beat:
+  image:
+    repository: stangirard/quivr-backend-prebuilt
+    pullPolicy: Always
+    tag: latest
+  resources:
+    requests:
+      cpu: 200m
+      memory: 240Mi
+    limits:
+      cpu: 200m
+      memory: 240Mi
+  container:
+    command:
+    env:
+      normal:
+        OPENAI_API_KEY:
+        SUPABASE_URL:
+        SUPABASE_SERVICE_KEY:
+        PG_DATABASE_URL:
+        JWT_SECRET_KEY:
+        CELERY_BROKER_URL:
+        QUIVR_DOMAIN:
+        ANTHROPIC_API_KEY:
+        COHERE_API_KEY:
+quivr-redis:
+  architecture: standalone
+  
