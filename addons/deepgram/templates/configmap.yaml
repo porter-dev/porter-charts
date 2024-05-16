@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-api-config
+data: 
+  api.toml: |
+  {{ .Values.api.config | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-engine-config
+data: 
+  engine.toml: |
+  {{ .Values.engine.config | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-management-config
+data:
+  modelLinks.txt: |-
+  {{ .Values.modelLinks | nindent 4 }}

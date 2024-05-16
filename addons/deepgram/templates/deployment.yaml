@@ -1,0 +1,208 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    deepgram: api
+  annotations:
+    porter.run/deepgram-version: "{{ .Chart.Version }}"
+  name: deepgram-api
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      deepgram: api
+  template:
+    metadata:
+      labels:
+        deepgram: api
+    spec:
+      imagePullSecrets:
+      - name: {{ .Release.Name }}-quay-credentials 
+      containers:
+      - image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
+        args: ["-v", "serve", "/api.toml"]
+        imagePullPolicy: Always
+        env:
+        - name: DEEPGRAM_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-env-config
+              key: DEEPGRAM_API_KEY
+        ports:
+        - containerPort: 8080
+          name: https
+        resources:
+          requests:
+            cpu: {{ .Values.api.resources.requests.cpu }}
+            memory: {{ .Values.api.resources.requests.memory }}
+          limits:
+            {{- if .Values.api.resources.limits.cpu }}
+            cpu: {{ .Values.api.resources.limits.cpu }}
+            {{- else }}
+            cpu: {{ .Values.api.resources.requests.cpu }}
+            {{- end }}
+            {{- if .Values.api.resources.limits.memory }}
+            memory: {{ .Values.api.resources.limits.memory }}
+            {{- else }}
+            memory: {{ .Values.api.resources.requests.memory }}
+            {{- end }}
+        volumeMounts:
+        - name: disk-buffer-volume
+          mountPath: /data/disk-buffer
+        - name: api-config
+          mountPath: /api.toml
+          subPath: api.toml
+        name: api
+        securityContext:
+          allowPrivilegeEscalation: false
+      volumes:
+      - name: disk-buffer-volume
+        persistentVolumeClaim:
+          claimName: "{{ .Release.Name }}-disk-buffer-pvc"
+      - name: api-config
+        configMap:
+          name: {{ .Release.Name }}-api-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    deepgram: engine
+  annotations:
+    porter.run/deepgram-version: "{{ .Chart.Version }}"
+  name: deepgram-engine
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      deepgram: engine
+  template:
+    metadata:
+      labels:
+        deepgram: engine
+    spec:
+      imagePullSecrets:
+      - name: {{ .Release.Name }}-quay-credentials 
+      tolerations:
+        - key: "removable"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      {{- if .Values.engine.tolerations }}
+        {{- toYaml .Values.engine.tolerations | nindent 8 }}
+      {{- end }}
+      initContainers:
+      - name: wait-for-model-download
+        image: busybox
+        command: 
+          - "/bin/sh"
+          - "-c"
+          - |
+            hash=$(sha256sum /config/modelLinks.txt | cut -d' ' -f1)
+            until [ -e /data/modelconfig/.$hash ]; echo "waiting until models are downloaded (file is /data/modelconfig/.$hash)"; do sleep 1; done]
+        volumeMounts:
+        - name: model-volume
+          mountPath: /data/models
+        - name: mgmt-config 
+          mountPath: /config
+      containers:
+      - image: "{{ .Values.engine.image.repository }}:{{ .Values.engine.image.tag }}"
+        imagePullPolicy: Always
+        args: ["-v", "serve", "/engine.toml"]
+        env:
+        - name: DEEPGRAM_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-env-config
+              key: DEEPGRAM_API_KEY
+        ports:
+        - containerPort: 8080
+          name: https
+        resources:
+          requests:
+            cpu: {{ .Values.engine.resources.requests.cpu }}
+            memory: {{ .Values.engine.resources.requests.memory }}
+        {{- if .Values.engine.resources.requests.nvidiaGpu }}
+            nvidia.com/gpu: {{ .Values.engine.resources.requests.nvidiaGpu }}
+        {{- end }}
+          limits:
+              {{- if .Values.engine.resources.limits.cpu }}
+            cpu: {{ .Values.engine.resources.limits.cpu }}
+              {{- else }}
+            cpu: {{ .Values.engine.resources.requests.cpu }}
+              {{- end }}
+            {{- if .Values.engine.resources.limits.memory }}
+            memory: {{ .Values.engine.resources.limits.memory }}
+            {{- else }}
+            memory: {{ .Values.engine.resources.requests.memory }}
+            {{- end -}}
+            {{- if .Values.engine.resources.limits.nvidiaGpu }}
+            nvidia.com/gpu: {{ .Values.engine.resources.limits.nvidiaGpu }}
+            {{- end }}
+        volumeMounts:
+        - name: model-volume
+          mountPath: /data/models
+          subPath: models 
+        - name: model-volume
+          mountPath: /data/modelconfig
+          subPath: config
+        - name: engine-config
+          mountPath: /engine.toml 
+          subPath: engine.toml
+        name: engine
+        securityContext:
+          allowPrivilegeEscalation: false
+      volumes:
+      - name: model-volume
+        persistentVolumeClaim:
+          claimName: "{{ .Release.Name }}-model-pvc"
+      - name: engine-config
+        configMap:
+          name: {{ .Release.Name }}-engine-config
+      - name: mgmt-config
+        configMap:
+          name: {{ .Release.Name }}-management-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-management
+  annotations:
+    porter.run/deepgram-version: "{{ .Chart.Version }}"
+spec: 
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      deepgram: management
+  template:
+    metadata:
+      labels:
+        deepgram: management
+    spec:
+      containers:
+      - name: {{ .Release.Name }}-management
+        image: {{ .Values.management.image }}
+        command: ["python", "/porter/download_models.py"]
+        args:   ["/config/modelLinks.txt", "/data/models", "/data/modelconfig"]
+        volumeMounts:
+        - name: mgmt-config
+          mountPath: /config
+        - name: model-volume
+          mountPath: /data/models
+          subPath: models 
+        - name: model-volume
+          mountPath: /data/modelconfig
+          subPath: config
+      volumes:
+        - name: mgmt-config
+          configMap:
+            name: {{ .Release.Name }}-management-config
+        - name: model-volume
+          persistentVolumeClaim:
+            claimName: "{{ .Release.Name }}-model-pvc"
