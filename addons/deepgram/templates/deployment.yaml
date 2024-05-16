@@ -102,7 +102,7 @@ spec:
           - "/bin/sh"
           - "-c"
           - |
-            hash=$(sha256sum /config/modelLinks.txt | cut -d' ' -f1)
+            hash=$(sha256sum /config/modelURLs.txt | cut -d' ' -f1)
             until [ -e /data/modelconfig/.$hash ]; echo "waiting until models are downloaded (file is /data/modelconfig/.$hash)"; do sleep 1; done]
         volumeMounts:
         - name: model-volume
@@ -189,7 +189,7 @@ spec:
       - name: {{ .Release.Name }}-management
         image: {{ .Values.management.image }}
         command: ["python", "/porter/download_models.py"]
-        args:   ["/config/modelLinks.txt", "/data/models", "/data/modelconfig"]
+        args:   ["/config/modelURLs.txt", "/data/models", "/data/modelconfig"]
         volumeMounts:
         - name: mgmt-config
           mountPath: /config

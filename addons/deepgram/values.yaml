@@ -215,7 +215,7 @@ engine:
       # state = "disabled" # or "enabled" or "auto"
 
 
-modelLinks: # this should be a list of links to download models from as new line separated strings
+modelURLs: # this should be a list of links to download models from as new line separated strings
 
 deepgramAPIKey: "your api key"
 

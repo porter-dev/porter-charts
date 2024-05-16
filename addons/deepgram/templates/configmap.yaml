@@ -19,5 +19,5 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-management-config
 data:
-  modelLinks.txt: |-
-  {{ .Values.modelLinks | nindent 4 }}
+  modelURLs.txt: |-
+  {{ .Values.modelURLs | nindent 4 }}
