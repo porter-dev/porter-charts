@@ -103,10 +103,14 @@ spec:
           - "-c"
           - |
             hash=$(sha256sum /config/modelURLs.txt | cut -d' ' -f1)
-            until [ -e /data/modelconfig/.$hash ]; echo "waiting until models are downloaded (file is /data/modelconfig/.$hash)"; do sleep 1; done]
+            until [ -e /data/modelconfig/.$hash ]; do 
+              echo "waiting until models are downloaded (file is /data/modelconfig/.$hash)"
+              sleep 1
+            done
         volumeMounts:
         - name: model-volume
-          mountPath: /data/models
+          mountPath: /data/modelconfig
+          subPath: config
         - name: mgmt-config 
           mountPath: /config
       containers:
@@ -146,10 +150,7 @@ spec:
         volumeMounts:
         - name: model-volume
           mountPath: /data/models
-          subPath: models 
-        - name: model-volume
-          mountPath: /data/modelconfig
-          subPath: config
+          subPath: models
         - name: engine-config
           mountPath: /engine.toml 
           subPath: engine.toml

@@ -108,7 +108,7 @@ api:
       ### then adjust the IP address accordingly.
       ###
       ### WARN: This must be HTTPS.
-      url = "https://porter-deepgram-engine.default.svc.cluster.local:8080/v2" # Docker Compose. This is going to change to engine from Porter
+      url = "https://deepgram-engine.default.svc.cluster.local:8080/v2" # Docker Compose. This is going to change to engine from Porter
 
       ### Factor to increase the timeout by for each additional retry (for
       ### exponential backoff).
