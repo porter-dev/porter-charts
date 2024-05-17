@@ -74,6 +74,7 @@ local_resource(
   helm cm-push addons/wallarm-ingress local && \
   helm cm-push addons/postgresql-managed local && \
   helm cm-push addons/redis-managed local && \
+  helm cm-push addons/deepgram local && \
   helm repo update local
   ''',
   deps=[
