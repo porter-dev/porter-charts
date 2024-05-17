@@ -84,3 +84,5 @@ stack:
 podLabels: {}
 
 priorityClassName: ""
+
+nodeGroups: []
