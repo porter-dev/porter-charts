@@ -12,7 +12,7 @@ quivr-backend:
       memory: 240Mi
   container:
     command:
-    port: 3000
+    port: 5050
     env:
       normal:
         OPENAI_API_KEY:
@@ -25,7 +25,7 @@ quivr-backend:
         ANTHROPIC_API_KEY:
         COHERE_API_KEY:
   service:
-    port: 3000
+    port: 5050
   ingress:
     enabled: false
     hosts: []
@@ -49,7 +49,7 @@ quivr-flower:
       memory: 240Mi
   container:
     command:
-    port: 3000
+    port: 5555
     env:
       normal:
         OPENAI_API_KEY:
@@ -62,7 +62,7 @@ quivr-flower:
         ANTHROPIC_API_KEY:
         COHERE_API_KEY:
   service:
-    port: 3000
+    port: 5555
   ingress:
     enabled: false
     hosts: []
