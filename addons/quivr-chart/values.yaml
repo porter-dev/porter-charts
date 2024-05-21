@@ -11,7 +11,7 @@ quivr-backend:
       cpu: 200m
       memory: 240Mi
   container:
-    command: uvicorn main:app --reload --host 0.0.0.0 --port 5050 --workers 6 --log-level
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 5050 --workers 6 --log-level info
     port: 5050
     env:
       normal:
