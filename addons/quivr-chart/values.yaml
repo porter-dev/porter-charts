@@ -124,4 +124,5 @@ quivr-beat:
         COHERE_API_KEY:
 quivr-redis:
   architecture: standalone
-  
+  auth:
+    enabled: false  
