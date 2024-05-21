@@ -3,7 +3,7 @@
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name: efs-{{ $.Values.fullnameOverride }}
+  name: efs-{{ $.Release.Name }}
 provisioner: efs.csi.aws.com
 parameters:
   provisioningMode: efs-ap
@@ -14,11 +14,11 @@ parameters:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: efs-{{ $.Values.fullnameOverride }}
+  name: efs-{{ $.Release.Name }}
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: efs-{{ $.Values.fullnameOverride }}
+  storageClassName: efs-{{ $.Release.Name }}
   resources:
     requests:
       storage: 5Gi

@@ -323,8 +323,8 @@ spec:
         {{ if .Values.awsEfsStorage }}
           volumeMounts:
         {{- range $v := .Values.awsEfsStorage }}
-          - name: efs-{{ $.Values.fullnameOverride }}
-            mountPath: /data/efs/{{ $.Values.fullnameOverride }}
+          - name: efs-{{ $.Release.Name }}
+            mountPath: /data/efs/{{ $.Release.Name }}
         {{ end }}   
         {{ end }}  
           {{ if .Values.pvc.enabled }}
@@ -426,9 +426,9 @@ spec:
         {{ end }}
         {{ if .Values.awsEfsStorage }}
         {{- range $v := .Values.awsEfsStorage }}
-        - name: efs-{{ $.Values.fullnameOverride }}
+        - name: efs-{{ $.Release.Name }}
           persistentVolumeClaim:
-            claimName: efs-{{ $.Values.fullnameOverride }}
+            claimName: efs-{{ $.Release.Name }}
         {{ end }}
         {{ end }}
         {{ if .Values.fileSecretMounts.enabled }}

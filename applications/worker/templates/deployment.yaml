@@ -281,6 +281,13 @@ spec:
             - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
               mountPath: {{ .Values.emptyDir.mountPath }}
           {{ end }}
+          {{ if .Values.awsEfsStorage }}
+          volumeMounts:
+          {{- range $v := .Values.awsEfsStorage }}
+            - name: efs-{{ $.Release.Name }}
+              mountPath: /data/efs/{{ $.Release.Name }}
+          {{ end }}
+          {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
@@ -335,7 +342,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.awsEfsStorage }}
       volumes:
         {{ if .Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
@@ -351,5 +358,12 @@ spec:
         - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
           emptyDir:
             {{- toYaml .Values.emptyDir.volumeOptions | nindent 8 }}
+        {{ end }}
+        {{ if .Values.awsEfsStorage }}
+        {{- range $v := .Values.awsEfsStorage }}
+        - name: efs-{{ $.Release.Name }}
+          persistentVolumeClaim:
+            claimName: efs-{{ $.Release.Name }}
+        {{ end }}
         {{ end }}
       {{ end }}
