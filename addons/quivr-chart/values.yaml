@@ -11,7 +11,7 @@ quivr-backend:
       cpu: 200m
       memory: 240Mi
   container:
-    command:
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 5050 --workers 6 --log-level
     port: 5050
     env:
       normal:
@@ -48,7 +48,7 @@ quivr-flower:
       cpu: 200m
       memory: 240Mi
   container:
-    command:
+    command: celery -A celery_worker flower -l info
     port: 5555
     env:
       normal:
@@ -85,7 +85,7 @@ quivr-worker:
       cpu: 200m
       memory: 240Mi
   container:
-    command:
+    command: celery -A celery_worker worker -l info
     env:
       normal:
         OPENAI_API_KEY:
@@ -110,7 +110,7 @@ quivr-beat:
       cpu: 200m
       memory: 240Mi
   container:
-    command:
+    command: celery -A celery_worker beat -l info
     env:
       normal:
         OPENAI_API_KEY:
