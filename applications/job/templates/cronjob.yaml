@@ -153,6 +153,13 @@ spec:
                 {{- else }}
                 memory: {{ .Values.resources.requests.memory }}
                 {{- end }}
+          {{ if .Values.awsEfsStorage }}
+            volumeMounts:
+          {{- range $v := .Values.awsEfsStorage }}
+            - name: {{ $v.name }}
+              mountPath: {{ $v.mountPath }}
+          {{ end }}
+          {{ end }}
           - name: sidecar
             image: ghcr.io/porter-dev/job_sidecar_container:31e471f4d
             imagePullPolicy: Always
@@ -198,11 +205,20 @@ spec:
               mountPath: /secrets/
               readOnly: true
           {{ end }}
-          {{ if .Values.cloudsql.enabled }}
+          {{ if or .Values.cloudsql.enabled .Values.awsEfsStorage }}
           volumes:
+            {{ if .Values.cloudsql.enabled }}
             - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
               secret:
                 secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
+            {{ end }}
+            {{ if .Values.awsEfsStorage }}
+            {{- range $v := .Values.awsEfsStorage }}
+            - name: {{ $v.name }}
+              persistentVolumeClaim:
+                claimName: {{ $v.name }}
+            {{ end }}
+            {{ end }}
           {{ end }}
           restartPolicy: Never
           shareProcessNamespace: true
