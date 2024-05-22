@@ -156,8 +156,8 @@ spec:
           {{ if .Values.awsEfsStorage }}
             volumeMounts:
           {{- range $v := .Values.awsEfsStorage }}
-            - name: efs-{{ $.Release.Name }}
-              mountPath: /data/efs/{{ $.Release.Name }}
+            - name: {{ $v.name }}
+              mountPath: {{ $v.mountPath }}
           {{ end }}
           {{ end }}
           - name: sidecar
@@ -214,9 +214,9 @@ spec:
             {{ end }}
             {{ if .Values.awsEfsStorage }}
             {{- range $v := .Values.awsEfsStorage }}
-            - name: efs-{{ $.Release.Name }}
+            - name: {{ $v.name }}
               persistentVolumeClaim:
-                claimName: efs-{{ $.Release.Name }}
+                claimName: {{ $v.name }}
             {{ end }}
             {{ end }}
           {{ end }}
