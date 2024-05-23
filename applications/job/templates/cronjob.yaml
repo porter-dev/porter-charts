@@ -49,6 +49,19 @@ spec:
             {{- toYaml .Values.podLabels | nindent 12 }}
             {{- end }}
         spec:
+          {{- if .Values.nodeGroups }}
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: porter.run/node-group-id
+                        operator: In
+                        values:
+                        {{- range $nodeGroup := .Values.nodeGroups }}
+                          - {{ $nodeGroup.id | quote }}
+                        {{- end }}
+          {{- end }}
           {{- if .Values.enableEDNS0 }}
           dnsConfig:
             options:
@@ -64,139 +77,139 @@ spec:
             - name: {{ .Values.image.imagePullSecret }}
           {{- end }}
           containers:
-          - name: {{ .Chart.Name }}
+            - name: {{ .Chart.Name }}
             {{- if .Values.global }}
             {{- if .Values.global.image }}
-            image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag }}"
+              image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag }}"
             {{- end }}
             {{- else }}
-            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             {{- end }}
-            imagePullPolicy: {{ .Values.image.pullPolicy }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
             {{- if .Values.global }}
             {{- if .Values.global.image }}
             {{- if and .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")) }}
-            command:
+              command:
             {{- range $command := trim .Values.container.command | splitList " " }}
-            - {{ $command | quote }}
+                - {{ $command | quote }}
             {{- end }}
             {{- end }}
             {{- end }}
             {{- else }}
             {{- if (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job")))) }}
-            command:
+              command:
             {{- range $command := trim .Values.container.command | splitList " " }}
-            - {{ $command | quote }}
+                - {{ $command | quote }}
             {{- end }}
             {{- end }}
             {{- end }}
             {{- if .Values.container.args }}
-            args:
+              args:
             {{- range $arg := .Values.container.args }}
-            - {{ $arg | quote }}
+                - {{ $arg | quote }}
             {{- end }}
             {{- end }}
             {{ if or .Values.configMapRefs .Values.secretRefs }}
-            envFrom:
+              envFrom:
             {{ range $configMapName := .Values.configMapRefs }}
-              - configMapRef:
-                  name: {{ $configMapName }}
+                - configMapRef:
+                    name: {{ $configMapName }}
             {{ end }}
             {{ range $secretName := .Values.secretRefs }}
-              - secretRef:
-                  name: {{ $secretName }}
+                - secretRef:
+                    name: {{ $secretName }}
             {{ end }}
-            {{ end }}          
-            env:
+            {{ end }}
+              env:
               {{- range $key, $val := .Values.container.env.normal }}
-              - name: {{ $key }}
+                - name: {{ $key }}
               {{- $splVal := split "_" $val -}}
               {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
-                valueFrom:
-                  secretKeyRef:
-                    name: {{ $splVal._1 }}
-                    key: {{ $key }}
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ $splVal._1 }}
+                      key: {{ $key }}
               {{- else }}
-                value: {{ quote $val }}
+                  value: {{ quote $val }}
               {{- end }}
               {{- end }}
               {{- range $syncedEnv := .Values.container.env.synced }}
               {{- range $key := $syncedEnv.keys }}
-              - name: {{ $key.name }}
+                - name: {{ $key.name }}
                 {{- if $key.secret }}
-                valueFrom:
-                  secretKeyRef:
-                    name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
-                    key: {{ $key.name }}
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
+                      key: {{ $key.name }}
                 {{- else }}
-                valueFrom:
-                  configMapKeyRef:
-                    name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
-                    key: {{ $key.name }}
+                  valueFrom:
+                    configMapKeyRef:
+                      name: {{ printf "%s.v%d" $syncedEnv.name ($syncedEnv.version | int) }}
+                      key: {{ $key.name }}
                 {{- end }}
               {{- end }}
               {{- end }}
-            resources:
-              requests:
-                cpu: {{ .Values.resources.requests.cpu }}
-                memory: {{ .Values.resources.requests.memory }}
-              limits:
+              resources:
+                requests:
+                  cpu: {{ .Values.resources.requests.cpu }}
+                  memory: {{ .Values.resources.requests.memory }}
+                limits:
                 {{- if .Values.resources.setCPULimits }}
                   {{- if .Values.resources.limits.cpu }}
-                cpu: {{ .Values.resources.limits.cpu }}
+                  cpu: {{ .Values.resources.limits.cpu }}
                   {{- else }}
-                cpu: {{ .Values.resources.requests.cpu }}
+                  cpu: {{ .Values.resources.requests.cpu }}
                   {{- end }}
                 {{- end }}
                 {{- if .Values.resources.limits.memory }}
-                memory: {{ .Values.resources.limits.memory }}
+                  memory: {{ .Values.resources.limits.memory }}
                 {{- else }}
-                memory: {{ .Values.resources.requests.memory }}
+                  memory: {{ .Values.resources.requests.memory }}
                 {{- end }}
-          - name: sidecar
-            image: ghcr.io/porter-dev/job_sidecar_container:31e471f4d
-            imagePullPolicy: Always
+            - name: sidecar
+              image: ghcr.io/porter-dev/job_sidecar_container:31e471f4d
+              imagePullPolicy: Always
             {{- if (.Values.sidecar.timeout) }}
-            env:
-            - name: TIMEOUT
-              value: {{ .Values.sidecar.timeout | quote }}
+              env:
+                - name: TIMEOUT
+                  value: {{ .Values.sidecar.timeout | quote }}
             {{- end }}
-            resources:
-              requests:
-                cpu: {{ .Values.sidecar.resources.requests.cpu }}
-                memory: {{ .Values.sidecar.resources.requests.memory }}
-              limits:
+              resources:
+                requests:
+                  cpu: {{ .Values.sidecar.resources.requests.cpu }}
+                  memory: {{ .Values.sidecar.resources.requests.memory }}
+                limits:
                 {{- if (.Values.resources.setCPULimits) }}
-                cpu: {{ .Values.sidecar.resources.requests.cpu }}
+                  cpu: {{ .Values.sidecar.resources.requests.cpu }}
                 {{ end }}
-                memory: {{ .Values.sidecar.resources.requests.memory }}
-            command:
-            - "./job_killer.sh"
+                  memory: {{ .Values.sidecar.resources.requests.memory }}
+              command:
+                - "./job_killer.sh"
             {{- if (.Values.sidecar.signalChildProcesses) }}
-            - "-c"
+                - "-c"
             {{- end }}
-            - {{ .Values.terminationGracePeriodSeconds | quote }}
+                - {{ .Values.terminationGracePeriodSeconds | quote }}
             {{- $cmdSpl := trim .Values.container.command | splitList " " }}
-            - {{ $cmdSpl| first | quote }}
+                - {{ $cmdSpl| first | quote }}
             {{- if .Values.cloudsql.enabled }}
-            - "cloud_sql_proxy"
+                - "cloud_sql_proxy"
             {{- end }}
           {{- if .Values.cloudsql.enabled }}
-          - name: cloud-sql-proxy
-            image: gcr.io/cloudsql-docker/gce-proxy:1.17
-            command:
-              - "/cloud_sql_proxy"
-              - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
-              - "-credential_file=/secrets/service_account.json"
+            - name: cloud-sql-proxy
+              image: gcr.io/cloudsql-docker/gce-proxy:1.17
+              command:
+                - "/cloud_sql_proxy"
+                - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
+                - "-credential_file=/secrets/service_account.json"
               {{ if .Values.terminationGracePeriodSeconds }}
-              - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
+                - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
               {{ end }}
-            securityContext:
-              runAsNonRoot: true
-            volumeMounts:
-            - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
-              mountPath: /secrets/
-              readOnly: true
+              securityContext:
+                runAsNonRoot: true
+              volumeMounts:
+                - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+                  mountPath: /secrets/
+                  readOnly: true
           {{ end }}
           {{ if .Values.cloudsql.enabled }}
           volumes:
@@ -210,7 +223,7 @@ spec:
           {{- if .Values.priorityClassName }}
           priorityClassName: {{ .Values.priorityClassName }}
           {{- end }}
-          tolerations: 
+          tolerations:
           {{ if .Values.tolerations}}
           {{ toYaml .Values.tolerations | nindent 12 }}
           {{ end }}
@@ -218,6 +231,12 @@ spec:
               operator: "Equal"
               value: "true"
               effect: "NoSchedule"
+          {{- range $nodeGroup := .Values.nodeGroups }}
+            - key: "porter.run/node-group-id"
+              operator: "Equal"
+              value: {{ $nodeGroup.id | quote }}
+              effect: "NoSchedule"
+          {{- end }}
       backoffLimit: 0
       {{- if (.Values.sidecar.timeout) }}
       activeDeadlineSeconds: {{ .Values.sidecar.timeout }}

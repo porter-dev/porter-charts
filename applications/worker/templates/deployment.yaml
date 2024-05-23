@@ -38,6 +38,18 @@ spec:
       {{- if .Values.affinity }}
       affinity:
         {{- toYaml .Values.affinity | nindent 8 }}
+      {{- else if .Values.nodeGroups }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: porter.run/node-group-id
+                    operator: In
+                    values:
+                      {{- range $nodeGroup := .Values.nodeGroups }}
+                      - {{ $nodeGroup.id | quote }}
+                      {{- end }}
       {{- end }}
       serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
@@ -322,13 +334,19 @@ spec:
       {{- if .Values.tolerations }}
         {{- toYaml .Values.tolerations | nindent 8 }}
       {{- end }}
+      {{- range $nodeGroup := .Values.nodeGroups }}
+        - key: "porter.run/node-group-id"
+          operator: "Equal"
+          value: {{ $nodeGroup.id | quote }}
+          effect: "NoSchedule"
+      {{- end }}
       {{- if .Values.topology.enabled }}
-      topologySpreadConstraints: 
+      topologySpreadConstraints:
         - maxSkew: {{ .Values.topology.maxSkew }}
           topologyKey: {{ .Values.topology.topologyKey }}
           whenUnsatisfiable: {{ .Values.topology.whenUnsatisfiable }}
           {{- if .Values.topology.labelSelector.enabled }}
-          labelSelector: 
+          labelSelector:
             matchLabels:
               {{- range $k, $v := .Values.topology.labelSelector.matchLabels }}
               {{ $k }}: {{ $v }}
