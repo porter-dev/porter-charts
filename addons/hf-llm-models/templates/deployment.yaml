@@ -4,7 +4,7 @@ metadata:
   labels:
     llm-model: {{ .Release.Name }}
   annotations:
-    porter.run/gpt2-version: "{{ .Chart.Version }}"
+    porter.run/hf-llm-model-version: "{{ .Chart.Version }}"
   name: {{ .Release.Name }}-workload
 spec:
   replicas: 1
