@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    llm-model: {{ .Release.Name }}
+  annotations:
+    porter.run/gpt2-version: "{{ .Chart.Version }}"
+  name: {{ .Release.Name }}-workload
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      llm-model: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        llm-model: {{ .Release.Name }}
+    spec:
+      tolerations:
+        - key: "removable"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      {{- if .Values.tolerations }}
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      containers:
+      - command:
+        - python3
+        - -m
+        - vllm.entrypoints.openai.api_server
+        - --model
+        - {{ .Values.modelID }}
+      {{- if .Values.quantization }}
+        - --quantization
+        - {{ .Values.quantization }}
+      {{- end }}
+        - --download-dir
+        - {{ .Values.modelDir }}
+        - --gpu-memory-utilization={{ printf "%.2f" .Values.gpuMemoryUtilization }}
+      {{- if .Values.dType}}
+        - --dtype
+        - {{ .Values.dType }}
+      {{- end }}
+        - --tensor-parallel-size={{ .Values.tensorParallelSize }}
+      {{- if .Values.maxModelLen }}
+        - --max-model-len={{ .Values.maxModelLen }}
+      {{- end }}
+        image: {{ .Values.vllmImage }}
+        imagePullPolicy: Always
+        env:
+        - name: HF_TOKEN
+          value: {{ .Values.huggingFaceToken }}
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+          name: https
+        resources:
+          requests:
+              {{- if .Values.resources.requests.cpu }}
+            cpu: {{ .Values.resources.requests.cpu }}
+              {{- end }}
+              {{- if .Values.resources.requests.memory }}
+            memory: {{ .Values.resources.requests.memory }}
+              {{- end }}
+              {{- if .Values.resources.requests.nvidiaGpu }}
+            nvidia.com/gpu: {{ .Values.resources.requests.nvidiaGpu }}
+              {{- end }}
+          limits:
+              {{- if .Values.resources.limits.cpu }}
+            cpu: {{ .Values.resources.limits.cpu }}
+              {{- end }}
+              {{- if .Values.resources.limits.memory }}
+            memory: {{ .Values.resources.limits.memory }}
+              {{- end }}
+              {{- if .Values.resources.limits.nvidiaGpu }}
+            nvidia.com/gpu: {{ .Values.resources.limits.nvidiaGpu }}
+              {{- end }}
+        volumeMounts:
+        - name: model-volume
+          mountPath: {{ .Values.modelDir }}
+        name: vllm
+        securityContext:
+          allowPrivilegeEscalation: false
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: model-volume
+        persistentVolumeClaim:
+          claimName: "{{ .Release.Name }}-model-pvc"

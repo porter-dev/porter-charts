@@ -1,0 +1,32 @@
+vllmImage: "docker.io/vllm/vllm-openai:latest"
+
+huggingFaceToken: <the hugging face token if modelId requires it> 
+
+modelDir: "/model"
+
+modelID: "mistralai/Mistral-7B-Instruct-v0.2"
+
+gpuMemoryUtilization: 0.98
+
+maxModelLen: 26016
+
+dType: half
+
+efsFileSystemId: <the efs file system id>
+
+tensorParallelSize: 1
+
+resources:
+  requests:
+    cpu: 2
+    memory: 14000Mi
+    nvidiaGpu: "1"
+  limits:
+    cpu: 4
+    memory: 40000Mi
+    nvidiaGpu: "1"
+
+tolerations:
+  - key: "nvidia.com/gpu"
+    operator: "Exists"
+    effect: "NoSchedule"
