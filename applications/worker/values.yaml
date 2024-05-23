@@ -159,3 +159,5 @@ emptyDir:
   
 priorityClassName: ""
 
+nodeGroups: []
+

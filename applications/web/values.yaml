@@ -281,3 +281,5 @@ priorityClassName: ""
 fileSecretMounts:
   enabled: false
   mounts: []
+
+nodeGroups: []
