@@ -75,6 +75,7 @@ local_resource(
   helm cm-push addons/postgresql-managed local && \
   helm cm-push addons/redis-managed local && \
   helm cm-push addons/deepgram local && \
+  helm cm-push addons/hf-llm-models local && \
   helm repo update local
   ''',
   deps=[
