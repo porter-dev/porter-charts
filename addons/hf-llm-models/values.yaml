@@ -1,6 +1,6 @@
 vllmImage: "docker.io/vllm/vllm-openai:latest"
 
-huggingFaceToken: <the hugging face token if modelId requires it> 
+huggingFaceToken: # a hugging face token if it is required by the model 
 
 modelDir: "/model"
 
@@ -12,7 +12,7 @@ maxModelLen: 26016
 
 dType: half
 
-efsFileSystemId: <the efs file system id>
+efsFileSystemId: # efs file system id created in the clients cluster, required
 
 tensorParallelSize: 1
 
