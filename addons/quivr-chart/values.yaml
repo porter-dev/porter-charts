@@ -5,11 +5,11 @@ quivr-backend:
     tag: latest
   resources:
     requests:
-      cpu: 200m
-      memory: 240Mi
+      cpu: 500m
+      memory: 2Gi
     limits:
-      cpu: 200m
-      memory: 240Mi
+      cpu: 500m
+      memory: 2Gi
   container:
     command: uvicorn main:app --reload --host 0.0.0.0 --port 5050 --workers 6 --log-level info
     port: 5050
@@ -24,45 +24,9 @@ quivr-backend:
         QUIVR_DOMAIN:
         ANTHROPIC_API_KEY:
         COHERE_API_KEY:
+        BRAVE_SEARCH_API_KEY:
   service:
     port: 5050
-  ingress:
-    enabled: false
-    hosts: []
-    porter_hosts: []
-    provider: aws
-    annotations: {}
-    wildcard: false
-    tls: true
-    separateTlsPerCustomDomain: true
-quivr-flower:
-  image:
-    repository: stangirard/quivr-backend-prebuilt
-    pullPolicy: Always
-    tag: latest
-  resources:
-    requests:
-      cpu: 200m
-      memory: 240Mi
-    limits:
-      cpu: 200m
-      memory: 240Mi
-  container:
-    command: celery -A celery_worker flower -l info
-    port: 5555
-    env:
-      normal:
-        OPENAI_API_KEY:
-        SUPABASE_URL:
-        SUPABASE_SERVICE_KEY:
-        PG_DATABASE_URL:
-        JWT_SECRET_KEY:
-        CELERY_BROKER_URL:
-        QUIVR_DOMAIN:
-        ANTHROPIC_API_KEY:
-        COHERE_API_KEY:
-  service:
-    port: 5555
   ingress:
     enabled: false
     hosts: []
@@ -79,11 +43,11 @@ quivr-worker:
     tag: latest
   resources:
     requests:
-      cpu: 200m
-      memory: 240Mi
+      cpu: 500m
+      memory: 2Gi
     limits:
-      cpu: 200m
-      memory: 240Mi
+      cpu: 500m
+      memory: 2Gi
   container:
     command: celery -A celery_worker worker -l info
     env:
@@ -97,6 +61,7 @@ quivr-worker:
         QUIVR_DOMAIN:
         ANTHROPIC_API_KEY:
         COHERE_API_KEY:
+        BRAVE_SEARCH_API_KEY:
 quivr-beat:
   image:
     repository: stangirard/quivr-backend-prebuilt
@@ -104,11 +69,11 @@ quivr-beat:
     tag: latest
   resources:
     requests:
-      cpu: 200m
-      memory: 240Mi
+      cpu: 440m
+      memory: 1800Mi
     limits:
-      cpu: 200m
-      memory: 240Mi
+      cpu: 440m
+      memory: 1800Mi
   container:
     command: celery -A celery_worker beat -l info
     env:
@@ -122,6 +87,7 @@ quivr-beat:
         QUIVR_DOMAIN:
         ANTHROPIC_API_KEY:
         COHERE_API_KEY:
+        BRAVE_SEARCH_API_KEY:
 quivr-redis:
   architecture: standalone
   auth:
