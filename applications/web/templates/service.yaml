@@ -12,7 +12,7 @@ metadata:
   {{- if gt (len .Values.service.annotations) 0}}
   annotations:
     {{- range $k, $v := .Values.service.annotations }}
-    {{ $k }}: {{ $v }}
+    {{ $k }}: {{ $v | quote }}
     {{- end }}
   {{- end }}
   {{- end }}
