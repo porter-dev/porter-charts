@@ -13,7 +13,6 @@ api:
     limits:
       cpu: 2
       memory: 16000Mi
-  tolerations: []
   config: | 
     ### Keep in mind that all paths are in-container paths, and do not need to exist
     ### on the host machine.
@@ -143,7 +142,6 @@ engine:
     - key: "nvidia.com/gpu"
       operator: "Exists"
       effect: "NoSchedule"
-  additionalTolerations: []
   config: |
     ### Keep in mind that all paths are in-container paths and do not need to exist
     ### on the host machine.
@@ -227,6 +225,9 @@ modelPath: "/data/models"
 
 efsFileSystemId: "this should be the efs file system id created in the clients cluster"
 
+apiTolerations: # any tolerations for the api deployment
+
+additionalEngineTolerations: # any additional tolerations for the engine deployment
 
 imageCredentials:
   username: deepgram+hash
