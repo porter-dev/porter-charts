@@ -13,6 +13,7 @@ api:
     limits:
       cpu: 2
       memory: 16000Mi
+  tolerations: []
   config: | 
     ### Keep in mind that all paths are in-container paths, and do not need to exist
     ### on the host machine.
@@ -142,6 +143,7 @@ engine:
     - key: "nvidia.com/gpu"
       operator: "Exists"
       effect: "NoSchedule"
+  additionalTolerations: []
   config: |
     ### Keep in mind that all paths are in-container paths and do not need to exist
     ### on the host machine.

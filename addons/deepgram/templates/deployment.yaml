@@ -20,6 +20,14 @@ spec:
     spec:
       imagePullSecrets:
       - name: {{ .Release.Name }}-quay-credentials 
+      tolerations:
+        - key: "removable"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      {{- if .Values.api.tolerations }}
+        {{- toYaml .Values.api.tolerations | nindent 8 }}
+      {{- end }}
       containers:
       - image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
         args: ["-v", "serve", "/api.toml"]
@@ -94,6 +102,9 @@ spec:
           effect: "NoSchedule"
       {{- if .Values.engine.tolerations }}
         {{- toYaml .Values.engine.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.engine.additionalTolerations }}
+        {{- toYaml .Values.engine.additionalTolerations | nindent 8 }}
       {{- end }}
       initContainers:
       - name: wait-for-model-download
