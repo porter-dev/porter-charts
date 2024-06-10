@@ -61,7 +61,11 @@ spec:
         {{- range $allPrivateHosts }}
         - {{ . | quote }}
         {{- end }}
-      secretName: {{ include "docker-template.fullname" . }}
+      {{ if .Values.privateIngress.wildcard }}
+      secretName: wildcard-cert-tls
+      {{ else }}
+      secretName: {{ include "docker-template.fullname" . }}  
+      {{ end }}
   {{- end }}
   rules:
   {{- range $allPrivateHosts }}
