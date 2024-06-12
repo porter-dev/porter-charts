@@ -3,25 +3,25 @@ kind: Service
 metadata:
   labels:
     deepgram: api
-  name: {{ .Release.Name }}-api
+  name: {{ .Release.Name }}-deepgram-api
 spec:
   ports:
     - name: https
       port: 8080
       targetPort: https
   selector:
-    deepgram: api
+    deepgram: {{ .Release.Name }}-api
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
     deepgram: engine
-  name: {{ .Release.Name }}-engine
+  name: {{ .Release.Name }}-deepgram-engine
 spec:
   ports:
     - name: https
       port: 8080
       targetPort: https
   selector:
-    deepgram: engine
+    deepgram: {{ .Release.Name }}-engine

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-api-config
+  name: {{ .Release.Name }}-deepgram-api-config
 data: 
   api.toml: |
   {{ .Values.api.config | nindent 4 }}
@@ -9,7 +9,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-engine-config
+  name: {{ .Release.Name }}-deepgram-engine-config
 data: 
   engine.toml: |
   {{ .Values.engine.config | nindent 4 }}
@@ -17,7 +17,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-management-config
+  name: {{ .Release.Name }}-deepgram-management-config
 data:
   modelURLs.txt: |-
   {{ .Values.modelURLs | nindent 4 }}
