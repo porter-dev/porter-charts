@@ -12,14 +12,14 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      deepgram: api
+      deepgram: {{ .Release.Name }}-api
   template:
     metadata:
       labels:
-        deepgram: api
+        deepgram: {{ .Release.Name }}-api
     spec:
       imagePullSecrets:
-      - name: {{ .Release.Name }}-quay-credentials 
+      - name: {{ .Release.Name }}-deepgram-quay-credentials 
       tolerations:
         - key: "removable"
           operator: "Equal"
@@ -48,7 +48,7 @@ spec:
         - name: DEEPGRAM_API_KEY
           valueFrom:
             secretKeyRef:
-              name: {{ .Release.Name }}-env-config
+              name: {{ .Release.Name }}-deepgram-env-config
               key: DEEPGRAM_API_KEY
         ports:
         - containerPort: 8080
@@ -80,10 +80,10 @@ spec:
       volumes:
       - name: disk-buffer-volume
         persistentVolumeClaim:
-          claimName: "{{ .Release.Name }}-disk-buffer-pvc"
+          claimName: "{{ .Release.Name }}-deepgram-disk-buffer-pvc"
       - name: api-config
         configMap:
-          name: {{ .Release.Name }}-api-config
+          name: {{ .Release.Name }}-deepgram-api-config
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -99,14 +99,14 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      deepgram: engine
+      deepgram: {{ .Release.Name }}-engine
   template:
     metadata:
       labels:
-        deepgram: engine
+        deepgram: {{ .Release.Name }}-engine
     spec:
       imagePullSecrets:
-      - name: {{ .Release.Name }}-quay-credentials 
+      - name: {{ .Release.Name }}-deepgram-quay-credentials 
       tolerations:
         - key: "removable"
           operator: "Equal"
@@ -141,7 +141,7 @@ spec:
         - name: DEEPGRAM_API_KEY
           valueFrom:
             secretKeyRef:
-              name: {{ .Release.Name }}-env-config
+              name: {{ .Release.Name }}-deepgram-env-config
               key: DEEPGRAM_API_KEY
         ports:
         - containerPort: 8080
@@ -180,13 +180,13 @@ spec:
       volumes:
       - name: model-volume
         persistentVolumeClaim:
-          claimName: "{{ .Release.Name }}-model-pvc"
+          claimName: "{{ .Release.Name }}-deepgram-model-pvc"
       - name: engine-config
         configMap:
-          name: {{ .Release.Name }}-engine-config
+          name: {{ .Release.Name }}-deepgram-engine-config
       - name: mgmt-config
         configMap:
-          name: {{ .Release.Name }}-management-config
+          name: {{ .Release.Name }}-deepgram-management-config
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -223,7 +223,7 @@ spec:
       volumes:
         - name: mgmt-config
           configMap:
-            name: {{ .Release.Name }}-management-config
+            name: {{ .Release.Name }}-deepgram-management-config
         - name: model-volume
           persistentVolumeClaim:
-            claimName: "{{ .Release.Name }}-model-pvc"
+            claimName: "{{ .Release.Name }}-deepgram-model-pvc"

@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-disk-buffer-pvc
+  name: {{ .Release.Name }}-deepgram-disk-buffer-pvc
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: efs-{{ .Release.Name }}
+  storageClassName: efs-{{ .Release.Name }}-deepgram
   resources:
     requests:
       storage: 50Gi
@@ -13,11 +13,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-model-pvc
+  name: {{ .Release.Name }}-deepgram-model-pvc
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: efs-{{ .Release.Name }}
+  storageClassName: efs-{{ .Release.Name }}-deepgram
   resources:
     requests:
       storage: 50Gi
