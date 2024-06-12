@@ -3,7 +3,7 @@ kind: Service
 metadata:
   labels:
     deepgram: api
-  name: {{ .Release.Name }}-api
+  name: {{ .Release.Name }}-deepgram-api
 spec:
   ports:
     - name: https
@@ -17,7 +17,7 @@ kind: Service
 metadata:
   labels:
     deepgram: engine
-  name: {{ .Release.Name }}-engine
+  name: {{ .Release.Name }}-deepgram-engine
 spec:
   ports:
     - name: https

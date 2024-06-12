@@ -5,7 +5,7 @@ metadata:
     deepgram: api
   annotations:
     porter.run/deepgram-version: "{{ .Chart.Version }}"
-  name: deepgram-api
+  name: {{ .Release.Name }}-deepgram-api
 spec:
   replicas: 1
   strategy:
@@ -25,8 +25,20 @@ spec:
           operator: "Equal"
           value: "true"
           effect: "NoSchedule"
-      {{- if .apiTolerations }}
-        {{- toYaml .apiTolerations | nindent 8 }}
+      {{- if .Values.apiNodeGroupID }}
+        - key: "porter.run/node-group-id"
+          operator: "Equal"
+          value: {{ .Values.apiNodeGroupID | quote }}
+          effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: porter.run/node-group-id
+                    operator: In
+                    values:
+                      - {{ .Values.apiNodeGroupID | quote }}
       {{- end }}
       containers:
       - image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
@@ -80,7 +92,7 @@ metadata:
     deepgram: engine
   annotations:
     porter.run/deepgram-version: "{{ .Chart.Version }}"
-  name: deepgram-engine
+  name: {{ .Release.Name }}-deepgram-engine
 spec:
   replicas: 1
   strategy:
@@ -102,9 +114,6 @@ spec:
           effect: "NoSchedule"
       {{- if .Values.engine.tolerations }}
         {{- toYaml .Values.engine.tolerations | nindent 8 }}
-      {{- end }}
-      {{- if .engineAdditionalTolerations }}
-        {{- toYaml .engineAdditionalTolerations | nindent 8 }}
       {{- end }}
       initContainers:
       - name: wait-for-model-download
@@ -182,7 +191,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-management
+  name: {{ .Release.Name }}-deepgram-management
   annotations:
     porter.run/deepgram-version: "{{ .Chart.Version }}"
 spec: 
