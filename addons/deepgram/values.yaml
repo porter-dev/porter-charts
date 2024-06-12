@@ -225,6 +225,7 @@ modelPath: "/data/models"
 
 efsFileSystemId: "this should be the efs file system id created in the clients cluster"
 
+apiNodeGroupID: # the ID of the api node group where the api should run
 
 imageCredentials:
   username: deepgram+hash
