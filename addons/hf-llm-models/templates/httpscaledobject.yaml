@@ -1,0 +1,20 @@
+{{ if .Values.autoscaling.enabled }} 
+kind: HTTPScaledObject
+apiVersion: http.keda.sh/v1alpha1
+metadata:
+    name: {{ .Release.Name }}-hf-llm
+spec:
+    hosts:
+    - {{ .Release.Name }}.porter.llm
+    scaleTargetRef:
+        deployment: {{ .Release.Name }}-hf-llm 
+        service: {{ .Release.Name }}-hf-llm
+        port: 8000
+    replicas:
+        min: {{ .Values.autoscaling.min }} 
+        max: {{ .Values.autoscaling.max }}
+    scaledownPeriod: {{ .Values.autoscaling.scaledownPeriod }}
+    scalingMetric:
+        concurrency:
+            targetValue: {{ .Values.autoscaling.targetConcurrency }}
+{{- end }}

@@ -30,3 +30,10 @@ tolerations:
   - key: "nvidia.com/gpu"
     operator: "Exists"
     effect: "NoSchedule"
+
+autoscaling:
+  enabled: false 
+  minReplicas: 0 # if true, the helm chart will be configured such that the main deployment will scale to zero when there are no requests
+  maxReplicas: 10
+  scaledownPeriod: 300 # the time in seconds to wait before scaling down the deployment after the last request
+  targetConcurrency: 100 # the target concurrent connections per replica
