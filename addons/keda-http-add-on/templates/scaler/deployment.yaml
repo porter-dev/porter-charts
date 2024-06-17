@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: scaler
+    {{- include "keda-http-add-on.labels" . | indent 4 }}
+  name: {{ .Chart.Name }}-external-scaler
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.scaler.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: scaler
+      {{- include "keda-http-add-on.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: scaler
+        {{- include "keda-http-add-on.labels" . | indent 8 }}
+    spec:
+      imagePullSecrets: 
+        {{- toYaml .Values.scaler.imagePullSecrets | nindent 8 }}
+      serviceAccountName: {{ .Chart.Name }}-external-scaler
+      {{- if .Values.podSecurityContext.scaler }}
+      securityContext:
+      {{- toYaml .Values.podSecurityContext.scaler | nindent 8 }}
+      {{- else }}
+      securityContext:
+      {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
+      containers:
+      - args:
+          - "--zap-log-level={{ .Values.logging.scaler.level }}"
+          - "--zap-encoder={{ .Values.logging.scaler.format }}"
+          - "--zap-time-encoding={{ .Values.logging.scaler.timeEncoding }}"
+        image: "{{ .Values.images.scaler }}:{{ .Values.images.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.scaler.pullPolicy | default "Always" }}
+        name: "{{ .Chart.Name }}-external-scaler"
+        ports:
+        - containerPort: {{ .Values.scaler.grpcPort }}
+          name: grpc
+        env:
+        - name: KEDA_HTTP_SCALER_TARGET_ADMIN_DEPLOYMENT
+          value: "{{ .Chart.Name }}-interceptor"
+        - name: KEDA_HTTP_SCALER_PORT
+          value: "{{ .Values.scaler.grpcPort }}"
+        - name: KEDA_HTTP_SCALER_TARGET_ADMIN_NAMESPACE
+          value: "{{ .Release.Namespace }}"
+        - name: KEDA_HTTP_SCALER_TARGET_ADMIN_SERVICE
+          value: "{{ .Chart.Name }}-{{ .Values.interceptor.admin.service }}"
+        - name: KEDA_HTTP_SCALER_TARGET_ADMIN_PORT
+          value: "{{ default 9091 .Values.interceptor.admin.port }}"
+        - name: KEDA_HTTP_SCALER_STREAM_INTERVAL_MS
+          value: "{{ .Values.scaler.streamInterval }}"
+        resources:
+          {{- toYaml .Values.scaler.resources | nindent 10 }}
+        livenessProbe:
+          grpc:
+            port: {{ .Values.scaler.grpcPort }}
+            service: liveness
+          timeoutSeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          failureThreshold: 6
+        readinessProbe:
+          grpc:
+            port: {{ .Values.scaler.grpcPort }}
+            service: readiness
+          timeoutSeconds: 1
+          periodSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        {{- if .Values.securityContext.scaler }}
+        securityContext:
+        {{- toYaml .Values.securityContext.scaler | nindent 10 }}
+        {{- else }}
+        securityContext:
+        {{- toYaml .Values.securityContext | nindent 10 }}
+        {{- end }}
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+        kubernetes.io/os: linux
+      {{- with .Values.scaler.nodeSelector }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.scaler.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.scaler.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

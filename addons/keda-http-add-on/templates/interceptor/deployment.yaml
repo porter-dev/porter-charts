@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: interceptor
+    {{- include "keda-http-add-on.labels" . | indent 4 }}
+  name: {{ .Chart.Name }}-interceptor
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: interceptor
+      {{- include "keda-http-add-on.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: interceptor
+        {{- include "keda-http-add-on.labels" . | indent 8 }}
+    spec:
+      imagePullSecrets: 
+        {{- toYaml .Values.interceptor.imagePullSecrets | nindent 8 }}
+      serviceAccountName: {{ .Chart.Name }}-interceptor
+      {{- if .Values.podSecurityContext.interceptor }}
+      securityContext:
+      {{- toYaml .Values.podSecurityContext.interceptor | nindent 8 }}
+      {{- else }}
+      securityContext:
+      {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
+      containers:
+      - args:
+          - "--zap-log-level={{ .Values.logging.interceptor.level }}"
+          - "--zap-encoder={{ .Values.logging.interceptor.format }}"
+          - "--zap-time-encoding={{ .Values.logging.interceptor.timeEncoding }}"
+        image: "{{ .Values.images.interceptor }}:{{ .Values.images.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: '{{ .Values.interceptor.pullPolicy | default "Always" }}'
+        name: "{{ .Chart.Name }}-interceptor"
+        env:
+        - name: KEDA_HTTP_CURRENT_NAMESPACE
+          value: "{{ .Release.Namespace }}"
+        - name: KEDA_HTTP_PROXY_PORT
+          value: "{{ .Values.interceptor.proxy.port }}"
+        - name: KEDA_HTTP_ADMIN_PORT
+          value: "{{ .Values.interceptor.admin.port }}"
+        - name: KEDA_HTTP_CONNECT_TIMEOUT
+          value: "{{ .Values.interceptor.tcpConnectTimeout }}"
+        - name: KEDA_HTTP_KEEP_ALIVE
+          value: "{{ .Values.interceptor.keepAlive }}"
+        - name: KEDA_RESPONSE_HEADER_TIMEOUT
+          value: "{{ .Values.interceptor.responseHeaderTimeout }}"
+        - name: KEDA_CONDITION_WAIT_TIMEOUT
+          value: "{{ .Values.interceptor.replicas.waitTimeout }}"
+        - name: KEDA_HTTP_ENDPOINTS_CACHE_POLLING_INTERVAL_MS
+          value: "{{ .Values.interceptor.endpointsCachePollingIntervalMS }}"
+        - name: KEDA_HTTP_FORCE_HTTP2
+          value: "{{ .Values.interceptor.forceHTTP2 }}"
+        - name: KEDA_HTTP_MAX_IDLE_CONNS
+          value: "{{ .Values.interceptor.maxIdleConns }}"
+        - name: KEDA_HTTP_IDLE_CONN_TIMEOUT
+          value: "{{ .Values.interceptor.idleConnTimeout }}"
+        - name: KEDA_HTTP_TLS_HANDSHAKE_TIMEOUT
+          value: "{{ .Values.interceptor.tlsHandshakeTimeout }}"
+        - name: KEDA_HTTP_EXPECT_CONTINUE_TIMEOUT
+          value: "{{ .Values.interceptor.expectContinueTimeout }}"
+        ports:
+        - containerPort: {{ .Values.interceptor.admin.port }}
+          name: admin
+        - containerPort: {{ .Values.interceptor.proxy.port }}
+          name: proxy
+        livenessProbe:
+          httpGet:
+            path: /livez
+            port: proxy
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: proxy
+        resources:
+          {{- toYaml .Values.interceptor.resources | nindent 10 }}
+        {{- if .Values.securityContext.interceptor }}
+        securityContext:
+        {{- toYaml .Values.securityContext.interceptor | nindent 10 }}
+        {{- else }}
+        securityContext:
+        {{- toYaml .Values.securityContext | nindent 10 }}
+        {{- end }}
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+        kubernetes.io/os: linux
+      {{- with .Values.interceptor.nodeSelector }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.interceptor.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.interceptor.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
