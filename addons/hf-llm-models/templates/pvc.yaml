@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-model-pvc
+  name: {{ .Release.Name }}-hf-llm
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: efs-{{ .Release.Name }}
+  storageClassName: efs-{{ .Release.Name }}-hf-llm
   resources:
     requests:
       storage: 20Gi
