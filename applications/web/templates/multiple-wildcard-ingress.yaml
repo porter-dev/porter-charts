@@ -5,7 +5,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: '{{ include "docker-template.fullname" $ }}-{{ $hostDetails.hostName | replace "." "-" }}'
+  name: '{{ include "docker-template.fullname" $ }}-{{ $hostDetails.hostName | replace "." "-" | replace "*" "wc" }}'
   labels:
     {{- include "docker-template.labels" $ | nindent 4 }}
   annotations:
