@@ -2,5 +2,5 @@ apiVersion: v2
 name: hf-llm-models
 description: A helm chart that will be used to deploy LLM models from hugging face in porter
 type: application
-version: 0.1.0
+version: 0.2.0
 appVersion: "0.1.0"
