@@ -76,6 +76,8 @@ local_resource(
   helm cm-push addons/redis-managed local && \
   helm cm-push addons/deepgram local && \
   helm cm-push addons/hf-llm-models local && \
+  helm cm-push addons/keda-http-add-on local && \
+  helm cm-push addons/kube-image-keeper local && \
   helm repo update local
   ''',
   deps=[

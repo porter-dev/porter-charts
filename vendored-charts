@@ -25,3 +25,4 @@ addons/sagemaker-chart
 addons/sfn-chart
 addons/sns-chart
 addons/sqs-chart
+addons/keda-http-add-on

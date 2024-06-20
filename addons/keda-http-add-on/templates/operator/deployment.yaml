@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: operator
+    {{- include "keda-http-add-on.labels" . | indent 4 }}
+  name: {{ .Chart.Name }}-controller-manager
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: operator
+      {{- include "keda-http-add-on.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: operator
+        {{- include "keda-http-add-on.labels" . | indent 8 }}
+    spec:
+      imagePullSecrets: 
+        {{- toYaml .Values.operator.imagePullSecrets | nindent 8 }}
+      serviceAccountName: {{ .Chart.Name }}
+      {{- if .Values.podSecurityContext.operator }}
+      securityContext:
+      {{- toYaml .Values.podSecurityContext.operator | nindent 8 }}
+      {{- else }}
+      securityContext:
+      {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
+      containers:
+      - args:
+        - --secure-listen-address=0.0.0.0:{{ .Values.operator.port | default 8443 }}
+        - --upstream=http://127.0.0.1:8080/
+        - --logtostderr=true
+        - --v={{ .Values.logging.operator.kubeRbacProxy.level }}
+        image: "{{ .Values.images.kubeRbacProxy.name }}:{{ .Values.images.kubeRbacProxy.tag }}"
+        name: kube-rbac-proxy
+        resources:
+          {{- toYaml .Values.operator.kubeRbacProxy.resources | nindent 10 }}
+        {{- if .Values.securityContext.kuberbacproxy }}
+        securityContext:
+        {{- toYaml .Values.securityContext.kuberbacproxy | nindent 10 }}
+        {{- else }}
+        securityContext:
+        {{- toYaml .Values.securityContext | nindent 10 }}
+        {{- end }}
+      - args:
+        - --metrics-bind-address=127.0.0.1:8080
+        - --leader-elect
+        - --zap-log-level={{ .Values.logging.operator.level }}
+        - --zap-time-encoding={{ .Values.logging.operator.timeEncoding }}
+        - --zap-encoder={{ .Values.logging.operator.format }}
+        image: "{{ .Values.images.operator }}:{{ .Values.images.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: '{{ .Values.operator.pullPolicy | default "Always" }}'
+        name: "{{ .Chart.Name }}-operator"
+        env:
+        - name: KEDAHTTP_OPERATOR_EXTERNAL_SCALER_SERVICE
+          value: "{{ .Chart.Name }}-{{ .Values.scaler.service }}"
+        - name: KEDAHTTP_OPERATOR_EXTERNAL_SCALER_PORT
+          value: "{{ default 9090 .Values.scaler.grpcPort }}"
+        - name: KEDA_HTTP_OPERATOR_NAMESPACE
+          value: "{{ .Release.Namespace }}"
+        - name: KEDA_HTTP_OPERATOR_WATCH_NAMESPACE
+          value: "{{ .Values.operator.watchNamespace }}"
+        ports:
+        - name: metrics
+          containerPort: 8080
+        - name: probes
+          containerPort: 8081
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: probes
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: probes
+        resources:
+          {{- toYaml .Values.operator.resources | nindent 10 }}
+        {{- if .Values.securityContext.operator }}
+        securityContext:
+        {{- toYaml .Values.securityContext.operator | nindent 10 }}
+        {{- else }}
+        securityContext:
+        {{- toYaml .Values.securityContext | nindent 10 }}
+        {{- end }}
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+        kubernetes.io/os: linux
+      {{- with .Values.operator.nodeSelector }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.operator.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.operator.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
