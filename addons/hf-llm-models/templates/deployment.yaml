@@ -17,6 +17,9 @@ spec:
     metadata:
       labels:
         llm-model: {{ .Release.Name }}-hf-llm
+        {{- with .Values.additionalLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       tolerations:
         - key: "removable"
@@ -57,16 +60,10 @@ spec:
         - containerPort: 8000
           protocol: TCP
           name: https
+        {{- with .Values.readinessProbe }}
         readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /health
-            port: 8000
-            scheme: HTTP
-          initialDelaySeconds: 15
-          periodSeconds: 15
-          successThreshold: 1
-          timeoutSeconds: 2
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
         resources:
           requests:
               {{- if .Values.resources.requests.cpu }}
