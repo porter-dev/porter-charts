@@ -59,6 +59,15 @@ ingress:
     enabled: false
     customTlsSecret:
 
+multipleWildcardIngress:
+  enabled: false
+  ingressClass: nginx
+  # hosts contains a list of objects, each object contains a hostName and a tlsSecret
+  hosts: []
+  custom_domain: true
+  rewriteCustomPathsEnabled: true
+  annotations: {}
+
 albIngress:
   enabled: false
   external_dns: false
