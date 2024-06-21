@@ -15,6 +15,10 @@ spec:
       llm-model: {{ .Release.Name }}-hf-llm
   template:
     metadata:
+      {{- with .Values.additionalAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
         llm-model: {{ .Release.Name }}-hf-llm
         {{- with .Values.additionalLabels }}
