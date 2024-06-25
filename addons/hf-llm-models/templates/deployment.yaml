@@ -30,14 +30,23 @@ spec:
           operator: "Equal"
           value: "true"
           effect: "NoSchedule"
+      {{- if .Values.tolerations }}
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
       {{- if .Values.nodeGroupId }}
         - effect: NoSchedule
           key: "porter.run/node-group-id"
           operator: "Equal"
           value: "{{ .Values.nodeGroupId }}"
-      {{- end }}
-      {{- if .Values.tolerations }}
-        {{- toYaml .Values.tolerations | nindent 8 }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: porter.run/node-group-id
+                    operator: In
+                    values:
+                      - {{ .Values.nodeGroupId | quote }}
       {{- end }}
       containers:
       - command:

@@ -227,6 +227,8 @@ efsFileSystemId: "this should be the efs file system id created in the clients c
 
 apiNodeGroupID: # the ID of the api node group where the api should run
 
+engineNodeGroupID: # the ID of the node group dedicated to the engine if any
+
 imageCredentials:
   username: deepgram+hash
   secret: secret
