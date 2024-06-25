@@ -15,14 +15,27 @@ spec:
       llm-model: {{ .Release.Name }}-hf-llm
   template:
     metadata:
+      {{- with .Values.additionalAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
         llm-model: {{ .Release.Name }}-hf-llm
+        {{- with .Values.additionalLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       tolerations:
         - key: "removable"
           operator: "Equal"
           value: "true"
           effect: "NoSchedule"
+      {{- if .Values.nodeGroupId }}
+        - effect: NoSchedule
+          key: "porter.run/node-group-id"
+          operator: "Equal"
+          value: "{{ .Values.nodeGroupId }}"
+      {{- end }}
       {{- if .Values.tolerations }}
         {{- toYaml .Values.tolerations | nindent 8 }}
       {{- end }}
@@ -57,16 +70,10 @@ spec:
         - containerPort: 8000
           protocol: TCP
           name: https
+        {{- with .Values.readinessProbe }}
         readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /health
-            port: 8000
-            scheme: HTTP
-          initialDelaySeconds: 15
-          periodSeconds: 15
-          successThreshold: 1
-          timeoutSeconds: 2
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
         resources:
           requests:
               {{- if .Values.resources.requests.cpu }}
