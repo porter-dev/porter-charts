@@ -115,6 +115,21 @@ spec:
       {{- if .Values.engine.tolerations }}
         {{- toYaml .Values.engine.tolerations | nindent 8 }}
       {{- end }}
+      {{- if .Values.engineNodeGroupID }}
+        - key: "porter.run/node-group-id"
+          operator: "Equal"
+          value: {{ .Values.engineNodeGroupID | quote }}
+          effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: porter.run/node-group-id
+                    operator: In
+                    values:
+                      - {{ .Values.engineNodeGroupID | quote }}
+      {{- end }}
       initContainers:
       - name: wait-for-model-download
         image: busybox
