@@ -30,6 +30,12 @@ spec:
           operator: "Equal"
           value: "true"
           effect: "NoSchedule"
+      {{- if .Values.nodeGroupId }}
+        - effect: NoSchedule
+          key: "porter.run/node-group-id"
+          operator: "Equal"
+          value: "{{ .Values.nodeGroupId }}"
+      {{- end }}
       {{- if .Values.tolerations }}
         {{- toYaml .Values.tolerations | nindent 8 }}
       {{- end }}
