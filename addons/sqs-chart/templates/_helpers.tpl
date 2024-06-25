@@ -1,5 +1,5 @@
 {{/* The name of the application this chart installs */}}
-{{- define "app.name" -}}
+{{- define "ack-sqs-controller.app.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -8,7 +8,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "app.fullname" -}}
+{{- define "ack-sqs-controller.app.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -22,27 +22,147 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/* The name and version as used by the chart label */}}
-{{- define "chart.name-version" -}}
+{{- define "ack-sqs-controller.chart.name-version" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/* The name of the service account to use */}}
-{{- define "service-account.name" -}}
+{{- define "ack-sqs-controller.service-account.name" -}}
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 
-{{- define "watch-namespace" -}}
+{{- define "ack-sqs-controller.watch-namespace" -}}
 {{- if eq .Values.installScope "namespace" -}}
 {{ .Values.watchNamespace | default .Release.Namespace }}
 {{- end -}}
 {{- end -}}
 
 {{/* The mount path for the shared credentials file */}}
-{{- define "aws.credentials.secret_mount_path" -}}
+{{- define "ack-sqs-controller.aws.credentials.secret_mount_path" -}}
 {{- "/var/run/secrets/aws" -}}
 {{- end -}}
 
 {{/* The path the shared credentials file is mounted */}}
-{{- define "aws.credentials.path" -}}
-{{- printf "%s/%s" (include "aws.credentials.secret_mount_path" .) .Values.aws.credentials.secretKey -}}
+{{- define "ack-sqs-controller.aws.credentials.path" -}}
+{{ $secret_mount_path := include "ack-sqs-controller.aws.credentials.secret_mount_path" . }}
+{{- printf "%s/%s" $secret_mount_path .Values.aws.credentials.secretKey -}}
 {{- end -}}
+
+{{/* The rules a of ClusterRole or Role */}}
+{{- define "ack-sqs-controller.rbac-rules" -}}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - iam.services.k8s.aws
+  resources:
+  - policies
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - iam.services.k8s.aws
+  resources:
+  - policies/status
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - kms.services.k8s.aws
+  resources:
+  - keys
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - kms.services.k8s.aws
+  resources:
+  - keys/status
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - adoptedresources
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - adoptedresources/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - fieldexports
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - fieldexports/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sqs.services.k8s.aws
+  resources:
+  - queues
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sqs.services.k8s.aws
+  resources:
+  - queues/status
+  verbs:
+  - get
+  - patch
+  - update
+{{- end }}
