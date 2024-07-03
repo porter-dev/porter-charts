@@ -19,6 +19,9 @@ spec:
     blueGreen: 
       activeService: {{ include "docker-template.fullname" . }}
       autoPromotionEnabled: false
+      previewMetadata:
+        labels:
+          role: preview
       prePromotionAnalysis:
         templates:
         - templateName: {{ include "docker-template.fullname" . }}-bluegreen

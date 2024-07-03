@@ -14,6 +14,7 @@ spec:
         spec:
           template:
             spec:
+              serviceAccountName: {{ include "docker-template.fullname" . }}-aj
               containers:
               - name: rollout-sync
                 image: ghcr.io/porter-dev/rollout-sync:latest
@@ -26,4 +27,43 @@ spec:
                 {{- end }}
               restartPolicy: Never
           backoffLimit: 0
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "docker-template.fullname" . }}-aj
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+- apiGroups: ["apps"]
+  resources: ["replicasets"]
+  verbs: ["get", "list"]
+- apiGroups: ["argoproj.io"]
+  resources: ["rollouts"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "docker-template.fullname" . }}-aj
+subjects:
+- kind: ServiceAccount
+  name: {{ include "docker-template.fullname" . }}-aj
+  namespace: {{ $.Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "docker-template.fullname" . }}-aj
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "docker-template.fullname" . }}-aj
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
