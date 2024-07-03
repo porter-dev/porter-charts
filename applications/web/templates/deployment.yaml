@@ -18,7 +18,8 @@ spec:
   strategy:
     blueGreen: 
       activeService: {{ include "docker-template.fullname" . }}
-      autoPromotionEnabled: false
+      autoPromotionEnabled: true
+      scaleDownDelayRevisionLimit: 5
       previewMetadata:
         labels:
           role: preview
