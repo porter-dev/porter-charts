@@ -1,6 +1,11 @@
 {{- if and (not .Values.statefulset.enabled) (or (not .Values.bluegreen.disablePrimaryDeployment) (eq (len .Values.bluegreen.imageTags) 0)) -}}
+{{- if eq .Values.deploymentStrategy.kind "blueGreen" }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+{{- else }}
 apiVersion: apps/v1
 kind: Deployment
+{{- end }}
 metadata:
   name: {{ include "docker-template.fullname" . }}
   labels:
@@ -9,11 +14,20 @@ metadata:
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
 spec:
+  {{- if eq .Values.deploymentStrategy.kind "blueGreen" }}
+  strategy:
+    blueGreen: 
+      activeService: {{ include "docker-template.fullname" . }}
+      autoPromotionEnabled: false
+      prePromotionAnalysis:
+        templates:
+        - templateName: {{ include "docker-template.fullname" . }}-bluegreen
+  {{- end }}
   {{- if not .Values.autoscaling.enabled }}
   {{- if not .Values.keda.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{ end }}
-  {{ end }}
+  {{- end }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
