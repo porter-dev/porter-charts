@@ -1,5 +1,5 @@
 {{- if and (not .Values.statefulset.enabled) (or (not .Values.bluegreen.disablePrimaryDeployment) (eq (len .Values.bluegreen.imageTags) 0)) -}}
-{{- if eq .Values.deploymentStrategy.kind "blueGreen" }}
+{{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 {{- else }}
@@ -14,7 +14,7 @@ metadata:
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
 spec:
-  {{- if eq .Values.deploymentStrategy.kind "blueGreen" }}
+  {{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
   strategy:
     blueGreen: 
       activeService: {{ include "docker-template.fullname" . }}
