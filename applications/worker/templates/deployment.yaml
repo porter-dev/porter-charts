@@ -269,7 +269,7 @@ spec:
             {{- end }}
             {{ if .Values.datadogSocketVolume.enabled }}
             - name: DD_TRACE_AGENT_URL
-              value: "unix:///var/run/datadog/apm.socket"
+              value: "unix:///var/run/datadog/dsd.socket"
             {{ end }}
             {{- range $syncedEnv := .Values.container.env.synced }}
             {{- range $key := $syncedEnv.keys }}
