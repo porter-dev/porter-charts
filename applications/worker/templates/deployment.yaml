@@ -1,5 +1,10 @@
+{{- if eq .Values.deploymentStrategy.kind "blueGreen" }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+{{- else }}
 apiVersion: apps/v1
 kind: Deployment
+{{- end }}
 metadata:
   name: {{ include "docker-template.fullname" . }}
   labels:
@@ -8,6 +13,19 @@ metadata:
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
 spec:
+  {{- if eq .Values.deploymentStrategy.kind "blueGreen" }}
+  strategy:
+    blueGreen: 
+      activeService: {{ include "docker-template.fullname" . }}
+      autoPromotionEnabled: true
+      scaleDownDelayRevisionLimit: 5
+      previewMetadata:
+        labels:
+          role: preview
+      prePromotionAnalysis:
+        templates:
+        - templateName: {{ include "docker-template.fullname" . }}-bluegreen
+  {{- end }}
   {{- if and (not .Values.keda.enabled) (not .Values.autoscaling.enabled) }}
   replicas: {{ .Values.replicaCount }}
   {{ end }}
@@ -269,7 +287,7 @@ spec:
             {{- end }}
             {{ if .Values.datadogSocketVolume.enabled }}
             - name: DD_TRACE_AGENT_URL
-              value: "unix:///var/run/datadog/apm.socket"
+              value: "unix:///var/run/datadog/dsd.socket"
             {{ end }}
             {{- range $syncedEnv := .Values.container.env.synced }}
             {{- range $key := $syncedEnv.keys }}
