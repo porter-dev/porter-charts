@@ -1,4 +1,4 @@
-{{- if eq .Values.deploymentStrategy.kind "blueGreen" }}
+{{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
 kind: AnalysisTemplate
 apiVersion: argoproj.io/v1alpha1
 metadata:
