@@ -267,6 +267,10 @@ spec:
               value: {{ quote $val }}
             {{- end }}
             {{- end }}
+            {{ if .Values.datadogSocketVolume.enabled }}
+            - name: DD_TRACE_AGENT_URL
+              value: "unix:///var/run/datadog/apm.socket"
+            {{ end }}
             {{- range $syncedEnv := .Values.container.env.synced }}
             {{- range $key := $syncedEnv.keys }}
             - name: {{ $key.name }}
@@ -283,6 +287,11 @@ spec:
               {{- end }}
             {{- end }}
             {{- end }}
+          {{ if .Values.datadogSocketVolume.enabled }}
+          volumeMounts:
+            - name: apmsocketpath
+              mountPath: /var/run/datadog
+        {{ end }}
           {{ if .Values.pvc.enabled }}
           volumeMounts:
             - name: "{{ include "docker-template.fullname" . }}-storage"
@@ -355,6 +364,11 @@ spec:
       {{ end }}
       {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled }}
       volumes:
+        {{ if .Values.datadogSocketVolume.enabled }}
+        - hostPath:
+            path: /var/run/datadog/
+          name: apmsocketpath
+        {{ end }}
         {{ if .Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
           secret:

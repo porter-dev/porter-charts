@@ -68,6 +68,9 @@ autoscaling:
       type: Pods
       value: 1
 
+datadogSocketVolume:
+  enabled: false
+
 keda:
   enabled: false
   pollingInterval: 30
