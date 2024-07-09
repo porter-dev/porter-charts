@@ -27,6 +27,6 @@ sources:
   - https://github.com/prometheus/node_exporter
   - https://github.com/kubernetes/kube-state-metrics
 type: application
-version: 0.12.0
+version: 0.13.0
 keywords:
   - MONITORING

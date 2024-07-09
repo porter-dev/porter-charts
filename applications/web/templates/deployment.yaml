@@ -5,7 +5,6 @@ kind: Rollout
 {{- else }}
 apiVersion: apps/v1
 kind: Deployment
-{{- end }}
 metadata:
   name: {{ include "docker-template.fullname" . }}
   labels:
@@ -30,8 +29,8 @@ spec:
   {{- if not .Values.autoscaling.enabled }}
   {{- if not .Values.keda.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
-  {{- end }}
+  {{ end }}
+  {{ end }}
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
