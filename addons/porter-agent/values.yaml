@@ -1,7 +1,7 @@
 agent:
-  image: "public.ecr.aws/o1j4x7p4/porter-agent:v3.2.15"
+  image: "ghcr.io/porter-dev/releases/porter-agent:3.3.8"
   cfAccessToken: ""
-  porterHost: "dashboard.getporter.dev"
+  porterHost: "dashboard.porter.run"
   porterPort: "80"
   porterToken: ""
   privateRegistry:
