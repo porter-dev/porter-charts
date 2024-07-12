@@ -7,8 +7,7 @@ spec:
   metrics:
   - name: {{ include "docker-template.fullname" . }}-bluegreen
     count: 1
-    interval: 5s
-    failureLimit: 1
+    failureLimit: 0
     provider:
       job:
         spec:

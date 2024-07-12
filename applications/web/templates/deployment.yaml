@@ -5,6 +5,7 @@ kind: Rollout
 {{- else }}
 apiVersion: apps/v1
 kind: Deployment
+{{- end }}
 metadata:
   name: {{ include "docker-template.fullname" . }}
   labels:
@@ -484,5 +485,4 @@ spec:
         {{ end }}
         {{ end }}
       {{ end }}
-{{- end }}
 {{- end }}
