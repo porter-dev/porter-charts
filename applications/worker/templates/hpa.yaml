@@ -22,8 +22,13 @@ spec:
         periodSeconds: {{ .Values.autoscaling.behavior.scaleUp.periodSeconds }}
   {{- end }}
   scaleTargetRef:
+    {{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
+    {{- else }}
     apiVersion: apps/v1
     kind: Deployment
+    {{- end }}
     name: {{ include "docker-template.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
