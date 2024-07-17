@@ -3,6 +3,11 @@ kind: AnalysisTemplate
 apiVersion: argoproj.io/v1alpha1
 metadata:
   name: {{ include "docker-template.fullname" . }}-bluegreen
+  labels:
+  {{- include "docker-template.labels" . | nindent 4 }}
+  {{- if .Values.labels }}
+  {{- toYaml .Values.labels | nindent 4 }}
+  {{- end }}
 spec:
   metrics:
   - name: {{ include "docker-template.fullname" . }}-bluegreen
