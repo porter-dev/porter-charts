@@ -24,6 +24,12 @@ spec:
         labels:
           role: preview
       prePromotionAnalysis:
+        analysisRunMetadata:
+          labels:
+            {{- include "docker-template.labels" . | nindent 12 }}
+            {{- if .Values.labels }}
+            {{- toYaml .Values.labels | nindent 12 }}
+            {{- end }}
         templates:
         - templateName: {{ include "docker-template.fullname" . }}-bluegreen
   {{- end }}
