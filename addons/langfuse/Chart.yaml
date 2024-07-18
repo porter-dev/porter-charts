@@ -13,11 +13,6 @@ home: https://langfuse.com/
 sources:
   - https://github.com/langfuse/langfuse
   - https://github.com/langfuse/langfuse-k8s
-dependencies:
-  - name: postgresql
-    version: 15.x.x
-    repository: oci://registry-1.docker.io/bitnamicharts
-    condition: postgresql.deploy
 maintainers:
   - name: langfuse
     email: contact@langfuse.com
