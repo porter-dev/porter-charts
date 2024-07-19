@@ -117,6 +117,10 @@ jobs:
             remote_repository: sqs-controller
             remote_directory: helm
             target_directory: addons/sqs-chart
+          - remote_owner: timescale
+            remote_repository: helm-charts
+            remote_directory: charts/timescaledb-single
+            target_directory: addons/timescale
 
     permissions:
       contents: write
