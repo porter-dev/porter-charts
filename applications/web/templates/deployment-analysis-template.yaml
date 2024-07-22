@@ -55,3 +55,4 @@ spec:
     porter.run/sync-rollout: "true"
     porter.run/app-name: {{ .Release.Name }}
     porter.run/service-name: {{ include "docker-template.fullname" . }}
+{{- end }}
