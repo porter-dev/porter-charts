@@ -27,18 +27,18 @@ jobs:
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             echo "$file was changed"
           done
-      - uses: actions/setup-go@v5
-        if: steps.changed-files.outputs.any_changed == 'true'
-        with:
 
       - name: Setup Helm
+        if: steps.changed-files.outputs.any_changed == 'true'
         uses: azure/setup-helm@v4.2.0
         id: install-helm
 
       - name: Helm template - web
+        if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: helm template applications/web -f applications/testdata/web.yaml
 
       - name: Helm template - worker
+        if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: helm template applications/worker -f applications/testdata/worker.yaml
