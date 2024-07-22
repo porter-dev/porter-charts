@@ -20,7 +20,6 @@ spec:
                 porter.run/service-name: {{ include "docker-template.fullname" . }}
                 porter.run/sync-rollout: "true"
             spec:
-              serviceAccountName: {{ include "docker-template.fullname" . }}-aj
               containers:
               - name: rollout-sync
                 image: ghcr.io/porter-dev/rollout-sync:latest
