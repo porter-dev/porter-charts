@@ -4,19 +4,21 @@ apiVersion: argoproj.io/v1alpha1
 metadata:
   name: {{ include "docker-template.fullname" . }}-bluegreen
   labels:
-  {{- include "docker-template.labels" . | nindent 4 }}
-  {{- if .Values.labels }}
-  {{- toYaml .Values.labels | nindent 4 }}
-  {{- end }}
+    porter.run/app-name: "{{ .Release.Name }}"
 spec:
   metrics:
-  - name: {{ include "docker-template.fullname" . }}-bluegreen
+  - name: {{ include "docker-template.fullname" . | trunc 22 | trimSuffix "-" }}
     count: 1
     failureLimit: 0
     provider:
       job:
         spec:
           template:
+            metadata:
+              labels:
+                porter.run/app-name: {{ .Release.Name }}
+                porter.run/service-name: {{ include "docker-template.fullname" . }}
+                porter.run/sync-rollout: "true"
             spec:
               serviceAccountName: {{ include "docker-template.fullname" . }}-aj
               containers:
@@ -71,3 +73,25 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "docker-template.fullname" . }}-ar
+  labels:
+    porter.run/sync-rollout: "true"
+    {{- include "docker-template.labels" . | nindent 4 }}
+    {{- if .Values.labels }}
+    {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    porter.run/sync-rollout: "true"
+    porter.run/app-name: {{ .Release.Name }}
+    porter.run/service-name: {{ include "docker-template.fullname" . }}

@@ -1,10 +1,5 @@
-{{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
-apiVersion: argoproj.io/v1alpha1
-kind: Rollout
-{{- else }}
 apiVersion: apps/v1
 kind: Deployment
-{{- end }}
 metadata:
   name: {{ include "docker-template.fullname" . }}
   labels:
@@ -13,18 +8,6 @@ metadata:
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
 spec:
-  {{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
-  strategy:
-    blueGreen: 
-      autoPromotionEnabled: true
-      scaleDownDelayRevisionLimit: 5
-      previewMetadata:
-        labels:
-          role: preview
-      prePromotionAnalysis:
-        templates:
-        - templateName: {{ include "docker-template.fullname" . }}-bluegreen
-  {{- end }}
   {{- if and (not .Values.keda.enabled) (not .Values.autoscaling.enabled) }}
   replicas: {{ .Values.replicaCount }}
   {{ end }}
