@@ -1,0 +1,92 @@
+global:
+  image:
+    repository: nginx
+    tag: "1.27"
+test2-test2:
+  autoscaling:
+    enabled: false
+    gpu: false
+    maxReplicas: 10
+    minReplicas: 1
+    targetCPUUtilizationPercentage: 50
+    targetGPUMemoryUtilizationRatio: 1
+    targetGPUUtilizationPercentage: 100
+    targetMemoryUtilizationPercentage: 50
+  cloudsql:
+    connectionName: ""
+    dbPort: 0
+    enabled: false
+    serviceAccountJSONSecret: ""
+  configMapRefs:
+  - 18-aaaaaa.1
+  container:
+    command: ""
+    env:
+      normal: null
+    port: 80
+  deploymentStrategy:
+    blueGreen:
+      partnerApps:
+      - test
+      - test2
+    kind: blueGreen
+  fileSecretMounts:
+    enabled: false
+    mounts: null
+  fullnameOverride: test2-test2
+  health:
+    livenessProbe:
+      command: ""
+      enabled: false
+      initialDelaySeconds: 0
+      path: ""
+      timeoutSeconds: 0
+    readinessProbe:
+      command: ""
+      enabled: false
+      initialDelaySeconds: 0
+      path: ""
+      timeoutSeconds: 0
+  ingress:
+    enabled: false
+    hosts: null
+    tls: true
+    wildcard: false
+  labels:
+    porter.run/absolute-name: test2-test2
+    porter.run/app-id: "18"
+    porter.run/app-instance-id: ce9f3244-93fe-4491-9c0a-337e30d834a7
+    porter.run/app-name: test2
+    porter.run/app-revision-id: ff416065-c468-455a-bd1c-ba2a7de2445d
+    porter.run/deployment-target-id: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
+    porter.run/porter-application: "true"
+    porter.run/project-id: "10"
+    porter.run/service-name: test2
+    porter.run/service-type: web
+    porter.run/tailscale-svc: "true"
+  nodeGroups: null
+  podDisruptionBudget:
+    enabled: false
+  podLabels:
+    porter.run/absolute-name: test2-test2
+    porter.run/app-id: "18"
+    porter.run/app-instance-id: ce9f3244-93fe-4491-9c0a-337e30d834a7
+    porter.run/app-name: test2
+    porter.run/app-revision-id: ff416065-c468-455a-bd1c-ba2a7de2445d
+    porter.run/deployment-target-id: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
+    porter.run/porter-application: "true"
+    porter.run/project-id: "10"
+    porter.run/service-name: test2
+    porter.run/service-type: web
+    porter.run/tailscale-svc: "true"
+  replicaCount: 1
+  resources:
+    limits: {}
+    requests:
+      cpu: "0.2"
+      memory: 100M
+  secretRefs:
+  - 18-aaaaaa.1
+  service:
+    port: 80
+  terminationGracePeriodSeconds: 30
