@@ -377,7 +377,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:

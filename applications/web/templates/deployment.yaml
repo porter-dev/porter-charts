@@ -452,7 +452,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
