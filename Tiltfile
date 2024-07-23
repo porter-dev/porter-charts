@@ -79,6 +79,7 @@ local_resource(
   helm cm-push addons/keda-http-add-on local && \
   helm cm-push addons/kube-image-keeper local && \
   helm cm-push addons/prometheus-adapter local && \
+  helm cm-push addons/langfuse local && \
   helm repo update local
   ''',
   deps=[
