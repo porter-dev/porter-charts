@@ -46,10 +46,12 @@ rules:
       - argoproj.io
     resources:
       - rollouts
+      - analysisruns
     verbs:
       - get
       - list
       - watch
+      - patch
   - apiGroups:
       - ""
     resources:

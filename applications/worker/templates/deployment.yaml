@@ -1,10 +1,5 @@
-{{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
-apiVersion: argoproj.io/v1alpha1
-kind: Rollout
-{{- else }}
 apiVersion: apps/v1
 kind: Deployment
-{{- end }}
 metadata:
   name: {{ include "docker-template.fullname" . }}
   labels:
@@ -13,18 +8,6 @@ metadata:
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
 spec:
-  {{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
-  strategy:
-    blueGreen: 
-      autoPromotionEnabled: true
-      scaleDownDelayRevisionLimit: 5
-      previewMetadata:
-        labels:
-          role: preview
-      prePromotionAnalysis:
-        templates:
-        - templateName: {{ include "docker-template.fullname" . }}-bluegreen
-  {{- end }}
   {{- if and (not .Values.keda.enabled) (not .Values.autoscaling.enabled) }}
   replicas: {{ .Values.replicaCount }}
   {{ end }}
@@ -302,9 +285,11 @@ spec:
             {{- end }}
           {{ if .Values.datadogSocketVolume.enabled }}
           volumeMounts:
-            - name: apmsocketpath
-              mountPath: /var/run/datadog
-        {{ end }}
+            - name: datadog-apm-socket
+              mountPath: /var/run/datadog/apm.socket
+            - name: datadog-dsd-socket
+              mountPath: /var/run/datadog/dsd.socket
+          {{ end }}
           {{ if .Values.pvc.enabled }}
           volumeMounts:
             - name: "{{ include "docker-template.fullname" . }}-storage"
@@ -375,12 +360,17 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
-            path: /var/run/datadog/
-          name: apmsocketpath
+            path: /var/run/datadog/apm.socket
+            type: Socket
+          name: datadog-apm-socket
+        - hostPath:
+            path: /var/run/datadog/dsd.socket
+            type: Socket
+          name: datadog-dsd-socket
         {{ end }}
         {{ if .Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"

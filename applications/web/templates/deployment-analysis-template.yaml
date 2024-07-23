@@ -3,17 +3,23 @@ kind: AnalysisTemplate
 apiVersion: argoproj.io/v1alpha1
 metadata:
   name: {{ include "docker-template.fullname" . }}-bluegreen
+  labels:
+    porter.run/app-name: "{{ .Release.Name }}"
 spec:
   metrics:
-  - name: {{ include "docker-template.fullname" . }}-bluegreen
+  - name: {{ include "docker-template.fullname" . | trunc 22 | trimSuffix "-" }}
     count: 1
     failureLimit: 0
     provider:
       job:
         spec:
           template:
+            metadata:
+              labels:
+                porter.run/app-name: {{ .Release.Name }}
+                porter.run/service-name: {{ include "docker-template.fullname" . }}
+                porter.run/sync-rollout: "true"
             spec:
-              serviceAccountName: {{ include "docker-template.fullname" . }}-aj
               containers:
               - name: rollout-sync
                 image: ghcr.io/porter-dev/rollout-sync:latest
@@ -27,42 +33,25 @@ spec:
               restartPolicy: Never
           backoffLimit: 0
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: {{ include "docker-template.fullname" . }}-aj
-rules:
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "list"]
-- apiGroups: ["apps"]
-  resources: ["replicasets"]
-  verbs: ["get", "list"]
-- apiGroups: ["argoproj.io"]
-  resources: ["rollouts"]
-  verbs: ["get", "list", "patch"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: {{ include "docker-template.fullname" . }}-aj
-subjects:
-- kind: ServiceAccount
-  name: {{ include "docker-template.fullname" . }}-aj
-  namespace: {{ $.Release.Namespace }}
-roleRef:
-  kind: ClusterRole
-  name: {{ include "docker-template.fullname" . }}-aj
-  apiGroup: rbac.authorization.k8s.io
----
 apiVersion: v1
-kind: ServiceAccount
+kind: Service
 metadata:
-  name: {{ include "docker-template.fullname" . }}-aj
+  name: {{ include "docker-template.fullname" . }}-ar
   labels:
+    porter.run/sync-rollout: "true"
     {{- include "docker-template.labels" . | nindent 4 }}
-  {{- with .Values.serviceAccount.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- if .Values.labels }}
+    {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    porter.run/sync-rollout: "true"
+    porter.run/app-name: {{ .Release.Name }}
+    porter.run/service-name: {{ include "docker-template.fullname" . }}
 {{- end }}
