@@ -89,6 +89,20 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.image.imagePullSecret }}
       {{- end }}
+      {{ if .Values.datadog.enabled }}
+      initContainers:
+        - name: downward-api
+          env:
+          - name: DOWNWARD_API_ENV_KEY
+            value: DD_AGENT_HOST
+          - name: DD_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
+          image: ghcr.io/porter-dev/downward-api-init:latest
+          imagePullPolicy: Always
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
