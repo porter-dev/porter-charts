@@ -46,3 +46,35 @@ spec:
     {{- if and .Values.bluegreen.enabled .Values.bluegreen.disablePrimaryDeployment (.Values.bluegreen.imageTags | len | eq 0 | not) }}
     porter.run/blue-green-value: {{ .Values.bluegreen.activeImageTag | quote }}
     {{- end }}
+{{- range $service := .Values.additionalServices }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "docker-template.fullname" $ }}-{{ $service.suffix }}
+  labels:
+    {{- include "docker-template.labels" $ | nindent 4 }}
+    {{- if $.Values.labels }}
+    {{- toYaml $.Values.labels | nindent 4 }}
+    {{- end }}
+    {{- if $service.labels }}
+    {{- toYaml $service.labels | nindent 4 }}
+    {{- end }}
+  {{- if $service.annotations }}
+  {{- if gt (len $service.annotations) 0}}
+  annotations:
+    {{- range $k, $v := $service.annotations }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
+spec:
+  type: {{ $service.type }}
+  ports:
+    - port: {{ $service.port }}
+      targetPort: http
+      protocol: TCP
+      name: https
+  selector:
+    {{- include "docker-template.selectorLabels" $ | nindent 4 }}
+{{- end }}
