@@ -86,3 +86,9 @@ podLabels: {}
 priorityClassName: ""
 
 nodeGroups: []
+
+# set this to mount files from a secret into the container at /etc/secrets/<mountPath>
+# Format: fileSecretMounts: [{secretName: <SECRET_NAME>, mountPath: <MOUNT_PATH>},..]
+fileSecretMounts:
+  enabled: false
+  mounts: []
