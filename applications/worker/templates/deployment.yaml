@@ -368,7 +368,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -394,5 +394,12 @@ spec:
         - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
           emptyDir:
             {{- toYaml .Values.emptyDir.volumeOptions | nindent 8 }}
+        {{ end }}
+        {{ if .Values.fileSecretMounts.enabled }}
+        {{ range .Values.fileSecretMounts.mounts }}
+        - name: {{ .mountPath }}
+          secret:
+            secretName: "{{ .secretName }}"
+        {{ end }}
         {{ end }}
       {{ end }}

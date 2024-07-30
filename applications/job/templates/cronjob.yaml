@@ -219,11 +219,20 @@ spec:
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if .Values.cloudsql.enabled }}
+          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled}}
           volumes:
+            {{ if .Values.cloudsql.enabled }}
             - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
               secret:
                 secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
+            {{ end }}
+            {{ if .Values.fileSecretMounts.enabled }}
+            {{ range .Values.fileSecretMounts.mounts }}
+            - name: {{ .mountPath }}
+              secret:
+                secretName: "{{ .secretName }}"
+            {{ end }}
+            {{ end }}
           {{ end }}
           restartPolicy: Never
           shareProcessNamespace: true
