@@ -66,6 +66,19 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.image.imagePullSecret }}
       {{- end }}
+      initContainers:
+        # this is used for ensuring the kubelet is ready on new nodes, and can injected any downward API keys
+        - name: downward-api
+          env:
+          - name: DOWNWARD_API_ENV_KEY
+            value: DOWNWARD_HOST_IP
+          - name: DOWNWARD_HOST_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
+          image: ghcr.io/porter-dev/downward-api-init:latest
+          imagePullPolicy: Always
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
