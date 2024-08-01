@@ -68,3 +68,31 @@ Name of the service account json secret to use with the CloudSQL proxy
 {{- define "cloudsql.serviceAccountJSONSecret" -}}
 {{- default (printf "cloudsql-secret-%s" (include "docker-template.fullname" .)) .Values.cloudsql.serviceAccountJSONSecret }}
 {{- end }}
+
+{{/* 
+The connection string to be passed to the CloudSQL proxy.
+For backwards compatibility, this concatenates targets from cloudsql.connectionName/dbPort, cloudsql.additionalConnection.connectionName/dbPort in addition to the cloudsql.connections list
+*/}}
+{{- define "cloudsql.connectionString" -}}
+{{- $singleConnection := .Values.cloudsql.connectionName -}}
+{{- $additionalConnection := .Values.cloudsql.additionalConnection -}}
+{{- $connections := default (list) .Values.cloudsql.connections -}}
+{{- $hasConnections := or $singleConnection (gt (len $connections) 0) $additionalConnection.enabled -}}
+{{- if $hasConnections -}}
+    
+    {{- if $singleConnection -}}
+        {{- $singleConnection -}}=tcp:{{.Values.cloudsql.dbPort }}
+    {{- end -}}
+
+    {{- if $additionalConnection.enabled -}}
+        {{- if $singleConnection }},{{ end -}}
+        {{ $additionalConnection.connectionName }}=tcp:{{ $additionalConnection.dbPort }}
+    {{- end -}}
+
+    {{- range $index, $conn := $connections -}} 
+        {{- if or $index $singleConnection $additionalConnection.enabled }},{{ end -}}
+        {{ $conn.name }}=tcp:{{ $conn.port }}
+    {{- end -}}
+
+{{- end }}
+{{- end }}
