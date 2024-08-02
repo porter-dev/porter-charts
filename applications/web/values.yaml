@@ -232,11 +232,14 @@ pvc:
 
 cloudsql:
   enabled: false
-  connectionName: ""
+  connections: []
+    # - name: "abcdedfg"
+    #   port: 34343
+  connectionName: "" # deprecated, keeping for backwards compatibility. use connections instead.
   dbPort: 5432
   serviceAccountJSON: ""
   serviceAccountJSONSecret: ""
-  additionalConnection:
+  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead. 
     enabled: false
     dbPort: 5432
     connectionName: ""

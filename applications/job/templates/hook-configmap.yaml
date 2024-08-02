@@ -192,7 +192,7 @@ data:
             image: gcr.io/cloudsql-docker/gce-proxy:1.17
             command:
               - "/cloud_sql_proxy"
-              - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
+              - "-instances={{- include "cloudsql.connectionString" . -}}"
               - "-credential_file=/secrets/service_account.json"
               {{ if .Values.terminationGracePeriodSeconds }}
               - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
