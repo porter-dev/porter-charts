@@ -313,6 +313,12 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
+            {{- if .Values.awsEfsStorage }}
+            {{- range .Values.awsEfsStorage }}
+            - name: PORTER_EFS_FILESYSTEM_ID_{{ upper $.Release.Name }}
+              value: {{ .fileSystemId }}
+            {{- end }}
+            {{- end }}
             {{- if .Values.global }}
             {{- if .Values.global.image }}
             {{- if .Values.global.image.tag }}
@@ -406,11 +412,7 @@ spec:
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
           command:
             - "/cloud_sql_proxy"
-            {{- if .Values.cloudsql.additionalConnection.enabled }}
-            - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }},{{ .Values.cloudsql.additionalConnection.connectionName }}=tcp:{{ .Values.cloudsql.additionalConnection.dbPort }}"
-            {{- else }}
-            - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
-            {{- end }}
+            - "-instances={{- include "cloudsql.connectionString" . -}}"
             - "-credential_file=/secrets/service_account.json"
             {{ if .Values.terminationGracePeriodSeconds }}
             - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"

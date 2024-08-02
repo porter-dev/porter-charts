@@ -12,6 +12,8 @@ cloudsql:
   dbPort: 0
   enabled: false
   serviceAccountJSONSecret: ""
+awsEfsStorage:
+- fileSystemId: fs-0cc6c01ae6d9726e8
 configMapRefs:
 - 18-aaaaaa.1
 container:
