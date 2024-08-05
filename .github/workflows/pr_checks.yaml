@@ -1,0 +1,44 @@
+name: PR Checks
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  helm-template:
+    name: Basic Helm Template
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: |
+            applications/**
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
+
+      - name: Setup Helm
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: azure/setup-helm@v4.2.0
+        id: install-helm
+
+      - name: Helm template - web
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: helm template applications/web -f applications/testdata/web.yaml
+
+      - name: Helm template - worker
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: helm template applications/worker -f applications/testdata/worker.yaml

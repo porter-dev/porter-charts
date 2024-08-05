@@ -24,4 +24,4 @@ name: rabbitmq
 sources:
   - https://github.com/bitnami/bitnami-docker-rabbitmq
   - https://www.rabbitmq.com
-version: 0.11.0
+version: 0.12.0

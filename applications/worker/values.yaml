@@ -68,6 +68,9 @@ autoscaling:
       type: Pods
       value: 1
 
+datadogSocketVolume:
+  enabled: false
+
 keda:
   enabled: false
   pollingInterval: 30
@@ -130,10 +133,17 @@ pvc:
 
 cloudsql:
   enabled: false
-  connectionName: ""
+  connections: []
+    # - name: "abcdedfg"
+    #   port: 34343
+  connectionName: "" # deprecated, keeping for backwards compatibility. use connections instead.
   dbPort: 5432
   serviceAccountJSON: ""
   serviceAccountJSONSecret: ""
+  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead. 
+    enabled: false
+    dbPort: 5432
+    connectionName: ""
 
 # Set this to add entries to the /etc/hosts file
 # Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
@@ -161,3 +171,8 @@ priorityClassName: ""
 
 nodeGroups: []
 
+# set this to mount files from a secret into the container at /etc/secrets/<mountPath>
+# Format: fileSecretMounts: [{secretName: <SECRET_NAME>, mountPath: <MOUNT_PATH>},..]
+fileSecretMounts:
+  enabled: false
+  mounts: []

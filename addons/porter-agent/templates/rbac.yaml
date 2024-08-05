@@ -43,6 +43,16 @@ metadata:
   name: porter-agent-manager-role
 rules:
   - apiGroups:
+      - argoproj.io
+    resources:
+      - rollouts
+      - analysisruns
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+  - apiGroups:
       - ""
     resources:
       - pods

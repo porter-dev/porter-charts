@@ -149,6 +149,14 @@ spec:
                 {{- end }}
               {{- end }}
               {{- end }}
+              {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
+              {{ range .Values.fileSecretMounts.mounts }}
+              volumeMounts:
+                - name: {{ .mountPath }}
+                  mountPath: "/etc/secrets/{{ .mountPath }}"
+                  readOnly: true
+              {{ end }}
+              {{ end }}
               resources:
                 requests:
                   cpu: {{ .Values.resources.requests.cpu }}
@@ -199,7 +207,7 @@ spec:
               image: gcr.io/cloudsql-docker/gce-proxy:1.17
               command:
                 - "/cloud_sql_proxy"
-                - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
+                - "-instances={{- include "cloudsql.connectionString" . -}}"
                 - "-credential_file=/secrets/service_account.json"
               {{ if .Values.terminationGracePeriodSeconds }}
                 - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
@@ -211,11 +219,20 @@ spec:
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if .Values.cloudsql.enabled }}
+          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled}}
           volumes:
+            {{ if .Values.cloudsql.enabled }}
             - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
               secret:
                 secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
+            {{ end }}
+            {{ if .Values.fileSecretMounts.enabled }}
+            {{ range .Values.fileSecretMounts.mounts }}
+            - name: {{ .mountPath }}
+              secret:
+                secretName: "{{ .secretName }}"
+            {{ end }}
+            {{ end }}
           {{ end }}
           restartPolicy: Never
           shareProcessNamespace: true

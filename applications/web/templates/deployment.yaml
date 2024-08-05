@@ -1,6 +1,11 @@
 {{- if and (not .Values.statefulset.enabled) (or (not .Values.bluegreen.disablePrimaryDeployment) (eq (len .Values.bluegreen.imageTags) 0)) -}}
+{{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+{{- else }}
 apiVersion: apps/v1
 kind: Deployment
+{{- end }}
 metadata:
   name: {{ include "docker-template.fullname" . }}
   labels:
@@ -9,6 +14,25 @@ metadata:
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
 spec:
+  {{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
+  strategy:
+    blueGreen: 
+      activeService: {{ include "docker-template.fullname" . }}
+      autoPromotionEnabled: true
+      scaleDownDelayRevisionLimit: 5
+      previewMetadata:
+        labels:
+          role: preview
+      prePromotionAnalysis:
+        analysisRunMetadata:
+          labels:
+            {{- include "docker-template.labels" . | nindent 12 }}
+            {{- if .Values.labels }}
+            {{- toYaml .Values.labels | nindent 12 }}
+            {{- end }}
+        templates:
+        - templateName: {{ include "docker-template.fullname" . }}-bluegreen
+  {{- end }}
   {{- if not .Values.autoscaling.enabled }}
   {{- if not .Values.keda.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -65,6 +89,19 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.image.imagePullSecret }}
       {{- end }}
+      initContainers:
+        # this is used for ensuring the kubelet is ready on new nodes, and can injected any downward API keys
+        - name: downward-api
+          env:
+          - name: DOWNWARD_API_ENV_KEY
+            value: DOWNWARD_HOST_IP
+          - name: DOWNWARD_HOST_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
+          image: ghcr.io/porter-dev/downward-api-init:latest
+          imagePullPolicy: Always
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -276,6 +313,12 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
+            {{- if .Values.awsEfsStorage }}
+            {{- range .Values.awsEfsStorage }}
+            - name: PORTER_EFS_FILESYSTEM_ID_{{ upper $.Values.fullnameOverride | replace " " "_" | replace "-" "_" }}
+              value: {{ .fileSystemId }}
+            {{- end }}
+            {{- end }}
             {{- if .Values.global }}
             {{- if .Values.global.image }}
             {{- if .Values.global.image.tag }}
@@ -332,6 +375,13 @@ spec:
             - name: PORT
               value: {{ .Values.container.port | quote }}
             {{- end }}
+        {{ if .Values.datadogSocketVolume.enabled }}
+          volumeMounts:
+            - name: datadog-apm-socket
+              mountPath: /var/run/datadog/apm.socket
+            - name: datadog-dsd-socket
+              mountPath: /var/run/datadog/dsd.socket
+        {{ end }}
         {{ if .Values.awsEfsStorage }}
           volumeMounts:
         {{- range $v := .Values.awsEfsStorage }}
@@ -362,11 +412,7 @@ spec:
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
           command:
             - "/cloud_sql_proxy"
-            {{- if .Values.cloudsql.additionalConnection.enabled }}
-            - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }},{{ .Values.cloudsql.additionalConnection.connectionName }}=tcp:{{ .Values.cloudsql.additionalConnection.dbPort }}"
-            {{- else }}
-            - "-instances={{ .Values.cloudsql.connectionName }}=tcp:{{ .Values.cloudsql.dbPort }}"
-            {{- end }}
+            - "-instances={{- include "cloudsql.connectionString" . -}}"
             - "-credential_file=/secrets/service_account.json"
             {{ if .Values.terminationGracePeriodSeconds }}
             - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
@@ -421,8 +467,18 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled }}
       volumes:
+        {{ if .Values.datadogSocketVolume.enabled }}
+        - hostPath:
+            path: /var/run/datadog/apm.socket
+            type: Socket
+          name: datadog-apm-socket
+        - hostPath:
+            path: /var/run/datadog/dsd.socket
+            type: Socket
+          name: datadog-dsd-socket
+        {{ end }}
         {{ if .Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
           secret:
