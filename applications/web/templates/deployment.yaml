@@ -313,6 +313,12 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
+            {{- if .Values.awsEfsStorage }}
+            {{- range .Values.awsEfsStorage }}
+            - name: PORTER_EFS_FILESYSTEM_ID_{{ upper $.Values.fullnameOverride | replace " " "_" | replace "-" "_" }}
+              value: {{ .fileSystemId }}
+            {{- end }}
+            {{- end }}
             {{- if .Values.global }}
             {{- if .Values.global.image }}
             {{- if .Values.global.image.tag }}
