@@ -18,6 +18,7 @@ langfuse:
   telemetryEnabled: True
   nextPublicSignUpDisabled: False
   enableExperimentalFeatures: False
+  encryptionKey: changeme
 
 serviceAccount:
   create: true
