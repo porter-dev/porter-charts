@@ -77,6 +77,14 @@ Create the name of the secret for postgresql if we use an external database
 {{- end }}
 
 {{/*
+Create the name of the secret for additional sensitive information
+*/}}
+{{- define "langfuse.additionalSecretName" -}}
+{{- printf "%s-additional" (include "langfuse.fullname" .) -}}
+{{- end }}
+
+
+{{/*
 Return PostgreSQL fullname
 */}}
 {{- define "langfuse.postgresql.fullname" -}}
