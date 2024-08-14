@@ -6,6 +6,11 @@ metadata:
   name: {{ include "docker-template.fullname" $ }}-{{ $tag }}
   labels:
     {{- include "docker-template.labels" $ | nindent 4 }}
+  annotations:
+    helm.sh/revision: {{ .Release.Revision | quote }}
+    {{- with .Values.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   {{- if not $.Values.autoscaling.enabled }}
   {{- if not $.Values.keda.enabled }}
