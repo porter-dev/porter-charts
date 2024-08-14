@@ -1,0 +1,50 @@
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: AWS Managed Prometheus
+        type: prometheus
+        access: proxy
+        url: https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-81bf47d1-c8e9-48b9-b14e-f669ca464436
+        isDefault: false
+        basicAuth: false
+        jsonData:
+          httpMethod: POST 
+          oauthPassThru: false 
+          sigV4AuthType: default
+          sigV4Auth: true
+          sigV4Region: us-east-1
+      - name: prometheus
+        type: prometheus
+        typeName: Prometheus
+        access: proxy
+        url: http://prometheus-server.monitoring.svc.cluster.local
+        user: ""
+        database: ""
+        basicAuth: false
+        isDefault: true
+        jsonData:
+          httpMethod: POST
+          prometheusType: Prometheus
+          prometheusVersion: 2.45.0
+        readOnly: false
+      - name: loki
+        type: loki
+        typeName: Loki
+        access: proxy
+        url: http://loki-headless.porter-agent-system.svc.cluster.local:3100
+        user: ""
+        database: ""
+        basicAuth: false
+        isDefault: false
+        jsonData: {}
+        readOnly: false
+serviceAccount:
+  create: true
+  name:
+  nameTest:
+  ## ServiceAccount labels.
+  labels: {}
+  ## Service account annotations. Can be templated.
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::992382605253:role/porter-telemetry-manager
