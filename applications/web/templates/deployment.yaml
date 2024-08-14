@@ -101,7 +101,7 @@ spec:
                 apiVersion: v1
                 fieldPath: status.hostIP
           image: ghcr.io/porter-dev/downward-api-init:latest
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: IfNotPresent
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
