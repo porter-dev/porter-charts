@@ -17,7 +17,7 @@ terminationGracePeriodSeconds: 30
 
 image:
   repository: public.ecr.aws/o1j4x7p4/hello-porter
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
   # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank. 
