@@ -96,11 +96,11 @@ livenessProbe:
 
 image:
   # -- The Docker registry
-  registry: ghcr.io
+  registry: docker.io
   # -- Docker image repository
-  repository: porter-dev/support-grafana
+  repository: grafana/grafana
   # Overrides the Grafana image tag whose default is the chart appVersion
-  tag: "latest"
+  tag: ""
   sha: ""
   pullPolicy: IfNotPresent
 
@@ -486,9 +486,7 @@ admin:
 ## 6. uncomment the annotation section in the serviceAccount: above
 ## make sure to replace arn:aws:iam::123456789000:role/iam-role-name-here with your role arn
 
-env: 
-  AWS_SDK_LOAD_CONFIG: true
-  GF_AUTH_SIGV4_AUTH_ENABLED: true
+env: {}
 
 ## "valueFrom" environment variable references that will be added to deployment pods. Name is templated.
 ## ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#envvarsource-v1-core
@@ -731,7 +729,7 @@ dashboardProviders:
      orgId: 1
      folder: ''
      type: file
-     disableDeletion: true
+     disableDeletion: false
      editable: true
      options:
        path: /var/lib/grafana/dashboards/default
@@ -742,12 +740,13 @@ dashboardProviders:
 ##
 ## dashboards per provider, use provider name as key.
 ##
-dashboards: 
+dashboards:
   default:
     nginx:
       file: dashboards/nginx.json
     upgrades:
       file: dashboards/upgrades.json
+  # default:
   #   some-dashboard:
   #     json: |
   #       $RAW_JSON
