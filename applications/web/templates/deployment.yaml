@@ -327,8 +327,10 @@ spec:
             {{- end }}
             {{- end }}
             {{- end }}
+            {{ if and (.Values.ingress) (.Values.ingress.hosts) }}
             - name: PORTER_DOMAINS
               value: "{{ .Values.ingress.hosts | join "," }}"
+            {{ end }}
             - name: PORTER_POD_REVISION
               value: "{{ .Release.Revision }}"
             - name: PORTER_APP_SERVICE_NAME
