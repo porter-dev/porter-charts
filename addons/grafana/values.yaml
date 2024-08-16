@@ -744,8 +744,6 @@ dashboards:
   default:
     nginx:
       file: dashboards/nginx.json
-    upgrades:
-      file: dashboards/upgrades.json
     gpu-metrics:
       file: dashboards/dcgm_metrics.json
   # default:
