@@ -66,7 +66,7 @@ spec:
           name: gpu_memory_utilization_ratio
         target:
           type: AverageValue
-          averageValue: {{ . | div 100.0 }}
+          averageValue: {{ . }}
     {{- end }}
 {{- end }}
 {{- end }}

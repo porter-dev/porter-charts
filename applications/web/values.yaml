@@ -129,8 +129,8 @@ autoscaling:
   maxReplicas: 10
   targetCPUUtilizationPercentage: 50
   targetMemoryUtilizationPercentage: 50
-  targetGPUUtilizationPercentage: 50
-  targetGPUMemoryUtilizationRatio: 50
+  targetGPUUtilizationPercentage: 100
+  targetGPUMemoryUtilizationRatio: 1
   behavior:
     enabled: false
     scaleDown:
