@@ -1,5 +1,17 @@
 autoscaling:
-  enabled: false
+  enabled: true
+  behavior:
+  enabled: true
+  scaleDown:
+    stabilizationWindowSeconds: 3600
+    type: Pods
+    value: 2
+    periodSeconds: 60
+  scaleUp:
+    stabilizationWindowSeconds: 3600
+    type: Pods
+    value: 2
+    periodSeconds: 60
   gpu: false
   maxReplicas: 10
   minReplicas: 1
