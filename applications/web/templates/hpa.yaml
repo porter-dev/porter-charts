@@ -12,11 +12,13 @@ spec:
   {{- if .Values.autoscaling.behavior.enabled }}
   behavior:
     scaleDown:
+      stabilizationWindowSeconds: {{ .Values.autoscaling.behavior.scaleDown.stabilizationWindowSeconds | default 60 }}
       policies:
       - type: {{ .Values.autoscaling.behavior.scaleDown.type }}
         value: {{ .Values.autoscaling.behavior.scaleDown.value }}
         periodSeconds: {{ .Values.autoscaling.behavior.scaleDown.periodSeconds }}
     scaleUp:
+      stabilizationWindowSeconds: {{ .Values.autoscaling.behavior.scaleUp.stabilizationWindowSeconds | default 60 }}
       policies:
       - type: {{ .Values.autoscaling.behavior.scaleUp.type }}
         value: {{ .Values.autoscaling.behavior.scaleUp.value }}
@@ -49,6 +51,26 @@ spec:
         target:
           type: Utilization
           averageUtilization: {{ . }}
+{{- end }}
+{{- if .Values.autoscaling.gpu }}
+  {{- with .Values.autoscaling.targetGPUUtilizationPercentage }}
+    - type: Pods
+      pods:
+        metric:
+          name: gpu_utilization
+        target:
+          type: AverageValue
+          averageValue: {{ . }}
+    {{- end }}
+    {{- with .Values.autoscaling.targetGPUMemoryUtilizationRatio }}
+    - type: Pods
+      pods:
+        metric:
+          name: gpu_memory_utilization_ratio
+        target:
+          type: AverageValue
+          averageValue: {{ . | div 100.0 }}
+    {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
