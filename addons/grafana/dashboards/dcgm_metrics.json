@@ -21,11 +21,13 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 12239,
   "graphTooltip": 0,
-  "id": 5,
   "links": [],
   "panels": [
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -99,8 +101,9 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
+          "placement": "bottom",
+          "showLegend": true,
+          "width": -1
         },
         "tooltip": {
           "maxHeight": 600,
@@ -116,11 +119,13 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(instance, gpu) (gpu_memory_utilization_ratio{instance=~\"$instance\", gpu=~\"$gpu\"}) * 100",
+          "exemplar": false,
+          "expr": "avg by(instance, gpu, porter_run_app_name) (gpu_memory_utilization_ratio{instance=~\"$instance\", gpu=~\"$gpu\", porter_run_app_name=\"$application\"}) * 100",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "__auto",
+          "interval": "",
+          "legendFormat": "Application: \"{{porter_run_app_name}}\", Instance: \"{{instance}}\", GPU: \"{{gpu}}\"",
           "range": true,
           "refId": "GPU VRAM utilization",
           "useBackend": false
@@ -206,7 +211,7 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -223,11 +228,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "avg by(instance, gpu) (DCGM_FI_DEV_GPU_UTIL{instance=~\"${instance}\", gpu=~\"${gpu}\"})",
+          "expr": "avg by(instance, gpu, porter_run_app_name) (DCGM_FI_DEV_GPU_UTIL{instance=~\"${instance}\", gpu=~\"${gpu}\", porter_run_app_name=~\"${application}\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "interval": "",
-          "legendFormat": "__auto",
+          "legendFormat": "Application: \"{{porter_run_app_name}}\", Instance: \"{{instance}}\", GPU: \"{{gpu}}\"",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -237,7 +242,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -308,7 +316,7 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -325,12 +333,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(instance, gpu) (DCGM_FI_DEV_GPU_TEMP{instance=~\"${instance}\", gpu=~\"${gpu}\"})",
+          "expr": "avg by(instance, gpu, porter_run_app_name) (DCGM_FI_DEV_GPU_TEMP{instance=~\"${instance}\", gpu=~\"${gpu}\", porter_run_app_name=\"$application\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
           "interval": "",
-          "legendFormat": "GPU {{gpu}}",
+          "legendFormat": "Application: \"{{porter_run_app_name}}\", Instance: \"{{instance}}\", GPU: \"{{gpu}}\"",
           "refId": "A",
           "useBackend": false
         }
@@ -339,7 +347,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -400,7 +411,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(instance, gpu) (DCGM_FI_DEV_GPU_TEMP{instance=~\"${instance}\", gpu=~\"${gpu}\"})",
+          "expr": "avg by(instance, gpu, porter_run_app_name) (DCGM_FI_DEV_GPU_TEMP{instance=~\"${instance}\", gpu=~\"${gpu}\", porter_run_app_name=\"$application\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "interval": "",
@@ -414,7 +425,10 @@
       "type": "gauge"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -485,7 +499,7 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -503,11 +517,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(instance, gpu) (DCGM_FI_DEV_POWER_USAGE{instance=~\"${instance}\", gpu=~\"${gpu}\"})",
+          "expr": "avg by(instance, gpu, porter_run_app_name) (DCGM_FI_DEV_POWER_USAGE{instance=~\"${instance}\", gpu=~\"${gpu}\", porter_run_app_name=~\"$application\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "interval": "",
-          "legendFormat": "GPU {{gpu}}",
+          "legendFormat": "Application: \"{{porter_run_app_name}}\", Instance: \"{{instance}}\", GPU: \"{{gpu}}\"",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -517,7 +531,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -578,7 +595,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum(DCGM_FI_DEV_POWER_USAGE{instance=~\"${instance}\", gpu=~\"${gpu}\"})",
+          "expr": "sum by() (DCGM_FI_DEV_POWER_USAGE{instance=~\"${instance}\", gpu=~\"${gpu}\", porter_run_app_name=~\"$application\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "interval": "",
@@ -592,7 +609,10 @@
       "type": "gauge"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -664,7 +684,7 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -681,13 +701,13 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(pod) (DCGM_FI_DEV_SM_CLOCK{instance=~\"${instance}\", gpu=~\"${gpu}\"}) * 1000000",
+          "expr": "avg by(pod, porter_run_app_name, instance, gpu) (DCGM_FI_DEV_SM_CLOCK{instance=~\"${instance}\", gpu=~\"${gpu}\", porter_run_app_name=~\"$application\"}) * 1000000",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "GPU {{gpu}}",
+          "legendFormat": "Application: \"{{porter_run_app_name}}\", Instance: \"{{instance}}\", GPU: \"{{gpu}}\"",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -773,7 +793,7 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -790,11 +810,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(gpu, instance, pod) (DCGM_FI_PROF_PIPE_TENSOR_ACTIVE{instance=~\"${instance}\", gpu=~\"${gpu}\"})",
+          "expr": "avg by(gpu, instance, pod, porter_run_app_name) (DCGM_FI_PROF_PIPE_TENSOR_ACTIVE{instance=~\"${instance}\", gpu=~\"${gpu}\", porter_run_app_name=~\"$application\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "interval": "",
-          "legendFormat": "GPU {{gpu}}",
+          "legendFormat": "Application: \"{{porter_run_app_name}}\", Instance: \"{{instance}}\", GPU: \"{{gpu}}\"",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -804,7 +824,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -874,7 +897,7 @@
             "max"
           ],
           "displayMode": "list",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -891,11 +914,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(instance, gpu, pod) (DCGM_FI_DEV_FB_USED{instance=~\"${instance}\", gpu=~\"${gpu}\"})",
+          "expr": "avg by(instance, gpu, pod, porter_run_app_name) (DCGM_FI_DEV_FB_USED{instance=~\"${instance}\", gpu=~\"${gpu}\", porter_run_app_name=~\"$application\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "interval": "",
-          "legendFormat": "GPU {{gpu}}",
+          "legendFormat": "Application: \"{{porter_run_app_name}}\", Instance: \"{{instance}}\", GPU: \"{{gpu}}\"",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -913,8 +936,8 @@
       {
         "current": {
           "selected": false,
-          "text": "10.78.123.252:9400",
-          "value": "10.78.123.252:9400"
+          "text": "All",
+          "value": "$__all"
         },
         "datasource": {
           "type": "prometheus",
@@ -965,6 +988,35 @@
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "test",
+          "value": "test"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P1809F7CD0C75ACF3"
+        },
+        "definition": "label_values(DCGM_FI_DEV_GPU_UTIL,porter_run_app_name)",
+        "description": "This is the name of the application that is running on the GPU at the moment the metrics were retrieved ",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Application",
+        "multi": true,
+        "name": "application",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(DCGM_FI_DEV_GPU_UTIL,porter_run_app_name)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
@@ -988,7 +1040,7 @@
   },
   "timezone": "",
   "title": "NVIDIA DCGM Exporter Dashboard",
-  "uid": "Oxed_c6Wd",
-  "version": 16,
+  "uid": "cdveeo686dr0gc",
+  "version": 1,
   "weekStart": ""
 }
