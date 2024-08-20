@@ -21,7 +21,6 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 12239,
   "graphTooltip": 0,
-  "id": 3,
   "links": [],
   "panels": [
     {
@@ -898,7 +897,7 @@
             "max"
           ],
           "displayMode": "list",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -964,13 +963,9 @@
       },
       {
         "current": {
-          "selected": true,
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
         },
         "datasource": {
           "type": "prometheus",
@@ -996,13 +991,9 @@
       },
       {
         "current": {
-          "selected": true,
-          "text": [
-            "test"
-          ],
-          "value": [
-            "test"
-          ]
+          "selected": false,
+          "text": "test",
+          "value": "test"
         },
         "datasource": {
           "type": "prometheus",
@@ -1050,6 +1041,6 @@
   "timezone": "",
   "title": "NVIDIA DCGM Exporter Dashboard",
   "uid": "cdveeo686dr0gc",
-  "version": 3,
+  "version": 1,
   "weekStart": ""
 }
