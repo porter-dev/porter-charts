@@ -1,5 +1,5 @@
 agent:
-  image: "ghcr.io/porter-dev/releases/porter-agent:3.3.10"
+  image: "ghcr.io/porter-dev/releases/porter-agent:3.3.11"
   cfAccessToken: ""
   porterHost: "dashboard.porter.run"
   porterPort: "80"
