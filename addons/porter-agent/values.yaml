@@ -43,6 +43,19 @@ loki:
       max_concurrent_tail_requests: 50
       # delete logs after a week
       retention_period: 168h
+    storage_config:
+      boltdb_shipper:
+        shared_store: filesystem
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: http-metrics
+      initialDelaySeconds: 45
+    livenessProbe:
+      httpGet:
+        path: /ready
+        port: http-metrics
+      initialDelaySeconds: 45
   enabled: true
   gateway:
     enabled: false
@@ -68,37 +81,15 @@ loki:
     persistence:
       enabled: true
       size: 100Gi
-  table_manager:
-    retention_deletes_enabled: true
-    retention_period: 168h
-  storage_config:
-    boltdb_shipper:
-      shared_store: filesystem
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+      requests:
+        cpu: 500m
+        memory: 1024Mi
   url: http://{{(include "loki.serviceName" .)}}:{{ .Values.loki.service.port }}
-  readinessProbe:
-    httpGet:
-      path: /ready
-      port: http-metrics
-    initialDelaySeconds: 45
-  livenessProbe:
-    httpGet:
-      path: /ready
-      port: http-metrics
-    initialDelaySeconds: 45
-  datasource:
-    jsonData: {}
-    uid: ""
-  persistence:
-    enabled: true
-    size: 100Gi
-  resources:
-    limits:
-      cpu: 500m
-      memory: 1024Mi
-    requests:
-      cpu: 500m
-      memory: 1024Mi
-
+  
 promtail:
   enabled: true
   config:
