@@ -140,6 +140,7 @@ jobs:
           remote_repository: ${{ matrix.charts.remote_repository }}
           remote_directory: ${{ matrix.charts.remote_directory }}
           target_directory: ${{ matrix.charts.target_directory }}
+          tag: ${{ matrix.charts.tag }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
           CHARTMUSEUM_URL: ${{ vars.PUBLIC_CHARTMUSEUM_ADDONS_URL }}
