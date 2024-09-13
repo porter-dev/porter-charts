@@ -117,6 +117,10 @@ jobs:
             remote_repository: sqs-controller
             remote_directory: helm
             target_directory: addons/sqs-chart
+          - remote_owner: aws
+            remote_repository: karpenter-provider-aws
+            remote_directory: charts/karpenter
+            target_directory: addons/karpenter-aws
 
     permissions:
       contents: write
@@ -138,3 +142,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
           CHARTMUSEUM_URL: ${{ vars.PUBLIC_CHARTMUSEUM_ADDONS_URL }}
+        continue-on-error: true
