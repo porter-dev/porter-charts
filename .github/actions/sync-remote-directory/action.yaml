@@ -32,14 +32,24 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
         gh repo clone ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}
-        cd ${{ inputs.remote_repository }}
         if [ ! -z "${{ inputs.tag }}" ]; then
+          cd ${{ inputs.remote_repository }}
           git checkout ${{ inputs.tag }}
           echo "Checked out tag: ${{ inputs.tag }}"
+          cd ..
         else
           echo "No tag specified, using default branch"
         fi
-        cd ..
+    - name: Replace symlinks with actual files
+      shell: bash
+      run: |
+        find . -type l | while read -r link; do
+          # Replace symlinks with actual files to ensure proper copying
+          echo "Replacing symlink: $link with actual file"
+          target=$(readlink -f "$link")
+          rm "$link"
+          cp -R "$target" "$link"
+        done
     - name: Copy required directory
       shell: bash
       run: |
@@ -55,6 +65,6 @@ runs:
         add-paths: |
           vendored-charts
           ${{ inputs.target_directory }}
-        title: ${{ inputs.tag && format('Sync: {0}/{1} - {2} (Tag: {3})', inputs.remote_owner, inputs.remote_repository, inputs.remote_directory, inputs.tag) || format('Sync: {0}/{1} - {2}', inputs.remote_owner, inputs.remote_repository, inputs.remote_directory) }}
+        title: "Sync: ${{ inputs.remote_owner }}/${{ inputs.remote_repository }} - ${{ inputs.remote_directory }} (Tag: ${{ inputs.tag }})"
         branch: "${{ inputs.target_directory }}"
 
