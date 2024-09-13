@@ -18,15 +18,28 @@ inputs:
   github_token:
     description: 'Github token to use to pull and push the remote'
     required: true
+  tag:
+    description: 'Tag to checkout from the remote repository'
+    required: false
+    type: string
 
 runs:
   using: composite
   steps:
     - name: Checkout ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}
       shell: bash
-      env: 
+      env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-      run: gh repo clone ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}
+      run: |
+        gh repo clone ${{ inputs.remote_owner }}/${{ inputs.remote_repository }}
+        cd ${{ inputs.remote_repository }}
+        if [ ! -z "${{ inputs.tag }}" ]; then
+          git checkout ${{ inputs.tag }}
+          echo "Checked out tag: ${{ inputs.tag }}"
+        else
+          echo "No tag specified, using default branch"
+        fi
+        cd ..
     - name: Copy required directory
       shell: bash
       run: |
@@ -42,7 +55,6 @@ runs:
         add-paths: |
           vendored-charts
           ${{ inputs.target_directory }}
-        title: "Sync: ${{ inputs.remote_owner }}/${{ inputs.remote_repository }} - ${{ inputs.remote_directory }}" 
+        title: ${{ inputs.tag && format('Sync: {0}/{1} - {2} (Tag: {3})', inputs.remote_owner, inputs.remote_repository, inputs.remote_directory, inputs.tag) || format('Sync: {0}/{1} - {2}', inputs.remote_owner, inputs.remote_repository, inputs.remote_directory) }}
         branch: "${{ inputs.target_directory }}"
-
 

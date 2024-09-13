@@ -121,6 +121,7 @@ jobs:
             remote_repository: karpenter-provider-aws
             remote_directory: charts/karpenter
             target_directory: addons/karpenter-aws
+            tag: v1.0.2
 
     permissions:
       contents: write
