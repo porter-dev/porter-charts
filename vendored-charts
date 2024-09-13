@@ -12,6 +12,7 @@ addons/elasticache-chart
 addons/emrcontainers-chart
 addons/eventbridge-chart
 addons/iam-chart
+addons/keda-http-add-onaddons/karpenter-aws
 addons/kms-chart
 addons/lambda-chart
 addons/memorydb-chart
@@ -25,4 +26,3 @@ addons/sagemaker-chart
 addons/sfn-chart
 addons/sns-chart
 addons/sqs-chart
-addons/keda-http-add-on
