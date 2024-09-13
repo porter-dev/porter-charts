@@ -142,3 +142,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
           CHARTMUSEUM_URL: ${{ vars.PUBLIC_CHARTMUSEUM_ADDONS_URL }}
+        continue-on-error: true
