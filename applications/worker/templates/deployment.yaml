@@ -237,7 +237,9 @@ spec:
             - name: PORTER_RESOURCES_CPU
               value: "{{ .Values.resources.requests.cpu }}"
             - name: PORTER_RESOURCES_REPLICAS
-              value: "{{ .Values.replicaCount }}"          
+              value: "{{ .Values.replicaCount }}"      
+            - name: PORTER_POD_REVISION
+              value: "{{ .Release.Revision }}"
             - name: PORTER_NODE_NAME
               valueFrom:
                 fieldRef:
