@@ -1,0 +1,59 @@
+cloudsql:
+  connectionName: ""
+  dbPort: 0
+  enabled: false
+  serviceAccountJSONSecret: ""
+configMapRefs:
+- dev.2
+- 5300-db00d8.10
+container:
+  command: python runjob.py
+  env:
+    normal: null
+  port: 3000
+deploymentStrategy:
+  blueGreen: {}
+fileSecretMounts:
+  enabled: false
+  mounts: null
+fullnameOverride: job-dev
+labels:
+  porter.run/absolute-name: job-dev
+  porter.run/app-id: "5300"
+  porter.run/app-instance-id: 2e9b5ad3-d53c-4bf7-9945-7dc59336f44e
+  porter.run/app-name: porter-app
+  porter.run/app-revision-id: 3db36407-cdff-4cf7-9cd2-c91ea5b6fcdd
+  porter.run/deployment-target-id: db00d884-f248-493d-9263-9286d7cbde37
+  porter.run/porter-application: "true"
+  porter.run/project-id: "11419"
+  porter.run/service-name: job-dev
+  porter.run/service-type: job
+nodeGroups: null
+paused: true
+podAnnotations: {}
+podLabels:
+  porter.run/absolute-name: job-dev
+  porter.run/app-id: "5300"
+  porter.run/app-name: alert-pipeline-dev
+  porter.run/porter-application: "true"
+  porter.run/service-name: classifier-dev
+  porter.run/service-type: job
+replicaCount: 1
+resources:
+  limits: {}
+  requests:
+    cpu: "2.5"
+    memory: 10430M
+schedule:
+  enabled: false
+  value: 1 2 3 4 5
+secretRefs:
+- dev.2
+- 5300-db00d8.10
+sidecar:
+  timeout: 86400
+terminationGracePeriodSeconds: 30
+global:
+  image:
+    tag: "1234adfa"
+    repository: "porterdev/hello-porter"
