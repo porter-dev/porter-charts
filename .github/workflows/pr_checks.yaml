@@ -42,3 +42,8 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: helm template applications/worker -f applications/testdata/worker.yaml
+        
+      - name: Helm template - job
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: helm template applications/job -f applications/testdata/job.yaml
