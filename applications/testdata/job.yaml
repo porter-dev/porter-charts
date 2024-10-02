@@ -25,7 +25,6 @@ labels:
   porter.run/app-revision-id: 3db36407-cdff-4cf7-9cd2-c91ea5b6fcdd
   porter.run/deployment-target-id: db00d884-f248-493d-9263-9286d7cbde37
   porter.run/porter-application: "true"
-  porter.run/project-id: "11419"
   porter.run/service-name: job-dev
   porter.run/service-type: job
 nodeGroups: null
@@ -33,7 +32,6 @@ paused: true
 podAnnotations: {}
 podLabels:
   porter.run/absolute-name: job-dev
-  porter.run/app-id: "5300"
   porter.run/app-name: alert-pipeline-dev
   porter.run/porter-application: "true"
   porter.run/service-name: classifier-dev
