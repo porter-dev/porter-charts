@@ -35,7 +35,7 @@ container:
 
 schedule:
   enabled: true
-  value: "15 00 * * *"
+  value: "05 */3 * * *"
   successfulHistory: 20
   failedHistory: 20
 
