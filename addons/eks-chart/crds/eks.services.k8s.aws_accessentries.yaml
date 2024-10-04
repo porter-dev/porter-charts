@@ -4,32 +4,28 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.2
-  name: podidentityassociations.eks.services.k8s.aws
+  name: accessentries.eks.services.k8s.aws
 spec:
   group: eks.services.k8s.aws
   names:
-    kind: PodIdentityAssociation
-    listKind: PodIdentityAssociationList
-    plural: podidentityassociations
-    singular: podidentityassociation
+    kind: AccessEntry
+    listKind: AccessEntryList
+    plural: accessentries
+    singular: accessentry
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
     - jsonPath: .spec.clusterName
       name: CLUSTER
       type: string
-    - jsonPath: .spec.namespace
-      name: NAMESPACE
+    - jsonPath: .spec.type
+      name: TYPE
       type: string
-    - jsonPath: .spec.serviceAccount
-      name: SERVICEACCOUNT
+    - jsonPath: .spec.username
+      name: USERNAME
       type: string
-    - jsonPath: .spec.roleARN
-      name: ROLEARN
-      priority: 1
-      type: string
-    - jsonPath: .status.associationID
-      name: ASSOCIATIONID
+    - jsonPath: .spec.principalARN
+      name: PRINCIPALARN
       priority: 1
       type: string
     - jsonPath: .status.conditions[?(@.type=="ACK.ResourceSynced")].status
@@ -41,8 +37,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: PodIdentityAssociation is the Schema for the PodIdentityAssociations
-          API
+        description: AccessEntry is the Schema for the AccessEntries API
         properties:
           apiVersion:
             description: |-
@@ -63,19 +58,34 @@ spec:
             type: object
           spec:
             description: |-
-              PodIdentityAssociationSpec defines the desired state of PodIdentityAssociation.
+              AccessEntrySpec defines the desired state of AccessEntry.
 
-              Amazon EKS Pod Identity associations provide the ability to manage credentials
-              for your applications, similar to the way that Amazon EC2 instance profiles
-              provide credentials to Amazon EC2 instances.
+              An access entry allows an IAM principal (user or role) to access your cluster.
+              Access entries can replace the need to maintain the aws-auth ConfigMap for
+              authentication. For more information about access entries, see Access entries
+              (https://docs.aws.amazon.com/eks/latest/userguide/access-entries.html) in
+              the Amazon EKS User Guide.
             properties:
-              clientRequestToken:
-                description: |-
-                  A unique, case-sensitive identifier that you provide to ensure the idempotency
-                  of the request.
-                type: string
+              accessPolicies:
+                items:
+                  properties:
+                    accessScope:
+                      description: The scope of an AccessPolicy that's associated
+                        to an AccessEntry.
+                      properties:
+                        namespaces:
+                          items:
+                            type: string
+                          type: array
+                        type:
+                          type: string
+                      type: object
+                    policyARN:
+                      type: string
+                  type: object
+                type: array
               clusterName:
-                description: The name of the cluster to create the association in.
+                description: The name of your cluster.
                 type: string
               clusterRef:
                 description: "AWSResourceReferenceWrapper provides a wrapper around
@@ -94,39 +104,44 @@ spec:
                         type: string
                     type: object
                 type: object
-              namespace:
+              kubernetesGroups:
                 description: |-
-                  The name of the Kubernetes namespace inside the cluster to create the association
-                  in. The service account and the pods that use the service account must be
-                  in this namespace.
-                type: string
-              roleARN:
+                  The value for name that you've specified for kind: Group as a subject in
+                  a Kubernetes RoleBinding or ClusterRoleBinding object. Amazon EKS doesn't
+                  confirm that the value for name exists in any bindings on your cluster. You
+                  can specify one or more names.
+
+                  Kubernetes authorizes the principalArn of the access entry to access any
+                  cluster objects that you've specified in a Kubernetes Role or ClusterRole
+                  object that is also specified in a binding's roleRef. For more information
+                  about creating Kubernetes RoleBinding, ClusterRoleBinding, Role, or ClusterRole
+                  objects, see Using RBAC Authorization in the Kubernetes documentation (https://kubernetes.io/docs/reference/access-authn-authz/rbac/).
+
+                  If you want Amazon EKS to authorize the principalArn (instead of, or in addition
+                  to Kubernetes authorizing the principalArn), you can associate one or more
+                  access policies to the access entry using AssociateAccessPolicy. If you associate
+                  any access policies, the principalARN has all permissions assigned in the
+                  associated access policies and all permissions in any Kubernetes Role or
+                  ClusterRole objects that the group names are bound to.
+                items:
+                  type: string
+                type: array
+              principalARN:
                 description: |-
-                  The Amazon Resource Name (ARN) of the IAM role to associate with the service
-                  account. The EKS Pod Identity agent manages credentials to assume this role
-                  for applications in the containers in the pods that use this service account.
-                type: string
-              roleRef:
-                description: "AWSResourceReferenceWrapper provides a wrapper around
-                  *AWSResourceReference\ntype to provide more user friendly syntax
-                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
-                  \ name: my-api"
-                properties:
-                  from:
-                    description: |-
-                      AWSResourceReference provides all the values necessary to reference another
-                      k8s resource for finding the identifier(Id/ARN/Name)
-                    properties:
-                      name:
-                        type: string
-                      namespace:
-                        type: string
-                    type: object
-                type: object
-              serviceAccount:
-                description: |-
-                  The name of the Kubernetes service account inside the cluster to associate
-                  the IAM credentials with.
+                  The ARN of the IAM principal for the AccessEntry. You can specify one ARN
+                  for each access entry. You can't specify the same ARN in more than one access
+                  entry. This value can't be changed after access entry creation.
+
+                  The valid principals differ depending on the type of the access entry in
+                  the type field. The only valid ARN is IAM roles for the types of access entries
+                  for nodes: . You can use every IAM principal type for STANDARD access entries.
+                  You can't use the STS session principal type with access entries because
+                  this is a temporary principal for each session and not a permanent identity
+                  that can be assigned permissions.
+
+                  IAM best practices (https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#bp-users-federation-idp)
+                  recommend using IAM roles with temporary credentials, rather than IAM users
+                  with long-term credentials.
                 type: string
               tags:
                 additionalProperties:
@@ -135,37 +150,37 @@ spec:
                   Metadata that assists with categorization and organization. Each tag consists
                   of a key and an optional value. You define both. Tags don't propagate to
                   any other cluster or Amazon Web Services resources.
-
-                  The following basic restrictions apply to tags:
-
-                    - Maximum number of tags per resource – 50
-
-                    - For each resource, each tag key must be unique, and each tag key can
-                      have only one value.
-
-                    - Maximum key length – 128 Unicode characters in UTF-8
-
-                    - Maximum value length – 256 Unicode characters in UTF-8
-
-                    - If your tagging schema is used across multiple services and resources,
-                      remember that other services may have restrictions on allowed characters.
-                      Generally allowed characters are: letters, numbers, and spaces representable
-                      in UTF-8, and the following characters: + - = . _ : / @.
-
-                    - Tag keys and values are case-sensitive.
-
-                    - Do not use aws:, AWS:, or any upper or lowercase combination of such
-                      as a prefix for either keys or values as it is reserved for Amazon Web
-                      Services use. You cannot edit or delete tag keys or values with this prefix.
-                      Tags with this prefix do not count against your tags per resource limit.
                 type: object
+              type:
+                description: |-
+                  The type of the new access entry. Valid values are Standard, FARGATE_LINUX,
+                  EC2_LINUX, and EC2_WINDOWS.
+
+                  If the principalArn is for an IAM role that's used for self-managed Amazon
+                  EC2 nodes, specify EC2_LINUX or EC2_WINDOWS. Amazon EKS grants the necessary
+                  permissions to the node for you. If the principalArn is for any other purpose,
+                  specify STANDARD. If you don't specify a value, Amazon EKS sets the value
+                  to STANDARD. It's unnecessary to create access entries for IAM roles used
+                  with Fargate profiles or managed Amazon EC2 nodes, because Amazon EKS creates
+                  entries in the aws-auth ConfigMap for the roles. You can't change this value
+                  once you've created the access entry.
+
+                  If you set the value to EC2_LINUX or EC2_WINDOWS, you can't specify values
+                  for kubernetesGroups, or associate an AccessPolicy to the access entry.
+                type: string
+              username:
+                description: |-
+                  The username to authenticate to Kubernetes with. We recommend not specifying
+                  a username and letting Amazon EKS specify it for you. For more information
+                  about the value Amazon EKS specifies for you, or constraints before specifying
+                  your own username, see Creating access entries (https://docs.aws.amazon.com/eks/latest/userguide/access-entries.html#creating-access-entries)
+                  in the Amazon EKS User Guide.
+                type: string
             required:
-            - namespace
-            - serviceAccount
+            - principalARN
             type: object
           status:
-            description: PodIdentityAssociationStatus defines the observed state of
-              PodIdentityAssociation
+            description: AccessEntryStatus defines the observed state of AccessEntry
             properties:
               ackResourceMetadata:
                 description: |-
@@ -196,12 +211,6 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
-              associationARN:
-                description: The Amazon Resource Name (ARN) of the association.
-                type: string
-              associationID:
-                description: The ID of the association.
-                type: string
               conditions:
                 description: |-
                   All CRS managed by ACK have a common `Status.Conditions` member that
@@ -238,17 +247,13 @@ spec:
                   type: object
                 type: array
               createdAt:
-                description: The timestamp that the association was created at.
+                description: The Unix epoch timestamp at object creation.
                 format: date-time
                 type: string
               modifiedAt:
-                description: The most recent timestamp that the association was modified
-                  at
+                description: The Unix epoch timestamp for the last modification to
+                  the object.
                 format: date-time
-                type: string
-              ownerARN:
-                description: If defined, the Pod Identity Association is owned by
-                  an Amazon EKS Addon.
                 type: string
             type: object
         type: object
