@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: stages.apigatewayv2.services.k8s.aws
+  name: apimappings.apigatewayv2.services.k8s.aws
 spec:
   group: apigatewayv2.services.k8s.aws
   names:
-    kind: Stage
-    listKind: StageList
-    plural: stages
-    singular: stage
+    kind: APIMapping
+    listKind: APIMappingList
+    plural: apimappings
+    singular: apimapping
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Stage is the Schema for the Stages API
+        description: APIMapping is the Schema for the APIMappings API
         properties:
           apiVersion:
             description: |-
@@ -38,22 +38,14 @@ spec:
             type: object
           spec:
             description: |-
-              StageSpec defines the desired state of Stage.
+              ApiMappingSpec defines the desired state of ApiMapping.
 
 
-              Represents an API stage.
+              Represents an API mapping.
             properties:
-              accessLogSettings:
-                description: Settings for logging access in a stage.
-                properties:
-                  destinationARN:
-                    description: Represents an Amazon Resource Name (ARN).
-                    type: string
-                  format:
-                    description: A string with a length between [1-1024].
-                    type: string
-                type: object
               apiID:
+                type: string
+              apiMappingKey:
                 type: string
               apiRef:
                 description: "AWSResourceReferenceWrapper provides a wrapper around
@@ -72,29 +64,9 @@ spec:
                         type: string
                     type: object
                 type: object
-              autoDeploy:
-                type: boolean
-              clientCertificateID:
+              domainName:
                 type: string
-              defaultRouteSettings:
-                description: Represents a collection of route settings.
-                properties:
-                  dataTraceEnabled:
-                    type: boolean
-                  detailedMetricsEnabled:
-                    type: boolean
-                  loggingLevel:
-                    description: The logging level.
-                    type: string
-                  throttlingBurstLimit:
-                    format: int64
-                    type: integer
-                  throttlingRateLimit:
-                    type: number
-                type: object
-              deploymentID:
-                type: string
-              deploymentRef:
+              domainRef:
                 description: "AWSResourceReferenceWrapper provides a wrapper around
                   *AWSResourceReference\ntype to provide more user friendly syntax
                   for references using 'from' field\nEx:\nAPIIDRef:\n\n\n\tfrom:\n\t
@@ -111,41 +83,13 @@ spec:
                         type: string
                     type: object
                 type: object
-              description:
+              stage:
                 type: string
-              routeSettings:
-                additionalProperties:
-                  description: Represents a collection of route settings.
-                  properties:
-                    dataTraceEnabled:
-                      type: boolean
-                    detailedMetricsEnabled:
-                      type: boolean
-                    loggingLevel:
-                      description: The logging level.
-                      type: string
-                    throttlingBurstLimit:
-                      format: int64
-                      type: integer
-                    throttlingRateLimit:
-                      type: number
-                  type: object
-                type: object
-              stageName:
-                type: string
-              stageVariables:
-                additionalProperties:
-                  type: string
-                type: object
-              tags:
-                additionalProperties:
-                  type: string
-                type: object
             required:
-            - stageName
+            - stage
             type: object
           status:
-            description: StageStatus defines the observed state of Stage
+            description: APIMappingStatus defines the observed state of APIMapping
             properties:
               ackResourceMetadata:
                 description: |-
@@ -177,8 +121,8 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
-              apiGatewayManaged:
-                type: boolean
+              apiMappingID:
+                type: string
               conditions:
                 description: |-
                   All CRS managed by ACK have a common `Status.Conditions` member that
@@ -214,14 +158,6 @@ spec:
                   - type
                   type: object
                 type: array
-              createdDate:
-                format: date-time
-                type: string
-              lastDeploymentStatusMessage:
-                type: string
-              lastUpdatedDate:
-                format: date-time
-                type: string
             type: object
         type: object
     served: true
