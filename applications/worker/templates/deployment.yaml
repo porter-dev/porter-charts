@@ -252,6 +252,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: PORTER_NODE_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
             {{- if .Values.global }}

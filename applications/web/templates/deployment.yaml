@@ -311,6 +311,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: PORTER_NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
             {{- if .Values.awsEfsStorage }}
