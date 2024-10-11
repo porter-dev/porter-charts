@@ -10,17 +10,11 @@ rules:
   - memorydb.services.k8s.aws
   resources:
   - acls
-
   - clusters
-
   - parametergroups
-
   - snapshots
-
   - subnetgroups
-
   - users
-
   verbs:
   - create
   - delete
