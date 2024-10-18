@@ -1,5 +1,5 @@
 agent:
-  image: "ghcr.io/porter-dev/releases/porter-agent:3.4.0"
+  image: "ghcr.io/porter-dev/releases/porter-agent:3.4.1"
   cfAccessToken: ""
   porterHost: "dashboard.porter.run"
   porterPort: "80"
@@ -89,7 +89,7 @@ loki:
         cpu: 500m
         memory: 1024Mi
   url: http://{{(include "loki.serviceName" .)}}:{{ .Values.loki.service.port }}
-  
+
 promtail:
   enabled: true
   config:
