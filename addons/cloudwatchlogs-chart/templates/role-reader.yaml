@@ -1,0 +1,16 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: ack-cloudwatchlogs-reader
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups:
+  - cloudwatchlogs.services.k8s.aws
+  resources:
+  - loggroups
+  verbs:
+  - get
+  - list
+  - watch

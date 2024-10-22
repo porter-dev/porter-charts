@@ -1,0 +1,36 @@
+{{ if eq .Values.installScope "cluster" }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "ack-cloudwatchlogs-controller.app.fullname" . }}
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: ack-cloudwatchlogs-controller
+subjects:
+- kind: ServiceAccount
+  name: {{ include "ack-cloudwatchlogs-controller.service-account.name" . }}
+  namespace: {{ .Release.Namespace }}
+{{ else if eq .Values.installScope "namespace" }}
+{{ $wn := include "ack-cloudwatchlogs-controller.watch-namespace" . }}
+{{ $namespaces := split "," $wn }}
+{{ $fullname := include "ack-cloudwatchlogs-controller.app.fullname" . }}
+{{ $releaseNamespace := .Release.Namespace }}
+{{ $serviceAccountName := include "ack-cloudwatchlogs-controller.service-account.name" . }}
+{{ range $namespaces }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $fullname }}
+  namespace: {{ . }}
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: ack-cloudwatchlogs-controller
+subjects:
+- kind: ServiceAccount
+  name: {{ $serviceAccountName }}
+  namespace: {{ $releaseNamespace }}
+{{ end }}
+{{ end }}
