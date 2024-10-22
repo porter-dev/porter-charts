@@ -45,6 +45,7 @@ jobs:
             remote_repository: cloudwatchlogs-controller
             remote_directory: helm
             target_directory: addons/cloudwatchlogs-chart
+            version: v0.0.10
           - remote_owner: aws-controllers-k8s
             remote_repository: dynamodb-controller
             remote_directory: helm
