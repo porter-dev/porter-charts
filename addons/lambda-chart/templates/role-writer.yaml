@@ -10,19 +10,12 @@ rules:
   - lambda.services.k8s.aws
   resources:
   - aliases
-
   - codesigningconfigs
-
   - eventsourcemappings
-
   - functions
-
   - functionurlconfigs
-
   - layerversions
-
   - versions
-
   verbs:
   - create
   - delete
