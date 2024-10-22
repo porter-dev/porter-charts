@@ -42,6 +42,10 @@ jobs:
             remote_directory: helm
             target_directory: addons/cloudwatch-chart
           - remote_owner: aws-controllers-k8s
+            remote_repository: cloudwatchlogs-controller
+            remote_directory: helm
+            target_directory: addons/cloudwatchlogs-chart
+          - remote_owner: aws-controllers-k8s
             remote_repository: dynamodb-controller
             remote_directory: helm
             target_directory: addons/dynamodb-chart
