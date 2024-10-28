@@ -73,7 +73,7 @@ sidecar:
   resources:
     requests:
       cpu: 10m
-      memory: 50Mi
+      memory: 100Mi
 
 # Set this to add entries to the /etc/hosts file
 # Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
