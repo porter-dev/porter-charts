@@ -121,6 +121,14 @@ spec:
             {{ end }}
             {{ end }}
               env:
+              {{- if .Values.global }}
+              {{- if .Values.global.image }}
+              {{- if .Values.global.image.tag }}
+                - name: PORTER_IMAGE_TAG
+                  value: "{{ .Values.global.image.tag }}"
+              {{- end }}
+              {{- end }}
+              {{- end }}
               {{- range $key, $val := .Values.container.env.normal }}
                 - name: {{ $key }}
               {{- $splVal := split "_" $val -}}

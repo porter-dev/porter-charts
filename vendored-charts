@@ -4,6 +4,7 @@ addons/applicationautoscaling-chart
 addons/aws-cloudwatch-metrics
 addons/cloudtrail-chart
 addons/cloudwatch-chart
+addons/cloudwatchlogs-chart
 addons/dynamodb-chart
 addons/ec2-chart
 addons/ecr-chart
@@ -12,6 +13,8 @@ addons/elasticache-chart
 addons/emrcontainers-chart
 addons/eventbridge-chart
 addons/iam-chart
+addons/karpenter-aws
+addons/keda-http-add-on
 addons/kms-chart
 addons/lambda-chart
 addons/memorydb-chart
@@ -25,4 +28,3 @@ addons/sagemaker-chart
 addons/sfn-chart
 addons/sns-chart
 addons/sqs-chart
-addons/keda-http-add-on

@@ -80,6 +80,8 @@ local_resource(
   helm cm-push addons/kube-image-keeper local && \
   helm cm-push addons/prometheus-adapter local && \
   helm cm-push addons/langfuse local && \
+  helm cm-push addons/grafana local && \
+  helm cm-push addons/porter-agent local && \
   helm repo update local
   ''',
   deps=[

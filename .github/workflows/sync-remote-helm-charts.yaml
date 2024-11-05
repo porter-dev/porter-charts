@@ -42,6 +42,11 @@ jobs:
             remote_directory: helm
             target_directory: addons/cloudwatch-chart
           - remote_owner: aws-controllers-k8s
+            remote_repository: cloudwatchlogs-controller
+            remote_directory: helm
+            target_directory: addons/cloudwatchlogs-chart
+            tag: v0.0.10
+          - remote_owner: aws-controllers-k8s
             remote_repository: dynamodb-controller
             remote_directory: helm
             target_directory: addons/dynamodb-chart
@@ -117,6 +122,11 @@ jobs:
             remote_repository: sqs-controller
             remote_directory: helm
             target_directory: addons/sqs-chart
+          - remote_owner: aws
+            remote_repository: karpenter-provider-aws
+            remote_directory: charts/karpenter
+            target_directory: addons/karpenter-aws
+            tag: v1.0.2
 
     permissions:
       contents: write
@@ -135,6 +145,8 @@ jobs:
           remote_repository: ${{ matrix.charts.remote_repository }}
           remote_directory: ${{ matrix.charts.remote_directory }}
           target_directory: ${{ matrix.charts.target_directory }}
+          tag: ${{ matrix.charts.tag }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
           CHARTMUSEUM_URL: ${{ vars.PUBLIC_CHARTMUSEUM_ADDONS_URL }}
+        continue-on-error: true
