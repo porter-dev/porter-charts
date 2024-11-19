@@ -47,10 +47,12 @@ spec:
 {{- else }}
   ingressClassName: nginx
 {{- end }}
+  {{- if $hostDetails.tlsSecret}}
   tls:
     - hosts:
         - {{ $hostDetails.hostName | quote }}
       secretName: {{ $hostDetails.tlsSecret }}
+  {{- end }}
   rules:
       - host: {{ $hostDetails.hostName | quote }}
         http:
