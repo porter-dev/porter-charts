@@ -65,6 +65,7 @@ multipleWildcardIngress:
   enabled: false
   ingressClass: nginx
   # hosts contains a list of objects, each object contains a hostName and a tlsSecret
+  # Leave tlsSecret blank ONLY if you want to allow Ingress for a specific host without TLS
   hosts: []
   custom_domain: true
   rewriteCustomPathsEnabled: true
