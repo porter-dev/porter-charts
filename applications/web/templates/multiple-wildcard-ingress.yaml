@@ -45,7 +45,7 @@ spec:
 {{- if hasKey $.Values.multipleWildcardIngress.annotations "kubernetes.io/ingress.class" }}
   ingressClassName: {{ index $.Values.multipleWildcardIngress.annotations "kubernetes.io/ingress.class" }}
 {{- else }}
-  ingressClassName: nginx
+  ingressClassName: {{ $.Values.multipleWildcardIngress.ingressClass }}
 {{- end }}
   {{- if $hostDetails.tlsSecret}}
   tls:
