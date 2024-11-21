@@ -169,6 +169,11 @@ spec:
                 requests:
                   cpu: {{ .Values.resources.requests.cpu }}
                   memory: {{ .Values.resources.requests.memory }}
+              {{ if .Values.resources.requests }}
+              {{ if .Values.resources.requests.nvidiaGpu }}
+                  nvidia.com/gpu: {{ .Values.resources.requests.nvidiaGpu }}
+              {{ end }}
+              {{ end }}
                 limits:
                 {{- if .Values.resources.setCPULimits }}
                   {{- if .Values.resources.limits.cpu }}
@@ -181,6 +186,9 @@ spec:
                   memory: {{ .Values.resources.limits.memory }}
                 {{- else }}
                   memory: {{ .Values.resources.requests.memory }}
+                {{- end }}
+                {{- if .Values.resources.limits.nvidiaGpu }}
+                  nvidia.com/gpu: {{ .Values.resources.limits.nvidiaGpu }}
                 {{- end }}
             - name: sidecar
               image: ghcr.io/porter-dev/job_sidecar_container:31e471f4d
@@ -260,6 +268,13 @@ spec:
             - key: "porter.run/node-group-id"
               operator: "Equal"
               value: {{ $nodeGroup.id | quote }}
+              effect: "NoSchedule"
+          {{- end }}
+          # nvidia.com/gpu tolerations is automatically injected in EKS/GKE, but not in AKS 
+          # since we want to be cloud agnostic, we just add it ourselves wherever we need it
+          {{- if .Values.resources.requests.nvidiaGpu}}
+            - key: "nvidia.com/gpu"
+              operator: "Exists"
               effect: "NoSchedule"
           {{- end }}
       backoffLimit: 0
