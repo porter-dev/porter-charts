@@ -375,6 +375,13 @@ spec:
           value: {{ $nodeGroup.id | quote }}
           effect: "NoSchedule"
       {{- end }}
+      # nvidia.com/gpu tolerations is automatically injected in EKS/GKE, but not in AKS 
+      # since we want to be cloud agnostic, we just add it ourselves wherever we need it
+      {{- if .Values.resources.requests.nvidiaGpu}}
+        - key: "nvidia.com/gpu"
+          operator: "Exists"
+          effect: "NoSchedule"
+      {{- end }}
       {{- if .Values.topology.enabled }}
       topologySpreadConstraints:
         - maxSkew: {{ .Values.topology.maxSkew }}
