@@ -1,3 +1,0 @@
-{{ include "nri-kube-events.compatibility.message.securityContext.runAsUser" . }}
-
-{{ include "nri-kube-events.compatibility.message.images" . }}
