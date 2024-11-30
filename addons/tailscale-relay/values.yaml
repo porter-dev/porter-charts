@@ -2,9 +2,9 @@
 replicas: 1
 
 image:
-  repository: docker.io/yosefmih/tailscale
+  repository: docker.io/mvisonneau/tailscale
   pullPolicy: IfNotPresent
-  # tag: <default to chart app version>
+  tag: v1.76.6
 
 # Use hostNetwork for the pod
 hostNetwork: false
