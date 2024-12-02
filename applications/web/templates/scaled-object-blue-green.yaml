@@ -6,6 +6,8 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: {{ $fullName }}-{{ $tag }}
+  annotations:
+    scaledobject.keda.sh/transfer-hpa-ownership: "true"
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -28,6 +30,8 @@ spec:
   advanced:
     restoreToOriginalReplicaCount: false
     horizontalPodAutoscalerConfig:
+      # the name of the HPA to adopt - otherwise the keda admission webhook will fail this update
+      name: {{ $fullName }}-{{ $tag }}
       behavior:
         scaleUp:
           stabilizationWindowSeconds: {{ $.Values.keda.hpa.scaleUp.stabilizationWindowSeconds }}
