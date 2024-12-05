@@ -9,9 +9,11 @@ rules:
 - apiGroups:
   - eks.services.k8s.aws
   resources:
+  - accessentries
   - addons
   - clusters
   - fargateprofiles
+  - identityproviderconfigs
   - nodegroups
   - podidentityassociations
   verbs:
