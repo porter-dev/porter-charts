@@ -746,6 +746,8 @@ dashboards:
       file: dashboards/nginx.json
     gpu-metrics:
       file: dashboards/dcgm_metrics.json
+    application-logs:
+      file: dashboards/application_logs.json
   # default:
   #   some-dashboard:
   #     json: |

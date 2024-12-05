@@ -2,7 +2,7 @@ apiVersion: v2
 name: nri-bundle
 description: Groups together the individual charts for the New Relic Kubernetes solution for a more comfortable deployment.
 home: https://github.com/newrelic/helm-charts
-icon: https://companieslogo.com/img/orig/NEWR-de5fcb2e.png?t=1681801483
+icon: https://newrelic.com/assets/newrelic/source/NewRelic-logo-square.svg
 sources:
   - https://github.com/newrelic/nri-bundle/
   - https://github.com/newrelic/nri-bundle/tree/master/charts/nri-bundle
@@ -15,44 +15,61 @@ sources:
   - https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-logging
   - https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-pixie
   - https://github.com/newrelic/newrelic-infra-operator/tree/master/charts/newrelic-infra-operator
-version: 0.13.0
+  - https://github.com/newrelic/k8s-agents-operator/tree/master/charts/k8s-agents-operator
+
+version: 5.0.102
+
 dependencies:
   - name: newrelic-infrastructure
     repository: https://newrelic.github.io/nri-kubernetes
     condition: infrastructure.enabled,newrelic-infrastructure.enabled
-    version: 3.33.2
+    version: 3.37.0
+
   - name: nri-prometheus
     repository: https://newrelic.github.io/nri-prometheus
     condition: prometheus.enabled,nri-prometheus.enabled
-    version: 2.1.17
+    version: 2.1.19
+
   - name: newrelic-prometheus-agent
     repository: https://newrelic.github.io/newrelic-prometheus-configurator
     condition: newrelic-prometheus-agent.enabled
-    version: 1.12.0
+    version: 1.15.2
+
   - name: nri-metadata-injection
     repository: https://newrelic.github.io/k8s-metadata-injection
     condition: webhook.enabled,nri-metadata-injection.enabled
-    version: 4.18.4
+    version: 4.22.2
+
   - name: newrelic-k8s-metrics-adapter
     repository: https://newrelic.github.io/newrelic-k8s-metrics-adapter
     condition: metrics-adapter.enabled,newrelic-k8s-metrics-adapter.enabled
-    version: 1.10.2
+    version: 1.13.1
+
   - name: kube-state-metrics
-    version: 5.18.1
+    version: 5.26.0
     condition: ksm.enabled,kube-state-metrics.enabled
     repository: https://prometheus-community.github.io/helm-charts
+
   - name: nri-kube-events
     repository: https://newrelic.github.io/nri-kube-events
     condition: kubeEvents.enabled,nri-kube-events.enabled
-    version: 3.9.4
+    version: 3.11.2
+
   - name: newrelic-logging
     repository: https://newrelic.github.io/helm-charts
     condition: logging.enabled,newrelic-logging.enabled
-    version: 1.21.2
+    version: 1.23.5
+
   - name: newrelic-pixie
     repository: https://newrelic.github.io/helm-charts
     condition: newrelic-pixie.enabled
-    version: 2.1.4
+    version: 2.1.6
+
+  - name: k8s-agents-operator
+    repository: https://newrelic.github.io/k8s-agents-operator
+    condition: k8s-agents-operator.enabled
+    version: 0.18.0
+
   # Keep the version of pixie-operator-chart in sync with the CRD versions for
   # olm_crd.yaml and px.dev_viziers.yaml in
   # https://github.com/newrelic/open-install-library/blob/main/recipes/newrelic/infrastructure/kubernetes.yml
@@ -60,11 +77,13 @@ dependencies:
     alias: pixie-chart
     repository: https://pixie-operator-charts.storage.googleapis.com
     condition: pixie-chart.enabled
-    version: 0.1.4
+    version: 0.1.6
+
   - name: newrelic-infra-operator
     repository: https://newrelic.github.io/newrelic-infra-operator
     condition: newrelic-infra-operator.enabled
-    version: 2.10.0
+    version: 2.13.1
+
 maintainers:
   - name: juanjjaramillo
     url: https://github.com/juanjjaramillo
@@ -72,6 +91,7 @@ maintainers:
     url: https://github.com/csongnr
   - name: dbudziwojskiNR
     url: https://github.com/dbudziwojskiNR
+
 keywords:
   - infrastructure
   - newrelic
