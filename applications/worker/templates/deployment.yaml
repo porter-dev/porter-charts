@@ -65,6 +65,9 @@ spec:
       {{- if and .Values.image .Values.image.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.image.imagePullSecret }}
+      {{- else if and .Values.global  .Values.global.image .Values.global.image.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.global.image.imagePullSecret }}
       {{- end }}
       initContainers:
         # this is used for ensuring the kubelet is ready on new nodes, and can injected any downward API keys
