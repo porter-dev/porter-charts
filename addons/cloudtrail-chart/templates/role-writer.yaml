@@ -10,9 +10,7 @@ rules:
   - cloudtrail.services.k8s.aws
   resources:
   - eventdatastores
-
   - trails
-
   verbs:
   - create
   - delete
