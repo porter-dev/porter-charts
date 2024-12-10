@@ -10,19 +10,14 @@ rules:
   - rds.services.k8s.aws
   resources:
   - dbclusters
-
   - dbclusterparametergroups
-
+  - dbclustersnapshots
   - dbinstances
-
   - dbparametergroups
-
   - dbproxies
-
+  - dbsnapshots
   - dbsubnetgroups
-
   - globalclusters
-
   verbs:
   - create
   - delete
@@ -36,9 +31,11 @@ rules:
   resources:
   - dbclusters
   - dbclusterparametergroups
+  - dbclustersnapshots
   - dbinstances
   - dbparametergroups
   - dbproxies
+  - dbsnapshots
   - dbsubnetgroups
   - globalclusters
   verbs:
