@@ -8,15 +8,14 @@ metadata:
     {{- if .Values.labels }}
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
+  {{- if .Values.service.annotations }}
+  {{- if gt (len .Values.service.annotations) 0}}
   annotations:
-    porter.prometheus/scrape: "true"
-    {{- if .Values.service.annotations }}
-    {{- if gt (len .Values.service.annotations) 0}}
     {{- range $k, $v := .Values.service.annotations }}
     {{ $k }}: {{ $v | quote }}
     {{- end }}
-    {{- end }}
-    {{- end }}
+  {{- end }}
+  {{- end }}
 spec:
   {{ if or .Values.ingress.enabled .Values.albIngress.enabled .Values.customNodePort.enabled }}
   type: NodePort
