@@ -304,6 +304,7 @@ datadog:
     # datadog.kubelet.podLogsPath -- Path (on host) where the PODs logs are located
     # @default -- /var/log/pods on Linux, C:\var\log\pods on Windows
     podLogsPath:
+    coreCheckEnabled: true
 
   # datadog.expvarPort -- Specify the port to expose pprof and expvar to not interfer with the agentmetrics port from the cluster-agent, which defaults to 5000
   expvarPort: 6000
@@ -741,7 +742,7 @@ datadog:
     # datadog.systemProbe.enableDefaultKernelHeadersPaths -- Enable mount of default paths where kernel headers are stored
     enableDefaultKernelHeadersPaths: true
 
- containerImageCollection:
+  containerImageCollection:
     # datadog.containerImageCollection.enabled -- Enable collection of container image metadata
 
     # This parameter requires Agent version 7.46+
@@ -1080,6 +1081,16 @@ clusterAgent:
     # clusterAgent.admissionController.enabled -- Enable the admissionController to be able to inject APM/Dogstatsd config and standard tags (env, service, version) automatically into your pods
     enabled: true
 
+    # clusterAgent.admissionController.validation -- Validation Webhook configuration options
+    validation:
+      # clusterAgent.admissionController.validation.enabled -- Enabled enables the Admission Controller validation webhook. Default: true. (Requires Agent 7.59.0+).
+      enabled: true
+
+    # clusterAgent.admissionController.mutation -- Mutation Webhook configuration options
+    mutation:
+      # clusterAgent.admissionController.mutation.enabled -- Enabled enables the Admission Controller mutation webhook. Default: true. (Requires Agent 7.59.0+).
+      enabled: true
+
     # clusterAgent.admissionController.webhookName -- Name of the mutatingwebhookconfigurations created by the cluster-agent
     webhookName: datadog-webhook
 
@@ -1109,6 +1120,56 @@ clusterAgent:
       enabled: false
     # clusterAgent.admissionController.port -- Set port of cluster-agent admission controller service
     port: 8000
+
+    agentSidecarInjection:
+      # clusterAgent.admissionController.agentSidecarInjection.enabled -- Enables Datadog Agent sidecar injection.
+
+      ## When enabled, the admission controller mutating webhook will inject an Agent sidecar with minimal configuration in every pod meeting the configured criteria.
+      enabled: false
+
+      # clusterAgent.admissionController.agentSidecarInjection.provider -- Used by the admission controller to add infrastructure provider-specific configurations to the Agent sidecar.
+
+      ## Currently only "fargate" is supported. To use the feature in other environments (including local testing) omit the config.
+      ## ref: https://docs.datadoghq.com/integrations/eks_fargate
+      provider:
+
+      # clusterAgent.admissionController.agentSidecarInjection.clusterAgentCommunicationEnabled -- Enable communication between Agent sidecars and the Cluster Agent.
+      clusterAgentCommunicationEnabled: true
+
+      # clusterAgent.admissionController.agentSidecarInjection.containerRegistry -- Override the default registry for the sidecar Agent.
+      containerRegistry:
+
+      # clusterAgent.admissionController.imageName -- Override the default agents.image.name for the Agent sidecar.
+      imageName:
+
+      # clusterAgent.admissionController.imageTag -- Override the default agents.image.tag for the Agent sidecar.
+      imageTag:
+
+      # clusterAgent.admissionController.agentSidecarInjection.selectors -- Defines the pod selector for sidecar injection, currently only one rule is supported.
+      selectors: []
+        # - objectSelector:
+        #   matchLabels:
+        #       "podlabelKey1": podlabelValue1
+        #       "podlabelKey2": podlabelValue2
+        #   namespaceSelector:
+        #     matchLabels:
+        #       "nsLabelKey1": nsLabelValue1
+        #       "nsLabelKey2": nsLabelValue2
+
+      # clusterAgent.admissionController.agentSidecarInjection.profiles -- Defines the sidecar configuration override, currently only one profile is supported.
+
+      ## This setting allows overriding the sidecar Agent configuration by adding environment variables and providing resource settings.
+      profiles: []
+        # - env:
+        #     - name: DD_ORCHESTRATOR_EXPLORER_ENABLED
+        #       value: "true"
+        #   resources:
+        #     requests:
+        #       cpu: "1"
+        #       memory: "512Mi"
+        #     limits:
+        #       cpu: "2"
+        #       memory: "1024Mi"
 
   # clusterAgent.confd -- Provide additional cluster check configurations. Each key will become a file in /conf.d.
 
@@ -1192,16 +1253,8 @@ clusterAgent:
     successThreshold: 1
     failureThreshold: 6
 
-  # clusterChecksRunner.startupProbe -- Override default agent startup probe settings
+  # clusterAgent.startupProbe -- Override default Cluster Agent startup probe settings
   # @default -- Every 15s / 6 KO / 1 OK
-
-  ## In case of issues with the probe, you can disable it with the
-  ## following values, to allow easier investigating:
-  #
-  # startupProbe:
-  #   exec:
-  #     command: ["/bin/true"]
-  #
   startupProbe:
     initialDelaySeconds: 15
     periodSeconds: 15
