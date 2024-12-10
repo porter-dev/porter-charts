@@ -8,6 +8,8 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "docker-template.fullname" . }}
+  annotations:
+    validations.keda.sh/hpa-ownership: "false"
 spec:
   {{- if .Values.autoscaling.behavior.enabled }}
   behavior:
