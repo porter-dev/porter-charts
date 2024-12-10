@@ -242,6 +242,36 @@ datadog:
   namespaceLabelsAsTags: {}
   #   env: environment
   #   <KUBERNETES_NAMESPACE_LABEL>: <DATADOG_TAG_KEY>
+  # datadog.namespaceAnnotationsAsTags -- Provide a mapping of Kubernetes Namespace Annotations to Datadog Tags
+  namespaceAnnotationsAsTags: {}
+  #   env: environment
+  #   <KUBERNETES_NAMESPACE_ANNOTATIONS>: <DATADOG_TAG_KEY>
+
+  # datadog.kubernetesResourcesLabelsAsTags -- Provide a mapping of Kubernetes Resources Labels to Datadog Tags
+  kubernetesResourcesLabelsAsTags: {}
+  #    deployments.apps:
+  #      x-team: team-from-label
+  #    pods:
+  #      x-ref: reference
+  #    namespaces:
+  #      kubernetes.io/metadata.name: name-as-tag
+  #    <RESOURCE_TYPE>:
+  #      <KUBERNETES_RESOURCE_LABEL>: <DATADOG_TAG_KEY>
+
+  # datadog.kubernetesResourcesAnnotationsAsTags -- Provide a mapping of Kubernetes Resources Annotations to Datadog Tags
+  kubernetesResourcesAnnotationsAsTags: {}
+  #    deployments.apps:
+  #      x-team: team-from-annotation
+  #    pods:
+  #      x-ann: annotation-reference
+  #    namespaces:
+  #      stale-annotation: annotation-as-tag
+  #    <RESOURCE_TYPE>:
+  #      <KUBERNETES_RESOURCE_ANNOTATION>: <DATADOG_TAG_KEY>
+
+  originDetectionUnified:
+    # datadog.originDetectionUnified.enabled -- Enabled enables unified mechanism for origin detection. Default: false. (Requires Agent 7.54.0+).
+    enabled: false
 
   # datadog.tags -- List of static tags to attach to every metric, event and service check collected by this Agent.
 
@@ -307,7 +337,7 @@ datadog:
     # datadog.dogstatsd.originDetection -- Enable origin detection for container tagging
 
     ## ref: https://docs.datadoghq.com/developers/dogstatsd/unix_socket/#using-origin-detection-for-container-tagging
-    originDetection: false
+    originDetection: true
 
     # datadog.dogstatsd.tags -- List of static tags to attach to every custom metric, event and service check collected by Dogstatsd.
 
@@ -346,7 +376,7 @@ datadog:
 
     ## This is required for Dogstatsd origin detection to work.
     ## See https://docs.datadoghq.com/developers/dogstatsd/unix_socket/
-    useHostPID: false
+    useHostPID: true
 
     # datadog.dogstatsd.nonLocalTraffic -- Enable this to make each node accept non-local statsd traffic (from outside of the pod)
 
@@ -396,7 +426,7 @@ datadog:
 
   clusterTagger:
     # datadog.clusterTagger.collectKubernetesTags -- Enables Kubernetes resources tags collection.
-    collectKubernetesTags: false
+    collectKubernetesTags: true
 
   # datadog.leaderElection -- Enables leader election mechanism for event collection
   leaderElection: true
@@ -478,6 +508,25 @@ datadog:
     # datadog.apm.hostSocketPath -- Host path to the trace-agent socket
     hostSocketPath: /var/run/datadog/
 
+  ## Application Security Managment (ASM) configuration
+  ##
+  ## ASM is disabled by default and can be enabled by setting the various `enabled` fields to `true` under the `datadog.asm` section.
+  ## Manually adding the various environment variables to a pod will take precedence over the ones in the Helm chart.
+  ## These will only have an effect on containers that have Datadog client libraries installed, either manually or via Single Step Instrumentation (under the `datadog.apm.instrumentation` section).
+  ## It requires Datadog Cluster Agent 7.53.0+.
+  asm:
+    threats:
+      # datadog.asm.threats.enabled -- Enable Application Security Management Threats App & API Protection by injecting `DD_APPSEC_ENABLED=true` environment variable to all pods in the cluster
+      enabled: false
+
+    sca:
+      # datadog.asm.sca.enabled -- Enable Application Security Management Software Composition Analysis by injecting `DD_APPSEC_SCA_ENABLED=true` environment variable to all pods in the cluster
+      enabled: false
+
+    iast:
+      # datadog.asm.iast.enabled -- Enable Application Security Management Interactive Application Security Testing by injecting `DD_IAST_ENABLED=true` environment variable to all pods in the cluster
+      enabled: false
+
   ## OTLP ingest related configuration
   otlp:
     receiver:
@@ -499,6 +548,48 @@ datadog:
           endpoint: "0.0.0.0:4318"
           # datadog.otlp.receiver.protocols.http.useHostPort -- Enable the Host Port for the OTLP/HTTP endpoint
           useHostPort: true
+
+    logs:
+      # datadog.otlp.logs.enabled -- Enable logs support in the OTLP ingest endpoint
+      enabled: false
+
+  ## OTel collector is currently in preview. Please reach out to your Datadog representative for more information.
+  ## OTLP Ingest is the GA feature for sending OTLP data to Datadog Agent.
+  ## OTel collector related configuration
+  otelCollector:
+    # datadog.otelCollector.enabled -- Enable the OTel Collector
+    enabled: false
+    # datadog.otelCollector.ports -- Ports that OTel Collector is listening
+    ports:
+
+        # Default GRPC port of OTLP receiver
+      - containerPort: "4317"
+        name: otel-grpc
+        # Default HTTP port of OTLP receiver
+      - containerPort: "4318"
+        name: otel-http
+    # datadog.otelCollector.config -- OTel collector configuration
+    config: null
+
+  ## Continuous Profiler configuration
+  ##
+  ## Continuous Profiler is disabled by default and can be enabled by setting the `enabled` field to
+  ## either `auto` or `true` value under the `datadog.profiling` section.
+  ## Manually adding the `DD_PROFILING_ENABLED` variable to a pod will take precedence over the
+  ## value in the Helm chart.
+  ## These will only have an effect on containers that have Datadog client libraries installed,
+  ## either manually or via Single Step Instrumentation (under the `datadog.apm.instrumentation`
+  ## section).
+  ## It requires Datadog Cluster Agent 7.57.0+.
+  profiling:
+    # datadog.profiling.enabled -- Enable Continuous Profiler by injecting `DD_PROFILING_ENABLED`
+    # environment variable with the same value to all pods in the cluster
+    # Valid values are:
+    # - false: Profiler is turned off and can not be turned on by other means.
+    # - null: Profiler is turned off, but can be turned on by other means.
+    # - auto: Profiler is turned off, but the library will turn it on if the application is a good candidate for profiling.
+    # - true: Profiler is turned on.
+    enabled: null
 
   # datadog.envFrom -- Set environment variables for all Agents directly from configMaps and/or secrets
 
@@ -579,6 +670,10 @@ datadog:
     # datadog.processAgent.processDiscovery -- Enables or disables autodiscovery of integrations
     processDiscovery: true
 
+    # datadog.processAgent.containerCollection -- Set this to true to enable container collection
+    ## ref: https://docs.datadoghq.com/infrastructure/containers/?tab=helm
+    containerCollection: true
+
   # datadog.osReleasePath -- Specify the path to your os-release file
   osReleasePath: /etc/os-release
 
@@ -645,6 +740,12 @@ datadog:
 
     # datadog.systemProbe.enableDefaultKernelHeadersPaths -- Enable mount of default paths where kernel headers are stored
     enableDefaultKernelHeadersPaths: true
+
+ containerImageCollection:
+    # datadog.containerImageCollection.enabled -- Enable collection of container image metadata
+
+    # This parameter requires Agent version 7.46+
+    enabled: true
 
   orchestratorExplorer:
     # datadog.orchestratorExplorer.enabled -- Set this to false to disable the orchestrator explorer
@@ -1091,6 +1192,23 @@ clusterAgent:
     successThreshold: 1
     failureThreshold: 6
 
+  # clusterChecksRunner.startupProbe -- Override default agent startup probe settings
+  # @default -- Every 15s / 6 KO / 1 OK
+
+  ## In case of issues with the probe, you can disable it with the
+  ## following values, to allow easier investigating:
+  #
+  # startupProbe:
+  #   exec:
+  #     command: ["/bin/true"]
+  #
+  startupProbe:
+    initialDelaySeconds: 15
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 6
+
   # clusterAgent.strategy -- Allow the Cluster Agent deployment to perform a rolling update on helm update
 
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
@@ -1409,6 +1527,15 @@ agents:
       # agents.containers.agent.readinessProbe -- Override default agent readiness probe settings
       # @default -- Every 15s / 6 KO / 1 OK
       readinessProbe:
+        initialDelaySeconds: 15
+        periodSeconds: 15
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 6
+
+      # agents.containers.agent.startupProbe -- Override default agent startup probe settings
+      # @default -- Every 15s / 6 KO / 1 OK
+      startupProbe:
         initialDelaySeconds: 15
         periodSeconds: 15
         timeoutSeconds: 5
@@ -1847,6 +1974,24 @@ clusterChecksRunner:
     timeoutSeconds: 5
     successThreshold: 1
     failureThreshold: 6
+
+  # clusterChecksRunner.startupProbe -- Override default agent startup probe settings
+  # @default -- Every 15s / 6 KO / 1 OK
+
+  ## In case of issues with the probe, you can disable it with the
+  ## following values, to allow easier investigating:
+  #
+  # startupProbe:
+  #   exec:
+  #     command: ["/bin/true"]
+  #
+  startupProbe:
+    initialDelaySeconds: 15
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 6
+
 
   # clusterChecksRunner.deploymentAnnotations -- Annotations to add to the cluster-checks-runner's Deployment
   deploymentAnnotations: {}
