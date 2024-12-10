@@ -9,13 +9,12 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ .Values.operator.name }}-external-metrics-reader
     {{- include "keda.labels" . | indent 4 }}
-  creationTimestamp: null
   name: {{ .Values.operator.name }}-external-metrics-reader
 rules:
 - apiGroups:
   - external.metrics.k8s.io
   resources:
-  - '*'
+  - 'externalmetrics'
   verbs:
-  - '*'
+  - 'get'
 {{- end -}}
