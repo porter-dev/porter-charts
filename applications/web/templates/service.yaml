@@ -8,13 +8,19 @@ metadata:
     {{- if .Values.labels }}
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
-  {{- if .Values.service.annotations }}
-  {{- if gt (len .Values.service.annotations) 0}}
+  {{- if or .Values.metricsScraping.enabled (and .Values.service.annotations (gt (len .Values.service.annotations) 0)) }}
   annotations:
+    {{- if .Values.metricsScraping.enabled }}
+    porter.prometheus/scrape: "true" 
+    porter.prometheus/port: {{ .Values.metricsScraping.port | quote }}
+    porter.prometheus/path: {{ .Values.metricsScraping.path | quote }}
+    porter.prometheus/scheme: "http"
+    {{- end }}
+    {{- if and .Values.service.annotations (gt (len .Values.service.annotations) 0) }}
     {{- range $k, $v := .Values.service.annotations }}
     {{ $k }}: {{ $v | quote }}
     {{- end }}
-  {{- end }}
+    {{- end }}
   {{- end }}
 spec:
   {{ if or .Values.ingress.enabled .Values.albIngress.enabled .Values.customNodePort.enabled }}
@@ -32,6 +38,13 @@ spec:
       {{- else if .Values.customNodePort.enabled }}
       nodePort: {{ .Values.customNodePort.port }}
       {{- end }}
+  {{- if and .Values.metricsScraping.enabled (ne .Values.metricsScraping.port .Values.service.port) }}
+    # add metrics scraping port if metrics scraping is enabled and the port is not the same as the service port
+    - port: {{ .Values.metricsScraping.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  {{- end }}
   {{- range .Values.service.extraPorts }}
     - port: {{ .port }}
       targetPort: {{ .targetPort }}

@@ -304,3 +304,9 @@ fileSecretMounts:
   mounts: []
 
 nodeGroups: []
+
+
+metricsScraping:
+  enabled: false
+  port: 80
+  path: "/metrics"
