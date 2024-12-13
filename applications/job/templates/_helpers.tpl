@@ -103,3 +103,36 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
 
 {{- end }}
 {{- end }}
+
+{{/*
+Get image repository, using global if available
+*/}}
+{{- define "docker-template.getImageRepository" -}}
+{{- if and .Values.global .Values.global.image -}}
+{{- .Values.global.image.repository -}}
+{{- else -}}
+{{- .Values.image.repository -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Get image tag, using global if available
+*/}}
+{{- define "docker-template.getImageTag" -}}
+{{- if and .Values.global .Values.global.image -}}
+{{- .Values.global.image.tag -}}
+{{- else -}}
+{{- .Values.image.tag -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Get image pull secret, using global if available
+*/}}
+{{- define "docker-template.getImagePullSecret" -}}
+{{- if and .Values.image .Values.image.imagePullSecret -}}
+{{- .Values.image.imagePullSecret -}}
+{{- else if and .Values.global .Values.global.image .Values.global.image.imagePullSecret -}}
+{{- .Values.global.image.imagePullSecret -}}
+{{- end -}}
+{{- end -}}
