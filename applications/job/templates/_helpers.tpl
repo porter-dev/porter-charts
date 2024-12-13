@@ -125,3 +125,14 @@ Get image tag, using global if available
 {{- .Values.image.tag -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Get image pull secret, using global if available
+*/}}
+{{- define "docker-template.getImagePullSecret" -}}
+{{- if and .Values.image .Values.image.imagePullSecret -}}
+{{- .Values.image.imagePullSecret -}}
+{{- else if and .Values.global .Values.global.image .Values.global.image.imagePullSecret -}}
+{{- .Values.global.image.imagePullSecret -}}
+{{- end -}}
+{{- end -}}
