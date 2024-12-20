@@ -178,3 +178,10 @@ nodeGroups: []
 fileSecretMounts:
   enabled: false
   mounts: []
+
+# set this to add additional volumes to the deployment
+additionalVolumes:
+  - name: ""
+    type: ""
+    mountPath: ""
+    volumeOptions: {}

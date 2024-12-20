@@ -331,6 +331,13 @@ spec:
               readOnly: true
           {{ end }}
           {{ end }}
+          {{ if .Values.additionalVolumes }}
+          {{ range .Values.additionalVolumes }}
+          volumeMounts:
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+          {{ end }}
+          {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
@@ -398,7 +405,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled .Values.additionalVolumes (len .Values.additionalVolumes | gt 0) }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -431,5 +438,10 @@ spec:
           secret:
             secretName: "{{ .secretName }}"
         {{ end }}
+        {{ end }}
+        {{ range .Values.additionalVolumes }}
+        - name: {{ .name }}
+          {{ .type }}:
+            {{- toYaml .volumeOptions | nindent 8 }}
         {{ end }}
       {{ end }}
