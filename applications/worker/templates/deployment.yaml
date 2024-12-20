@@ -332,11 +332,11 @@ spec:
           {{ end }}
           {{ end }}
           {{ if .Values.additionalVolumes }}
-          {{ range .Values.additionalVolumes }}
           volumeMounts:
+            {{- range .Values.additionalVolumes }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
-          {{ end }}
+            {{- end }}
           {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
@@ -405,7 +405,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled .Values.additionalVolumes (len .Values.additionalVolumes | gt 0) }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -439,9 +439,11 @@ spec:
             secretName: "{{ .secretName }}"
         {{ end }}
         {{ end }}
-        {{ range .Values.additionalVolumes }}
+        {{ if .Values.additionalVolumes }}
+        {{- range .Values.additionalVolumes }}
         - name: {{ .name }}
           {{ .type }}:
-            {{- toYaml .volumeOptions | nindent 8 }}
+            {{- toYaml .volumeOptions | nindent 12 }}
+        {{- end }}
         {{ end }}
       {{ end }}
