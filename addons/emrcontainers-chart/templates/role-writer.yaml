@@ -10,9 +10,7 @@ rules:
   - emrcontainers.services.k8s.aws
   resources:
   - jobruns
-
   - virtualclusters
-
   verbs:
   - create
   - delete
