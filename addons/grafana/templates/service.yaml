@@ -6,6 +6,7 @@ metadata:
   name: {{ include "grafana.fullname" . }}
   namespace: {{ include "grafana.namespace" . }}
   labels:
+    porter.run/tailscale-svc: "true"
     {{- include "grafana.labels" . | nindent 4 }}
     {{- with .Values.service.labels }}
     {{- toYaml . | nindent 4 }}
