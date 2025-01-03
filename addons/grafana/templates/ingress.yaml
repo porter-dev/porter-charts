@@ -1,4 +1,4 @@
-{{- if .Values.ingress.enabled -}}
+{{- if and .Values.ingress.enabled ( not .Values.multipleWildcardIngress.enabled ) -}}
 {{- $ingressApiIsStable := eq (include "grafana.ingress.isStable" .) "true" -}}
 {{- $ingressSupportsIngressClassName := eq (include "grafana.ingress.supportsIngressClassName" .) "true" -}}
 {{- $ingressSupportsPathType := eq (include "grafana.ingress.supportsPathType" .) "true" -}}
