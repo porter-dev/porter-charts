@@ -259,9 +259,9 @@ serviceMonitor:
   targetLabels: []
 
 extraExposePorts: []
- # - name: keycloak
- #   port: 8080
- #   targetPort: 8080
+  # - name: keycloak
+  #   port: 8080
+  #   targetPort: 8080
 
 # overrides pod.spec.hostAliases in the grafana deployment's pods
 hostAliases: []
@@ -306,6 +306,16 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+multipleWildcardIngress:
+  enabled: false
+  ingressClass: nginx
+  # hosts contains a list of objects, each object contains a hostName and a tlsSecret
+  # Leave tlsSecret blank ONLY if you want to allow Ingress for a specific host without TLS
+  hosts: []
+  custom_domain: true
+  rewriteCustomPathsEnabled: true
+  annotations: {}
 
 resources: {}
 #  limits:
@@ -746,6 +756,8 @@ dashboards:
       file: dashboards/nginx.json
     gpu-metrics:
       file: dashboards/dcgm_metrics.json
+    application-logs:
+      file: dashboards/application_logs.json
   # default:
   #   some-dashboard:
   #     json: |

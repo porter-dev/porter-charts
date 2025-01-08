@@ -75,17 +75,21 @@ spec:
           {{- if and .Values.image .Values.image.imagePullSecret }}
           imagePullSecrets:
             - name: {{ .Values.image.imagePullSecret }}
+          {{- else if and .Values.global  .Values.global.image .Values.global.image.imagePullSecret }}
+          imagePullSecrets:
+            - name: {{ .Values.global.image.imagePullSecret }}
           {{- end }}
           containers:
             - name: {{ .Chart.Name }}
             {{- if .Values.global }}
             {{- if .Values.global.image }}
               image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag }}"
+              imagePullPolicy: {{ if eq .Values.global.image.tag "latest" }}"Always"{{ else }}"IfNotPresent"{{ end }}
             {{- end }}
             {{- else }}
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ if eq .Values.image.tag "latest" }}"Always"{{ else }}"IfNotPresent"{{ end }}
             {{- end }}
-              imagePullPolicy: {{ .Values.image.pullPolicy }}
             {{- if .Values.global }}
             {{- if .Values.global.image }}
             {{- if and .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")) }}

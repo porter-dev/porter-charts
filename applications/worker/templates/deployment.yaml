@@ -65,6 +65,9 @@ spec:
       {{- if and .Values.image .Values.image.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.image.imagePullSecret }}
+      {{- else if and .Values.global  .Values.global.image .Values.global.image.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.global.image.imagePullSecret }}
       {{- end }}
       initContainers:
         # this is used for ensuring the kubelet is ready on new nodes, and can injected any downward API keys
@@ -86,11 +89,12 @@ spec:
           {{- if .Values.global }}
           {{- if .Values.global.image }}
           image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag }}"
+          imagePullPolicy: {{ if eq .Values.global.image.tag "latest" }}"Always"{{ else }}"IfNotPresent"{{ end }}
           {{- end }}
           {{- else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ if eq .Values.image.tag "latest" }}"Always"{{ else }}"IfNotPresent"{{ end }}
           {{- end }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.global }}
           {{- if .Values.global.image }}
           {{- if and .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")) }}
@@ -328,6 +332,13 @@ spec:
               readOnly: true
           {{ end }}
           {{ end }}
+          {{ if .Values.additionalVolumes }}
+          volumeMounts:
+            {{- range .Values.additionalVolumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
+          {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
@@ -395,7 +406,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -428,5 +439,12 @@ spec:
           secret:
             secretName: "{{ .secretName }}"
         {{ end }}
+        {{ end }}
+        {{ if .Values.additionalVolumes }}
+        {{- range .Values.additionalVolumes }}
+        - name: {{ .name }}
+          {{ .type }}:
+            {{- toYaml .volumeOptions | nindent 12 }}
+        {{- end }}
         {{ end }}
       {{ end }}

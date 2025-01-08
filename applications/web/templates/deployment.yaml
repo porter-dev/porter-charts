@@ -88,6 +88,9 @@ spec:
       {{- if and .Values.image .Values.image.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.image.imagePullSecret }}
+      {{- else if and .Values.global  .Values.global.image .Values.global.image.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.global.image.imagePullSecret }}
       {{- end }}
       initContainers:
         # this is used for ensuring the kubelet is ready on new nodes, and can injected any downward API keys
@@ -109,11 +112,12 @@ spec:
           {{- if .Values.global }}
           {{- if .Values.global.image }}
           image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag }}"
+          imagePullPolicy: {{ if eq .Values.global.image.tag "latest" }}"Always"{{ else }}"IfNotPresent"{{ end }}
           {{- end }}
           {{- else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ if eq .Values.image.tag "latest" }}"Always"{{ else }}"IfNotPresent"{{ end }}
           {{- end }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.global }}
           {{- if .Values.global.image }}
           {{- if and .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")) }}
@@ -165,6 +169,12 @@ spec:
             - name: http
               containerPort: {{ .Values.container.port }}
               protocol: TCP
+            {{- if and .Values.metricsScraping.enabled (ne .Values.metricsScraping.port .Values.container.port) }}
+            # if metrics scraping is enabled and the port is not the same as the container port, add a metrics port
+            - name: metrics
+              containerPort: {{ .Values.metricsScraping.port }}
+              protocol: TCP
+            {{- end }}
             {{- range .Values.container.extraPorts }}
             - name: {{ .name }}
               containerPort: {{ .containerPort }}
