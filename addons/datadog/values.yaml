@@ -1084,7 +1084,7 @@ clusterAgent:
     # clusterAgent.admissionController.validation -- Validation Webhook configuration options
     validation:
       # clusterAgent.admissionController.validation.enabled -- Enabled enables the Admission Controller validation webhook. Default: true. (Requires Agent 7.59.0+).
-      enabled: true
+      enabled: false
 
     # clusterAgent.admissionController.mutation -- Mutation Webhook configuration options
     mutation:
