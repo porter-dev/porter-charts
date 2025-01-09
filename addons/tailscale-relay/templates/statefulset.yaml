@@ -39,6 +39,12 @@ spec:
       {{- if .Values.rbac.enabled }}
       serviceAccountName: {{ template "exporter.serviceAccountName" . }}
       {{- end }}
+      initContainers:
+      - args:
+        - -c
+        - sysctl -w net.ipv4.ip_forward=1 net.ipv6.conf.all.forwarding=1
+        command:
+        - /bin/sh
       containers:
         - name: {{ .Chart.Name }}
           image: {{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}
