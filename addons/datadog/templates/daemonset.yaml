@@ -185,6 +185,9 @@ spec:
       - effect: NoSchedule
         key: porter.run/node-group-id
         operator: Exists
+      - effect: NoSchedule
+        key: nvidia.com/gpu
+        operator: Exists
       {{- if eq .Values.targetSystem "windows" }}
       - effect: NoSchedule
         key: node.kubernetes.io/os
