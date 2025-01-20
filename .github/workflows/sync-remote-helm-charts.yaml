@@ -131,7 +131,7 @@ jobs:
             remote_repository: external-secrets
             remote_directory: deploy/charts/external-secrets
             target_directory: addons/external-secrets
-            tag: v0.10.3
+            tag: helm-chart-0.10.3
 
     permissions:
       contents: write
