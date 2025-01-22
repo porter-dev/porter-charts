@@ -10,13 +10,9 @@ rules:
   - prometheusservice.services.k8s.aws
   resources:
   - alertmanagerdefinitions
-
   - loggingconfigurations
-
   - rulegroupsnamespaces
-
   - workspaces
-
   verbs:
   - create
   - delete
