@@ -84,14 +84,16 @@ keda:
     failureReplicas: 6
   hpa:
     scaleUp:
-      stabilizationWindowSeconds: 300
+      stabilizationWindowSeconds: 60
       policy:
-        value: 10
-        periodSeconds: 300
+        type: Percent
+        value: 100
+        periodSeconds: 60
     scaleDown:
       stabilizationWindowSeconds: 300
       policy:
-        value: 10
+        type: Percent
+        value: 50
         periodSeconds: 300
   trigger:
     metricName: ""
