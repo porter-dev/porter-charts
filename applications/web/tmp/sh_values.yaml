@@ -1,0 +1,121 @@
+
+autoscaling:
+  enabled: false
+  gpu: false
+  maxReplicas: 0
+  minReplicas: 0
+  targetCPUUtilizationPercentage: 0
+  targetGPUMemoryUtilizationRatio: 0
+  targetGPUUtilizationPercentage: 0
+  targetMemoryUtilizationPercentage: 0
+cloudsql:
+  connectionName: ''
+  dbPort: 0
+  enabled: false
+  serviceAccountJSONSecret: ''
+configMapRefs:
+  - brain.1
+  - 5571-3dd5f2.6
+container:
+  command: ''
+  env:
+    normal: null
+  port: 8000
+deploymentStrategy:
+  blueGreen: {}
+fileSecretMounts:
+  enabled: false
+  mounts: null
+fullnameOverride: brain-api
+health:
+  livenessProbe:
+    command: ''
+    enabled: true
+    initialDelaySeconds: 15
+    path: /healthz
+    timeoutSeconds: 1
+  readinessProbe:
+    command: ''
+    enabled: true
+    initialDelaySeconds: 15
+    path: /healthz
+    timeoutSeconds: 1
+ingress:
+  enabled: false
+  hosts: null
+  tls: true
+  wildcard: false
+keda:
+  enabled: false
+  maxReplicaCount: 0
+  minReplicaCount: 0
+  trigger:
+    metricName: ''
+    metricQuery: ''
+    metricThreshold: 0
+labels:
+  porter.run/absolute-name: brain-api
+  porter.run/app-id: '5571'
+  porter.run/app-instance-id: bef7f24f-837e-4d44-8293-a766f607b6a7
+  porter.run/app-name: brain
+  porter.run/app-revision-id: a6ec1a91-f138-4142-96bf-515a97a4bf74
+  porter.run/deployment-target-id: 3dd5f28f-2362-413d-bd13-28b601104486
+  porter.run/image-repository-hash: 0440182e12160cc573623b777dfe9075d0be7c4191dccfd4f968b760326d71f
+  porter.run/image-tag: eb15b04b91784200075b1e9033947e90b0d291e3
+  porter.run/porter-application: 'true'
+  porter.run/project-id: '10032'
+  porter.run/service-name: api
+  porter.run/service-type: web
+  porter.run/tailscale-svc: 'true'
+metricsScraping:
+  enabled: false
+  path: /metrics
+  port: 8000
+multipleWildcardIngress:
+  annotations:
+    kubernetes.io/ingress.class: nginx-private
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300s"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300s"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300s"
+  custom_domain: true
+  enabled: true
+  hosts:
+    - hostName: brain.samplehc.com
+      tlsSecret: brain-brain-samplehc-com
+  ingressClass: nginx-private
+  rewriteCustomPathsEnabled: true
+nodeGroups: null
+podAnnotations: {}
+podDisruptionBudget:
+  enabled: true
+  minAvailablePercentage: 30
+podLabels:
+  porter.run/absolute-name: brain-api
+  porter.run/app-id: '5571'
+  porter.run/app-instance-id: bef7f24f-837e-4d44-8293-a766f607b6a7
+  porter.run/app-name: brain
+  porter.run/app-revision-id: a6ec1a91-f138-4142-96bf-515a97a4bf74
+  porter.run/deployment-target-id: 3dd5f28f-2362-413d-bd13-28b601104486
+  porter.run/image-repository-hash: 0440182e12160cc573623b777dfe9075d0be7c4191dccfd4f968b760326d71f
+  porter.run/image-tag: eb15b04b91784200075b1e9033947e90b0d291e3
+  porter.run/porter-application: 'true'
+  porter.run/project-id: '10032'
+  porter.run/service-name: api
+  porter.run/service-type: web
+  porter.run/tailscale-svc: 'true'
+replicaCount: 4
+resources:
+  limits: {}
+  requests:
+    cpu: '6.0'
+    memory: 12080M
+secretRefs:
+  - brain.1
+  - 5571-3dd5f2.6
+service:
+  port: 8000
+terminationGracePeriodSeconds: 30
+image:
+  imagePullSecret: porter-image-pull-secret
+  repository: 516488285945.dkr.ecr.us-east-1.amazonaws.com/brain
+  tag: f2fff29a9e967a1870a2fad4c615f66cac0b32a2
