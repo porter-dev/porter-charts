@@ -12,6 +12,7 @@ addons/eks-chart
 addons/elasticache-chart
 addons/emrcontainers-chart
 addons/eventbridge-chart
+addons/external-secrets
 addons/iam-chart
 addons/karpenter-aws
 addons/keda-http-add-on
