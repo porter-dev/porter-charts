@@ -7,8 +7,7 @@ additionalLabels: {}
 # app: karpenter
 
 # -- Additional annotations to add into metadata.
-additionalAnnotations:
-  kubernetes.io/description: "Karpenter is a Kubernetes node provisioning service that automatically launches and manages nodes in response to pod requirements."
+additionalAnnotations: {}
 # -- Image pull policy for Docker images.
 imagePullPolicy: IfNotPresent
 # -- Image pull secrets for Docker images.
@@ -21,11 +20,9 @@ serviceAccount:
   create: true
   # -- The name of the ServiceAccount to use.
   # If not set and create is true, a name is generated using the fullname template.
-  name: "karpenter"
+  name: ""
   # -- Additional annotations for the ServiceAccount.
-  annotations:
-    eks.amazonaws.com/role-name: "{{ .KarpenterRole }}"
-    eks.amazonaws.com/pod-identity-name: "{{ .KarpenterRole }}"
+  annotations: {}
 # -- Specifies additional rules for the core ClusterRole.
 additionalClusterRoleRules: []
 serviceMonitor:
