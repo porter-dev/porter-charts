@@ -70,11 +70,18 @@ spec:
       {{- if .Values.maxModelLen }}
         - --max-model-len={{ .Values.maxModelLen }}
       {{- end }}
+      {{- if .Values.extraArgs }}
+        {{- range .Values.extraArgs }}
+        - {{ . }}
+        {{- end }}
+      {{- end }}
         image: {{ .Values.vllmImage }}
         imagePullPolicy: IfNotPresent
         env:
         - name: HF_TOKEN
           value: {{ .Values.huggingFaceToken }}
+        - name: NCCL_DEBUG
+          value: INFO
         ports:
         - containerPort: 8000
           protocol: TCP
@@ -105,6 +112,10 @@ spec:
             nvidia.com/gpu: {{ .Values.resources.limits.nvidiaGpu }}
               {{- end }}
         volumeMounts:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 4Gi
         - name: model-volume
           mountPath: {{ .Values.modelDir }}
         name: vllm
