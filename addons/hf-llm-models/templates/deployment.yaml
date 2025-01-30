@@ -113,9 +113,7 @@ spec:
               {{- end }}
         volumeMounts:
         - name: dshm
-          emptyDir:
-            medium: Memory
-            sizeLimit: 4Gi
+          mountPath: /dev/shm
         - name: model-volume
           mountPath: {{ .Values.modelDir }}
         name: vllm
@@ -123,6 +121,10 @@ spec:
           allowPrivilegeEscalation: false
       terminationGracePeriodSeconds: 10
       volumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 4Gi
       - name: model-volume
         persistentVolumeClaim:
           claimName: "{{ .Release.Name }}-hf-llm"
