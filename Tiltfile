@@ -82,6 +82,7 @@ local_resource(
   helm cm-push addons/langfuse local && \
   helm cm-push addons/grafana local && \
   helm cm-push addons/porter-agent local && \
+  helm cm-push addons/karpenter local && \
   helm repo update local
   ''',
   deps=[
