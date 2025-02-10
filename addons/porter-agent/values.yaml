@@ -1,5 +1,5 @@
 agent:
-  image: "ghcr.io/porter-dev/releases/porter-agent:3.4.5"
+  image: "ghcr.io/porter-dev/releases/porter-agent:3.4.7"
   cfAccessToken: ""
   porterHost: "dashboard.porter.run"
   porterPort: "80"
@@ -12,6 +12,7 @@ agent:
   lokiURL: porter-agent-loki.porter-agent-system:9095
   lokiHTTPURL: http://porter-agent-loki.porter-agent-system:3100
   prometheusURL: http://prometheus-server.monitoring.svc
+  # NOTE: if updating the measurement period, MAKE SURE TO ALSO UPDATE THE PROMETHEUS QUERY FOR CALCULATING THE AVERAGE RESOURCE USAGE
   billingMeasurementPeriod: "5m"
 
 resources:
