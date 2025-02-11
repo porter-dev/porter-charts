@@ -94,6 +94,7 @@ resources:
   requests:
     cpu: "0.2"
     memory: 100M
+    nvidiaGpu: 2
 secretRefs:
 - 18-aaaaaa.1
 service:
