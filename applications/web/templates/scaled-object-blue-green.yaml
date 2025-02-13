@@ -50,6 +50,7 @@ spec:
         metricName: {{ $.Values.keda.trigger.metricName }}
         query: {{ $.Values.keda.trigger.metricQuery }}
         threshold: '{{ $.Values.keda.trigger.metricThreshold }}'
+        ignoreNullValues: {{ $.Values.keda.trigger.ignoreNullValues | default "true" | quote }}
   {{- end }}
   {{- if $.Values.keda.triggers }}
   triggers:
