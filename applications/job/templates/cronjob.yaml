@@ -79,6 +79,9 @@ spec:
           imagePullSecrets:
             - name: {{ .Values.global.image.imagePullSecret }}
           {{- end }}
+          {{- if .Values.enableHostIpc }}
+          hostIPC: true
+          {{- end }}
           containers:
             - name: {{ .Chart.Name }}
             {{- if .Values.global }}
