@@ -21,7 +21,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 12239,
   "graphTooltip": 0,
-  "id": 4,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -940,10 +940,10 @@
         "current": {
           "selected": true,
           "text": [
-            "amd-full-call-cobra"
+            "All"
           ],
           "value": [
-            "amd-full-call-cobra"
+            "$__all"
           ]
         },
         "datasource": {
@@ -1054,8 +1054,8 @@
     ]
   },
   "timezone": "",
-  "title": "NVIDIA DCGM Exporter Dashboard 2",
+  "title": "NVIDIA DCGM Exporter Dashboard",
   "uid": "cdveeo686dr0gd",
-  "version": 7,
+  "version": 1,
   "weekStart": ""
 }
