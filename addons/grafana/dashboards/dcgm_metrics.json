@@ -412,11 +412,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(Hostname, gpu, porter_run_app_name) (DCGM_FI_DEV_GPU_TEMP{Hostname=~\"$Hostname\", gpu=~\"${gpu}\", porter_run_app_name=~\"$application\"})",
+          "expr": "avg by(gpu, Hostname) (DCGM_FI_DEV_GPU_TEMP{Hostname=~\"$Hostname\", gpu=~\"${gpu}\", porter_run_app_name=~\"$application\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "{{Hostname}}__{{gpu}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -1054,7 +1054,7 @@
     ]
   },
   "timezone": "",
-  "title": "NVIDIA DCGM Exporter Dashboard",
+  "title": "NVIDIA DCGM Exporter Dashboard 2",
   "uid": "cdveeo686dr0gd",
   "version": 7,
   "weekStart": ""
