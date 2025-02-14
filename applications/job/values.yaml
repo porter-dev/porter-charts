@@ -99,3 +99,8 @@ nodeGroups: []
 fileSecretMounts:
   enabled: false
   mounts: []
+
+# hostIPC is required on pods that need to access the host's IPC namespace
+# this is the case for instance for pods that need to use the MPS sliced GPUs
+# enable this conservatively
+enableHostIpc: false

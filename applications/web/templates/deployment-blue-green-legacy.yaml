@@ -39,6 +39,9 @@ spec:
       imagePullSecrets:
         - name: {{ $.Values.image.imagePullSecret }}
       {{- end }}
+      {{- if $.Values.enableHostIpc }}
+      hostIPC: true
+      {{- end }}
       containers:
         - name: {{ $.Chart.Name }}
           securityContext:

@@ -92,6 +92,9 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.global.image.imagePullSecret }}
       {{- end }}
+      {{- if .Values.enableHostIpc }}
+      hostIPC: true
+      {{- end }}
       initContainers:
         # this is used for ensuring the kubelet is ready on new nodes, and can injected any downward API keys
         - name: downward-api
