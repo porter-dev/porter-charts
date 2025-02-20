@@ -127,11 +127,6 @@ jobs:
             remote_directory: charts/karpenter
             target_directory: addons/karpenter-aws
             tag: v1.0.2
-          - remote_owner: external-secrets
-            remote_repository: external-secrets
-            remote_directory: deploy/charts/external-secrets
-            target_directory: addons/external-secrets
-            tag: helm-chart-0.10.3
 
     permissions:
       contents: write
@@ -155,3 +150,26 @@ jobs:
         env:
           CHARTMUSEUM_URL: ${{ vars.PUBLIC_CHARTMUSEUM_ADDONS_URL }}
         continue-on-error: true
+
+  sync-chart-using-tar-file:
+    strategy:
+      matrix:
+        charts:
+          - chart_url: https://github.com/external-secrets/external-secrets/releases/download/helm-chart-0.10.3/external-secrets-0.10.3.tgz
+            target_directory: addons/external-secrets
+            chart_name: external-secrets
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout porter-charts
+        uses: actions/checkout@v4
+
+      - name: Sync chart from tar file
+        uses: ./.github/actions/sync-remote-directory-using-tar-file
+        with:
+          chart_url: ${{ matrix.charts.chart_url }}
+          target_directory: ${{ matrix.charts.target_directory }}
+          chart_name: ${{ matrix.charts.chart_name }}
+          github_token: ${{ secrets.GITHUB_TOKEN }} 
