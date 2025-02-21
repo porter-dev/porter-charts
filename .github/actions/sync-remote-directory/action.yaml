@@ -22,11 +22,6 @@ inputs:
     description: 'Tag to checkout from the remote repository'
     required: false
     type: string
-  draft_mode:
-    description: 'Whether to create the PR as a draft'
-    required: false
-    type: boolean
-    default: false
 
 runs:
   using: composite
@@ -72,5 +67,4 @@ runs:
           ${{ inputs.target_directory }}
         title: "Sync: ${{ inputs.remote_owner }}/${{ inputs.remote_repository }} - ${{ inputs.remote_directory }} (Tag: ${{ inputs.tag }})"
         branch: "${{ inputs.target_directory }}"
-        draft: ${{ inputs.draft_mode }}
 
