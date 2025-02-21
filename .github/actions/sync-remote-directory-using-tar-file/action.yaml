@@ -14,6 +14,11 @@ inputs:
   chart_name:
     description: 'Name of the chart for PR title and branch name'
     required: true
+  draft_mode:
+    description: 'Whether to create the PR as a draft'
+    required: false
+    type: boolean
+    default: false
 
 runs:
   using: composite
@@ -54,6 +59,7 @@ runs:
           ${{ inputs.target_directory }}
         title: "Sync: ${{ inputs.chart_name }} from tar file"
         branch: "sync-${{ inputs.chart_name }}-release"
+        draft: ${{ inputs.draft_mode }}
 
     - name: Cleanup
       shell: bash
