@@ -63,4 +63,4 @@ runs:
 
     - name: Cleanup
       shell: bash
-      run: rm -rf /tmp/helm-charts 
+      run: rm -rf /tmp/helm-charts
