@@ -3,13 +3,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      test_mode:
-        description: 'Running in test mode (PRs will be created as drafts)'
-        required: false
-        default: 'true'
-        type: boolean
 
 jobs:
   sync-chart:

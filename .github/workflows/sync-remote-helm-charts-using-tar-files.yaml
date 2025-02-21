@@ -1,4 +1,4 @@
-name: 'Sync remote charts in PR'
+name: 'Sync remote charts in PR using tar files'
 on:
   push:
     branches:
