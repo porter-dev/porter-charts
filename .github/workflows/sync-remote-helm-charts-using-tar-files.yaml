@@ -30,3 +30,4 @@ jobs:
           target_directory: ${{ matrix.charts.target_directory }}
           chart_name: ${{ matrix.charts.chart_name }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          
