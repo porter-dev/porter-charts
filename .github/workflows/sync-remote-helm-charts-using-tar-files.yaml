@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '.github/workflows/sync-remote-helm-charts-using-tar-files.yaml'
   workflow_dispatch:
 
 jobs:
