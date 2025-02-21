@@ -4,12 +4,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      test_mode:
-        description: 'Running in test mode (PRs will be created as drafts)'
-        required: false
-        default: 'true'
-        type: boolean
 
 jobs:
   sync-chart-using-tar-file:
@@ -34,4 +28,3 @@ jobs:
           target_directory: ${{ matrix.charts.target_directory }}
           chart_name: ${{ matrix.charts.chart_name }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          draft_mode: ${{ github.event.inputs.test_mode == 'true' }} 

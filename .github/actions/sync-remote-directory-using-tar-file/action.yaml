@@ -1,4 +1,4 @@
-name: 'Sync Helm chart from release'
+name: 'Sync Helm chart from release using tar file'
 description: 'Download and sync a Helm chart from a release URL'
 
 inputs:
@@ -14,11 +14,6 @@ inputs:
   chart_name:
     description: 'Name of the chart for PR title and branch name'
     required: true
-  draft_mode:
-    description: 'Whether to create the PR as a draft'
-    required: false
-    type: boolean
-    default: false
 
 runs:
   using: composite
@@ -39,12 +34,11 @@ runs:
     - name: Sync to target directory
       shell: bash
       run: |
-        # Clear target directory
-        rm -rf ${{ inputs.target_directory }}
+        # Create target directory if it doesn't exist
         mkdir -p ${{ inputs.target_directory }}
-        
+
         # Copy contents to directory
-        cp -R /tmp/helm-charts/${{ inputs.chart_name }}/* ${{ inputs.target_directory }}/
+        rsync -av --delete --cvs-exclude /tmp/helm-charts/${{ inputs.chart_name }}/ ${{ inputs.target_directory }}/
         
         # Add to vendored-charts
         echo "${{ inputs.target_directory }}" >> vendored-charts
@@ -59,7 +53,6 @@ runs:
           ${{ inputs.target_directory }}
         title: "Sync: ${{ inputs.chart_name }} from tar file"
         branch: "sync-${{ inputs.chart_name }}-release"
-        draft: ${{ inputs.draft_mode }}
 
     - name: Cleanup
       shell: bash
