@@ -1,9 +1,9 @@
 {{ if .Values.awsEfsStorage }}
-{{- range $v := .Values.awsEfsStorage }}
+{{- range $index, $v := .Values.awsEfsStorage }}
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name: efs-{{ $.Values.fullnameOverride }}
+  name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
 provisioner: efs.csi.aws.com
 parameters:
   provisioningMode: efs-ap
@@ -14,13 +14,14 @@ parameters:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: efs-{{ $.Values.fullnameOverride }}
+  name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: efs-{{ $.Values.fullnameOverride }}
+  storageClassName: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
   resources:
     requests:
       storage: 5Gi
+---
 {{- end }}
 {{- end }}

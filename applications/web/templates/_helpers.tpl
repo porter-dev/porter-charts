@@ -116,3 +116,15 @@ Otherwise, use the default path /data/efs/<fullname>
 {{- printf "/data/efs/%s" .fullname -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Get the EFS resource name. If index is 0, don't append it to the name.
+*/}}
+{{- define "docker-template.efsName" -}}
+{{- $name := printf "efs-%s" .fullname -}}
+{{- if ne (.index | int) 0 -}}
+{{- printf "%s-%d" $name (.index | int) -}}
+{{- else -}}
+{{- $name -}}
+{{- end -}}
+{{- end -}}
