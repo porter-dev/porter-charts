@@ -412,7 +412,7 @@ spec:
           volumeMounts:
         {{- range $v := .Values.awsEfsStorage }}
           - name: efs-{{ $.Values.fullnameOverride }}
-            mountPath: /data/efs/{{ $.Values.fullnameOverride }}
+            mountPath: {{ include "docker-template.efsMountPath" (dict "mountPath" $v.mountPath "fullname" $.Values.fullnameOverride) }}
         {{ end }}   
         {{ end }}  
           {{ if .Values.pvc.enabled }}
