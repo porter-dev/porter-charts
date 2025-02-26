@@ -21,7 +21,7 @@ spec:
   storageClassName: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
   resources:
     requests:
-      storage: 5Gi
+      storage: {{ default "5Gi" $v.storageSize }}
 ---
 {{- end }}
 {{- end }}
