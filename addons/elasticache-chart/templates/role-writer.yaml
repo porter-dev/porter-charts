@@ -9,18 +9,13 @@ rules:
 - apiGroups:
   - elasticache.services.k8s.aws
   resources:
+  - cacheclusters
   - cacheparametergroups
-
   - cachesubnetgroups
-
   - replicationgroups
-
   - snapshots
-
   - users
-
   - usergroups
-
   verbs:
   - create
   - delete
@@ -32,6 +27,7 @@ rules:
 - apiGroups:
   - elasticache.services.k8s.aws
   resources:
+  - cacheclusters
   - cacheparametergroups
   - cachesubnetgroups
   - replicationgroups
