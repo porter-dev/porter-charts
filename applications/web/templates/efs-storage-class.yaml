@@ -8,7 +8,7 @@ provisioner: efs.csi.aws.com
 parameters:
   provisioningMode: efs-ap
   fileSystemId: {{ $v.fileSystemId }}
-  directoryPerms: {{ default "700" $v.directoryPerms }}
+  directoryPerms: "{{ default "700" $v.directoryPerms }}"
   reuseAccessPoint: "true"
 ---
 apiVersion: v1
