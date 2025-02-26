@@ -8,7 +8,7 @@ provisioner: efs.csi.aws.com
 parameters:
   provisioningMode: efs-ap
   fileSystemId: {{ $v.fileSystemId }}
-  directoryPerms: "700"
+  directoryPerms: "{{ default "700" $v.directoryPerms }}"
   reuseAccessPoint: "true"
 ---
 apiVersion: v1
@@ -21,7 +21,7 @@ spec:
   storageClassName: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
   resources:
     requests:
-      storage: 5Gi
+      storage: {{ default "5Gi" $v.storageSize }}
 ---
 {{- end }}
 {{- end }}
