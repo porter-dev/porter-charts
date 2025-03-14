@@ -10,9 +10,7 @@ rules:
   - ecr.services.k8s.aws
   resources:
   - pullthroughcacherules
-
   - repositories
-
   verbs:
   - create
   - delete
