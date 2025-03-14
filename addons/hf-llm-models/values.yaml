@@ -55,3 +55,7 @@ autoscaling:
   maxReplicas: 10
   scaledownPeriod: 300 # the time in seconds to wait before scaling down the deployment after the last request
   targetConcurrency: 100 # the target concurrent connections per replica
+
+# Metrics configuration for Prometheus scraping
+metrics:
+  enabled: false # Whether to enable metrics scraping
