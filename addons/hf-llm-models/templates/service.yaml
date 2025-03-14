@@ -1,6 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
+  {{- if .Values.metrics.enabled }}
+  annotations:
+    porter.prometheus/scrape: "true" 
+    porter.prometheus/port: "8000"
+    porter.prometheus/path: "/metrics"
+    porter.prometheus/scheme: "http"
+  {{- end }}
   labels:
     llm-model: {{ .Release.Name }}-hf-llm
   name: {{ .Release.Name }}-hf-llm
