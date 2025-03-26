@@ -354,7 +354,7 @@ spec:
             {{ end }}
           resources:
             limits:
-              memory: 2Gi
+              memory: 4Gi
               cpu: 2
             requests:
               memory: 128Mi
