@@ -23,6 +23,10 @@ spec:
               containers:
               - name: rollout-sync
                 image: ghcr.io/porter-dev/rollout-sync:latest
+                resources:
+                  requests:
+                    cpu: 50m
+                    memory: 100Mi
                 command: [sh, -c]
                 args:
                 {{- if and (.Values.deploymentStrategy.blueGreen)  (.Values.deploymentStrategy.blueGreen.partnerApps) }}
