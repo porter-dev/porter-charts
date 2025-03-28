@@ -10,11 +10,8 @@ rules:
   - kms.services.k8s.aws
   resources:
   - aliases
-
   - grants
-
   - keys
-
   verbs:
   - create
   - delete
