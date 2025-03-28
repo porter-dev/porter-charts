@@ -10,11 +10,8 @@ rules:
   - dynamodb.services.k8s.aws
   resources:
   - backups
-
   - globaltables
-
   - tables
-
   verbs:
   - create
   - delete
