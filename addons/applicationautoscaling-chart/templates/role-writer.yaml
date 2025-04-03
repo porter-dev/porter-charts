@@ -10,9 +10,7 @@ rules:
   - applicationautoscaling.services.k8s.aws
   resources:
   - scalabletargets
-
   - scalingpolicies
-
   verbs:
   - create
   - delete
