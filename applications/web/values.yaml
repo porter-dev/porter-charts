@@ -234,6 +234,13 @@ pvc:
   mountPath: /mypath
   existingVolume: ""
 
+# set this to add additional volumes to the deployment
+additionalVolumes:
+  # - name: ""
+  #   type: ""
+  #   mountPath: ""
+  #   volumeOptions: {}
+
 cloudsql:
   enabled: false
   connections: []
@@ -315,3 +322,4 @@ metricsScraping:
 # this is the case for instance for pods that need to use the MPS sliced GPUs
 # enable this conservatively
 enableHostIpc: false
+
