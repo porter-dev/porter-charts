@@ -51,7 +51,7 @@ ingress:
   provider: aws
   custom_domain: false
   custom_paths: []
-  rewriteCustomPathsEnabled: true
+  rewriteCustomPathsEnabled: false
   annotations: {}
   wildcard: false
   tls: true
@@ -68,7 +68,7 @@ multipleWildcardIngress:
   # Leave tlsSecret blank ONLY if you want to allow Ingress for a specific host without TLS
   hosts: []
   custom_domain: true
-  rewriteCustomPathsEnabled: true
+  rewriteCustomPathsEnabled: false
   annotations: {}
 
 albIngress:
