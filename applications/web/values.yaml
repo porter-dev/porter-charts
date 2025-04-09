@@ -68,7 +68,7 @@ multipleWildcardIngress:
   # Leave tlsSecret blank ONLY if you want to allow Ingress for a specific host without TLS
   hosts: []
   custom_domain: true
-  rewriteCustomPathsEnabled: false
+  rewriteCustomPathsEnabled: true
   annotations: {}
 
 albIngress:
