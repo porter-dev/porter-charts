@@ -9,17 +9,20 @@ rules:
 - apiGroups:
   - ec2.services.k8s.aws
   resources:
+  - capacityreservations
   - dhcpoptions
   - elasticipaddresses
   - flowlogs
   - instances
   - internetgateways
+  - launchtemplates
   - natgateways
   - networkacls
   - routetables
   - securitygroups
   - subnets
   - transitgateways
+  - transitgatewayvpcattachments
   - vpcs
   - vpcendpoints
   - vpcendpointserviceconfigurations
