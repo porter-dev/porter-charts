@@ -10,6 +10,7 @@ metadata:
   {{- end }}
   labels:
     llm-model: {{ .Release.Name }}-hf-llm
+    porter.run/tailscale-svc: "true"
   name: {{ .Release.Name }}-hf-llm
 spec:
   ports:
