@@ -4,20 +4,21 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.2
-  name: subnetgroups.memorydb.services.k8s.aws
+  name: multiregionclusters.memorydb.services.k8s.aws
 spec:
   group: memorydb.services.k8s.aws
   names:
-    kind: SubnetGroup
-    listKind: SubnetGroupList
-    plural: subnetgroups
-    singular: subnetgroup
+    kind: MultiRegionCluster
+    listKind: MultiRegionClusterList
+    plural: multiregionclusters
+    singular: multiregioncluster
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: SubnetGroup is the Schema for the SubnetGroups API
+        description: MultiRegionCluster is the Schema for the MultiRegionClusters
+          API
         properties:
           apiVersion:
             description: |-
@@ -38,52 +39,37 @@ spec:
             type: object
           spec:
             description: |-
-              SubnetGroupSpec defines the desired state of SubnetGroup.
+              MultiRegionClusterSpec defines the desired state of MultiRegionCluster.
 
-              Represents the output of one of the following operations:
-
-                - CreateSubnetGroup
-
-                - UpdateSubnetGroup
-
-              A subnet group is a collection of subnets (typically private) that you can
-              designate for your clusters running in an Amazon Virtual Private Cloud (VPC)
-              environment.
+              Represents a multi-Region cluster.
             properties:
               description:
-                description: A description for the subnet group.
+                description: A description for the multi-Region cluster.
                 type: string
-              name:
-                description: The name of the subnet group.
+              engine:
+                description: The name of the engine to be used for the multi-Region
+                  cluster.
                 type: string
-              subnetIDs:
-                description: A list of VPC subnet IDs for the subnet group.
-                items:
-                  type: string
-                type: array
-              subnetRefs:
-                items:
-                  description: "AWSResourceReferenceWrapper provides a wrapper around
-                    *AWSResourceReference\ntype to provide more user friendly syntax
-                    for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
-                    \ name: my-api"
-                  properties:
-                    from:
-                      description: |-
-                        AWSResourceReference provides all the values necessary to reference another
-                        k8s resource for finding the identifier(Id/ARN/Name)
-                      properties:
-                        name:
-                          type: string
-                        namespace:
-                          type: string
-                      type: object
-                  type: object
-                type: array
+              engineVersion:
+                description: The version of the engine to be used for the multi-Region
+                  cluster.
+                type: string
+              multiRegionClusterNameSuffix:
+                description: A suffix to be added to the multi-Region cluster name.
+                type: string
+              multiRegionParameterGroupName:
+                description: The name of the multi-Region parameter group to be associated
+                  with the cluster.
+                type: string
+              nodeType:
+                description: The node type to be used for the multi-Region cluster.
+                type: string
+              numShards:
+                description: The number of shards for the multi-Region cluster.
+                format: int64
+                type: integer
               tags:
-                description: |-
-                  A list of tags to be added to this resource. A tag is a key-value pair. A
-                  tag key must be accompanied by a tag value, although null is accepted.
+                description: A list of tags to be applied to the multi-Region cluster.
                 items:
                   description: |-
                     A tag that can be added to an MemoryDB resource. Tags are composed of a Key/Value
@@ -98,11 +84,16 @@ spec:
                       type: string
                   type: object
                 type: array
+              tlsEnabled:
+                description: Whether to enable TLS encryption for the multi-Region
+                  cluster.
+                type: boolean
             required:
-            - name
+            - multiRegionClusterNameSuffix
+            - nodeType
             type: object
           status:
-            description: SubnetGroupStatus defines the observed state of SubnetGroup
+            description: MultiRegionClusterStatus defines the observed state of MultiRegionCluster
             properties:
               ackResourceMetadata:
                 description: |-
@@ -133,9 +124,24 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
+              clusters:
+                description: The clusters in this multi-Region cluster.
+                items:
+                  description: Represents a Regional cluster
+                  properties:
+                    arn:
+                      type: string
+                    clusterName:
+                      type: string
+                    region:
+                      type: string
+                    status:
+                      type: string
+                  type: object
+                type: array
               conditions:
                 description: |-
-                  All CRs managed by ACK have a common `Status.Conditions` member that
+                  All CRS managed by ACK have a common `Status.Conditions` member that
                   contains a collection of `ackv1alpha1.Condition` objects that describe
                   the various terminal states of the CR and its backend AWS service API
                   resource
@@ -168,28 +174,15 @@ spec:
                   - type
                   type: object
                 type: array
-              subnets:
-                description: A list of subnets associated with the subnet group.
-                items:
-                  description: |-
-                    Represents the subnet associated with a cluster. This parameter refers to
-                    subnets defined in Amazon Virtual Private Cloud (Amazon VPC) and used with
-                    MemoryDB.
-                  properties:
-                    availabilityZone:
-                      description: Indicates if the cluster has a Multi-AZ configuration
-                        (multiaz) or not (singleaz).
-                      properties:
-                        name:
-                          type: string
-                      type: object
-                    identifier:
-                      type: string
-                  type: object
-                type: array
-              vpcID:
-                description: The Amazon Virtual Private Cloud identifier (VPC ID)
-                  of the subnet group.
+              multiRegionClusterName:
+                description: The name of the multi-Region cluster.
+                type: string
+              numberOfShards:
+                description: The number of shards in the multi-Region cluster.
+                format: int64
+                type: integer
+              status:
+                description: The current status of the multi-Region cluster.
                 type: string
             type: object
         type: object
