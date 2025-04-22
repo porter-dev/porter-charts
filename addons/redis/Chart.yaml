@@ -8,7 +8,7 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami-common
-    version: 2.x.x
+    version: 2.29.1
 description: Redis is an in-memory database that persists on disk with a key-value data model.
 home: https://github.com/bitnami/charts/tree/main/bitnami/redis
 icon: https://bitnami.com/assets/stacks/redis/img/redis-stack-220x234.png
