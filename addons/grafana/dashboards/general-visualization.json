@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "This dashboard allows you to check basically everything that can be seen in Porter dashboard, but if more details and control, being it:\n- App's CPU usage;\n- App's Memory usage;\n- App's number of instances;\n- App's amount of network data received;\n- App's number (and response status) of requests received;\n- App's logs\n- NGINX logs\n- Cluster's number of nodes",
+  "description": "This dashboard allows you to check basically everything that can be seen in Porter dashboard, but with more details and control:\n- App's CPU usage;\n- App's Memory usage;\n- App's number of instances;\n- App's amount of network data received;\n- App's number (and response status) of requests received;\n- App's logs\n- NGINX logs\n- Cluster's number of nodes",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
