@@ -758,6 +758,8 @@ dashboards:
       file: dashboards/dcgm_metrics.json
     application-logs:
       file: dashboards/application_logs.json
+    general-visualization:
+      file: dashboards/general_visualization.json
   # default:
   #   some-dashboard:
   #     json: |
