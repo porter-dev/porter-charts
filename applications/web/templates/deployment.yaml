@@ -13,6 +13,9 @@ metadata:
     {{- if .Values.labels }}
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
+    {{- if and (eq .Values.deploymentStrategy.kind "blueGreen") .Values.deploymentStrategy.blueGreen.group }}
+    porter.run/blue-green-group: {{ .Values.deploymentStrategy.blueGreen.group | quote }}
+    {{- end }}
 spec:
   {{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
   strategy:

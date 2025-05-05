@@ -29,7 +29,9 @@ spec:
                     memory: 100Mi
                 command: [sh, -c]
                 args:
-                {{- if and (.Values.deploymentStrategy.blueGreen)  (.Values.deploymentStrategy.blueGreen.partnerApps) }}
+                {{- if and (.Values.deploymentStrategy.blueGreen)  (.Values.deploymentStrategy.blueGreen.group) }}
+                - rollout sync --strategy blue-green
+                {{- else if and (.Values.deploymentStrategy.blueGreen)  (.Values.deploymentStrategy.blueGreen.partnerApps) }}
                 - rollout sync --strategy blue-green --blue-green-apps {{ range $index, $app := .Values.deploymentStrategy.blueGreen.partnerApps }}{{ if $index }},{{ end }}{{ $app }}{{ end }}
                 {{- else }}
                 - rollout sync --strategy blue-green --blue-green-apps {{ include "docker-template.fullname" . }}
