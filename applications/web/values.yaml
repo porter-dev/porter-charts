@@ -25,6 +25,9 @@ image:
   # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank. 
   imagePullSecret:
 
+downwardAPIInit:
+  image: ghcr.io/porter-dev/downward-api-init:latest
+
 podLabels: {}
 
 serviceAccount:
