@@ -109,7 +109,7 @@ spec:
               fieldRef:
                 apiVersion: v1
                 fieldPath: status.hostIP
-          image: ghcr.io/porter-dev/downward-api-init:latest
+          image: {{ .Values.downwardAPIInit.image }}
           imagePullPolicy: IfNotPresent
       containers:
         - name: {{ .Chart.Name }}
