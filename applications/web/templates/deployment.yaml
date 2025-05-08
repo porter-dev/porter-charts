@@ -35,6 +35,9 @@ spec:
             {{- end }}
         templates:
         - templateName: {{ include "docker-template.fullname" . }}-bluegreen
+  {{- else if .Values.strategy }}
+  strategy:
+    type: {{ .Values.strategy }}
   {{- end }}
   {{- if not .Values.autoscaling.enabled }}
   {{- if not .Values.keda.enabled }}
