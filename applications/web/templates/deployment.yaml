@@ -35,9 +35,9 @@ spec:
             {{- end }}
         templates:
         - templateName: {{ include "docker-template.fullname" . }}-bluegreen
-  {{- else if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "recreate") }}
+  {{- else if .Values.strategy }}
   strategy:
-    type: Recreate
+    type: {{ .Values.strategy }}
   {{- end }}
   {{- if not .Values.autoscaling.enabled }}
   {{- if not .Values.keda.enabled }}
