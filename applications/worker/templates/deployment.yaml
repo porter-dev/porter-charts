@@ -14,9 +14,13 @@ spec:
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
+  # need both for backwards compatibility
   {{- if .Values.strategy }}
   strategy:
     type: {{ .Values.strategy }}
+  {{- else if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "recreate") }}
+  strategy:
+    type: Recreate
   {{- end }}
   template:
     metadata:
