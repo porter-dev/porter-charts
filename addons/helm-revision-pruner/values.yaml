@@ -10,7 +10,7 @@ terminationGracePeriodSeconds: 30
 allowConcurrency: true
 
 image:
-  repository: public.ecr.aws/porter-sre/helm-revision-pruner
+  repository: ghcr.io/porter-dev/helm-revision-pruner
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
