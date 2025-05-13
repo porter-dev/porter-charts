@@ -1,5 +1,6 @@
 {{- if and (not .Values.statefulset.enabled) (or (not .Values.bluegreen.disablePrimaryDeployment) (eq (len .Values.bluegreen.imageTags) 0)) -}}
-{{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
+{{- $isBlueGreen := and .Values.deploymentStrategy (eq .Values.deploymentStrategy.kind "blueGreen") -}}
+{{- if $isBlueGreen }}
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 {{- else }}
@@ -17,7 +18,8 @@ metadata:
     porter.run/blue-green-group: {{ .Values.deploymentStrategy.blueGreen.group | quote }}
     {{- end }}
 spec:
-  {{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
+  {{- if $isBlueGreen }}
+  progressDeadlineSeconds: 1200
   strategy:
     blueGreen: 
       activeService: {{ include "docker-template.fullname" . }}
