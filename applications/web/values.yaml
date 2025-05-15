@@ -318,3 +318,12 @@ metricsScraping:
 # this is the case for instance for pods that need to use the MPS sliced GPUs
 # enable this conservatively
 enableHostIpc: false
+
+
+deploymentStrategy:
+  kind: rolling # or blueGreen
+  rolling:
+    maxSurge: 25%
+    maxUnavailable: 25%
+  # blueGreen:
+  #   group: ""

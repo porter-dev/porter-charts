@@ -132,7 +132,7 @@ engine:
   resources:
     requests:
       cpu: 2
-      memory: 14000Mi
+      memory: 12000Mi
       nvidiaGpu: "1"
     limits:
       cpu: 4
