@@ -40,6 +40,12 @@ spec:
   {{- else if .Values.strategy }}
   strategy:
     type: {{ .Values.strategy }}
+  {{- else if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "rolling") (.Values.deploymentStrategy.rolling) }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.deploymentStrategy.rolling.maxSurge }}
+      maxUnavailable: {{ .Values.deploymentStrategy.rolling.maxUnavailable }}
   {{- end }}
   {{- if not .Values.autoscaling.enabled }}
   {{- if not .Values.keda.enabled }}
