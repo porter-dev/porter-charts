@@ -153,6 +153,7 @@ keda:
   minReplicaCount: 1
   maxReplicaCount: 10
   fallback:
+    enabled: true
     failureThreshold: 3
     failureReplicas: 6
   hpa:
