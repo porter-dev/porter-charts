@@ -10,9 +10,7 @@ rules:
   - sfn.services.k8s.aws
   resources:
   - activities
-
   - statemachines
-
   verbs:
   - create
   - delete
