@@ -10,17 +10,12 @@ rules:
   - iam.services.k8s.aws
   resources:
   - groups
-
   - instanceprofiles
-
   - openidconnectproviders
-
   - policies
-
   - roles
-
+  - servicelinkedroles
   - users
-
   verbs:
   - create
   - delete
@@ -37,6 +32,7 @@ rules:
   - openidconnectproviders
   - policies
   - roles
+  - servicelinkedroles
   - users
   verbs:
   - get
