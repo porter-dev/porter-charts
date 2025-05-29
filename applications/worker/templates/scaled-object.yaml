@@ -13,9 +13,11 @@ spec:
   cooldownPeriod: {{ .Values.keda.cooldownPeriod }}
   minReplicaCount: {{ .Values.keda.minReplicaCount }}
   maxReplicaCount: {{ .Values.keda.maxReplicaCount }}
+  {{- if .Values.keda.fallback }}
   fallback:
     failureThreshold: {{ .Values.keda.fallback.failureThreshold }}
     replicas: {{ .Values.keda.fallback.failureReplicas }}
+  {{- end }}
   advanced:
     restoreToOriginalReplicaCount: true
     horizontalPodAutoscalerConfig:
