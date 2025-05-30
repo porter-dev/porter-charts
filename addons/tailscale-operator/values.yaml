@@ -5,7 +5,8 @@
 # values will be created in the operator namespace. If unset a Secret named
 # operator-oauth must be precreated or oauthSecretVolume needs to be adjusted.
 # This block will be overridden by oauthSecretVolume, if set.
-oauth: {}
+oauth:
+  {}
   # clientId: ""
   # clientSecret: ""
 
@@ -14,7 +15,8 @@ oauth: {}
 # The volume needs to contain two files named `client_id` and `client_secret`.
 # If unset the volume will reference the Secret named operator-oauth.
 # This block will override the oauth block.
-oauthSecretVolume: {}
+oauthSecretVolume:
+  {}
   # csi:
   #   driver: secrets-store.csi.k8s.io
   #   readOnly: true
@@ -42,7 +44,7 @@ operatorConfig:
     repository: tailscale/k8s-operator
     # Digest will be prioritized over tag. If neither are set appVersion will be
     # used.
-    tag: ""
+    tag: "v1.84.0"
     digest: ""
     pullPolicy: Always
   logging: "info" # info, debug, dev
@@ -90,7 +92,7 @@ proxyConfig:
     repository: tailscale/tailscale
     # Digest will be prioritized over tag. If neither are set appVersion will be
     # used.
-    tag: ""
+    tag: "v1.84.0"
     digest: ""
   # ACL tag that operator will tag proxies with. Operator must be made owner of
   # these tags
