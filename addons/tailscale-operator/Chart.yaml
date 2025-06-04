@@ -3,16 +3,16 @@ appVersion: v1.84.0
 description: A Helm chart for Tailscale Kubernetes operator
 home: https://github.com/tailscale/tailscale
 keywords:
-- tailscale
-- vpn
-- ingress
-- egress
-- wireguard
+  - tailscale
+  - vpn
+  - ingress
+  - egress
+  - wireguard
 maintainers:
-- name: tailscale-maintainers
-  url: https://tailscale.com/
+  - name: tailscale-maintainers
+    url: https://tailscale.com/
 name: tailscale-operator
 sources:
-- https://github.com/tailscale/tailscale
+  - https://github.com/tailscale/tailscale
 type: application
-version: 1.84.0
+version: 0.1.0
