@@ -101,13 +101,17 @@ promtail:
     # See https://github.com/grafana/helm-charts/blob/18282f1780c73130a89ba5e0ee0f8c5721f08b13/charts/promtail/values.yaml#L343
     snippets:
       extraRelabelConfigs:
+      - source_labels: [__meta_kubernetes_pod_container_id]
+        target_label: container_id
+        regex: ".*://(.*)$" # Remove the runtime prefix (containerd://, docker://)
+        replacement: "${1}"
       - source_labels:
           - __meta_kubernetes_namespace
           - __meta_kubernetes_pod_name
           - __meta_kubernetes_pod_annotation_helm_sh_revision
         target_label: porter_pod_name
         action: replace
-        separator: '_'
+        separator: "_"
       - action: labelmap
         regex: __meta_kubernetes_pod_label_(.+)
   resources:
