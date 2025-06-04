@@ -1,0 +1,59 @@
+name: 'Sync Helm chart from release using tar file'
+description: 'Download and sync a Helm chart from a release URL'
+
+inputs:
+  chart_url:
+    description: 'Full URL to the chart .tgz file'
+    required: true
+  target_directory:
+    description: 'Directory within the current repo where we would like to copy the files'
+    required: true
+  github_token:
+    description: 'Github token to use for API calls'
+    required: true
+  chart_name:
+    description: 'Name of the chart for PR title and branch name'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Create temp directory
+      shell: bash
+      run: mkdir -p /tmp/helm-charts
+    - name: Download Helm chart
+      shell: bash
+      run: |
+        echo "Downloading chart from: ${{ inputs.chart_url }}"
+        curl -L -o /tmp/helm-charts/chart.tgz "${{ inputs.chart_url }}"
+    - name: Extract chart
+      shell: bash
+      run: |
+        cd /tmp/helm-charts
+        tar -xzf chart.tgz
+    - name: Sync to target directory
+      shell: bash
+      run: |
+        # Create target directory if it doesn't exist
+        mkdir -p ${{ inputs.target_directory }}
+
+        # Copy contents to directory
+        rsync -av --delete --cvs-exclude /tmp/helm-charts/${{ inputs.chart_name }}/ ${{ inputs.target_directory }}/
+        
+        # Add to vendored-charts
+        echo "${{ inputs.target_directory }}" >> vendored-charts
+        sort -uo vendored-charts vendored-charts
+
+    - name: Create PR
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ inputs.github_token }}
+        add-paths: |
+          vendored-charts
+          ${{ inputs.target_directory }}
+        title: "Sync: ${{ inputs.chart_name }} from tar file"
+        branch: "sync-${{ inputs.chart_name }}-release"
+
+    - name: Cleanup
+      shell: bash
+      run: rm -rf /tmp/helm-charts

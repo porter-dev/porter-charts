@@ -39,6 +39,9 @@ spec:
       imagePullSecrets:
         - name: {{ $.Values.image.imagePullSecret }}
       {{- end }}
+      {{- if $.Values.enableHostIpc }}
+      hostIPC: true
+      {{- end }}
       containers:
         - name: {{ $.Chart.Name }}
           securityContext:
@@ -74,10 +77,10 @@ spec:
             - name: http
               containerPort: {{ $.Values.container.port }}
               protocol: TCP
-            {{- if and .Values.metricsScraping.enabled (ne .Values.metricsScraping.port .Values.container.port) }}
+            {{- if and $.Values.metricsScraping.enabled (ne $.Values.metricsScraping.port $.Values.container.port) }}
             # if metrics scraping is enabled and the port is not the same as the container port, add a metrics port
             - name: metrics
-              containerPort: {{ .Values.metricsScraping.port }}
+              containerPort: {{ $.Values.metricsScraping.port }}
               protocol: TCP
             {{- end }}
             {{- range $.Values.container.extraPorts }}

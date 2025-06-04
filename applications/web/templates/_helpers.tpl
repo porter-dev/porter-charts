@@ -104,3 +104,27 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
 
 {{- end }}
 {{- end }}
+
+{{/*
+Get the EFS mount path for a given volume. If an override is provided, use that.
+Otherwise, use the default path /data/efs/<fullname>
+*/}}
+{{- define "docker-template.efsMountPath" -}}
+{{- if .mountPath -}}
+{{- .mountPath -}}
+{{- else -}}
+{{- printf "/data/efs/%s" .fullname -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Get the EFS resource name. If index is 0, don't append it to the name.
+*/}}
+{{- define "docker-template.efsName" -}}
+{{- $name := printf "efs-%s" .fullname -}}
+{{- if ne (.index | int) 0 -}}
+{{- printf "%s-%d" $name (.index | int) -}}
+{{- else -}}
+{{- $name -}}
+{{- end -}}
+{{- end -}}

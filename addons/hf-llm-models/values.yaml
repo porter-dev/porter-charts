@@ -37,7 +37,7 @@ readinessProbe:
 resources:
   requests:
     cpu: 2
-    memory: 14000Mi
+    memory: 12000Mi
     nvidiaGpu: "1"
   limits:
     cpu: 4
@@ -55,3 +55,7 @@ autoscaling:
   maxReplicas: 10
   scaledownPeriod: 300 # the time in seconds to wait before scaling down the deployment after the last request
   targetConcurrency: 100 # the target concurrent connections per replica
+
+# enable metrics scraping from the service
+metrics:
+  enabled: false

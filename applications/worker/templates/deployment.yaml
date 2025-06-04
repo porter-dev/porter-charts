@@ -69,6 +69,9 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.global.image.imagePullSecret }}
       {{- end }}
+      {{- if .Values.enableHostIpc }}
+      hostIPC: true
+      {{- end }}
       initContainers:
         # this is used for ensuring the kubelet is ready on new nodes, and can injected any downward API keys
         - name: downward-api
@@ -80,7 +83,7 @@ spec:
               fieldRef:
                 apiVersion: v1
                 fieldPath: status.hostIP
-          image: ghcr.io/porter-dev/downward-api-init:latest
+          image: {{ .Values.downwardAPIInit.image }}
           imagePullPolicy: IfNotPresent
       containers:
         - name: {{ .Chart.Name }}
@@ -351,7 +354,7 @@ spec:
             {{ end }}
           resources:
             limits:
-              memory: 2Gi
+              memory: 4Gi
               cpu: 2
             requests:
               memory: 128Mi

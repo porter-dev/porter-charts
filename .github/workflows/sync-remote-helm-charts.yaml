@@ -127,11 +127,6 @@ jobs:
             remote_directory: charts/karpenter
             target_directory: addons/karpenter-aws
             tag: v1.0.2
-          - remote_owner: external-secrets
-            remote_repository: external-secrets
-            remote_directory: deploy/charts/external-secrets
-            target_directory: addons/external-secrets
-            tag: v0.10.3
 
     permissions:
       contents: write

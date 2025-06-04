@@ -1,5 +1,6 @@
 {{- if and (not .Values.statefulset.enabled) (or (not .Values.bluegreen.disablePrimaryDeployment) (eq (len .Values.bluegreen.imageTags) 0)) -}}
-{{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
+{{- $isBlueGreen := and .Values.deploymentStrategy (eq .Values.deploymentStrategy.kind "blueGreen") -}}
+{{- if $isBlueGreen }}
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 {{- else }}
@@ -13,8 +14,12 @@ metadata:
     {{- if .Values.labels }}
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
+    {{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") (.Values.deploymentStrategy.blueGreen) (.Values.deploymentStrategy.blueGreen.group) }}
+    porter.run/blue-green-group: {{ .Values.deploymentStrategy.blueGreen.group | quote }}
+    {{- end }}
 spec:
-  {{- if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "blueGreen") }}
+  {{- if $isBlueGreen }}
+  progressDeadlineSeconds: 1200
   strategy:
     blueGreen: 
       activeService: {{ include "docker-template.fullname" . }}
@@ -32,6 +37,15 @@ spec:
             {{- end }}
         templates:
         - templateName: {{ include "docker-template.fullname" . }}-bluegreen
+  {{- else if .Values.strategy }}
+  strategy:
+    type: {{ .Values.strategy }}
+  {{- else if and (.Values.deploymentStrategy) (eq .Values.deploymentStrategy.kind "rolling") (.Values.deploymentStrategy.rolling) }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.deploymentStrategy.rolling.maxSurge }}
+      maxUnavailable: {{ .Values.deploymentStrategy.rolling.maxUnavailable }}
   {{- end }}
   {{- if not .Values.autoscaling.enabled }}
   {{- if not .Values.keda.enabled }}
@@ -92,6 +106,9 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.global.image.imagePullSecret }}
       {{- end }}
+      {{- if .Values.enableHostIpc }}
+      hostIPC: true
+      {{- end }}
       initContainers:
         # this is used for ensuring the kubelet is ready on new nodes, and can injected any downward API keys
         - name: downward-api
@@ -103,7 +120,7 @@ spec:
               fieldRef:
                 apiVersion: v1
                 fieldPath: status.hostIP
-          image: ghcr.io/porter-dev/downward-api-init:latest
+          image: {{ .Values.downwardAPIInit.image }}
           imagePullPolicy: IfNotPresent
       containers:
         - name: {{ .Chart.Name }}
@@ -400,11 +417,16 @@ spec:
             - name: datadog-dsd-socket
               mountPath: /var/run/datadog/dsd.socket
         {{ end }}
+        {{ if .Values.resources.requests.nvidiaGpu}}
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+        {{ end }}
         {{ if .Values.awsEfsStorage }}
           volumeMounts:
-        {{- range $v := .Values.awsEfsStorage }}
-          - name: efs-{{ $.Values.fullnameOverride }}
-            mountPath: /data/efs/{{ $.Values.fullnameOverride }}
+        {{- range $index, $v := .Values.awsEfsStorage }}
+          - name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
+            mountPath: {{ include "docker-template.efsMountPath" (dict "mountPath" $v.mountPath "fullname" $.Values.fullnameOverride) }}
         {{ end }}   
         {{ end }}  
           {{ if .Values.pvc.enabled }}
@@ -439,7 +461,7 @@ spec:
             runAsNonRoot: true
           resources:
             limits:
-              memory: 2Gi
+              memory: 4Gi
               cpu: 4
             requests:
               memory: 128Mi
@@ -492,7 +514,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled }}
+      {{ if or .Values.pvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -503,6 +525,12 @@ spec:
             path: /var/run/datadog/dsd.socket
             type: Socket
           name: datadog-dsd-socket
+        {{ end }}
+        {{ if .Values.resources.requests.nvidiaGpu}}
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 4Gi
         {{ end }}
         {{ if .Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
@@ -524,10 +552,10 @@ spec:
             {{- toYaml .Values.emptyDir.volumeOptions | nindent 12 }}
         {{ end }}
         {{ if .Values.awsEfsStorage }}
-        {{- range $v := .Values.awsEfsStorage }}
-        - name: efs-{{ $.Values.fullnameOverride }}
+        {{- range $index, $v := .Values.awsEfsStorage }}
+        - name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
           persistentVolumeClaim:
-            claimName: efs-{{ $.Values.fullnameOverride }}
+            claimName: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
         {{ end }}
         {{ end }}
         {{ if .Values.fileSecretMounts.enabled }}

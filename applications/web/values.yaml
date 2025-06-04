@@ -25,6 +25,9 @@ image:
   # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank. 
   imagePullSecret:
 
+downwardAPIInit:
+  image: ghcr.io/porter-dev/downward-api-init:latest
+
 podLabels: {}
 
 serviceAccount:
@@ -150,20 +153,21 @@ keda:
   minReplicaCount: 1
   maxReplicaCount: 10
   fallback:
+    enabled: true
     failureThreshold: 3
     failureReplicas: 6
   hpa:
     scaleUp:
-      stabilizationWindowSeconds: 300
+      stabilizationWindowSeconds: 60
       policy:
         type: Percent
-        value: 10
-        periodSeconds: 300
+        value: 100
+        periodSeconds: 60
     scaleDown:
       stabilizationWindowSeconds: 300
       policy:
         type: Percent
-        value: 10
+        value: 50
         periodSeconds: 300
   trigger:
     metricName: ""
@@ -310,3 +314,17 @@ metricsScraping:
   enabled: false
   port: 80
   path: "/metrics"
+
+# hostIPC is required on pods that need to access the host's IPC namespace
+# this is the case for instance for pods that need to use the MPS sliced GPUs
+# enable this conservatively
+enableHostIpc: false
+
+
+deploymentStrategy:
+  kind: rolling # or blueGreen
+  rolling:
+    maxSurge: 25%
+    maxUnavailable: 25%
+  # blueGreen:
+  #   group: ""
