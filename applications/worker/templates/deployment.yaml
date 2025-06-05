@@ -50,6 +50,16 @@ spec:
                       {{- range $nodeGroup := .Values.nodeGroups }}
                       - {{ $nodeGroup.id | quote }}
                       {{- end }}
+      {{- else}}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: porter.run/workload-kind
+                    operator: In
+                    values:
+                      - application
       {{- end }}
       serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
