@@ -49,7 +49,10 @@ spec:
             {{- toYaml .Values.podLabels | nindent 12 }}
             {{- end }}
         spec:
-          {{- if .Values.nodeGroups }}
+          {{- if .Values.affinity }}
+          affinity:
+            {{- toYaml .Values.affinity | nindent 12 }}
+          {{- else if .Values.nodeGroups }}
           affinity:
             nodeAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
