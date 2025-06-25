@@ -19,6 +19,10 @@ langfuse:
   nextPublicSignUpDisabled: False
   enableExperimentalFeatures: False
   encryptionKey: changeme
+  # -- Allows additional containers to be added to all langfuse deployments
+  extraContainers: []
+  # -- Allows additional volumes to be added to all langfuse deployments
+  extraVolumes: []
 
 serviceAccount:
   create: true
