@@ -181,6 +181,15 @@ spec:
                 - {{ $command | quote }}
                 {{- end }}
             {{- end }}
+          {{- else }} 
+          lifecycle:
+            # if no preStop is defined, we sleep for 5 seconds to give time 
+            # for the pod to be removed from the endpoint slice
+            preStop:
+              exec:
+                command:
+                - sleep
+                - "5"
           {{- end }}
           ports:
             - name: http
