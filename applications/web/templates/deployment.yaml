@@ -180,7 +180,9 @@ spec:
                 {{- range $command := trim .Values.container.lifecycle.preStop | splitList " " }}
                 - {{ $command | quote }}
                 {{- end }}
-            {{- else }} 
+            {{- end }}
+          {{- else }} 
+          lifecycle:
             # if no preStop is defined, we sleep for 5 seconds to give time 
             # for the pod to be removed from the endpoint slice
             preStop:
@@ -188,7 +190,6 @@ spec:
                 command:
                 - sleep
                 - "5"
-            {{- end }}
           {{- end }}
           ports:
             - name: http
