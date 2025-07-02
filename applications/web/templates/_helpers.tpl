@@ -128,3 +128,49 @@ Get the EFS resource name. If index is 0, don't append it to the name.
 {{- $name -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Renders the full block of annotations for the ingress.
+This helper uses the global .Values object.
+*/}}
+{{- define "ingressAnnotations" -}}
+{{- $ingress := .Values.ingress -}}
+{{- $customPaths := $ingress.custom_paths -}}
+{{- $annotations := dict
+  "nginx.ingress.kubernetes.io/proxy-body-size" "50m"
+  "nginx.ingress.kubernetes.io/proxy-send-timeout" "60"
+  "nginx.ingress.kubernetes.io/proxy-read-timeout" "60"
+  "nginx.ingress.kubernetes.io/proxy-connect-timeout" "60"
+-}}
+{{- if and (gt (len $customPaths) 0) $ingress.rewriteCustomPathsEnabled }}
+  {{- $_ := set $annotations "nginx.ingress.kubernetes.io/rewrite-target" "/" -}}
+{{- end }}
+{{- if $ingress.tls -}}
+  {{- if not (hasKey $ingress.annotations "cert-manager.io/cluster-issuer") -}}
+    {{- if $ingress.wildcard -}}
+      {{- $_ := set $annotations "cert-manager.io/cluster-issuer" "letsencrypt-prod-wildcard" -}}
+    {{- else -}}
+      {{- $_ := set $annotations "cert-manager.io/cluster-issuer" "letsencrypt-prod" -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $userAnnotations := $ingress.annotations -}}
+{{- if hasKey $ingress.annotations "normal" -}}
+  {{- $userAnnotations = $ingress.annotations.normal -}}
+{{- end -}}
+
+{{- $cleanedUserAnnotations := dict -}}
+{{- range $k, $v := $userAnnotations -}}
+  {{- if and $v (not (eq $v "null")) -}}
+    {{- $_ := set $cleanedUserAnnotations $k $v -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $_ := mergeOverwrite $annotations $cleanedUserAnnotations -}}
+
+{{- range $k, $v := $annotations }}
+{{ $k }}: {{ $v | toString | trimPrefix "\"" | trimSuffix "\"" | quote }}
+{{- end }}
+
+{{- end -}}
