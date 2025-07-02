@@ -10,47 +10,7 @@ metadata:
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 50m
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
-    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
-    {{- if and (gt (len $customPaths) 0) .Values.ingress.rewriteCustomPathsEnabled }}
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    {{- end }}
-    {{- if .Values.ingress.tls }}
-    {{- if not (hasKey .Values.ingress.annotations "cert-manager.io/cluster-issuer")}}
-    {{- if .Values.ingress.wildcard }}
-    cert-manager.io/cluster-issuer: letsencrypt-prod-wildcard
-    {{- else }}
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    {{- end }}
-    {{- end }}
-    {{- end }}
-    # provider-agnostic default annotations
-    # if value is provided as "null" or null, it is unset
-    # adding a fix for scenarios where ingress annotations are inside ingress.annotations.normal
-    {{- if not (hasKey .Values.ingress.annotations "normal")}} 
-    {{- if gt (len .Values.ingress.annotations) 0}}
-    {{- range $k, $v := .Values.ingress.annotations }}
-    {{- if $v}}
-    {{- if and (not (eq $v "null")) $v}}
-    {{ $k }}: {{ $v }}
-    {{- end }}
-    {{- end }}
-    {{- end }}
-    {{- end }}
-    {{- end }}
-    {{- if hasKey .Values.ingress.annotations "normal"}}
-    {{- if gt (len .Values.ingress.annotations.normal) 0}}
-    {{- range $k, $v := .Values.ingress.annotations.normal }}
-    {{- if $v}}
-    {{- if and (not (eq $v "null")) $v}}
-    {{ $k }}: {{ $v }}
-    {{- end }}
-    {{- end }}
-    {{- end }}
-    {{- end }}
-    {{- end }}
+{{- include "ingressAnnotations" . | nindent 4 }}
 spec:
 {{- if hasKey .Values.ingress.annotations "kubernetes.io/ingress.class" }}
   ingressClassName: {{ index .Values.ingress.annotations "kubernetes.io/ingress.class" }}
