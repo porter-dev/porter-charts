@@ -238,7 +238,7 @@ pvc:
   mountPath: /mypath
   existingVolume: ""
   # if existingPersistentVolume is set, the pvc will be created with the existing volume name
-  existingVolumeName: ""
+  existingPersistentVolume: ""
 
 cloudsql:
   enabled: false
