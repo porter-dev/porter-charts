@@ -6,6 +6,9 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  {{- if .Values.pvc.existingPersistentVolume }}
+  volumeName: {{ .Values.pvc.existingPersistentVolume }}
+  {{- else }}
   resources:
     requests:
       storage: {{ .Values.pvc.storage }}

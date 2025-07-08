@@ -138,6 +138,7 @@ pvc:
   enabled: false
   storage: 20Gi
   mountPath: /mypath
+  existingPersistentVolume: ""
 
 cloudsql:
   enabled: false
