@@ -429,7 +429,11 @@ spec:
         {{ if .Values.pvc.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-storage"
           persistentVolumeClaim:
+            {{- if .Values.pvc.existingVolume }}
+            claimName: {{ .Values.pvc.existingVolume }}
+            {{- else }}
             claimName: "{{ include "docker-template.fullname" . }}-pvc"
+            {{- end }}
         {{ end }}
         {{ if .Values.emptyDir.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
