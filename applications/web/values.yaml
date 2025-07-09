@@ -237,8 +237,6 @@ pvc:
   storage: 20Gi
   mountPath: /mypath
   existingVolume: ""
-  # if existingPersistentVolume is set, the pvc will be created with the existing volume name
-  existingPersistentVolume: ""
 
 cloudsql:
   enabled: false

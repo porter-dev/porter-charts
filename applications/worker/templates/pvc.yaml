@@ -1,4 +1,4 @@
-{{- if .Values.pvc.enabled -}}
+{{- if and .Values.pvc.enabled (not .Values.pvc.existingVolume) -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -6,9 +6,6 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  {{- if .Values.pvc.existingPersistentVolume }}
-  volumeName: {{ .Values.pvc.existingPersistentVolume }}
-  {{- else }}
   resources:
     requests:
       storage: {{ .Values.pvc.storage }}
