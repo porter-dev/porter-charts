@@ -27,26 +27,78 @@ nodeSelector: {}
 tolerations: []
 
 loki:
+  deploymentMode: SingleBinary
+  resultsCache:
+    enabled: false
+  chunksCache:
+    enabled: false
+  sidecar:
+    rules:
+      enabled: false
+  lokiCanary:
+    enabled: false
+  ingester:
+    replicas: 0
+  distributor:
+    replicas: 0
+  querier:
+    replicas: 0
+  queryFrontend:
+    replicas: 0
+  queryScheduler:
+    replicas: 0
+  indexGateway:
+    replicas: 0
+  compactor:
+    replicas: 0
+  ruler:
+    replicas: 0
+  write:
+    replicas: 0
+  read:
+    replicas: 0
+  backend:
+    replicas: 0
   loki:
+    image:
+      tag: 3.4.4
+    configStorageType: ConfigMap
+    configObjectName: porter-agent-loki-config
+    generatedConfigObjectName: porter-agent-loki-config
     auth_enabled: false
+    server:
+      http_listen_port: 3100
+      grpc_listen_port: 9095
     commonConfig:
       replication_factor: 1
-    storage:
-      type: filesystem
+      path_prefix: /var/loki
+      storage:
+        filesystem:
+          chunks_directory: /var/loki/chunks
+          rules_directory: /var/loki/rules
+    schemaConfig:
+      configs:
+        - from: "2024-04-01"
+          object_store: filesystem
+          store: tsdb
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
     compactor:
       retention_enabled: true
       retention_delete_delay: 0h
       retention_delete_worker_count: 50
+      delete_request_store: filesystem
     limits_config:
+      max_label_names_per_series: 50
       reject_old_samples: true
-      # reject samples older than one week
       reject_old_samples_max_age: 168h
       max_concurrent_tail_requests: 50
-      # delete logs after a week
       retention_period: 168h
     storage_config:
-      boltdb_shipper:
-        shared_store: filesystem
+      filesystem:
+        directory: /var/loki/chunks
     readinessProbe:
       httpGet:
         path: /ready
@@ -71,6 +123,9 @@ loki:
   test:
     enabled: false
   singleBinary:
+    affinity: {}
+    service:
+      labels: {}
     replicas: 1
     nodeSelector:
       porter.run/workload-kind: monitoring
