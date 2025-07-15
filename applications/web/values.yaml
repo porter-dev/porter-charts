@@ -314,7 +314,7 @@ metricsScraping:
   enabled: false
   port: 80
   path: "/metrics"
-  scrapeIntervalSeconds: 60
+  scrapeInterval: "60s"
 
 # hostIPC is required on pods that need to access the host's IPC namespace
 # this is the case for instance for pods that need to use the MPS sliced GPUs

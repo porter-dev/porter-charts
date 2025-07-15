@@ -15,7 +15,7 @@ metadata:
     porter.prometheus/port: {{ .Values.metricsScraping.port | quote }}
     porter.prometheus/path: {{ .Values.metricsScraping.path | quote }}
     porter.prometheus/scheme: "http"
-    porter.prometheus/scrape-interval: {{ printf "%ds" .Values.metricsScraping.scrapeIntervalSeconds }}
+    porter.prometheus/scrape-interval: {{ .Values.metricsScraping.scrapeInterval | quote }}
     {{- end }}
     {{- if and .Values.service.annotations (gt (len .Values.service.annotations) 0) }}
     {{- range $k, $v := .Values.service.annotations }}
