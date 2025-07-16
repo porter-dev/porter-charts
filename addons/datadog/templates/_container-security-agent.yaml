@@ -2,6 +2,10 @@
 - name: security-agent
   image: "{{ include "image-path" (dict "root" .Values "image" .Values.agents.image) }}"
   imagePullPolicy: {{ .Values.agents.image.pullPolicy }}
+  {{- if .Values.agents.lifecycle }}
+  lifecycle:
+{{ toYaml .Values.agents.lifecycle | indent 4 }}
+  {{- end }}
   {{- if eq  (include "should-enable-compliance" .) "true" }}
   securityContext:
     capabilities:
@@ -91,9 +95,11 @@
     - name: cgroups
       mountPath: /host/sys/fs/cgroup
       readOnly: true
+    {{- if (eq (include "should-add-host-path-for-etc-passwd" .) "true") }}
     - name: passwd
       mountPath: /etc/passwd
       readOnly: true
+    {{- end }}
     - name: group
       mountPath: /etc/group
       readOnly: true
