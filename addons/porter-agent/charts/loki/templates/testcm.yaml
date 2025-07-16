@@ -1,0 +1,8 @@
+# templates/debug-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: debug-generated-config
+data:
+  calculated-config: |
+{{ include "loki.calculatedConfig" . | indent 4 }}
