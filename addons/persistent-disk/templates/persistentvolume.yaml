@@ -1,6 +1,6 @@
 {{- if .Values.efs.fileSystemId -}}
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: PersistentVolume
 metadata:
   name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
@@ -15,10 +15,14 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.capacity }}
+  volumeMode: {{ .Values.persistentVolume.volumeMode }}
   accessModes:
-    {{- toYaml .Values.persistentVolumeClaim.accessModes | nindent 4 }}
-  resources:
-    requests:
-      storage: {{ .Values.persistentVolumeClaim.requestStorage }}
+    {{- toYaml .Values.persistentVolume.accessModes | nindent 4 }}
+  persistentVolumeReclaimPolicy: {{ .Values.storageClass.reclaimPolicy }}
   storageClassName: {{ .Release.Name }}
-{{- end }}
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: {{ .Values.efs.fileSystemId }}
+{{- end }} 

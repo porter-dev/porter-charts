@@ -83,7 +83,6 @@ local_resource(
   helm cm-push addons/grafana local && \
   helm cm-push addons/porter-agent local && \
   helm cm-push addons/karpenter local && \
-  helm cm-push addons/tailscale-operator local && \
   helm cm-push addons/persistent-disk local && \
   helm repo update local
   ''',

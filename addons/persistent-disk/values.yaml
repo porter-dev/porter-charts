@@ -1,18 +1,31 @@
+# Default values for persistent-disk.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+efs:
+  # The AWS EFS file system ID. This value is required.
+  fileSystemId: ""
+
+# -- Labels to apply to all resources.
 labels: {}
 
+# -- Annotations to apply to all resources.
 annotations: {}
 
+# StorageClass configuration
 storageClass:
   reclaimPolicy: "Retain"
   volumeBindingMode: "Immediate"
-  directoryPerms: "777"
-  reuseAccessPoint: "true"
-  efs:
-    enabled: true
-    fileSystemId: ""
-    provisioningMode: "efs-ap"
-    provisioner: efs.csi.aws.com
+  provisioner: efs.csi.aws.com
 
+# PersistentVolume configuration
+persistentVolume:
+  capacity: "5Gi"
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+
+# PersistentVolumeClaim configuration
 persistentVolumeClaim:
   requestStorage: "5Gi"
   accessModes:
