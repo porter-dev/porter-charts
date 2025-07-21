@@ -9,11 +9,14 @@ agent:
     secret: ""
   clusterID: ""
   projectID: ""
+  region: ""
   lokiURL: porter-agent-loki.porter-agent-system:9095
   lokiHTTPURL: http://porter-agent-loki.porter-agent-system:3100
   prometheusURL: http://prometheus-server.monitoring.svc
   # NOTE: if updating the measurement period, MAKE SURE TO ALSO UPDATE THE PROMETHEUS QUERY FOR CALCULATING THE AVERAGE RESOURCE USAGE
   billingMeasurementPeriod: "5m"
+  serviceAccount:
+    annotations: {}
 
 resources:
   limits:
@@ -119,3 +122,13 @@ promtail:
       memory: 256Mi
     requests:
       memory: 256Mi
+
+complianceReconciler:
+  enabled: false
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
