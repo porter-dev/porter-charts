@@ -17,3 +17,4 @@ data:
   SQL_LITE_PATH: "/porter/sqlite/agent.db"
   PROMETHEUS_URL: "{{ .Values.agent.prometheusURL }}"
   MEASUREMENT_PERIOD: "{{ .Values.agent.billingMeasurementPeriod }}"
+  REGION: "{{ .Values.agent.region }}"
