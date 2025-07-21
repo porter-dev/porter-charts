@@ -1,0 +1,18 @@
+{{- $scName := .Values.storageClass.name | default (printf "pd-sc-%s" .Release.Name) -}}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    porter.run/addon-name: {{ .Release.Name }}
+    porter.run/addon-type: persistent-disk
+    {{- with .Values.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with .Values.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+provisioner: efs.csi.aws.com
+reclaimPolicy: {{ .Values.storageClass.reclaimPolicy }}
+volumeBindingMode: {{ .Values.storageClass.volumeBindingMode }} 
