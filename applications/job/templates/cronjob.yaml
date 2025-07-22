@@ -288,7 +288,9 @@ spec:
               effect: "NoSchedule"
           {{- end }}
       backoffLimit: 0
-      {{- if (.Values.sidecar.timeout) }}
+      {{- if .Values.activeDeadlineSeconds }}
+      activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
+      {{- else if .Values.sidecar.timeout }}
       activeDeadlineSeconds: {{ .Values.sidecar.timeout }}
       {{- end }}
 {{ end }}
