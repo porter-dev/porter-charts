@@ -104,3 +104,6 @@ fileSecretMounts:
 # this is the case for instance for pods that need to use the MPS sliced GPUs
 # enable this conservatively
 enableHostIpc: false
+
+# job timeout configuration
+activeDeadlineSeconds: # Optional - if not set, will use sidecar.timeout
