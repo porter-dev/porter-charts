@@ -1,0 +1,12 @@
+{{- if and .Values.pvc.enabled (not .Values.pvc.existingVolume) -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "{{ include "docker-template.fullname" . }}-pvc"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.pvc.storage }}
+{{ end }} 
