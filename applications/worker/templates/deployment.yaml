@@ -310,37 +310,39 @@ spec:
               {{- end }}
             {{- end }}
             {{- end }}
-          {{ if .Values.datadogSocketVolume.enabled }}
+          {{ if include "worker.shouldRenderVolumeMounts" . }}
           volumeMounts:
+            {{ if .Values.datadogSocketVolume.enabled }}
             - name: datadog-apm-socket
               mountPath: /var/run/datadog/apm.socket
             - name: datadog-dsd-socket
               mountPath: /var/run/datadog/dsd.socket
-          {{ end }}
-          {{ if .Values.pvc.enabled }}
-          volumeMounts:
+            {{ end }}
+            {{ if .Values.resources.requests.nvidiaGpu }}
+            - name: dshm
+              mountPath: /dev/shm
+            {{ end }}
+            {{ if .Values.pvc.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-storage"
               mountPath: {{ .Values.pvc.mountPath }}
-          {{ end }}
-          {{ if .Values.emptyDir.enabled }}
-          volumeMounts:
+            {{ end }}
+            {{ if .Values.emptyDir.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
               mountPath: {{ .Values.emptyDir.mountPath }}
-          {{ end }}
-          {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
-          {{ range .Values.fileSecretMounts.mounts }}
-          volumeMounts:
+            {{ end }}
+            {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
+            {{ range .Values.fileSecretMounts.mounts }}
             - name: {{ .mountPath }}
               mountPath: "/etc/secrets/{{ .mountPath }}"
               readOnly: true
-          {{ end }}
-          {{ end }}
-          {{ if .Values.additionalVolumes }}
-          volumeMounts:
+            {{ end }}
+            {{ end }}
+            {{ if .Values.additionalVolumes }}
             {{- range .Values.additionalVolumes }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
             {{- end }}
+            {{ end }}
           {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
@@ -409,7 +411,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) .Values.resources.requests.nvidiaGpu }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -420,6 +422,12 @@ spec:
             path: /var/run/datadog/dsd.socket
             type: Socket
           name: datadog-dsd-socket
+        {{ end }}
+        {{ if .Values.resources.requests.nvidiaGpu}}
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 4Gi
         {{ end }}
         {{ if .Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
