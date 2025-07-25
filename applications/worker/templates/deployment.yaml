@@ -327,14 +327,14 @@ spec:
               mountPath: {{ .Values.emptyDir.mountPath }}
             {{ end }}
             {{- if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
-            {{- range .Values.fileSecretMounts.mounts }}
+            {{ range .Values.fileSecretMounts.mounts }}
             - name: {{ .mountPath }}
               mountPath: "/etc/secrets/{{ .mountPath }}"
               readOnly: true
             {{ end }}
             {{ end }}
             {{- if .Values.additionalVolumes }}
-            {{- range .Values.additionalVolumes }}
+            {{ range .Values.additionalVolumes }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
             {{ end }}
