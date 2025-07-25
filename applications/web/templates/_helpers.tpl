@@ -179,7 +179,7 @@ This helper uses the global .Values object.
 Return true if volumeMounts should be rendered in the main container
 
 */}}
-{{- define "shouldRenderVolumeMounts" -}}
+{{- define "web.shouldRenderVolumeMounts" -}}
 {{- if or .Values.datadogSocketVolume.enabled .Values.resources.requests.nvidiaGpu .Values.awsEfsStorage .Values.pvc.enabled .Values.emptyDir.enabled (and .Values.fileSecretMounts .Values.fileSecretMounts.enabled) -}}
 true
 {{- else -}}

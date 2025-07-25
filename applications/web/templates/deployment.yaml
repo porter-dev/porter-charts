@@ -419,7 +419,7 @@ spec:
             - name: PORT
               value: {{ .Values.container.port | quote }}
             {{- end }}
-        {{- if include "shouldRenderVolumeMounts" . }}
+        {{- if include "web.shouldRenderVolumeMounts" . }}
           volumeMounts:
           {{- if .Values.datadogSocketVolume.enabled  }}
             - name: datadog-apm-socket

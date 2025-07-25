@@ -100,7 +100,7 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
 {{/*
 Return true if volumeMounts should be rendered in the main container
 */}}
-{{- define "shouldRenderVolumeMounts" -}}
+{{- define "worker.shouldRenderVolumeMounts" -}}
 {{- if or .Values.datadogSocketVolume.enabled .Values.pvc.enabled .Values.emptyDir.enabled (and .Values.fileSecretMounts .Values.fileSecretMounts.enabled) .Values.additionalVolumes -}}
 true
 {{- else -}}
