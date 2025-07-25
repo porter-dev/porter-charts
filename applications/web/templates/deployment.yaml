@@ -419,43 +419,40 @@ spec:
             - name: PORT
               value: {{ .Values.container.port | quote }}
             {{- end }}
-        {{ if .Values.datadogSocketVolume.enabled }}
+        {{- if include "web.shouldRenderVolumeMounts" . }}
           volumeMounts:
+          {{- if .Values.datadogSocketVolume.enabled  }}
             - name: datadog-apm-socket
               mountPath: /var/run/datadog/apm.socket
             - name: datadog-dsd-socket
               mountPath: /var/run/datadog/dsd.socket
-        {{ end }}
-        {{ if .Values.resources.requests.nvidiaGpu}}
-          volumeMounts:
+          {{ end }}
+          {{- if .Values.resources.requests.nvidiaGpu}}
             - name: dshm
               mountPath: /dev/shm
-        {{ end }}
-        {{ if .Values.awsEfsStorage }}
-          volumeMounts:
-        {{- range $index, $v := .Values.awsEfsStorage }}
-          - name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
-            mountPath: {{ include "docker-template.efsMountPath" (dict "mountPath" $v.mountPath "fullname" $.Values.fullnameOverride) }}
-        {{ end }}   
-        {{ end }}  
-          {{ if .Values.pvc.enabled }}
-          volumeMounts:
+          {{ end }}
+          {{- if .Values.awsEfsStorage }}
+          {{ range $index, $v := .Values.awsEfsStorage }}
+            - name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
+              mountPath: {{ include "docker-template.efsMountPath" (dict "mountPath" $v.mountPath "fullname" $.Values.fullnameOverride) }}
+          {{ end }}   
+          {{ end }}  
+          {{- if .Values.pvc.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-storage"
               mountPath: {{ .Values.pvc.mountPath }}
           {{ end }}
-          {{ if .Values.emptyDir.enabled }}
-          volumeMounts:
+          {{- if .Values.emptyDir.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
               mountPath: {{ .Values.emptyDir.mountPath }}
           {{ end }}
-          {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
+          {{- if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
           {{ range .Values.fileSecretMounts.mounts }}
-          volumeMounts:
             - name: {{ .mountPath }}
               mountPath: "/etc/secrets/{{ .mountPath }}"
               readOnly: true
           {{ end }}
           {{ end }}
+        {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.17

@@ -175,6 +175,11 @@ spec:
                   readOnly: true
               {{ end }}
               {{ end }}
+              {{ if .Values.pvc.enabled }}
+              volumeMounts:
+                - name: "{{ include "docker-template.fullname" . }}-storage"
+                  mountPath: {{ .Values.pvc.mountPath }}
+              {{ end }}
               resources:
                 requests:
                   cpu: {{ .Values.resources.requests.cpu }}
@@ -245,12 +250,21 @@ spec:
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled}}
+          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled}}
           volumes:
             {{ if .Values.cloudsql.enabled }}
             - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
               secret:
                 secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
+            {{ end }}
+            {{ if .Values.pvc.enabled }}
+            - name: "{{ include "docker-template.fullname" . }}-storage"
+              persistentVolumeClaim:
+                {{- if .Values.pvc.existingVolume }}
+                claimName: {{ .Values.pvc.existingVolume }}
+                {{- else }}
+                claimName: "{{ include "docker-template.fullname" . }}-pvc"
+                {{- end }}
             {{ end }}
             {{ if .Values.fileSecretMounts.enabled }}
             {{ range .Values.fileSecretMounts.mounts }}
