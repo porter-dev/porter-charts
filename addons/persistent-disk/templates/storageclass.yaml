@@ -13,6 +13,13 @@ metadata:
     {{- with .Values.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-provisioner: efs.csi.aws.com
+{{- if .Values.storageClass.efs.enabled }}
 reclaimPolicy: {{ .Values.storageClass.reclaimPolicy }}
-volumeBindingMode: {{ .Values.storageClass.volumeBindingMode }} 
+volumeBindingMode: {{ .Values.storageClass.volumeBindingMode }}
+provisioner: {{ .Values.storageClass.efs.provisioner }}
+parameters:
+  directoryPerms: {{ .Values.storageClass.directoryPerms | quote }}
+  reuseAccessPoint: {{ .Values.storageClass.reuseAccessPoint | quote }}
+  fileSystemId: {{ .Values.storageClass.efs.fileSystemId | quote }}
+  provisioningMode: {{ .Values.storageClass.efs.provisioningMode | quote }}
+{{- end }}

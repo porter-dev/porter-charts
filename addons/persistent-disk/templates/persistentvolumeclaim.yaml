@@ -1,4 +1,4 @@
-{{- if .Values.efs.fileSystemId -}}
+{{- if .Values.storageClass.efs.enabled -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
