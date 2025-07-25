@@ -9,15 +9,9 @@ storageClass:
   reuseAccessPoint: "true"
   efs:
     enabled: true
-    fileSystemId: "fs-042d04a019267cbe5"
+    fileSystemId: ""
     provisioningMode: "efs-ap"
     provisioner: efs.csi.aws.com
-
-persistentVolume:
-  capacity: "5Gi"
-  accessModes:
-    - ReadWriteMany
-  volumeMode: Filesystem
 
 persistentVolumeClaim:
   requestStorage: "5Gi"
