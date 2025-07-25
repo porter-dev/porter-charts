@@ -310,36 +310,36 @@ spec:
               {{- end }}
             {{- end }}
             {{- end }}
-          {{ if include "shouldRenderVolumeMounts" . }}
+        {{- if include "shouldRenderVolumeMounts" . }}
           volumeMounts:
-            {{ if .Values.datadogSocketVolume.enabled }}
+            {{- if .Values.datadogSocketVolume.enabled }}
             - name: datadog-apm-socket
               mountPath: /var/run/datadog/apm.socket
             - name: datadog-dsd-socket
               mountPath: /var/run/datadog/dsd.socket
-            {{ end }}
-            {{ if .Values.pvc.enabled }}
+            {{- end }}
+            {{- if .Values.pvc.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-storage"
               mountPath: {{ .Values.pvc.mountPath }}
-            {{ end }}
-            {{ if .Values.emptyDir.enabled }}
+            {{- end }}
+            {{- if .Values.emptyDir.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
               mountPath: {{ .Values.emptyDir.mountPath }}
-            {{ end }}
-            {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
-            {{ range .Values.fileSecretMounts.mounts }}
+            {{- end }}
+            {{- if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
+            {{- range .Values.fileSecretMounts.mounts }}
             - name: {{ .mountPath }}
               mountPath: "/etc/secrets/{{ .mountPath }}"
               readOnly: true
-            {{ end }}
-            {{ end }}
-            {{ if .Values.additionalVolumes }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.additionalVolumes }}
             {{- range .Values.additionalVolumes }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
             {{- end }}
-            {{ end }}
-          {{ end }}
+            {{- end }}
+        {{- end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
