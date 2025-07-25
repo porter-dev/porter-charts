@@ -407,7 +407,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) .Values.resources.requests.nvidiaGpu }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -418,12 +418,6 @@ spec:
             path: /var/run/datadog/dsd.socket
             type: Socket
           name: datadog-dsd-socket
-        {{ end }}
-        {{ if .Values.resources.requests.nvidiaGpu}}
-        - name: dshm
-          emptyDir:
-            medium: Memory
-            sizeLimit: 4Gi
         {{ end }}
         {{ if .Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
