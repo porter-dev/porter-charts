@@ -1,12 +1,5 @@
 {{- if and (not .Values.statefulset.enabled) (or (not .Values.bluegreen.disablePrimaryDeployment) (eq (len .Values.bluegreen.imageTags) 0)) -}}
 {{- $isBlueGreen := and .Values.deploymentStrategy (eq .Values.deploymentStrategy.kind "blueGreen") -}}
-{{- define "web.shouldRenderVolumeMounts" -}}
-{{- if or .Values.datadogSocketVolume.enabled .Values.resources.requests.nvidiaGpu .Values.awsEfsStorage .Values.pvc.enabled .Values.emptyDir.enabled (and .Values.fileSecretMounts .Values.fileSecretMounts.enabled) -}}
-true
-{{- else -}}
-false
-{{- end -}}
-{{- end -}}
 {{- if $isBlueGreen }}
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
@@ -426,7 +419,7 @@ spec:
             - name: PORT
               value: {{ .Values.container.port | quote }}
             {{- end }}
-          {{ if include "web.shouldRenderVolumeMounts" . }}
+          {{ if include "shouldRenderVolumeMounts" . }}
           volumeMounts:
           {{ if .Values.datadogSocketVolume.enabled  }}
             - name: datadog-apm-socket
@@ -444,21 +437,21 @@ spec:
               mountPath: {{ include "docker-template.efsMountPath" (dict "mountPath" $v.mountPath "fullname" $.Values.fullnameOverride) }}
           {{ end }}   
           {{ end }}  
-            {{ if .Values.pvc.enabled }}
-              - name: "{{ include "docker-template.fullname" . }}-storage"
-                mountPath: {{ .Values.pvc.mountPath }}
-            {{ end }}
-            {{ if .Values.emptyDir.enabled }}
-              - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
-                mountPath: {{ .Values.emptyDir.mountPath }}
-            {{ end }}
-            {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
-            {{ range .Values.fileSecretMounts.mounts }}
-              - name: {{ .mountPath }}
-                mountPath: "/etc/secrets/{{ .mountPath }}"
-                readOnly: true
-            {{ end }}
-            {{ end }}
+          {{ if .Values.pvc.enabled }}
+            - name: "{{ include "docker-template.fullname" . }}-storage"
+              mountPath: {{ .Values.pvc.mountPath }}
+          {{ end }}
+          {{ if .Values.emptyDir.enabled }}
+            - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
+              mountPath: {{ .Values.emptyDir.mountPath }}
+          {{ end }}
+          {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
+          {{ range .Values.fileSecretMounts.mounts }}
+            - name: {{ .mountPath }}
+              mountPath: "/etc/secrets/{{ .mountPath }}"
+              readOnly: true
+          {{ end }}
+          {{ end }}
           {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy

@@ -310,17 +310,13 @@ spec:
               {{- end }}
             {{- end }}
             {{- end }}
-          {{ if include "worker.shouldRenderVolumeMounts" . }}
+          {{ if include "shouldRenderVolumeMounts" . }}
           volumeMounts:
             {{ if .Values.datadogSocketVolume.enabled }}
             - name: datadog-apm-socket
               mountPath: /var/run/datadog/apm.socket
             - name: datadog-dsd-socket
               mountPath: /var/run/datadog/dsd.socket
-            {{ end }}
-            {{ if .Values.resources.requests.nvidiaGpu }}
-            - name: dshm
-              mountPath: /dev/shm
             {{ end }}
             {{ if .Values.pvc.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-storage"
