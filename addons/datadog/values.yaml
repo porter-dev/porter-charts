@@ -339,7 +339,7 @@ datadog:
 
     ## ref: https://docs.datadoghq.com/developers/dogstatsd/unix_socket/#using-origin-detection-for-container-tagging
     originDetection: true
-x
+
     # datadog.dogstatsd.tags -- List of static tags to attach to every custom metric, event and service check collected by Dogstatsd.
 
     ## Learn more about tagging: https://docs.datadoghq.com/tagging/
