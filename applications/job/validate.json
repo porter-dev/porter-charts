@@ -68,6 +68,28 @@
           }
         }
       }
+    },
+    "pvc": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "storage": {
+          "type": "string",
+          "pattern": "^\\d+(Ki|Mi|Gi|Ti)$",
+          "default": "20Gi"
+        },
+        "mountPath": {
+          "type": "string",
+          "default": "/mypath"
+        },
+        "existingVolume": {
+          "type": "string",
+          "default": ""
+        }
+      }
     }
   }
 }
