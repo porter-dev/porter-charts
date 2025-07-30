@@ -21,8 +21,8 @@ version: 0.60.0
 appVersion: "3.5.2"
 dependencies:
   - name: "loki"
-    repository: "https://chart-addons.getporter.dev"
-    version: "0.4.0"
+    repository: "https://grafana.github.io/helm-charts"
+    version: "6.30.1"
   - name: "promtail"
     repository: "https://grafana.github.io/helm-charts"
-    version: "6.11.5"
+    version: "6.17.0"
