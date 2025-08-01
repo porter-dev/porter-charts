@@ -247,14 +247,14 @@ spec:
               securityContext:
                 runAsNonRoot: true
               volumeMounts:
-                - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+                - name: "cloud-sql-proxy-service-account-secret"
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
           {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled}}
           volumes:
             {{ if .Values.cloudsql.enabled }}
-            - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+            - name: "cloud-sql-proxy-service-account-secret"
               secret:
                 secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
             {{ end }}

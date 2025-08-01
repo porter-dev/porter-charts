@@ -474,7 +474,7 @@ spec:
               memory: 128Mi
               cpu: 0.1
           volumeMounts:
-          - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+          - name: "cloud-sql-proxy-service-account-secret"
             mountPath: /secrets/
             readOnly: true
         {{ end }}
@@ -540,7 +540,7 @@ spec:
             sizeLimit: 4Gi
         {{ end }}
         {{ if .Values.cloudsql.enabled }}
-        - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+        - name: "cloud-sql-proxy-service-account-secret"
           secret:
             secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
         {{ end }}
