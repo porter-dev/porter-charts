@@ -147,31 +147,6 @@ tabs:
       label: Propagate SIGTERM to child processes.
       settings:
         default: true
-  - name: persistence_toggle
-    contents:
-      - type: heading
-        label: Persistent Disks
-      - type: subtitle
-        label: Attach persistent disks to your job to retain data across runs.
-      - type: checkbox
-        label: Enable Persistence
-        variable: pvc.enabled
-  - name: persistent_storage
-    show_if: pvc.enabled
-    contents:
-      - type: number-input
-        label: Persistent Storage
-        variable: pvc.storage
-        placeholder: "ex: 20"
-        settings:
-          unit: Gi
-          default: 20
-      - type: string-input
-        label: Mount Path
-        variable: pvc.mountPath
-        placeholder: "ex: /mypath"
-        settings:
-          default: /mypath
     - type: heading
       label: Image Settings
     - type: subtitle
