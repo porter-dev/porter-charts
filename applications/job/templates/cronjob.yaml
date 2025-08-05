@@ -42,8 +42,10 @@ spec:
             kubectl.kubernetes.io/default-container: {{ .Chart.Name }}
             {{- if .Values.safeToEvict }}
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
+            "karpenter.sh/do-not-disrupt": "false"
             {{- else }}
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+            "karpenter.sh/do-not-disrupt": "true"
             {{- end }}
           labels:
             {{- if .Values.podLabels }}
