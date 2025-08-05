@@ -44,6 +44,7 @@ spec:
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
             {{- else }}
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+            "karpenter.sh/do-not-disrupt": "true"
             {{- end }}
           labels:
             {{- if .Values.podLabels }}
