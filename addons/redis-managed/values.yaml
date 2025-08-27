@@ -93,7 +93,7 @@ diagnosticMode:
 ##
 image:
   registry: docker.io
-  repository: bitnami/redis
+  repository: porterhub/redis-managed
   tag: 7.2.3-debian-11-r2
   digest: ''
   ## Specify a imagePullPolicy
