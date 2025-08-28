@@ -26,7 +26,7 @@ spec:
     {{- range .Values.gateway.ingress.tls }}
     - hosts:
         {{- range .hosts }}
-        - {{ tpl . $ | quote }}
+        - {{ . | quote }}
         {{- end }}
       {{- with .secretName }}
       secretName: {{ . }}
@@ -35,7 +35,7 @@ spec:
   {{- end }}
   rules:
     {{- range .Values.gateway.ingress.hosts }}
-    - host: {{ tpl .host $ | quote }}
+    - host: {{ .host | quote }}
       http:
         paths:
           {{- range .paths }}

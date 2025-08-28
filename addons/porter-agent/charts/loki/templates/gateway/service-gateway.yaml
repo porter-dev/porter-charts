@@ -6,22 +6,13 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
     {{- include "loki.gatewayLabels" . | nindent 4 }}
-    {{- with .Values.loki.serviceLabels }}
-    {{- toYaml . | nindent 4}}
-    {{- end }}
     {{- with .Values.gateway.service.labels }}
-    {{- toYaml . | nindent 4}}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
-    {{- if not (and .Values.enterprise.enabled .Values.enterprise.gelGateway) }}
-    prometheus.io/service-monitor: "false"
-    {{- end }}
+  {{- with .Values.gateway.service.annotations }}
   annotations:
-    {{- with .Values.loki.serviceAnnotations }}
-    {{- toYaml . | nindent 4}}
-    {{- end }}
-    {{- with .Values.gateway.service.annotations }}
-    {{- toYaml . | nindent 4}}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.gateway.service.type }}
   {{- with .Values.gateway.service.clusterIP }}
@@ -31,9 +22,9 @@ spec:
   loadBalancerIP: {{ .Values.gateway.service.loadBalancerIP }}
   {{- end }}
   ports:
-    - name: http-metrics
+    - name: http
       port: {{ .Values.gateway.service.port }}
-      targetPort: http-metrics
+      targetPort: http
       {{- if and (eq "NodePort" .Values.gateway.service.type) .Values.gateway.service.nodePort }}
       nodePort: {{ .Values.gateway.service.nodePort }}
       {{- end }}

@@ -7,9 +7,6 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
     {{- include "loki.labels" . | nindent 4 }}
-    {{- with .Values.ingress.labels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -23,7 +20,7 @@ spec:
     {{- range .Values.ingress.tls }}
     - hosts:
         {{- range .hosts }}
-        - {{ tpl . $ | quote }}
+        - {{ . | quote }}
         {{- end }}
       {{- with .secretName }}
       secretName: {{ . }}
@@ -32,7 +29,7 @@ spec:
   {{- end }}
   rules:
     {{- range $.Values.ingress.hosts }}
-    - host: {{ tpl . $ | quote }}
+    - host: {{ . | quote }}
       http:
         paths:
           {{- include "loki.ingress.servicePaths" $ | indent 10}}

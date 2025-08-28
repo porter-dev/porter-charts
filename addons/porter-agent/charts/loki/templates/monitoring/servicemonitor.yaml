@@ -5,7 +5,6 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ include "loki.fullname" $ }}
-  namespace: {{ $.Release.Namespace }}
   {{- with .annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -39,11 +38,9 @@ spec:
       {{- end }}
       relabelings:
         - sourceLabels: [job]
-          action: replace
           replacement: "{{ $.Release.Namespace }}/$1"
           targetLabel: job
-        - action: replace
-          replacement: "{{ include "loki.clusterLabel" $ }}"
+        - replacement: "{{ include "loki.clusterLabel" $ }}"
           targetLabel: cluster
         {{- with .relabelings }}
         {{- toYaml . | nindent 8 }}
