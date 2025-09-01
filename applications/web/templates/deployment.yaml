@@ -521,7 +521,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled }}
+      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -553,6 +553,12 @@ spec:
             claimName: "{{ include "docker-template.fullname" . }}-pvc"
         {{ end }}
         {{ end }}
+        {{ if .Values.multiplePvc.enabled }}
+        {{- range .Values.multiplePvc.volumes }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .existingVolume }}
+        {{- end }}
         {{ if .Values.emptyDir.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
           emptyDir:
