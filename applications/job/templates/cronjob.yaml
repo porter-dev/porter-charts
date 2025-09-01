@@ -280,6 +280,7 @@ spec:
               persistentVolumeClaim:
                 claimName: {{ .existingVolume }}
             {{- end }}
+            {{ end }}
             {{ if .Values.fileSecretMounts.enabled }}
             {{ range .Values.fileSecretMounts.mounts }}
             - name: {{ .mountPath }}
