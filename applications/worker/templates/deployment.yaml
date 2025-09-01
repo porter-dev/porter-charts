@@ -323,6 +323,12 @@ spec:
             - name: "{{ include "docker-template.fullname" . }}-storage"
               mountPath: {{ .Values.pvc.mountPath }}
             {{ end }}
+            {{- if .Values.multiplePvc.enabled }}
+            {{- range .Values.multiplePvc.volumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
+            {{- end }}
             {{- if .Values.emptyDir.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
               mountPath: {{ .Values.emptyDir.mountPath }}
@@ -408,7 +414,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) }}
+      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -433,6 +439,13 @@ spec:
             {{- else }}
             claimName: "{{ include "docker-template.fullname" . }}-pvc"
             {{- end }}
+        {{ end }}
+        {{ if .Values.multiplePvc.enabled }}
+        {{- range .Values.multiplePvc.volumes }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .existingVolume }}
+        {{- end }}
         {{ end }}
         {{ if .Values.emptyDir.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
