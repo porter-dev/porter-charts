@@ -182,6 +182,12 @@ spec:
                 - name: "{{ include "docker-template.fullname" . }}-storage"
                   mountPath: {{ .Values.pvc.mountPath }}
               {{ end }}
+              {{- if .Values.multiplePvc.enabled }}
+              {{- range .Values.multiplePvc.volumes }}
+              - name: {{ .name }}
+                mountPath: {{ .mountPath }}
+              {{- end }}
+              {{- end }}
               resources:
                 requests:
                   cpu: {{ .Values.resources.requests.cpu }}
@@ -252,7 +258,7 @@ spec:
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled}}
+          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled }}
           volumes:
             {{ if .Values.cloudsql.enabled }}
             - name: "cloud-sql-proxy-service-account-secret"
@@ -267,6 +273,13 @@ spec:
                 {{- else }}
                 claimName: "{{ include "docker-template.fullname" . }}-pvc"
                 {{- end }}
+            {{ end }}
+            {{ if .Values.multiplePvc.enabled }}
+            {{- range .Values.multiplePvc.volumes }}
+            - name: {{ .name }}
+              persistentVolumeClaim:
+                claimName: {{ .existingVolume }}
+            {{- end }}
             {{ end }}
             {{ if .Values.fileSecretMounts.enabled }}
             {{ range .Values.fileSecretMounts.mounts }}
