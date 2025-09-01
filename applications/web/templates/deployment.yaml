@@ -442,6 +442,12 @@ spec:
             - name: "{{ include "docker-template.fullname" . }}-storage"
               mountPath: {{ .Values.pvc.mountPath }}
           {{ end }}
+          {{- if .Values.multiplePvc.enabled }}
+            {{- range .Values.multiplePvc.volumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
+            {{- end }}
           {{- if .Values.emptyDir.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
               mountPath: {{ .Values.emptyDir.mountPath }}
