@@ -111,5 +111,13 @@ pvc:
   mountPath: /mypath
   existingVolume: ""
 
+multiplePvc:
+  enabled: false
+  volumes:
+    - name: ""
+      storage: 20Gi
+      mountPath: /mypath
+      existingVolume: ""
+
 # job timeout configuration
 activeDeadlineSeconds: # Optional - if not set, will use sidecar.timeout
