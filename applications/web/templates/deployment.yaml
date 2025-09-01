@@ -565,6 +565,7 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .existingVolume }}
         {{- end }}
+        {{ end }}
         {{ if .Values.emptyDir.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
           emptyDir:
