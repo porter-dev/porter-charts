@@ -9,7 +9,6 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "loki.writeFullname" . }}
-  namespace: {{ $.Release.Namespace }}
   labels:
     {{- include "loki.writeLabels" . | nindent 4 }}
 spec:

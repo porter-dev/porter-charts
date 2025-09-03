@@ -29,11 +29,6 @@ kubectlImage:
   digest: null
   # -- Docker image pull policy
   pullPolicy: IfNotPresent
-
-# Disable rollout operator
-rollout_operator:
-  enabled: false
-
 loki:
   # Configures the readiness probe for all of the Loki pods
   readinessProbe:
@@ -248,6 +243,7 @@ loki:
     grpc_listen_port: 9095
   # -- Limits config
   limits_config:
+    enforce_metric_name: false
     reject_old_samples: true
     reject_old_samples_max_age: 168h
     max_cache_freshness_per_query: 10m
@@ -611,7 +607,7 @@ monitoring:
       # -- Controls whether to install the Grafana Agent Operator and its CRDs.
       # Note that helm will not install CRDs if this flag is enabled during an upgrade.
       # In that case install the CRDs manually from https://github.com/grafana/agent/tree/main/production/operator/crds
-      installOperator: false
+      installOperator: true
       # -- Grafana Agent annotations
       annotations: {}
       # -- Additional Grafana Agent labels

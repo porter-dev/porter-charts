@@ -9,7 +9,6 @@ metadata:
   labels:
     app.kubernetes.io/part-of: memberlist
     {{- include "loki.readLabels" . | nindent 4 }}
-  {{- if or (not (empty .Values.loki.annotations)) (not (empty .Values.read.annotations))}}
   annotations:
     {{- with .Values.loki.annotations }}
     {{- toYaml . | nindent 4 }}
@@ -17,7 +16,6 @@ metadata:
     {{- with .Values.read.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- end }}
 spec:
   {{- if not .Values.read.autoscaling.enabled }}
   replicas: {{ .Values.read.replicas }}
@@ -33,7 +31,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: {{ include "loki.configMapOrSecretContentHash" (dict "ctx" . "name" "/config.yaml") }}
+        checksum/config: {{ include (print .Template.BasePath "/config.yaml") . | sha256sum }}
         {{- with .Values.loki.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -71,25 +69,25 @@ spec:
             - -config.file=/etc/loki/config/config.yaml
             - -target={{ .Values.read.targetModule }}
             - -legacy-read-mode=false
-            - -common.compactor-grpc-address={{ include "loki.backendFullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:{{ .Values.loki.server.grpc_listen_port }}
-            {{- with (concat .Values.global.extraArgs .Values.read.extraArgs) | uniq }}
+            - -common.compactor-grpc-address={{ include "loki.backendFullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:9095
+            {{- with .Values.read.extraArgs }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           ports:
             - name: http-metrics
-              containerPort: {{ .Values.loki.server.http_listen_port }}
+              containerPort: 3100
               protocol: TCP
             - name: grpc
-              containerPort: {{ .Values.loki.server.grpc_listen_port }}
+              containerPort: 9095
               protocol: TCP
             - name: http-memberlist
               containerPort: 7946
               protocol: TCP
-          {{- with (concat .Values.global.extraEnv .Values.read.extraEnv) | uniq }}
+          {{- with .Values.read.extraEnv }}
           env:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with (concat .Values.global.extraEnvFrom .Values.read.extraEnvFrom) | uniq }}
+          {{- with .Values.read.extraEnvFrom }}
           envFrom:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -97,10 +95,6 @@ spec:
             {{- toYaml .Values.loki.containerSecurityContext | nindent 12 }}
           readinessProbe:
             {{- toYaml .Values.loki.readinessProbe | nindent 12 }}
-          {{- if .Values.read.livenessProbe }}
-          livenessProbe:
-            {{- toYaml .Values.read.livenessProbe | nindent 12 }}
-          {{- end }}
           volumeMounts:
             - name: config
               mountPath: /etc/loki/config
@@ -114,28 +108,17 @@ spec:
             - name: license
               mountPath: /etc/loki/license
             {{- end}}
-            {{- with (concat .Values.global.extraVolumeMounts .Values.read.extraVolumeMounts) | uniq }}
+            {{- with .Values.read.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           resources:
             {{- toYaml .Values.read.resources | nindent 12 }}
-        {{- with .Values.read.extraContainers }}
-        {{- toYaml . | nindent 8}}
-        {{- end }}
       {{- with .Values.read.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.read.dnsConfig }}
-      dnsConfig:
         {{- tpl . $ | nindent 8 }}
       {{- end }}
       {{- with .Values.read.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.read.topologySpreadConstraints }}
-      topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.read.tolerations }}
@@ -148,7 +131,12 @@ spec:
         - name: data
           emptyDir: {}
         - name: config
+          {{- if .Values.loki.existingSecretForConfig }}
+          secret:
+            secretName: {{ .Values.loki.existingSecretForConfig }}
+          {{- else }}
           {{- include "loki.configVolume" . | nindent 10 }}
+          {{- end }}
         - name: runtime-config
           configMap:
             name: {{ template "loki.name" . }}-runtime
@@ -161,7 +149,7 @@ spec:
             secretName: enterprise-logs-license
           {{- end }}
         {{- end }}
-        {{- with (concat .Values.global.extraVolumes .Values.read.extraVolumes) | uniq }}
+        {{- with .Values.read.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
 {{- end }}

@@ -10,38 +10,34 @@ metadata:
     {{- end }}
   annotations:
     {{- if not .Values.sidecar.configReloader.enabled }}
-    checksum/config: {{ tpl .Values.config.file . | sha256sum }}
+    {{- if not .Values.configmap.enabled }}
+    checksum/config: {{ include (print .Template.BasePath "/secret.yaml") . | sha256sum }}
+    {{- else }}
+    checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum }}
+    {{- end }}
     {{- end }}
     {{- with .Values.podAnnotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
   serviceAccountName: {{ include "promtail.serviceAccountName" . }}
-  automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
   {{- include "promtail.enableServiceLinks" . | nindent 2 }}
-  {{- with .Values.hostNetwork }}
-  hostNetwork: {{ . }}
-  {{- end }}
   {{- with .Values.priorityClassName }}
   priorityClassName: {{ . }}
   {{- end }}
   {{- with .Values.initContainer }}
   initContainers:
-    {{- tpl (toYaml .) $ | nindent 4 }}
-  {{- end }}
-  {{- with .Values.global.imagePullSecrets | default .Values.imagePullSecrets }}
-  imagePullSecrets:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with .Values.hostAliases }}
-  hostAliases:
+  {{- with .Values.imagePullSecrets }}
+  imagePullSecrets:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   securityContext:
     {{- toYaml .Values.podSecurityContext | nindent 4 }}
   containers:
     - name: promtail
-      image: "{{ .Values.global.imageRegistry | default .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+      image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
       imagePullPolicy: {{ .Values.image.pullPolicy }}
       args:
         - "-config.file=/etc/promtail/promtail.yaml"
@@ -167,6 +163,6 @@ spec:
     {{- toYaml . | nindent 4 }}
     {{- end }}
     {{- with .Values.extraVolumes }}
-    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
 {{- end }}
