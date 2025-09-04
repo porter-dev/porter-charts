@@ -88,13 +88,6 @@ loki:
           index:
             prefix: loki_index_
             period: 24h
-        - from: "2024-04-01"
-          object_store: filesystem
-          store: tsdb
-          schema: v13
-          index:
-            prefix: index_
-            period: 24h
     compactor:
       retention_enabled: true
       retention_delete_delay: 0h
