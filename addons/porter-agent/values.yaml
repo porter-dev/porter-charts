@@ -81,7 +81,7 @@ loki:
           rules_directory: /var/loki/rules
     schemaConfig:
       configs:
-        - from: "2022-01-11"
+        - from: "2022-04-10"
           store: boltdb-shipper
           object_store: filesystem
           schema: v12
