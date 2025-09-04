@@ -4,20 +4,21 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.2
-  name: users.memorydb.services.k8s.aws
+  name: multiregionclusters.memorydb.services.k8s.aws
 spec:
   group: memorydb.services.k8s.aws
   names:
-    kind: User
-    listKind: UserList
-    plural: users
-    singular: user
+    kind: MultiRegionCluster
+    listKind: MultiRegionClusterList
+    plural: multiregionclusters
+    singular: multiregioncluster
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: User is the Schema for the Users API
+        description: MultiRegionCluster is the Schema for the MultiRegionClusters
+          API
         properties:
           apiVersion:
             description: |-
@@ -38,60 +39,37 @@ spec:
             type: object
           spec:
             description: |-
-              UserSpec defines the desired state of User.
+              MultiRegionClusterSpec defines the desired state of MultiRegionCluster.
 
-              You create users and assign them specific permissions by using an access
-              string. You assign the users to Access Control Lists aligned with a specific
-              role (administrators, human resources) that are then deployed to one or more
-              MemoryDB clusters.
+              Represents a multi-Region cluster.
             properties:
-              accessString:
-                description: |-
-                  Access permissions string used for this user.
-
-                  Regex Pattern: `\S`
+              description:
+                description: A description for the multi-Region cluster.
                 type: string
-              authenticationMode:
-                description: |-
-                  Denotes the user's authentication properties, such as whether it requires
-                  a password to authenticate.
-                properties:
-                  passwords:
-                    items:
-                      description: |-
-                        SecretKeyReference combines a k8s corev1.SecretReference with a
-                        specific key within the referred-to Secret
-                      properties:
-                        key:
-                          description: Key is the key within the secret
-                          type: string
-                        name:
-                          description: name is unique within a namespace to reference
-                            a secret resource.
-                          type: string
-                        namespace:
-                          description: namespace defines the space within which the
-                            secret name must be unique.
-                          type: string
-                      required:
-                      - key
-                      type: object
-                      x-kubernetes-map-type: atomic
-                    type: array
-                  type_:
-                    type: string
-                type: object
-              name:
-                description: |-
-                  The name of the user. This value must be unique as it also serves as the
-                  user identifier.
-
-                  Regex Pattern: `^[a-zA-Z][a-zA-Z0-9\-]*$`
+              engine:
+                description: The name of the engine to be used for the multi-Region
+                  cluster.
                 type: string
+              engineVersion:
+                description: The version of the engine to be used for the multi-Region
+                  cluster.
+                type: string
+              multiRegionClusterNameSuffix:
+                description: A suffix to be added to the multi-Region cluster name.
+                type: string
+              multiRegionParameterGroupName:
+                description: The name of the multi-Region parameter group to be associated
+                  with the cluster.
+                type: string
+              nodeType:
+                description: The node type to be used for the multi-Region cluster.
+                type: string
+              numShards:
+                description: The number of shards for the multi-Region cluster.
+                format: int64
+                type: integer
               tags:
-                description: |-
-                  A list of tags to be added to this resource. A tag is a key-value pair. A
-                  tag key must be accompanied by a tag value, although null is accepted.
+                description: A list of tags to be applied to the multi-Region cluster.
                 items:
                   description: |-
                     A tag that can be added to an MemoryDB resource. Tags are composed of a Key/Value
@@ -106,13 +84,16 @@ spec:
                       type: string
                   type: object
                 type: array
+              tlsEnabled:
+                description: Whether to enable TLS encryption for the multi-Region
+                  cluster.
+                type: boolean
             required:
-            - accessString
-            - authenticationMode
-            - name
+            - multiRegionClusterNameSuffix
+            - nodeType
             type: object
           status:
-            description: UserStatus defines the observed state of User
+            description: MultiRegionClusterStatus defines the observed state of MultiRegionCluster
             properties:
               ackResourceMetadata:
                 description: |-
@@ -143,24 +124,24 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
-              aclNames:
-                description: The names of the Access Control Lists to which the user
-                  belongs
+              clusters:
+                description: The clusters in this multi-Region cluster.
                 items:
-                  type: string
+                  description: Represents a Regional cluster
+                  properties:
+                    arn:
+                      type: string
+                    clusterName:
+                      type: string
+                    region:
+                      type: string
+                    status:
+                      type: string
+                  type: object
                 type: array
-              authentication:
-                description: Denotes whether the user requires a password to authenticate.
-                properties:
-                  passwordCount:
-                    format: int64
-                    type: integer
-                  type_:
-                    type: string
-                type: object
               conditions:
                 description: |-
-                  All CRs managed by ACK have a common `Status.Conditions` member that
+                  All CRS managed by ACK have a common `Status.Conditions` member that
                   contains a collection of `ackv1alpha1.Condition` objects that describe
                   the various terminal states of the CR and its backend AWS service API
                   resource
@@ -193,32 +174,15 @@ spec:
                   - type
                   type: object
                 type: array
-              events:
-                description: |-
-                  A list of events. Each element in the list contains detailed information
-                  about one event.
-                items:
-                  description: |-
-                    Represents a single occurrence of something interesting within the system.
-                    Some examples of events are creating a cluster or adding or removing a node.
-                  properties:
-                    date:
-                      format: date-time
-                      type: string
-                    message:
-                      type: string
-                    sourceName:
-                      type: string
-                    sourceType:
-                      type: string
-                  type: object
-                type: array
-              minimumEngineVersion:
-                description: The minimum engine version supported for the user
+              multiRegionClusterName:
+                description: The name of the multi-Region cluster.
                 type: string
+              numberOfShards:
+                description: The number of shards in the multi-Region cluster.
+                format: int64
+                type: integer
               status:
-                description: Indicates the user status. Can be "active", "modifying"
-                  or "deleting".
+                description: The current status of the multi-Region cluster.
                 type: string
             type: object
         type: object
