@@ -86,7 +86,7 @@ loki:
           object_store: filesystem
           schema: v12
           index:
-            prefix: loki_index_
+            prefix: index_
             period: 24h
     compactor:
       retention_enabled: true
