@@ -77,7 +77,7 @@ Name of the service account json secret to use with the CloudSQL proxy
 {{- end }}
 
 
-{{/* 
+{{/*
 The connection string to be passed to the CloudSQL proxy.
 For backwards compatibility, this concatenates targets from cloudsql.connectionName/dbPort, cloudsql.additionalConnection.connectionName/dbPort in addition to the cloudsql.connections list
 */}}
@@ -87,7 +87,7 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
 {{- $connections := default (list) .Values.cloudsql.connections -}}
 {{- $hasConnections := or $singleConnection (gt (len $connections) 0) $additionalConnection.enabled -}}
 {{- if $hasConnections -}}
-    
+
     {{- if $singleConnection -}}
         {{- $singleConnection -}}=tcp:{{.Values.cloudsql.dbPort }}
     {{- end -}}
@@ -97,7 +97,7 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
         {{ $additionalConnection.connectionName }}=tcp:{{ $additionalConnection.dbPort }}
     {{- end -}}
 
-    {{- range $index, $conn := $connections -}} 
+    {{- range $index, $conn := $connections -}}
         {{- if or $index $singleConnection $additionalConnection.enabled }},{{ end -}}
         {{ $conn.name }}=tcp:{{ $conn.port }}
     {{- end -}}
@@ -127,6 +127,25 @@ Get the EFS resource name. If index is 0, don't append it to the name.
 {{- else -}}
 {{- $name -}}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Get the persistent disk mount path for a given volume. If an override is provided, use that.
+Otherwise, use the default path /data/<appName>
+*/}}
+{{- define "docker-template.persistentDiskMountPath" -}}
+{{- if .mountPath -}}
+{{- .mountPath -}}
+{{- else -}}
+{{- printf "/data/%s" .releaseName -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Get the persistent disk resource name using the disk name
+*/}}
+{{- define "docker-template.persistentDiskName" -}}
+{{- .name -}}
 {{- end -}}
 
 {{/*
@@ -173,16 +192,4 @@ This helper uses the global .Values object.
 {{ $k }}: {{ $v | toString | trimPrefix "\"" | trimSuffix "\"" | quote }}
 {{- end }}
 
-{{- end -}}
-
-{{/*
-Return true if volumeMounts should be rendered in the main container
-
-*/}}
-{{- define "web.shouldRenderVolumeMounts" -}}
-{{- if or .Values.datadogSocketVolume.enabled .Values.resources.requests.nvidiaGpu .Values.awsEfsStorage .Values.pvc.enabled .Values.multiplePvc.enabled .Values.emptyDir.enabled (and .Values.fileSecretMounts .Values.fileSecretMounts.enabled) -}}
-true
-{{- else -}}
-false
-{{- end -}}
 {{- end -}}

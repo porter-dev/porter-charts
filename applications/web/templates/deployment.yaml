@@ -21,7 +21,7 @@ spec:
   {{- if $isBlueGreen }}
   progressDeadlineSeconds: 1200
   strategy:
-    blueGreen: 
+    blueGreen:
       activeService: {{ include "docker-template.fullname" . }}
       autoPromotionEnabled: true
       scaleDownDelayRevisionLimit: 5
@@ -182,9 +182,9 @@ spec:
                 - {{ $command | quote }}
                 {{- end }}
             {{- end }}
-          {{- else }} 
+          {{- else }}
           lifecycle:
-            # if no preStop is defined, we sleep for 5 seconds to give time 
+            # if no preStop is defined, we sleep for 5 seconds to give time
             # for the pod to be removed from the endpoint slice
             preStop:
               exec:
@@ -431,14 +431,23 @@ spec:
           {{- if .Values.resources.requests.nvidiaGpu}}
             - name: dshm
               mountPath: /dev/shm
-          {{ end }}
-          {{- if .Values.awsEfsStorage }}
-          {{ range $index, $v := .Values.awsEfsStorage }}
-            - name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
-              mountPath: {{ include "docker-template.efsMountPath" (dict "mountPath" $v.mountPath "fullname" $.Values.fullnameOverride) }}
-          {{ end }}   
-          {{ end }}  
-          {{- if .Values.pvc.enabled }}
+        {{ end }}
+        {{ if .Values.awsEfsStorage }}
+          volumeMounts:
+        {{- range $index, $v := .Values.awsEfsStorage }}
+          - name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
+            mountPath: {{ include "docker-template.efsMountPath" (dict "mountPath" $v.mountPath "fullname" $.Values.fullnameOverride) }}
+        {{ end }}
+        {{ end }}
+        {{ if .Values.persistentDisks }}
+          volumeMounts:
+        {{- range $v := .Values.persistentDisks }}
+          - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
+            mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name) }}
+        {{ end }}
+        {{ end }}
+          {{ if .Values.pvc.enabled }}
+          volumeMounts:
             - name: "{{ include "docker-template.fullname" . }}-storage"
               mountPath: {{ .Values.pvc.mountPath }}
           {{ end }}
@@ -507,7 +516,7 @@ spec:
           value: {{ $nodeGroup.id | quote }}
           effect: "NoSchedule"
       {{- end }}
-      # nvidia.com/gpu toleration is automatically injected in EKS/GKE, but not in AKS 
+      # nvidia.com/gpu toleration is automatically injected in EKS/GKE, but not in AKS
       # since we want to be cloud agnostic, we just add it ourselves wherever we need it
       {{- if .Values.resources.requests.nvidiaGpu}}
         - key: "nvidia.com/gpu"
@@ -515,19 +524,19 @@ spec:
           effect: "NoSchedule"
       {{- end }}
       {{- if .Values.topology.enabled }}
-      topologySpreadConstraints: 
+      topologySpreadConstraints:
         - maxSkew: {{ .Values.topology.maxSkew }}
           topologyKey: {{ .Values.topology.topologyKey }}
           whenUnsatisfiable: {{ .Values.topology.whenUnsatisfiable }}
           {{- if .Values.topology.labelSelector.enabled }}
-          labelSelector: 
+          labelSelector:
             matchLabels:
               {{- range $k, $v := .Values.topology.labelSelector.matchLabels }}
               {{ $k }}: {{ $v }}
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled }}
+      {{ if or .Values.pvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.persistentDisks .Values.datadogSocketVolume.enabled }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -576,6 +585,13 @@ spec:
         - name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
           persistentVolumeClaim:
             claimName: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
+        {{ end }}
+        {{ end }}
+        {{ if .Values.persistentDisks }}
+        {{- range $v := .Values.persistentDisks }}
+        - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
+          persistentVolumeClaim:
+            claimName: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
         {{ end }}
         {{ end }}
         {{ if .Values.fileSecretMounts.enabled }}

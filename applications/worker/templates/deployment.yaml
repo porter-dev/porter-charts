@@ -245,7 +245,7 @@ spec:
             - name: PORTER_RESOURCES_CPU
               value: "{{ .Values.resources.requests.cpu }}"
             - name: PORTER_RESOURCES_REPLICAS
-              value: "{{ .Values.replicaCount }}"      
+              value: "{{ .Values.replicaCount }}"
             - name: PORTER_POD_REVISION
               value: "{{ .Release.Revision }}"
             - name: PORTER_NODE_NAME
@@ -328,24 +328,13 @@ spec:
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
             {{- end }}
-            {{- end }}
-            {{- if .Values.emptyDir.enabled }}
-            - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
-              mountPath: {{ .Values.emptyDir.mountPath }}
-            {{ end }}
-            {{- if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
-            {{ range .Values.fileSecretMounts.mounts }}
-            - name: {{ .mountPath }}
-              mountPath: "/etc/secrets/{{ .mountPath }}"
-              readOnly: true
-            {{ end }}
-            {{ end }}
-            {{- if .Values.additionalVolumes }}
-            {{ range .Values.additionalVolumes }}
-            - name: {{ .name }}
-              mountPath: {{ .mountPath }}
-            {{ end }}
-            {{ end }}
+          {{ end }}
+        {{ if .Values.persistentDisks }}
+          volumeMounts:
+        {{- range $v := .Values.persistentDisks }}
+          - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
+            mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name) }}
+        {{ end }}
         {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
@@ -394,7 +383,7 @@ spec:
           value: {{ $nodeGroup.id | quote }}
           effect: "NoSchedule"
       {{- end }}
-      # nvidia.com/gpu toleration is automatically injected in EKS/GKE, but not in AKS 
+      # nvidia.com/gpu toleration is automatically injected in EKS/GKE, but not in AKS
       # since we want to be cloud agnostic, we just add it ourselves wherever we need it
       {{- if .Values.resources.requests.nvidiaGpu}}
         - key: "nvidia.com/gpu"
@@ -414,7 +403,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) }}
+      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) .Values.persistentDisks }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -465,5 +454,12 @@ spec:
           {{ .type }}:
             {{- toYaml .volumeOptions | nindent 12 }}
         {{- end }}
+        {{ end }}
+        {{ if .Values.persistentDisks }}
+        {{- range $v := .Values.persistentDisks }}
+        - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
+          persistentVolumeClaim:
+            claimName: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
+        {{ end }}
         {{ end }}
       {{ end }}

@@ -177,17 +177,13 @@ spec:
                   readOnly: true
               {{ end }}
               {{ end }}
-              {{ if .Values.pvc.enabled }}
+              {{ if .Values.persistentDisks }}
               volumeMounts:
-                - name: "{{ include "docker-template.fullname" . }}-storage"
-                  mountPath: {{ .Values.pvc.mountPath }}
+            {{- range $v := .Values.persistentDisks }}
+                - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
+                  mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name) }}
+            {{ end }}
               {{ end }}
-              {{- if .Values.multiplePvc.enabled }}
-              {{- range .Values.multiplePvc.volumes }}
-              - name: {{ .name }}
-                mountPath: {{ .mountPath }}
-              {{- end }}
-              {{- end }}
               resources:
                 requests:
                   cpu: {{ .Values.resources.requests.cpu }}
@@ -258,7 +254,7 @@ spec:
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled }}
+          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.persistentDisks}}
           volumes:
             {{ if .Values.cloudsql.enabled }}
             - name: "cloud-sql-proxy-service-account-secret"
@@ -288,6 +284,13 @@ spec:
                 secretName: "{{ .secretName }}"
             {{ end }}
             {{ end }}
+            {{ if .Values.persistentDisks }}
+            {{- range $v := .Values.persistentDisks }}
+            - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
+              persistentVolumeClaim:
+                claimName: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
+            {{ end }}
+            {{ end }}
           {{ end }}
           restartPolicy: Never
           shareProcessNamespace: true
@@ -309,7 +312,7 @@ spec:
               value: {{ $nodeGroup.id | quote }}
               effect: "NoSchedule"
           {{- end }}
-          # nvidia.com/gpu toleration is automatically injected in EKS/GKE, but not in AKS 
+          # nvidia.com/gpu toleration is automatically injected in EKS/GKE, but not in AKS
           # since we want to be cloud agnostic, we just add it ourselves wherever we need it
           {{- if .Values.resources.requests.nvidiaGpu}}
             - key: "nvidia.com/gpu"
