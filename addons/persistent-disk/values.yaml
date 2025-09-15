@@ -1,0 +1,19 @@
+labels: {}
+
+annotations: {}
+
+storageClass:
+  reclaimPolicy: "Retain"
+  volumeBindingMode: "Immediate"
+  directoryPerms: "777"
+  reuseAccessPoint: "true"
+  efs:
+    enabled: true
+    fileSystemId: ""
+    provisioningMode: "efs-ap"
+    provisioner: efs.csi.aws.com
+
+persistentVolumeClaim:
+  requestStorage: "5Gi"
+  accessModes:
+    - ReadWriteMany
