@@ -185,17 +185,10 @@ spec:
               {{- if .Values.multiplePvc.enabled }}
               {{- range .Values.multiplePvc.volumes }}
               - name: {{ .name }}
-                mountPath: {{ .mountPath }}
+                mountPath: {{ if .mountPath }}{{ .mountPath }}{{ else }}{{ printf "/data/%s/%s" $.Release.Name .name }}{{ end }}
               {{- end }}
               {{- end }}
 
-              {{ if .Values.persistentDisks }}
-              volumeMounts:
-              {{- range $v := .Values.persistentDisks }}
-                - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
-                  mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name "diskName" $v.name) }}
-              {{ end }}
-              {{ end }}
               resources:
                 requests:
                   cpu: {{ .Values.resources.requests.cpu }}
@@ -266,7 +259,7 @@ spec:
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled .Values.persistentDisks}}
+          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled}}
           volumes:
             {{ if .Values.cloudsql.enabled }}
             - name: "cloud-sql-proxy-service-account-secret"
@@ -286,7 +279,7 @@ spec:
             {{- range .Values.multiplePvc.volumes }}
             - name: {{ .name }}
               persistentVolumeClaim:
-                claimName: {{ .existingVolume }}
+                claimName: {{ if .existingVolume }}{{ .existingVolume }}{{ else }}{{ .name }}{{ end }}
             {{- end }}
             {{ end }}
             {{ if .Values.fileSecretMounts.enabled }}
@@ -294,13 +287,6 @@ spec:
             - name: {{ .mountPath }}
               secret:
                 secretName: "{{ .secretName }}"
-            {{ end }}
-            {{ end }}
-            {{ if .Values.persistentDisks }}
-            {{- range $v := .Values.persistentDisks }}
-            - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
-              persistentVolumeClaim:
-                claimName: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
             {{ end }}
             {{ end }}
           {{ end }}

@@ -445,7 +445,7 @@ spec:
           {{- if .Values.multiplePvc.enabled }}
             {{- range .Values.multiplePvc.volumes }}
             - name: {{ .name }}
-              mountPath: {{ .mountPath }}
+              mountPath: {{ if .mountPath }}{{ .mountPath }}{{ else }}{{ printf "/data/%s/%s" $.Release.Name .name }}{{ end }}
             {{- end }}
             {{- end }}
           {{- if .Values.emptyDir.enabled }}
@@ -457,12 +457,6 @@ spec:
             - name: {{ .mountPath }}
               mountPath: "/etc/secrets/{{ .mountPath }}"
               readOnly: true
-          {{ end }}
-          {{ end }}
-          {{ if .Values.persistentDisks }}
-          {{- range $v := .Values.persistentDisks }}
-            - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
-              mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name "diskName" $v.name) }}
           {{ end }}
           {{ end }}
         {{ end }}
@@ -533,7 +527,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled .Values.persistentDisks}}
+      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled}}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -569,7 +563,7 @@ spec:
         {{- range .Values.multiplePvc.volumes }}
         - name: {{ .name }}
           persistentVolumeClaim:
-            claimName: {{ .existingVolume }}
+            claimName: {{ if .existingVolume }}{{ .existingVolume }}{{ else }}{{ .name }}{{ end }}
         {{- end }}
         {{ end }}
         {{ if .Values.emptyDir.enabled }}
@@ -589,13 +583,6 @@ spec:
         - name: {{ .mountPath }}
           secret:
             secretName: "{{ .secretName }}"
-        {{ end }}
-        {{ end }}
-        {{ if .Values.persistentDisks }}
-        {{- range $v := .Values.persistentDisks }}
-        - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
-          persistentVolumeClaim:
-            claimName: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
         {{ end }}
         {{ end }}
       {{ end }}
