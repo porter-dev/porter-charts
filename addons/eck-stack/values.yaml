@@ -13,7 +13,7 @@ eck-elasticsearch:
 # If enabled, will use the eck-kibana chart and deploy a Kibana resource.
 #
 eck-kibana:
-  enabled: true
+  enabled: false
   # This is also adjusting the kibana reference to the elasticsearch resource named previously so that
   # both the eck-elasticsearch and the eck-kibana chart work together by default in the eck-stack chart.
   elasticsearchRef:
