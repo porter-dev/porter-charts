@@ -1,0 +1,10 @@
+apiVersion: v2
+description: Elastic Agent managed by the ECK operator
+icon: https://images.contentstack.io/v3/assets/bltefdd0b53724fa2ce/blt77c2da6e0198746e/620ac24e6662ca0a6f617114/icon-agent-32-color.svg
+kubeVersion: '>= 1.21.0-0'
+name: eck-agent
+sources:
+- https://github.com/elastic/cloud-on-k8s
+- https://github.com/elastic/elastic-agent
+type: application
+version: 0.16.0
