@@ -16,4 +16,4 @@ storageClass:
 persistentVolumeClaim:
   requestStorage: "5Gi"
   accessModes:
-    - ReadWriteMany 
+    - ReadWriteMany

@@ -21,4 +21,4 @@ spec:
     requests:
       storage: {{ .Values.persistentVolumeClaim.requestStorage }}
   storageClassName: {{ .Release.Name }}
-{{- end }} 
+{{- end }}
