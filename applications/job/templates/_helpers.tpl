@@ -106,13 +106,13 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
 
 {{/*
 Get the persistent disk mount path for a given volume. If an override is provided, use that.
-Otherwise, use the default path /data/<appName>
+Otherwise, use the default path /data/<releaseName>/<diskName>
 */}}
 {{- define "docker-template.persistentDiskMountPath" -}}
 {{- if .mountPath -}}
 {{- .mountPath -}}
 {{- else -}}
-{{- printf "/data/%s" .releaseName -}}
+{{- printf "/data/%s/%s" .releaseName .diskName -}}
 {{- end -}}
 {{- end -}}
 

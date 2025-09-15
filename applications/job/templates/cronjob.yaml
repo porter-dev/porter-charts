@@ -181,7 +181,7 @@ spec:
               volumeMounts:
             {{- range $v := .Values.persistentDisks }}
                 - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
-                  mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name) }}
+                  mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name "diskName" $v.name) }}
             {{ end }}
               {{ end }}
               resources:
