@@ -77,7 +77,7 @@ Name of the service account json secret to use with the CloudSQL proxy
 {{- end }}
 
 
-{{/*
+{{/* 
 The connection string to be passed to the CloudSQL proxy.
 For backwards compatibility, this concatenates targets from cloudsql.connectionName/dbPort, cloudsql.additionalConnection.connectionName/dbPort in addition to the cloudsql.connections list
 */}}
@@ -87,7 +87,7 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
 {{- $connections := default (list) .Values.cloudsql.connections -}}
 {{- $hasConnections := or $singleConnection (gt (len $connections) 0) $additionalConnection.enabled -}}
 {{- if $hasConnections -}}
-
+    
     {{- if $singleConnection -}}
         {{- $singleConnection -}}=tcp:{{.Values.cloudsql.dbPort }}
     {{- end -}}
@@ -97,7 +97,7 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
         {{ $additionalConnection.connectionName }}=tcp:{{ $additionalConnection.dbPort }}
     {{- end -}}
 
-    {{- range $index, $conn := $connections -}}
+    {{- range $index, $conn := $connections -}} 
         {{- if or $index $singleConnection $additionalConnection.enabled }},{{ end -}}
         {{ $conn.name }}=tcp:{{ $conn.port }}
     {{- end -}}
@@ -186,4 +186,3 @@ true
 false
 {{- end -}}
 {{- end -}}
-

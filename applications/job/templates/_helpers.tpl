@@ -103,4 +103,3 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
 
 {{- end }}
 {{- end }}
-
