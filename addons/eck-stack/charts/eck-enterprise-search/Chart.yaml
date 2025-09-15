@@ -1,0 +1,9 @@
+apiVersion: v2
+description: Elastic Enterprise Search managed by the ECK operator
+icon: https://github.com/elastic/ent-search/blob/main/public/app-search-favicon-196x196.png
+kubeVersion: '>= 1.21.0-0'
+name: eck-enterprise-search
+sources:
+- https://github.com/elastic/cloud-on-k8s
+type: application
+version: 0.16.0
