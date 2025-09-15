@@ -18,7 +18,8 @@
 
 # Version of Elasticsearch.
 #
-version: 9.1.0
+# version: 9.1.0
+version: 8.19.3
 
 # Elasticsearch Docker image to deploy
 #
