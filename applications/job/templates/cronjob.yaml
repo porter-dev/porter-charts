@@ -177,12 +177,24 @@ spec:
                   readOnly: true
               {{ end }}
               {{ end }}
+              {{ if .Values.pvc.enabled }}
+              volumeMounts:
+                - name: "{{ include "docker-template.fullname" . }}-storage"
+                  mountPath: {{ .Values.pvc.mountPath }}
+              {{ end }}
+              {{- if .Values.multiplePvc.enabled }}
+              {{- range .Values.multiplePvc.volumes }}
+              - name: {{ .name }}
+                mountPath: {{ .mountPath }}
+              {{- end }}
+              {{- end }}
+
               {{ if .Values.persistentDisks }}
               volumeMounts:
-            {{- range $v := .Values.persistentDisks }}
+              {{- range $v := .Values.persistentDisks }}
                 - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
                   mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name "diskName" $v.name) }}
-            {{ end }}
+              {{ end }}
               {{ end }}
               resources:
                 requests:
@@ -254,7 +266,7 @@ spec:
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.persistentDisks}}
+          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled .Values.persistentDisks}}
           volumes:
             {{ if .Values.cloudsql.enabled }}
             - name: "cloud-sql-proxy-service-account-secret"

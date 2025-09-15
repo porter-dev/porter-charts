@@ -328,13 +328,30 @@ spec:
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
             {{- end }}
-          {{ end }}
-        {{ if .Values.persistentDisks }}
-          volumeMounts:
-        {{- range $v := .Values.persistentDisks }}
-          - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
-            mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name "diskName" $v.name) }}
-        {{ end }}
+            {{- end }}
+            {{- if .Values.emptyDir.enabled }}
+            - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
+              mountPath: {{ .Values.emptyDir.mountPath }}
+            {{ end }}
+            {{- if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
+            {{ range .Values.fileSecretMounts.mounts }}
+            - name: {{ .mountPath }}
+              mountPath: "/etc/secrets/{{ .mountPath }}"
+              readOnly: true
+            {{ end }}
+            {{ end }}
+            {{- if .Values.additionalVolumes }}
+            {{ range .Values.additionalVolumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{ end }}
+            {{ end }}
+            {{ if .Values.persistentDisks }}
+            {{- range $v := .Values.persistentDisks }}
+            - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
+              mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name "diskName" $v.name) }}
+            {{ end }}
+            {{ end }}
         {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
@@ -403,7 +420,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) .Values.persistentDisks }}
+      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) .Values.persistentDisks}}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:

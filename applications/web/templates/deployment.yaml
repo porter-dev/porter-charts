@@ -431,23 +431,14 @@ spec:
           {{- if .Values.resources.requests.nvidiaGpu}}
             - name: dshm
               mountPath: /dev/shm
-        {{ end }}
-        {{ if .Values.awsEfsStorage }}
-          volumeMounts:
-        {{- range $index, $v := .Values.awsEfsStorage }}
-          - name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
-            mountPath: {{ include "docker-template.efsMountPath" (dict "mountPath" $v.mountPath "fullname" $.Values.fullnameOverride) }}
-        {{ end }}
-        {{ end }}
-        {{ if .Values.persistentDisks }}
-          volumeMounts:
-        {{- range $v := .Values.persistentDisks }}
-          - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
-            mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name "diskName" $v.name) }}
-        {{ end }}
-        {{ end }}
-          {{ if .Values.pvc.enabled }}
-          volumeMounts:
+          {{ end }}
+          {{- if .Values.awsEfsStorage }}
+          {{ range $index, $v := .Values.awsEfsStorage }}
+            - name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
+              mountPath: {{ include "docker-template.efsMountPath" (dict "mountPath" $v.mountPath "fullname" $.Values.fullnameOverride) }}
+          {{ end }}
+          {{ end }}
+          {{- if .Values.pvc.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-storage"
               mountPath: {{ .Values.pvc.mountPath }}
           {{ end }}
@@ -466,6 +457,12 @@ spec:
             - name: {{ .mountPath }}
               mountPath: "/etc/secrets/{{ .mountPath }}"
               readOnly: true
+          {{ end }}
+          {{ end }}
+          {{ if .Values.persistentDisks }}
+          {{- range $v := .Values.persistentDisks }}
+            - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
+              mountPath: {{ include "docker-template.persistentDiskMountPath" (dict "mountPath" $v.mountPath "releaseName" $.Release.Name "diskName" $v.name) }}
           {{ end }}
           {{ end }}
         {{ end }}
@@ -536,7 +533,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.persistentDisks .Values.datadogSocketVolume.enabled }}
+      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled .Values.persistentDisks}}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -587,18 +584,18 @@ spec:
             claimName: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
         {{ end }}
         {{ end }}
-        {{ if .Values.persistentDisks }}
-        {{- range $v := .Values.persistentDisks }}
-        - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
-          persistentVolumeClaim:
-            claimName: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
-        {{ end }}
-        {{ end }}
         {{ if .Values.fileSecretMounts.enabled }}
         {{ range .Values.fileSecretMounts.mounts }}
         - name: {{ .mountPath }}
           secret:
             secretName: "{{ .secretName }}"
+        {{ end }}
+        {{ end }}
+        {{ if .Values.persistentDisks }}
+        {{- range $v := .Values.persistentDisks }}
+        - name: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
+          persistentVolumeClaim:
+            claimName: {{ include "docker-template.persistentDiskName" (dict "name" $v.name) }}
         {{ end }}
         {{ end }}
       {{ end }}

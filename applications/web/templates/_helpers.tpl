@@ -130,25 +130,6 @@ Get the EFS resource name. If index is 0, don't append it to the name.
 {{- end -}}
 
 {{/*
-Get the persistent disk mount path for a given volume. If an override is provided, use that.
-Otherwise, use the default path /data/<releaseName>/<diskName>
-*/}}
-{{- define "docker-template.persistentDiskMountPath" -}}
-{{- if .mountPath -}}
-{{- .mountPath -}}
-{{- else -}}
-{{- printf "/data/%s/%s" .releaseName .diskName -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Get the persistent disk resource name using the disk name
-*/}}
-{{- define "docker-template.persistentDiskName" -}}
-{{- .name -}}
-{{- end -}}
-
-{{/*
 Renders the full block of annotations for the ingress.
 This helper uses the global .Values object.
 */}}
@@ -192,4 +173,35 @@ This helper uses the global .Values object.
 {{ $k }}: {{ $v | toString | trimPrefix "\"" | trimSuffix "\"" | quote }}
 {{- end }}
 
+{{- end -}}
+
+{{/*
+Return true if volumeMounts should be rendered in the main container
+
+*/}}
+{{- define "web.shouldRenderVolumeMounts" -}}
+{{- if or .Values.datadogSocketVolume.enabled .Values.resources.requests.nvidiaGpu .Values.awsEfsStorage .Values.pvc.enabled .Values.multiplePvc.enabled .Values.emptyDir.enabled (and .Values.fileSecretMounts .Values.fileSecretMounts.enabled) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Get the persistent disk mount path for a given volume. If an override is provided, use that.
+Otherwise, use the default path /data/<releaseName>/<diskName>
+*/}}
+{{- define "docker-template.persistentDiskMountPath" -}}
+{{- if .mountPath -}}
+{{- .mountPath -}}
+{{- else -}}
+{{- printf "/data/%s/%s" .releaseName .diskName -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Get the persistent disk resource name using the disk name
+*/}}
+{{- define "docker-template.persistentDiskName" -}}
+{{- .name -}}
 {{- end -}}
