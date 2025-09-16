@@ -169,7 +169,7 @@ spec:
                 {{- end }}
               {{- end }}
               {{- end }}
-              {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
+              {{- if include "job.shouldRenderVolumeMounts" . }}
               volumeMounts:
               {{ range .Values.fileSecretMounts.mounts }}
                 - name: {{ .mountPath }}
@@ -178,7 +178,6 @@ spec:
               {{ end }}
               {{ end }}
               {{ if .Values.pvc.enabled }}
-              volumeMounts:
                 - name: "{{ include "docker-template.fullname" . }}-storage"
                   mountPath: {{ .Values.pvc.mountPath }}
               {{ end }}
