@@ -346,12 +346,10 @@ spec:
               mountPath: {{ .mountPath }}
             {{ end }}
             {{ end }}
-            {{- if .Values.hostVolumeMounts.enabled }}
-            {{- range .Values.hostVolumeMounts.volumes }}
+            {{- range .Values.hostVolumeMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
             {{- end }}
-            {{ end }}
         {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
@@ -420,7 +418,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled .Values.hostVolumeMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) }}
+      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled .Values.hostVolumeMounts (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -472,12 +470,10 @@ spec:
             {{- toYaml .volumeOptions | nindent 12 }}
         {{- end }}
         {{ end }}
-        {{- if .Values.hostVolumeMounts.enabled }}
-        {{- range .Values.hostVolumeMounts.volumes }}
+        {{- range .Values.hostVolumeMounts }}
         - name: {{ .name }}
           hostPath:
             path: {{ .hostPath }}
             type: {{ .type | default "DirectoryOrCreate" }}
         {{- end }}
-        {{ end }}
       {{ end }}

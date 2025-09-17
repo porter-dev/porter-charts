@@ -181,9 +181,9 @@ spec:
                 - name: "{{ include "docker-template.fullname" . }}-storage"
                   mountPath: {{ .Values.pvc.mountPath }}
               {{ end }}
-              {{ if .Values.hostVolumeMounts.enabled }}
+              {{ if .Values.hostVolumeMounts }}
               volumeMounts:
-              {{ range .Values.hostVolumeMounts.volumes }}
+              {{ range .Values.hostVolumeMounts }}
                 - name: {{ .name }}
                   mountPath: {{ .mountPath }}
               {{ end }}
@@ -264,7 +264,7 @@ spec:
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled .Values.hostVolumeMounts.enabled }}
+          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled .Values.hostVolumeMounts }}
           volumes:
             {{ if .Values.cloudsql.enabled }}
             - name: "cloud-sql-proxy-service-account-secret"
@@ -294,13 +294,11 @@ spec:
                 secretName: "{{ .secretName }}"
             {{ end }}
             {{ end }}
-            {{ if .Values.hostVolumeMounts.enabled }}
-            {{ range .Values.hostVolumeMounts.volumes }}
+            {{ range .Values.hostVolumeMounts }}
             - name: {{ .name }}
               hostPath:
                 path: {{ .hostPath }}
                 type: {{ .type | default "DirectoryOrCreate" }}
-            {{ end }}
             {{ end }}
           {{ end }}
           restartPolicy: Never

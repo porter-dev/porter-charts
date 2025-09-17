@@ -461,12 +461,10 @@ spec:
               readOnly: true
           {{ end }}
           {{ end }}
-          {{- if .Values.hostVolumeMounts.enabled }}
-          {{- range .Values.hostVolumeMounts.volumes }}
+          {{- range .Values.hostVolumeMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
           {{- end }}
-          {{ end }}
         {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
@@ -535,7 +533,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled .Values.hostVolumeMounts.enabled }}
+      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled .Values.hostVolumeMounts }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -593,13 +591,11 @@ spec:
             secretName: "{{ .secretName }}"
         {{ end }}
         {{ end }}
-        {{- if .Values.hostVolumeMounts.enabled }}
-        {{- range .Values.hostVolumeMounts.volumes }}
+        {{- range .Values.hostVolumeMounts }}
         - name: {{ .name }}
           hostPath:
             path: {{ .hostPath }}
             type: {{ .type | default "DirectoryOrCreate" }}
         {{- end }}
-        {{ end }}
       {{ end }}
 {{- end }}
