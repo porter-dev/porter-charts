@@ -103,3 +103,15 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
 
 {{- end }}
 {{- end }}
+
+{{/*
+Return true if volumeMounts should be rendered in the main container
+
+*/}}
+{{- define "job.shouldRenderVolumeMounts" -}}
+{{- if or .Values.pvc.enabled .Values.multiplePvc.enabled (and .Values.fileSecretMounts .Values.fileSecretMounts.enabled) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
