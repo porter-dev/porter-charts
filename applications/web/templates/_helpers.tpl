@@ -180,7 +180,7 @@ Return true if volumeMounts should be rendered in the main container
 
 */}}
 {{- define "web.shouldRenderVolumeMounts" -}}
-{{- if or .Values.datadogSocketVolume.enabled .Values.resources.requests.nvidiaGpu .Values.awsEfsStorage .Values.pvc.enabled .Values.multiplePvc.enabled .Values.emptyDir.enabled (and .Values.fileSecretMounts .Values.fileSecretMounts.enabled) -}}
+{{- if or .Values.datadogSocketVolume.enabled .Values.resources.requests.nvidiaGpu .Values.awsEfsStorage .Values.pvc.enabled .Values.multiplePvc.enabled .Values.emptyDir.enabled (and .Values.fileSecretMounts .Values.fileSecretMounts.enabled) .Values.hostVolumeMounts.enabled -}}
 true
 {{- else -}}
 false
