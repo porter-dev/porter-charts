@@ -51,8 +51,6 @@ spec:
               fieldPath: spec.nodeName
         - name: NVME_MOUNT_PATH
           value: {{ .Values.nvmeStorage.hostMountPath | quote }}
-        - name: DEVICE_SIZE_THRESHOLD
-          value: {{ .Values.nvmeStorage.deviceSizeThreshold | quote }}
         volumeMounts:
         - name: host-mnt
           mountPath: /host/mnt

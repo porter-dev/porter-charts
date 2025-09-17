@@ -10,9 +10,6 @@ image:
 nvmeStorage:
   # Mount path on the host where NVMe storage will be mounted
   hostMountPath: "/mnt/nvme-shared"
-  # Device size threshold in bytes (80GB default)
-  # Devices smaller than this are considered root volumes and skipped
-  deviceSizeThreshold: 85899345920
 
 # Example application configuration that can consume the NVMe storage:
 # In your application's values.yaml:
