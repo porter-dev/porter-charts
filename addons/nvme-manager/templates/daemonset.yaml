@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "nvme-manager.fullname" . }}
+  labels:
+    {{- include "nvme-manager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nvme-manager
+spec:
+  selector:
+    matchLabels:
+      {{- include "nvme-manager.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: nvme-manager
+  template:
+    metadata:
+      labels:
+        {{- include "nvme-manager.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: nvme-manager
+    spec:
+      {{- if .Values.nodeGroups }}
+      # Only run on specified node groups (NVMe instance types)
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: porter.run/node-group-id
+                    operator: In
+                    values:
+                        {{- range $nodeGroup := .Values.nodeGroups }}
+                      - {{ $nodeGroup.id | quote }}
+                        {{- end }}
+      {{- else }}
+      # Default: run on all nodes, but only succeed on NVMe nodes
+      tolerations:
+      - operator: Exists
+      {{- end }}
+      hostPID: true
+      hostNetwork: true
+      serviceAccountName: {{ include "nvme-manager.fullname" . }}
+      containers:
+      - name: nvme-manager
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NVME_MOUNT_PATH
+          value: {{ .Values.nvmeStorage.hostMountPath | quote }}
+        - name: DEVICE_SIZE_THRESHOLD
+          value: {{ .Values.nvmeStorage.deviceSizeThreshold | quote }}
+        volumeMounts:
+        - name: host-mnt
+          mountPath: /host/mnt
+          mountPropagation: Bidirectional
+        - name: dev
+          mountPath: /dev
+        - name: proc
+          mountPath: /host/proc
+          readOnly: true
+        - name: sys
+          mountPath: /host/sys
+          readOnly: true
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      volumes:
+      - name: host-mnt
+        hostPath:
+          path: /mnt
+          type: DirectoryOrCreate
+      - name: dev
+        hostPath:
+          path: /dev
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: sys
+        hostPath:
+          path: /sys
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- if .Values.tolerations }}
+      {{- range .Values.tolerations }}
+      - {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      restartPolicy: Always
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}

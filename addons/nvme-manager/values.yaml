@@ -1,0 +1,51 @@
+# Default values for nvme-manager
+# This is a YAML-formatted file.
+
+image:
+  repository: "public.ecr.aws/porter-dev/cluster-services"
+  tag: "nvme-manager-latest"
+  pullPolicy: IfNotPresent
+
+# NVMe storage configuration
+nvmeStorage:
+  # Mount path on the host where NVMe storage will be mounted
+  hostMountPath: "/mnt/nvme-shared"
+  # Device size threshold in bytes (80GB default)
+  # Devices smaller than this are considered root volumes and skipped
+  deviceSizeThreshold: 85899345920
+
+# Example application configuration that can consume the NVMe storage:
+# In your application's values.yaml:
+#
+# hostVolumeMounts:
+#   enabled: true
+#   volumes:
+#     - name: nvme-storage
+#       hostPath: /mnt/nvme-shared  # Must match nvmeStorage.hostMountPath above
+#       mountPath: /tmp/nvme
+#       type: Directory
+#
+# nodeGroups:  # Optional: restrict to NVMe node groups
+#   - id: "c5d-nodes"
+
+# Node selector for running on specific node groups
+nodeGroups: []
+# - id: "nvme-nodes"
+
+# Resource limits
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# Priority class for the DaemonSet pods
+priorityClassName: ""
+
+# Additional tolerations for the DaemonSet
+tolerations:
+- key: porter.run/node-group-id
+  operator: Exists
+  effect: NoSchedule
