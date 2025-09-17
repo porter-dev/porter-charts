@@ -2,8 +2,8 @@
 # This is a YAML-formatted file.
 
 image:
-  repository: "public.ecr.aws/porter-dev/cluster-services"
-  tag: "nvme-manager-latest"
+  repository: "ghcr.io/porter-dev/nvme-manager"
+  tag: "latest"
   pullPolicy: IfNotPresent
 
 # NVMe storage configuration
