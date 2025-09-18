@@ -48,6 +48,14 @@ spec:
   {{- end }}
   {{- if .Values.keda.triggers }}
   triggers:
-  {{- toYaml .Values.keda.triggers | nindent 4 }}
+  {{- range .Values.keda.triggers }}
+    - type: {{ .type }}
+      {{- if .authenticationRef }}
+      authenticationRef:
+        name: {{ $fullName }}-{{ .authenticationRef }}
+      {{- end }}
+      metadata:
+      {{- toYaml .metadata | nindent 8 }}
+  {{- end }}
   {{- end }}
 {{- end }}
