@@ -82,12 +82,14 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
+                  {{- if .Values.nodeGroups }}
                   - key: porter.run/node-group-id
                     operator: In
                     values:
                         {{- range $nodeGroup := .Values.nodeGroups }}
                       - {{ $nodeGroup.id | quote }}
                         {{- end }}
+                  {{- end }}
       {{- end }}
       serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
@@ -459,6 +461,10 @@ spec:
               readOnly: true
           {{ end }}
           {{ end }}
+          {{- range .Values.hostVolumeMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+          {{- end }}
         {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
@@ -527,7 +533,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled }}
+      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled .Values.hostVolumeMounts }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -585,5 +591,11 @@ spec:
             secretName: "{{ .secretName }}"
         {{ end }}
         {{ end }}
+        {{ range .Values.hostVolumeMounts }}
+        - name: {{ .name }}
+          hostPath:
+            path: {{ .hostPath }}
+            type: {{ .type | default "DirectoryOrCreate" }}
+        {{- end }}
       {{ end }}
 {{- end }}

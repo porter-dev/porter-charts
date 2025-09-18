@@ -181,12 +181,18 @@ spec:
                 - name: "{{ include "docker-template.fullname" . }}-storage"
                   mountPath: {{ .Values.pvc.mountPath }}
               {{ end }}
+              {{ if .Values.hostVolumeMounts }}
+              {{ range .Values.hostVolumeMounts }}
+                - name: {{ .name }}
+                  mountPath: {{ .mountPath }}
+              {{ end }}
+              {{ end }}
               {{- if .Values.multiplePvc.enabled }}
               {{- range .Values.multiplePvc.volumes }}
-              - name: {{ .name }}
-                mountPath: {{ .mountPath }}
-              {{- end }}
-              {{- end }}
+                - name: {{ .name }}
+                  mountPath: {{ .mountPath }}
+              {{ end }}
+              {{ end }}
               resources:
                 requests:
                   cpu: {{ .Values.resources.requests.cpu }}
@@ -257,7 +263,7 @@ spec:
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled }}
+          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled .Values.hostVolumeMounts }}
           volumes:
             {{ if .Values.cloudsql.enabled }}
             - name: "cloud-sql-proxy-service-account-secret"
@@ -286,6 +292,12 @@ spec:
               secret:
                 secretName: "{{ .secretName }}"
             {{ end }}
+            {{ end }}
+            {{ range .Values.hostVolumeMounts }}
+            - name: {{ .name }}
+              hostPath:
+                path: {{ .hostPath }}
+                type: {{ .type | default "DirectoryOrCreate" }}
             {{ end }}
           {{ end }}
           restartPolicy: Never
