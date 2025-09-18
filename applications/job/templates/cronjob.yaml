@@ -182,7 +182,6 @@ spec:
                   mountPath: {{ .Values.pvc.mountPath }}
               {{ end }}
               {{ if .Values.hostVolumeMounts }}
-              volumeMounts:
               {{ range .Values.hostVolumeMounts }}
                 - name: {{ .name }}
                   mountPath: {{ .mountPath }}
@@ -190,10 +189,10 @@ spec:
               {{ end }}
               {{- if .Values.multiplePvc.enabled }}
               {{- range .Values.multiplePvc.volumes }}
-              - name: {{ .name }}
-                mountPath: {{ .mountPath }}
-              {{- end }}
-              {{- end }}
+                - name: {{ .name }}
+                  mountPath: {{ .mountPath }}
+              {{ end }}
+              {{ end }}
               resources:
                 requests:
                   cpu: {{ .Values.resources.requests.cpu }}

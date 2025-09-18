@@ -109,7 +109,7 @@ Return true if volumeMounts should be rendered in the main container
 
 */}}
 {{- define "job.shouldRenderVolumeMounts" -}}
-{{- if or .Values.pvc.enabled .Values.multiplePvc.enabled (and .Values.fileSecretMounts .Values.fileSecretMounts.enabled) (and .Values.hostVolumeMounts (gt (len .Values.hostVolumeMounts) 0)) -}}
+{{- if or .Values.pvc.enabled .Values.multiplePvc.enabled (and .Values.fileSecretMounts .Values.fileSecretMounts.enabled) .Values.hostVolumeMounts -}}
 true
 {{- else -}}
 false

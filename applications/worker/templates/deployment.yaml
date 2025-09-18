@@ -346,7 +346,7 @@ spec:
               mountPath: {{ .mountPath }}
             {{ end }}
             {{ end }}
-            {{- range .Values.hostVolumeMounts }}
+            {{ range .Values.hostVolumeMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
             {{- end }}
