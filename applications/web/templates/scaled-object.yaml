@@ -48,13 +48,14 @@ spec:
   {{- if .Values.keda.triggers }}
   triggers:
   {{- range .Values.keda.triggers }}
-    - type: {{ .type }}
-      {{- if .authenticationRef }}
+    {{/* Render all trigger fields while processing authenticationRef to reference TriggerAuthentication resources */}}
+    {{- $authRef := .authenticationRef }}
+    {{- $triggerCopy := omit . "authenticationRef" }}
+    - {{- toYaml $triggerCopy | nindent 6 }}
+      {{- if $authRef }}
       authenticationRef:
-        name: {{ $fullName }}-{{ .authenticationRef }}
+        name: {{ $fullName }}-{{ $authRef }}
       {{- end }}
-      metadata:
-      {{- toYaml .metadata | nindent 8 }}
   {{- end }}
   {{- end }}
 {{- end }}
