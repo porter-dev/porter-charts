@@ -104,6 +104,33 @@ keda:
     metricQuery: ""
     metricThreshold: ""
   triggers: []
+    # Example Temporal trigger with authentication:
+    # - type: temporal
+    #   authenticationRef: temporal-auth
+    #   metadata:
+    #     endpoint: temporal-frontend.temporal.svc.cluster.local:7233
+    #     namespace: default
+    #     taskQueue: my-workflow-queue
+    #     targetQueueSize: "5"
+    #     queueTypes: workflow,activity
+
+  # Named authentication configurations that can be referenced by triggers
+  authentications: {}
+    # Example for Temporal Cloud API key:
+    # temporal-auth:
+    #   apiKey:
+    #     secretName: temporal-secret
+    #     secretKey: api-key
+    #
+    # Example for custom secret refs:
+    # custom-auth:
+    #   secretRefs:
+    #     - parameter: username
+    #       secretName: my-secret
+    #       secretKey: username
+    #     - parameter: password
+    #       secretName: my-secret
+    #       secretKey: password
 
 health:
   enabled: false
