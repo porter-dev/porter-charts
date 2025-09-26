@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.2
-  name: stages.apigatewayv2.services.k8s.aws
+  name: apimappings.apigatewayv2.services.k8s.aws
 spec:
   group: apigatewayv2.services.k8s.aws
   names:
-    kind: Stage
-    listKind: StageList
-    plural: stages
-    singular: stage
+    kind: APIMapping
+    listKind: APIMappingList
+    plural: apimappings
+    singular: apimapping
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Stage is the Schema for the Stages API
+        description: APIMapping is the Schema for the APIMappings API
         properties:
           apiVersion:
             description: |-
@@ -38,22 +38,15 @@ spec:
             type: object
           spec:
             description: |-
-              StageSpec defines the desired state of Stage.
+              ApiMappingSpec defines the desired state of ApiMapping.
 
-              Represents an API stage.
+              Represents an API mapping.
             properties:
-              accessLogSettings:
-                description: Settings for logging access in this stage.
-                properties:
-                  destinationARN:
-                    description: Represents an Amazon Resource Name (ARN).
-                    type: string
-                  format:
-                    description: A string with a length between [1-1024].
-                    type: string
-                type: object
               apiID:
                 description: The API identifier.
+                type: string
+              apiMappingKey:
+                description: The API mapping key.
                 type: string
               apiRef:
                 description: "AWSResourceReferenceWrapper provides a wrapper around
@@ -72,36 +65,10 @@ spec:
                         type: string
                     type: object
                 type: object
-              autoDeploy:
-                description: |-
-                  Specifies whether updates to an API automatically trigger a new deployment.
-                  The default value is false.
-                type: boolean
-              clientCertificateID:
-                description: |-
-                  The identifier of a client certificate for a Stage. Supported only for WebSocket
-                  APIs.
+              domainName:
+                description: The domain name.
                 type: string
-              defaultRouteSettings:
-                description: The default route settings for the stage.
-                properties:
-                  dataTraceEnabled:
-                    type: boolean
-                  detailedMetricsEnabled:
-                    type: boolean
-                  loggingLevel:
-                    description: The logging level.
-                    type: string
-                  throttlingBurstLimit:
-                    format: int64
-                    type: integer
-                  throttlingRateLimit:
-                    type: number
-                type: object
-              deploymentID:
-                description: The deployment identifier of the API stage.
-                type: string
-              deploymentRef:
+              domainRef:
                 description: "AWSResourceReferenceWrapper provides a wrapper around
                   *AWSResourceReference\ntype to provide more user friendly syntax
                   for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
@@ -118,49 +85,14 @@ spec:
                         type: string
                     type: object
                 type: object
-              description:
-                description: The description for the API stage.
+              stage:
+                description: The API stage.
                 type: string
-              routeSettings:
-                additionalProperties:
-                  description: Represents a collection of route settings.
-                  properties:
-                    dataTraceEnabled:
-                      type: boolean
-                    detailedMetricsEnabled:
-                      type: boolean
-                    loggingLevel:
-                      description: The logging level.
-                      type: string
-                    throttlingBurstLimit:
-                      format: int64
-                      type: integer
-                    throttlingRateLimit:
-                      type: number
-                  type: object
-                description: Route settings for the stage, by routeKey.
-                type: object
-              stageName:
-                description: The name of the stage.
-                type: string
-              stageVariables:
-                additionalProperties:
-                  type: string
-                description: |-
-                  A map that defines the stage variables for a Stage. Variable names can have
-                  alphanumeric and underscore characters, and the values must match [A-Za-z0-9-._~:/?#&=,]+.
-                type: object
-              tags:
-                additionalProperties:
-                  type: string
-                description: The collection of tags. Each tag element is associated
-                  with a given resource.
-                type: object
             required:
-            - stageName
+            - stage
             type: object
           status:
-            description: StageStatus defines the observed state of Stage
+            description: APIMappingStatus defines the observed state of APIMapping
             properties:
               ackResourceMetadata:
                 description: |-
@@ -191,12 +123,9 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
-              apiGatewayManaged:
-                description: |-
-                  Specifies whether a stage is managed by API Gateway. If you created an API
-                  using quick create, the $default stage is managed by API Gateway. You can't
-                  modify the $default stage.
-                type: boolean
+              apiMappingID:
+                description: The API mapping identifier.
+                type: string
               conditions:
                 description: |-
                   All CRs managed by ACK have a common `Status.Conditions` member that
@@ -232,19 +161,6 @@ spec:
                   - type
                   type: object
                 type: array
-              createdDate:
-                description: The timestamp when the stage was created.
-                format: date-time
-                type: string
-              lastDeploymentStatusMessage:
-                description: |-
-                  Describes the status of the last deployment of a stage. Supported only for
-                  stages with autoDeploy enabled.
-                type: string
-              lastUpdatedDate:
-                description: The timestamp when the stage was last updated.
-                format: date-time
-                type: string
             type: object
         type: object
     served: true
