@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
 spec:
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
