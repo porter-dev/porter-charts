@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
 spec:
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
@@ -18,6 +19,10 @@ spec:
       labels:
         {{- include "docker-template.selectorLabels" . | nindent 8 }}
     spec:
+      nodeSelector:
+        {{- range $ns := .Values.nodeSelector }}
+        {{ $ns.label }}: {{ $ns.value }}
+        {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -53,16 +58,16 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
-            {{- range $key, $val := .Values.container.env.normal }}
-            - name: {{ $key }}
-            {{- $splVal := split "_" $val -}}
+            {{- range $env := .Values.container.env.normal }}
+            - name: {{ $env.name }}
+            {{- $splVal := split "_" $env.value -}}
             {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
               valueFrom:
                 secretKeyRef:
                   name: {{ $splVal._1 }}
-                  key: {{ $key }}
+                  key: {{ $env.name }}
             {{- else }}
-              value: {{ quote $val }}
+              value: {{ quote $env.value }}
             {{- end }}
             {{- end }}
             {{- if or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter") }}

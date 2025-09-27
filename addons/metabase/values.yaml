@@ -52,12 +52,17 @@ privateIngress:
 container:
   port: 3000
   env: 
-    # - name: NODE_ENV
-    #   value: development
-    # - name: OK
-    #   value: ok
+    normal:
+      # - name: NODE_ENV
+      #   value: development
+      # - name: ENV_VAR
+      #   value: PORTERSECRET_secret-name
 
 resources:
   requests:
     cpu: 500m
     memory: 512Mi
+
+nodeSelector:
+  - label: porter.run/workload-kind
+    value: application
