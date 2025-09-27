@@ -65,7 +65,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ $splVal._1 }}
-                  key: {{ $env.namekey }}
+                  key: {{ $env.name }}
             {{- else }}
               value: {{ quote $env.value }}
             {{- end }}
