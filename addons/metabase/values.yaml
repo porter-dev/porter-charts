@@ -61,3 +61,7 @@ resources:
   requests:
     cpu: 500m
     memory: 512Mi
+
+nodeSelector:
+  - label: porter.run/workload-kind
+    value: application
