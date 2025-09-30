@@ -212,6 +212,7 @@ spec:
           {{ if .Values.health.livenessProbe.enabled }}
           livenessProbe:
             {{- include "docker-template.healthProbe" .Values.health.livenessProbe | nindent 12 }}
+          {{ end }}
           {{ if .Values.health.livenessCommand.enabled }}
           livenessProbe:
             exec:
