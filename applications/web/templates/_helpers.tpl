@@ -186,3 +186,44 @@ true
 false
 {{- end -}}
 {{- end -}}
+
+{{/*
+Render a health probe (startup, readiness, or liveness).
+Supports both exec (command-based) and httpGet (HTTP-based) probes.
+Usage: include "docker-template.healthProbe" .Values.health.livenessProbe
+*/}}
+{{- define "docker-template.healthProbe" -}}
+{{- $probe := . -}}
+{{- if $probe.enabled }}
+{{ if $probe.command }}
+exec:
+  command:
+  {{- range $command := trim $probe.command | splitList " " }}
+  - {{ $command | quote }}
+  {{- end }}
+{{ else }}
+httpGet:
+  path: {{ $probe.path }}
+  scheme: {{ $probe.scheme }}
+  port: {{ $probe.port | default "http" }}
+  {{ if or ($probe.httpHeaders) ($probe.auth.enabled) }}
+  httpHeaders:
+    {{ if $probe.auth.enabled }}
+    - name: Authorization
+      value: Basic {{ printf "%s:%s" $probe.auth.username $probe.auth.password | b64enc }}
+    {{ end }}
+    {{- range $probe.httpHeaders }}
+    - name: {{ .name }}
+      value: {{ .value }}
+    {{- end }}
+  {{ end }}
+{{ end }}
+initialDelaySeconds: {{ $probe.initialDelaySeconds }}
+periodSeconds: {{ $probe.periodSeconds }}
+timeoutSeconds: {{ $probe.timeoutSeconds }}
+{{- if $probe.successThreshold }}
+successThreshold: {{ $probe.successThreshold }}
+{{- end }}
+failureThreshold: {{ $probe.failureThreshold }}
+{{- end }}
+{{- end -}}
