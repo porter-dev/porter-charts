@@ -58,19 +58,18 @@ spec:
                   fieldPath: status.podIP
             - name: PORTER_POD_IMAGE_TAG
               value: "{{ .Values.image.tag }}"
-            {{- range $env := .Values.container.env.normal }}
-            - name: {{ $env.name }}
-            {{- $splVal := split "_" $env.value -}}
+            {{- range $key, $val := .Values.container.env.normal }}
+            - name: {{ $key }}
+            {{- $splVal := split "_" $val -}}
             {{- if and (len $splVal | eq 2) (eq $splVal._0 "PORTERSECRET") }}
               valueFrom:
                 secretKeyRef:
                   name: {{ $splVal._1 }}
-                  key: {{ $env.name }}
+                  key: {{ $key }}
             {{- else }}
-              value: {{ quote $env.value }}
+              value: {{ quote $val }}
             {{- end }}
-            {{- end }}
-            {{- if or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter") }}
+            {{- end }}            {{- if or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter") }}
             - name: PORT
               value: {{ .Values.container.port | quote }}
             {{- end }}
