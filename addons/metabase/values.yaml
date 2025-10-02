@@ -53,10 +53,8 @@ container:
   port: 3000
   env: 
     normal:
-      # - name: NODE_ENV
-      #   value: development
-      # - name: ENV_VAR
-      #   value: PORTERSECRET_secret-name
+      # NODE_ENV: development
+      # ENV: PORTERSECRET_ENV
 
 resources:
   requests:
