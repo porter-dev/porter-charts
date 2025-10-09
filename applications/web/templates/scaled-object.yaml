@@ -34,11 +34,11 @@ spec:
           - type: {{ .Values.keda.hpa.scaleDown.policy.type }}
             value: {{ .Values.keda.hpa.scaleDown.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleDown.policy.periodSeconds }}
-  {{- if or .Values.keda.trigger .Values.keda.porterTriggers .Values.keda.triggers }}
+  {{- if or (and .Values.keda.trigger .Values.keda.trigger.metricName) .Values.keda.porterTriggers .Values.keda.triggers }}
   triggers:
-  {{- if .Values.keda.trigger }}
+  {{- if and .Values.keda.trigger .Values.keda.trigger.metricName }}
     - type: prometheus
-      metricType: {{ .Values.keda.trigger.metricType }}
+      metricType: {{ .Values.keda.trigger.metricType | default "AverageValue" }}
       metadata:
         serverAddress: http://prometheus-server.monitoring.svc.cluster.local:80
         metricName: {{ .Values.keda.trigger.metricName }}

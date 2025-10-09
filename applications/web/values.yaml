@@ -174,16 +174,26 @@ keda:
     metricType: AverageValue
     metricQuery: ""
     metricThreshold: ""
-  triggers: []
-    # Example Temporal trigger with authentication:
+  porterTriggers: []
+    # Example: Porter-managed triggers (authenticationRef.name gets prefixed with release name)
     # - type: temporal
-    #   authenticationRef: temporal-auth
+    #   authenticationRef:
+    #     name: temporal-570667b8-f40c-4b84-a36d-7e805849a361
+    #   metadata:
+    #     endpoint: temporal.example.com:7233
+    #     namespace: default
+    #     taskQueue: my-workflow-queue
+    #     targetQueueSize: "5"
+  triggers: []
+    # Example: Raw KEDA triggers (passed through as-is)
+    # - type: temporal
+    #   authenticationRef:
+    #     name: temporal-auth
     #   metadata:
     #     endpoint: temporal-frontend.temporal.svc.cluster.local:7233
     #     namespace: default
     #     taskQueue: my-workflow-queue
     #     targetQueueSize: "5"
-    #     queueTypes: workflow,activity
 
   # Named authentication configurations that can be referenced by triggers
   authentications: {}
