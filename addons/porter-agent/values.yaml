@@ -30,26 +30,79 @@ nodeSelector: {}
 tolerations: []
 
 loki:
+  deploymentMode: SingleBinary
+  resultsCache:
+    enabled: false
+  chunksCache:
+    enabled: false
+  sidecar:
+    rules:
+      enabled: false
+  lokiCanary:
+    enabled: false
+  ingester:
+    replicas: 0
+  distributor:
+    replicas: 0
+  querier:
+    replicas: 0
+  queryFrontend:
+    replicas: 0
+  queryScheduler:
+    replicas: 0
+  indexGateway:
+    replicas: 0
+  compactor:
+    replicas: 0
+  ruler:
+    replicas: 0
+  write:
+    replicas: 0
+  read:
+    replicas: 0
+  backend:
+    replicas: 0
   loki:
+    image:
+      tag: 3.5.4
+    configStorageType: ConfigMap
+    configObjectName: porter-agent-loki-config
+    generatedConfigObjectName: porter-agent-loki-config
     auth_enabled: false
+    server:
+      http_listen_port: 3100
+      grpc_listen_port: 9095
     commonConfig:
       replication_factor: 1
-    storage:
-      type: filesystem
+      path_prefix: /var/loki
+      storage:
+        filesystem:
+          chunks_directory: /var/loki/chunks
+          rules_directory: /var/loki/rules
+    schemaConfig:
+      configs:
+      - from: "2022-01-11"
+        index:
+          period: 24h
+          prefix: loki_index_
+        object_store: filesystem
+        schema: v12
+        store: boltdb-shipper
     compactor:
       retention_enabled: true
       retention_delete_delay: 0h
       retention_delete_worker_count: 50
+      delete_request_store: filesystem
     limits_config:
+      max_label_names_per_series: 50
       reject_old_samples: true
-      # reject samples older than one week
       reject_old_samples_max_age: 168h
       max_concurrent_tail_requests: 50
-      # delete logs after a week
       retention_period: 168h
+      allow_structured_metadata: false
     storage_config:
-      boltdb_shipper:
-        shared_store: filesystem
+      filesystem:
+        directory: /var/loki/chunks
     readinessProbe:
       httpGet:
         path: /ready
@@ -74,6 +127,9 @@ loki:
   test:
     enabled: false
   singleBinary:
+    affinity: {}
+    service:
+      labels: {}
     replicas: 1
     nodeSelector:
       porter.run/workload-kind: monitoring
@@ -104,19 +160,19 @@ promtail:
     # See https://github.com/grafana/helm-charts/blob/18282f1780c73130a89ba5e0ee0f8c5721f08b13/charts/promtail/values.yaml#L343
     snippets:
       extraRelabelConfigs:
-      - source_labels: [__meta_kubernetes_pod_container_id]
-        target_label: container_id
-        regex: ".*://(.*)$" # Remove the runtime prefix (containerd://, docker://)
-        replacement: "${1}"
-      - source_labels:
-          - __meta_kubernetes_namespace
-          - __meta_kubernetes_pod_name
-          - __meta_kubernetes_pod_annotation_helm_sh_revision
-        target_label: porter_pod_name
-        action: replace
-        separator: "_"
-      - action: labelmap
-        regex: __meta_kubernetes_pod_label_(.+)
+        - source_labels: [__meta_kubernetes_pod_container_id]
+          target_label: container_id
+          regex: ".*://(.*)$" # Remove the runtime prefix (containerd://, docker://)
+          replacement: "${1}"
+        - source_labels:
+            - __meta_kubernetes_namespace
+            - __meta_kubernetes_pod_name
+            - __meta_kubernetes_pod_annotation_helm_sh_revision
+          target_label: porter_pod_name
+          action: replace
+          separator: "_"
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
   resources:
     limits:
       memory: 256Mi

@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
 spec:
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "docker-template.selectorLabels" . | nindent 6 }}
@@ -18,6 +19,10 @@ spec:
       labels:
         {{- include "docker-template.selectorLabels" . | nindent 8 }}
     spec:
+      nodeSelector:
+        {{- range $ns := .Values.nodeSelector }}
+        {{ $ns.label }}: {{ $ns.value }}
+        {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

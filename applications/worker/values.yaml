@@ -140,6 +140,14 @@ pvc:
   mountPath: /mypath
   existingVolume: ""
 
+multiplePvc:
+  enabled: false
+  volumes:
+    - name: ""
+      storage: 20Gi
+      mountPath: /mypath
+      existingVolume: ""
+
 cloudsql:
   enabled: false
   connections: []
@@ -185,6 +193,20 @@ nodeGroups: []
 fileSecretMounts:
   enabled: false
   mounts: []
+
+# Host volume mounts for mounting host directories into containers
+# Format: hostVolumeMounts: [{name: <NAME>, hostPath: <HOST_PATH>, mountPath: <CONTAINER_PATH>, type: <HOSTPATH_TYPE>},..]
+hostVolumeMounts: []
+# Example:
+# hostVolumeMounts:
+#   - name: nvme-storage
+#     hostPath: /mnt/nvme-shared
+#     mountPath: /tmp/nvme
+#     type: DirectoryOrCreate
+#   - name: docker-socket
+#     hostPath: /var/run/docker.sock
+#     mountPath: /var/run/docker.sock
+#     type: Socket
 
 # set this to add additional volumes to the deployment
 additionalVolumes:

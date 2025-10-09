@@ -100,7 +100,38 @@ fileSecretMounts:
   enabled: false
   mounts: []
 
+# Host volume mounts for mounting host directories into containers
+# Format: hostVolumeMounts: [{name: <NAME>, hostPath: <HOST_PATH>, mountPath: <CONTAINER_PATH>, type: <HOSTPATH_TYPE>},..]
+hostVolumeMounts: []
+# Example:
+# hostVolumeMounts:
+#   - name: nvme-storage
+#     hostPath: /mnt/nvme-shared
+#     mountPath: /tmp/nvme
+#     type: DirectoryOrCreate
+#   - name: docker-socket
+#     hostPath: /var/run/docker.sock
+#     mountPath: /var/run/docker.sock
+#     type: Socket
+
 # hostIPC is required on pods that need to access the host's IPC namespace
 # this is the case for instance for pods that need to use the MPS sliced GPUs
 # enable this conservatively
 enableHostIpc: false
+
+pvc:
+  enabled: false
+  storage: 20Gi
+  mountPath: /mypath
+  existingVolume: ""
+
+multiplePvc:
+  enabled: false
+  volumes:
+    - name: ""
+      storage: 20Gi
+      mountPath: /mypath
+      existingVolume: ""
+
+# job timeout configuration
+activeDeadlineSeconds: # Optional - if not set, will use sidecar.timeout

@@ -39,10 +39,12 @@ spec:
       template:
         metadata:
           annotations:
+            kubectl.kubernetes.io/default-container: {{ .Chart.Name }}
             {{- if .Values.safeToEvict }}
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
             {{- else }}
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+            "karpenter.sh/do-not-disrupt": "true"
             {{- end }}
           labels:
             {{- if .Values.podLabels }}
@@ -167,12 +169,28 @@ spec:
                 {{- end }}
               {{- end }}
               {{- end }}
-              {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
-              {{ range .Values.fileSecretMounts.mounts }}
+              {{- if include "job.shouldRenderVolumeMounts" . }}
               volumeMounts:
+              {{ range .Values.fileSecretMounts.mounts }}
                 - name: {{ .mountPath }}
                   mountPath: "/etc/secrets/{{ .mountPath }}"
                   readOnly: true
+              {{ end }}
+              {{ end }}
+              {{ if .Values.pvc.enabled }}
+                - name: "{{ include "docker-template.fullname" . }}-storage"
+                  mountPath: {{ .Values.pvc.mountPath }}
+              {{ end }}
+              {{ if .Values.hostVolumeMounts }}
+              {{ range .Values.hostVolumeMounts }}
+                - name: {{ .name }}
+                  mountPath: {{ .mountPath }}
+              {{ end }}
+              {{ end }}
+              {{- if .Values.multiplePvc.enabled }}
+              {{- range .Values.multiplePvc.volumes }}
+                - name: {{ .name }}
+                  mountPath: {{ .mountPath }}
               {{ end }}
               {{ end }}
               resources:
@@ -241,16 +259,32 @@ spec:
               securityContext:
                 runAsNonRoot: true
               volumeMounts:
-                - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+                - name: "cloud-sql-proxy-service-account-secret"
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled}}
+          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled .Values.hostVolumeMounts }}
           volumes:
             {{ if .Values.cloudsql.enabled }}
-            - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+            - name: "cloud-sql-proxy-service-account-secret"
               secret:
                 secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
+            {{ end }}
+            {{ if .Values.pvc.enabled }}
+            - name: "{{ include "docker-template.fullname" . }}-storage"
+              persistentVolumeClaim:
+                {{- if .Values.pvc.existingVolume }}
+                claimName: {{ .Values.pvc.existingVolume }}
+                {{- else }}
+                claimName: "{{ include "docker-template.fullname" . }}-pvc"
+                {{- end }}
+            {{ end }}
+            {{ if .Values.multiplePvc.enabled }}
+            {{- range .Values.multiplePvc.volumes }}
+            - name: {{ .name }}
+              persistentVolumeClaim:
+                claimName: {{ .existingVolume }}
+            {{- end }}
             {{ end }}
             {{ if .Values.fileSecretMounts.enabled }}
             {{ range .Values.fileSecretMounts.mounts }}
@@ -258,6 +292,12 @@ spec:
               secret:
                 secretName: "{{ .secretName }}"
             {{ end }}
+            {{ end }}
+            {{ range .Values.hostVolumeMounts }}
+            - name: {{ .name }}
+              hostPath:
+                path: {{ .hostPath }}
+                type: {{ .type | default "DirectoryOrCreate" }}
             {{ end }}
           {{ end }}
           restartPolicy: Never
@@ -288,7 +328,9 @@ spec:
               effect: "NoSchedule"
           {{- end }}
       backoffLimit: 0
-      {{- if (.Values.sidecar.timeout) }}
+      {{- if .Values.activeDeadlineSeconds }}
+      activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
+      {{- else if .Values.sidecar.timeout }}
       activeDeadlineSeconds: {{ .Values.sidecar.timeout }}
       {{- end }}
 {{ end }}

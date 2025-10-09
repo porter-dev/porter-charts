@@ -1122,7 +1122,7 @@ datadog:
   # datadog.containerExclude -- Exclude containers from Agent Autodiscovery, as a space-separated list
 
   ## ref: https://docs.datadoghq.com/agent/guide/autodiscovery-management/?tab=containerizedagent#exclude-containers
-  containerExclude: 'kube_namespace:cert-manager kube_namespace:ingress-nginx kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system kube_namespace:telemetry image:^gcr.io/datadoghq/agent:.*'
+  containerExclude: 'kube_namespace:^cert-manager$ kube_namespace:^ingress-nginx$ kube_namespace:^kube-system$ kube_namespace:^monitoring$ kube_namespace:^porter-agent-system$ kube_namespace:^telemetry$ image:^gcr.io/datadoghq/agent:.*'
 
   # datadog.containerInclude -- Include containers in Agent Autodiscovery, as a space-separated list.
   # If a container matches an include rule, it’s always included in Autodiscovery
@@ -1130,14 +1130,16 @@ datadog:
   ## ref: https://docs.datadoghq.com/agent/guide/autodiscovery-management/?tab=containerizedagent#include-containers
   containerInclude:
 
-  # datadog.containerExcludeLogs -- Exclude logs from Agent Autodiscovery, as a space-separated list
-  containerExcludeLogs: 'kube_namespace:cert-manager kube_namespace:ingress-nginx kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system kube_namespace:telemetry image:^gcr.io/datadoghq/agent:.*'
+  # datadog.containerExcludeLogs -- Exclude logs from the Agent Autodiscovery,
+  # as a space-separated list
+  containerExcludeLogs: 'kube_namespace:^cert-manager$ kube_namespace:^ingress-nginx$ kube_namespace:^kube-system$ kube_namespace:^monitoring$ kube_namespace:^porter-agent-system$ kube_namespace:^telemetry$ image:^gcr.io/datadoghq/agent:.*'
 
   # datadog.containerIncludeLogs -- Include logs in Agent Autodiscovery, as a space-separated list
   containerIncludeLogs:
 
-  # datadog.containerExcludeMetrics -- Exclude metrics from Agent Autodiscovery, as a space-separated list
-  containerExcludeMetrics: 'kube_namespace:cert-manager kube_namespace:ingress-nginx kube_namespace:kube-system kube_namespace:monitoring kube_namespace:porter-agent-system kube_namespace:telemetry image:^gcr.io/datadoghq/agent:.*'
+  # datadog.containerExcludeMetrics -- Exclude metrics from the Agent
+  # Autodiscovery, as a space-separated list
+  containerExcludeMetrics: 'kube_namespace:^cert-manager$ kube_namespace:^ingress-nginx$ kube_namespace:^kube-system$ kube_namespace:^monitoring$ kube_namespace:^porter-agent-system$ kube_namespace:^telemetry$ image:^gcr.io/datadoghq/agent:.*'
 
   # datadog.containerIncludeMetrics -- Include metrics in Agent Autodiscovery, as a space-separated list
   containerIncludeMetrics:

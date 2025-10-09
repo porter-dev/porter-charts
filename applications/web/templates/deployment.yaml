@@ -58,6 +58,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: {{ .Chart.Name }}
         helm.sh/revision: {{ .Release.Revision | quote }}
         {{- with .Values.podAnnotations }}
           {{- toYaml . | nindent 8 }}
@@ -81,12 +82,14 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
+                  {{- if .Values.nodeGroups }}
                   - key: porter.run/node-group-id
                     operator: In
                     values:
                         {{- range $nodeGroup := .Values.nodeGroups }}
                       - {{ $nodeGroup.id | quote }}
                         {{- end }}
+                  {{- end }}
       {{- end }}
       serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
@@ -419,43 +422,50 @@ spec:
             - name: PORT
               value: {{ .Values.container.port | quote }}
             {{- end }}
-        {{ if .Values.datadogSocketVolume.enabled }}
+        {{- if include "web.shouldRenderVolumeMounts" . }}
           volumeMounts:
+          {{- if .Values.datadogSocketVolume.enabled  }}
             - name: datadog-apm-socket
               mountPath: /var/run/datadog/apm.socket
             - name: datadog-dsd-socket
               mountPath: /var/run/datadog/dsd.socket
-        {{ end }}
-        {{ if .Values.resources.requests.nvidiaGpu}}
-          volumeMounts:
+          {{ end }}
+          {{- if .Values.resources.requests.nvidiaGpu}}
             - name: dshm
               mountPath: /dev/shm
-        {{ end }}
-        {{ if .Values.awsEfsStorage }}
-          volumeMounts:
-        {{- range $index, $v := .Values.awsEfsStorage }}
-          - name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
-            mountPath: {{ include "docker-template.efsMountPath" (dict "mountPath" $v.mountPath "fullname" $.Values.fullnameOverride) }}
-        {{ end }}   
-        {{ end }}  
-          {{ if .Values.pvc.enabled }}
-          volumeMounts:
+          {{ end }}
+          {{- if .Values.awsEfsStorage }}
+          {{ range $index, $v := .Values.awsEfsStorage }}
+            - name: {{ include "docker-template.efsName" (dict "fullname" $.Values.fullnameOverride "index" $index) }}
+              mountPath: {{ include "docker-template.efsMountPath" (dict "mountPath" $v.mountPath "fullname" $.Values.fullnameOverride) }}
+          {{ end }}   
+          {{ end }}  
+          {{- if .Values.pvc.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-storage"
               mountPath: {{ .Values.pvc.mountPath }}
           {{ end }}
-          {{ if .Values.emptyDir.enabled }}
-          volumeMounts:
+          {{- if .Values.multiplePvc.enabled }}
+            {{- range .Values.multiplePvc.volumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
+            {{- end }}
+          {{- if .Values.emptyDir.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
               mountPath: {{ .Values.emptyDir.mountPath }}
           {{ end }}
-          {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
+          {{- if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
           {{ range .Values.fileSecretMounts.mounts }}
-          volumeMounts:
             - name: {{ .mountPath }}
               mountPath: "/etc/secrets/{{ .mountPath }}"
               readOnly: true
           {{ end }}
           {{ end }}
+          {{- range .Values.hostVolumeMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+          {{- end }}
+        {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
@@ -476,7 +486,7 @@ spec:
               memory: 128Mi
               cpu: 0.1
           volumeMounts:
-          - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+          - name: "cloud-sql-proxy-service-account-secret"
             mountPath: /secrets/
             readOnly: true
         {{ end }}
@@ -523,7 +533,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled }}
+      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled .Values.hostVolumeMounts }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -542,7 +552,7 @@ spec:
             sizeLimit: 4Gi
         {{ end }}
         {{ if .Values.cloudsql.enabled }}
-        - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+        - name: "cloud-sql-proxy-service-account-secret"
           secret:
             secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
         {{ end }}
@@ -554,6 +564,13 @@ spec:
         {{ else }}
             claimName: "{{ include "docker-template.fullname" . }}-pvc"
         {{ end }}
+        {{ end }}
+        {{ if .Values.multiplePvc.enabled }}
+        {{- range .Values.multiplePvc.volumes }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .existingVolume }}
+        {{- end }}
         {{ end }}
         {{ if .Values.emptyDir.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
@@ -574,5 +591,11 @@ spec:
             secretName: "{{ .secretName }}"
         {{ end }}
         {{ end }}
+        {{ range .Values.hostVolumeMounts }}
+        - name: {{ .name }}
+          hostPath:
+            path: {{ .hostPath }}
+            type: {{ .type | default "DirectoryOrCreate" }}
+        {{- end }}
       {{ end }}
 {{- end }}

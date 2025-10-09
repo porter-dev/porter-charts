@@ -21,6 +21,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: {{ .Chart.Name }}
         helm.sh/revision: {{ .Release.Revision | quote }}
         {{- with .Values.podAnnotations }}
           {{- toYaml . | nindent 8 }}
@@ -310,38 +311,46 @@ spec:
               {{- end }}
             {{- end }}
             {{- end }}
-          {{ if .Values.datadogSocketVolume.enabled }}
+        {{- if include "worker.shouldRenderVolumeMounts" . }}
           volumeMounts:
+            {{- if .Values.datadogSocketVolume.enabled }}
             - name: datadog-apm-socket
               mountPath: /var/run/datadog/apm.socket
             - name: datadog-dsd-socket
               mountPath: /var/run/datadog/dsd.socket
-          {{ end }}
-          {{ if .Values.pvc.enabled }}
-          volumeMounts:
+            {{ end }}
+            {{- if .Values.pvc.enabled }}
             - name: "{{ include "docker-template.fullname" . }}-storage"
               mountPath: {{ .Values.pvc.mountPath }}
-          {{ end }}
-          {{ if .Values.emptyDir.enabled }}
-          volumeMounts:
-            - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
-              mountPath: {{ .Values.emptyDir.mountPath }}
-          {{ end }}
-          {{ if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
-          {{ range .Values.fileSecretMounts.mounts }}
-          volumeMounts:
-            - name: {{ .mountPath }}
-              mountPath: "/etc/secrets/{{ .mountPath }}"
-              readOnly: true
-          {{ end }}
-          {{ end }}
-          {{ if .Values.additionalVolumes }}
-          volumeMounts:
-            {{- range .Values.additionalVolumes }}
+            {{ end }}
+            {{- if .Values.multiplePvc.enabled }}
+            {{- range .Values.multiplePvc.volumes }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
             {{- end }}
-          {{ end }}
+            {{- end }}
+            {{- if .Values.emptyDir.enabled }}
+            - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
+              mountPath: {{ .Values.emptyDir.mountPath }}
+            {{ end }}
+            {{- if and .Values.fileSecretMounts .Values.fileSecretMounts.enabled }}
+            {{ range .Values.fileSecretMounts.mounts }}
+            - name: {{ .mountPath }}
+              mountPath: "/etc/secrets/{{ .mountPath }}"
+              readOnly: true
+            {{ end }}
+            {{ end }}
+            {{- if .Values.additionalVolumes }}
+            {{ range .Values.additionalVolumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{ end }}
+            {{ end }}
+            {{ range .Values.hostVolumeMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
+        {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
@@ -362,7 +371,7 @@ spec:
           securityContext:
             runAsNonRoot: true
           volumeMounts:
-          - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+          - name: "cloud-sql-proxy-service-account-secret"
             mountPath: /secrets/
             readOnly: true
         {{ end }}
@@ -409,7 +418,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) }}
+      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.datadogSocketVolume.enabled .Values.fileSecretMounts.enabled .Values.hostVolumeMounts (and .Values.additionalVolumes (not (empty .Values.additionalVolumes))) }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -422,7 +431,7 @@ spec:
           name: datadog-dsd-socket
         {{ end }}
         {{ if .Values.cloudsql.enabled }}
-        - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
+        - name: "cloud-sql-proxy-service-account-secret"
           secret:
             secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
         {{ end }}
@@ -435,10 +444,17 @@ spec:
             claimName: "{{ include "docker-template.fullname" . }}-pvc"
             {{- end }}
         {{ end }}
+        {{ if .Values.multiplePvc.enabled }}
+        {{- range .Values.multiplePvc.volumes }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .existingVolume }}
+        {{- end }}
+        {{ end }}
         {{ if .Values.emptyDir.enabled }}
         - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
           emptyDir:
-            {{- toYaml .Values.emptyDir.volumeOptions | nindent 8 }}
+            {{- toYaml .Values.emptyDir.volumeOptions | nindent 12}}
         {{ end }}
         {{ if .Values.fileSecretMounts.enabled }}
         {{ range .Values.fileSecretMounts.mounts }}
@@ -454,4 +470,10 @@ spec:
             {{- toYaml .volumeOptions | nindent 12 }}
         {{- end }}
         {{ end }}
+        {{- range .Values.hostVolumeMounts }}
+        - name: {{ .name }}
+          hostPath:
+            path: {{ .hostPath }}
+            type: {{ .type | default "DirectoryOrCreate" }}
+        {{- end }}
       {{ end }}
