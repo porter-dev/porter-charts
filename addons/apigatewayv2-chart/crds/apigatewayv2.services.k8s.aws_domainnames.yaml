@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.2
-  name: deployments.apigatewayv2.services.k8s.aws
+  name: domainnames.apigatewayv2.services.k8s.aws
 spec:
   group: apigatewayv2.services.k8s.aws
   names:
-    kind: Deployment
-    listKind: DeploymentList
-    plural: deployments
-    singular: deployment
+    kind: DomainName
+    listKind: DomainNameList
+    plural: domainnames
+    singular: domainname
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Deployment is the Schema for the Deployments API
+        description: DomainName is the Schema for the DomainNames API
         properties:
           apiVersion:
             description: |-
@@ -38,41 +38,59 @@ spec:
             type: object
           spec:
             description: |-
-              DeploymentSpec defines the desired state of Deployment.
+              DomainNameSpec defines the desired state of DomainName.
 
-              An immutable representation of an API that can be called by users. A Deployment
-              must be associated with a Stage for it to be callable over the internet.
+              Represents a domain name.
             properties:
-              apiID:
-                description: The API identifier.
+              domainName:
+                description: The domain name.
                 type: string
-              apiRef:
-                description: "AWSResourceReferenceWrapper provides a wrapper around
-                  *AWSResourceReference\ntype to provide more user friendly syntax
-                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
-                  \ name: my-api"
+              domainNameConfigurations:
+                description: The domain name configurations.
+                items:
+                  description: The domain name configuration.
+                  properties:
+                    certificateARN:
+                      description: Represents an Amazon Resource Name (ARN).
+                      type: string
+                    certificateName:
+                      description: A string with a length between [1-128].
+                      type: string
+                    endpointType:
+                      description: Represents an endpoint type.
+                      type: string
+                    ownershipVerificationCertificateARN:
+                      description: Represents an Amazon Resource Name (ARN).
+                      type: string
+                    securityPolicy:
+                      description: |-
+                        The Transport Layer Security (TLS) version of the security policy for this
+                        domain name. The valid values are TLS_1_0 and TLS_1_2.
+                      type: string
+                  type: object
+                type: array
+              mutualTLSAuthentication:
+                description: The mutual TLS authentication configuration for a custom
+                  domain name.
                 properties:
-                  from:
-                    description: |-
-                      AWSResourceReference provides all the values necessary to reference another
-                      k8s resource for finding the identifier(Id/ARN/Name)
-                    properties:
-                      name:
-                        type: string
-                      namespace:
-                        type: string
-                    type: object
+                  truststoreURI:
+                    description: A string representation of a URI with a length between
+                      [1-2048].
+                    type: string
+                  truststoreVersion:
+                    description: A string with a length between [1-64].
+                    type: string
                 type: object
-              description:
-                description: The description for the deployment resource.
-                type: string
-              stageName:
-                description: The name of the Stage resource for the Deployment resource
-                  to create.
-                type: string
+              tags:
+                additionalProperties:
+                  type: string
+                description: The collection of tags associated with a domain name.
+                type: object
+            required:
+            - domainName
             type: object
           status:
-            description: DeploymentStatus defines the observed state of Deployment
+            description: DomainNameStatus defines the observed state of DomainName
             properties:
               ackResourceMetadata:
                 description: |-
@@ -103,9 +121,9 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
-              autoDeployed:
-                description: Specifies whether a deployment was automatically released.
-                type: boolean
+              apiMappingSelectionExpression:
+                description: The API mapping selection expression.
+                type: string
               conditions:
                 description: |-
                   All CRs managed by ACK have a common `Status.Conditions` member that
@@ -141,20 +159,6 @@ spec:
                   - type
                   type: object
                 type: array
-              createdDate:
-                description: The date and time when the Deployment resource was created.
-                format: date-time
-                type: string
-              deploymentID:
-                description: The identifier for the deployment.
-                type: string
-              deploymentStatus:
-                description: 'The status of the deployment: PENDING, FAILED, or SUCCEEDED.'
-                type: string
-              deploymentStatusMessage:
-                description: May contain additional feedback on the status of an API
-                  deployment.
-                type: string
             type: object
         type: object
     served: true
