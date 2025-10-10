@@ -103,65 +103,7 @@ keda:
     metricName: ""
     metricQuery: ""
     metricThreshold: ""
-  
-  # Porter-managed triggers: Porter will create TriggerAuthentication resources with the 
-  # release name prefix (e.g., {release-name}-temporal-auth) to avoid ownership conflicts.
-  # Use this for triggers configured through the Porter app create flow.
-  porterTriggers: []
-    # Example Temporal trigger with authentication:
-    # - type: temporal
-    #   authenticationRef:
-    #     name: temporal-auth  # Will become {release-name}-temporal-auth
-    #   metadata:
-    #     endpoint: temporal-frontend.temporal.svc.cluster.local:7233
-    #     namespace: default
-    #     taskQueue: my-workflow-queue
-    #     targetQueueSize: "5"
-    #     queueTypes: workflow,activity
-    #
-    # Example Prometheus trigger:
-    # - type: prometheus
-    #   authenticationRef:
-    #     name: prom-auth  # Will become {release-name}-prom-auth
-    #   metadata:
-    #     serverAddress: http://prometheus-server.monitoring.svc.cluster.local
-    #     metricName: http_requests_total
-    #     threshold: '100'
-    #     query: sum(rate(http_requests_total[2m]))
-
-  # Raw KEDA triggers: These are passed through as-is without any modifications.
-  # Use this when you create and manage TriggerAuthentication resources yourself via helm overrides.
-  # The authenticationRef.name must exactly match your pre-created TriggerAuthentication resource.
   triggers: []
-    # Example with user-managed authentication:
-    # - type: temporal
-    #   authenticationRef:
-    #     name: my-custom-temporal-auth  # Must pre-exist, used exactly as specified
-    #   metadata:
-    #     endpoint: temporal-frontend.temporal.svc.cluster.local:7233
-    #     namespace: default
-    #     taskQueue: my-workflow-queue
-    #     targetQueueSize: "5"
-    #     queueTypes: workflow,activity
-
-  # Named authentication configurations that can be referenced by porterTriggers.
-  # Porter will create TriggerAuthentication resources with the release name prefix.
-  authentications: {}
-    # Example for Temporal Cloud API key:
-    # temporal-auth:
-    #   apiKey:
-    #     secretName: temporal-secret
-    #     secretKey: api-key
-    #
-    # Example for custom secret refs:
-    # custom-auth:
-    #   secretRefs:
-    #     - parameter: username
-    #       secretName: my-secret
-    #       secretKey: username
-    #     - parameter: password
-    #       secretName: my-secret
-    #       secretKey: password
 
 health:
   enabled: false

@@ -34,11 +34,10 @@ spec:
           - type: {{ .Values.keda.hpa.scaleDown.policy.type }}
             value: {{ .Values.keda.hpa.scaleDown.policy.value }}
             periodSeconds: {{ .Values.keda.hpa.scaleDown.policy.periodSeconds }}
-  {{- if or (and .Values.keda.trigger .Values.keda.trigger.metricName) .Values.keda.porterTriggers .Values.keda.triggers }}
+  {{- if .Values.keda.trigger }}
   triggers:
-  {{- if and .Values.keda.trigger .Values.keda.trigger.metricName }}
     - type: prometheus
-      metricType: {{ .Values.keda.trigger.metricType | default "AverageValue" }}
+      metricType: {{ .Values.keda.trigger.metricType }}
       metadata:
         serverAddress: http://prometheus-server.monitoring.svc.cluster.local:80
         metricName: {{ .Values.keda.trigger.metricName }}
@@ -46,19 +45,8 @@ spec:
         threshold: '{{ .Values.keda.trigger.metricThreshold }}'
         ignoreNullValues: {{ .Values.keda.trigger.ignoreNullValues | default "true" | quote }}
   {{- end }}
-  {{- range .Values.keda.porterTriggers }}
-    {{/* Porter-managed triggers: prefix authenticationRef.name with release name */}}
-    {{- $authRef := .authenticationRef }}
-    {{- $triggerCopy := omit . "authenticationRef" }}
-    - {{- toYaml $triggerCopy | nindent 6 }}
-      {{- if $authRef }}
-      authenticationRef:
-        name: {{ $fullName }}-{{ $authRef.name }}
-      {{- end }}
-  {{- end }}
-  {{- range .Values.keda.triggers }}
-    {{/* Raw KEDA triggers: pass through as-is */}}
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+  {{- if .Values.keda.triggers }}
+  triggers:
+  {{- toYaml .Values.keda.triggers | nindent 4 }}
   {{- end }}
 {{- end }}
