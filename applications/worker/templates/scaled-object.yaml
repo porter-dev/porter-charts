@@ -56,9 +56,8 @@ spec:
         name: {{ $fullName }}-{{ $authRef.name }}
       {{- end }}
   {{- end }}
-  {{- range .Values.keda.triggers }}
-    {{/* Raw KEDA triggers: pass through as-is */}}
-    {{- toYaml . | nindent 4 }}
+  {{- if .Values.keda.triggers }}
+  {{- toYaml .Values.keda.triggers | nindent 4 }}
   {{- end }}
   {{- end }}
 {{- end }}
