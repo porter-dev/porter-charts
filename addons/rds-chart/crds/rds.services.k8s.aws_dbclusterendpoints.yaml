@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.2
-  name: dbparametergroups.rds.services.k8s.aws
+  name: dbclusterendpoints.rds.services.k8s.aws
 spec:
   group: rds.services.k8s.aws
   names:
-    kind: DBParameterGroup
-    listKind: DBParameterGroupList
-    plural: dbparametergroups
-    singular: dbparametergroup
+    kind: DBClusterEndpoint
+    listKind: DBClusterEndpointList
+    plural: dbclusterendpoints
+    singular: dbclusterendpoint
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: DBParameterGroup is the Schema for the DBParameterGroups API
+        description: DBClusterEndpoint is the Schema for the DBClusterEndpoints API
         properties:
           apiVersion:
             description: |-
@@ -38,87 +38,69 @@ spec:
             type: object
           spec:
             description: |-
-              DBParameterGroupSpec defines the desired state of DBParameterGroup.
+              DBClusterEndpointSpec defines the desired state of DBClusterEndpoint.
 
-              Contains the details of an Amazon RDS DB parameter group.
+              This data type represents the information you need to connect to an Amazon
+              Aurora DB cluster. This data type is used as a response element in the following
+              actions:
 
-              This data type is used as a response element in the DescribeDBParameterGroups
-              action.
+                - CreateDBClusterEndpoint
+
+                - DescribeDBClusterEndpoints
+
+                - ModifyDBClusterEndpoint
+
+                - DeleteDBClusterEndpoint
+
+              For the data structure that represents Amazon RDS DB instance endpoints,
+              see Endpoint.
             properties:
-              description:
-                description: The description for the DB parameter group.
-                type: string
-              family:
+              dbClusterEndpointIdentifier:
                 description: |-
-                  The DB parameter group family name. A DB parameter group can be associated
-                  with one and only one DB parameter group family, and can be applied only
-                  to a DB instance running a database engine and engine version compatible
-                  with that DB parameter group family.
-
-                  To list all of the available parameter group families for a DB engine, use
-                  the following command:
-
-                  aws rds describe-db-engine-versions --query "DBEngineVersions[].DBParameterGroupFamily"
-                  --engine
-
-                  For example, to list all of the available parameter group families for the
-                  MySQL DB engine, use the following command:
-
-                  aws rds describe-db-engine-versions --query "DBEngineVersions[].DBParameterGroupFamily"
-                  --engine mysql
-
-                  The output contains duplicates.
-
-                  The following are the valid DB engine values:
-
-                    - aurora-mysql
-
-                    - aurora-postgresql
-
-                    - db2-ae
-
-                    - db2-se
-
-                    - mysql
-
-                    - oracle-ee
-
-                    - oracle-ee-cdb
-
-                    - oracle-se2
-
-                    - oracle-se2-cdb
-
-                    - postgres
-
-                    - sqlserver-ee
-
-                    - sqlserver-se
-
-                    - sqlserver-ex
-
-                    - sqlserver-web
+                  The identifier to use for the new endpoint. This parameter is stored as a
+                  lowercase string.
                 type: string
-              name:
+              dbClusterIdentifier:
                 description: |-
-                  The name of the DB parameter group.
-
-                  Constraints:
-
-                    - Must be 1 to 255 letters, numbers, or hyphens.
-
-                    - First character must be a letter
-
-                    - Can't end with a hyphen or contain two consecutive hyphens
-
-                  This value is stored as a lowercase string.
+                  The DB cluster identifier of the DB cluster associated with the endpoint.
+                  This parameter is stored as a lowercase string.
                 type: string
-              parameterOverrides:
-                additionalProperties:
-                  type: string
+              dbClusterIdentifierRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
                 type: object
+              endpointType:
+                description: 'The type of the endpoint, one of: READER, WRITER, ANY.'
+                type: string
+              excludedMembers:
+                description: |-
+                  List of DB instance identifiers that aren't part of the custom endpoint group.
+                  All other eligible instances are reachable through the custom endpoint. This
+                  parameter is relevant only if the list of static members is empty.
+                items:
+                  type: string
+                type: array
+              staticMembers:
+                description: List of DB instance identifiers that are part of the
+                  custom endpoint group.
+                items:
+                  type: string
+                type: array
               tags:
-                description: Tags to assign to the DB parameter group.
+                description: The tags to be assigned to the Amazon RDS resource.
                 items:
                   description: |-
                     Metadata assigned to an Amazon RDS resource consisting of a key-value pair.
@@ -135,12 +117,10 @@ spec:
                   type: object
                 type: array
             required:
-            - description
-            - family
-            - name
+            - dbClusterEndpointIdentifier
             type: object
           status:
-            description: DBParameterGroupStatus defines the observed state of DBParameterGroup
+            description: DBClusterEndpointStatus defines the observed state of DBClusterEndpoint
             properties:
               ackResourceMetadata:
                 description: |-
@@ -206,42 +186,21 @@ spec:
                   - type
                   type: object
                 type: array
-              parameterOverrideStatuses:
-                description: A list of Parameter values.
-                items:
-                  description: |-
-                    This data type is used as a request parameter in the ModifyDBParameterGroup
-                    and ResetDBParameterGroup actions.
-
-                    This data type is used as a response element in the DescribeEngineDefaultParameters
-                    and DescribeDBParameters actions.
-                  properties:
-                    allowedValues:
-                      type: string
-                    applyMethod:
-                      type: string
-                    applyType:
-                      type: string
-                    dataType:
-                      type: string
-                    description:
-                      type: string
-                    isModifiable:
-                      type: boolean
-                    minimumEngineVersion:
-                      type: string
-                    parameterName:
-                      type: string
-                    parameterValue:
-                      type: string
-                    source:
-                      type: string
-                    supportedEngineModes:
-                      items:
-                        type: string
-                      type: array
-                  type: object
-                type: array
+              dbClusterEndpointResourceIdentifier:
+                description: |-
+                  A unique system-generated identifier for an endpoint. It remains the same
+                  for the whole life of the endpoint.
+                type: string
+              endpoint:
+                description: The DNS address of the endpoint.
+                type: string
+              status:
+                description: |-
+                  The current status of the endpoint. One of: creating, available, deleting,
+                  inactive, modifying. The inactive state applies to an endpoint that can't
+                  be used for a certain kind of cluster, such as a writer endpoint for a read-only
+                  secondary cluster in a global database.
+                type: string
             type: object
         type: object
     served: true
