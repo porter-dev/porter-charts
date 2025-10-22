@@ -136,7 +136,7 @@ spec:
           {{- end }}
           {{- else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ if eq .Values.image.tag "latest" }}"Always"{{ else }}"IfNotPresent"{{ end }}
+          imagePullPolicy: {{ if eq .Values.image.tag "latest" }}"Always"{{ else if eq .Values.image.pullPolicy "Always" }}"Always"{{ else }}"IfNotPresent"{{ end }}
           {{- end }}
           {{- if .Values.global }}
           {{- if .Values.global.image }}
