@@ -98,7 +98,7 @@ diagnosticMode:
 image:
   registry: ghcr.io
   repository: porter-dev/postgres-extensions
-  tag: latest
+  tag: 16.1.0-debian-11-r16
   digest: ""
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
