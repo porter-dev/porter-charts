@@ -96,8 +96,8 @@ diagnosticMode:
 ## @param image.debug Specify if debug values should be set
 ##
 image:
-  registry: docker.io
-  repository: porterhub/postgresql-managed
+  registry: ghcr.io
+  repository: porter-dev/postgres-extensions
   tag: 16.1.0-debian-11-r16
   digest: ""
   ## Specify a imagePullPolicy
