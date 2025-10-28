@@ -760,6 +760,8 @@ dashboards:
       file: dashboards/application_logs.json
     general-visualization:
       file: dashboards/general_visualization.json
+    app-rightsizing:
+      file: dashboards/app_rightsizing.json
   # default:
   #   some-dashboard:
   #     json: |
