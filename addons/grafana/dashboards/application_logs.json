@@ -130,7 +130,7 @@
               "uid": "P982945308D3682D1"
             },
             "editorMode": "builder",
-            "expr": "sum by(porter_run_app_name, porter_run_service_name) (count_over_time({porter_run_app_name!=\"\", porter_run_service_name=~\"$service\"} | porter_run_app_name=`$app` [$__interval]))",
+            "expr": "sum by(porter_run_app_name, porter_run_service_name) (count_over_time({porter_run_app_name=~\"$app\", porter_run_service_name=~\"$service\"} [$__interval]))",
             "queryType": "range",
             "refId": "A"
           }
@@ -168,7 +168,7 @@
               "uid": "P982945308D3682D1"
             },
             "editorMode": "builder",
-            "expr": "{porter_run_app_name!=\"\", porter_run_service_name=~\"$service\"} |= \"${search:pipe}\" | porter_run_app_name=`$app`",
+            "expr": "{porter_run_app_name=~\"$app\", porter_run_service_name=~\"$service\"} |= \"${search:pipe}\"",
             "queryType": "range",
             "refId": "A"
           }
@@ -237,7 +237,7 @@
               "uid": "P982945308D3682D1"
             },
             "editorMode": "builder",
-            "expr": "sum by(level) (count_over_time({porter_run_app_name!=\"\", porter_run_service_name=~\"$service\"} | porter_run_app_name=`$app` | pattern `<_> level=<level> <_>` [$__range]))",
+            "expr": "sum by(level) (count_over_time({porter_run_app_name=~\"$app\", porter_run_service_name=~\"$service\"} | pattern `<_> level=<level> <_>` [$__range]))",
             "queryType": "range",
             "refId": "A"
           }
@@ -264,14 +264,14 @@
             "type": "loki",
             "uid": "P982945308D3682D1"
           },
-          "definition": "label_values({porter_run_app_name!=\"\"}, porter_run_app_name)",
+          "definition": "label_values({porter_run_app_name~=\"$app\"}, porter_run_app_name)",
           "hide": 0,
           "includeAll": true,
           "label": "Application",
           "multi": false,
           "name": "app",
           "options": [],
-          "query": "label_values({porter_run_app_name!=\"\"}, porter_run_app_name)",
+          "query": "label_values({porter_run_app_name~=\"$app\"}, porter_run_app_name)",
           "refresh": 2,
           "regex": "",
           "skipUrlSync": false,
