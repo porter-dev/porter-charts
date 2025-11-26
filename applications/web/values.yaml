@@ -246,7 +246,7 @@ health:
     periodSeconds: 5
     timeoutSeconds: 1
     successThreshold: 1
-    failureThreshold: 15
+    failureThreshold: 5
     httpHeaders: []
     auth:
       enabled: false
