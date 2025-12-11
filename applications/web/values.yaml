@@ -57,6 +57,7 @@ ingress:
   rewriteCustomPathsEnabled: true
   annotations: {}
   wildcard: false
+  setUniqueWildcardName: false
   tls: true
   useDefaultIngressTLSSecret: false
   separateTlsPerCustomDomain: true
