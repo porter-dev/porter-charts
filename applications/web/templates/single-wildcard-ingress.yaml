@@ -1,0 +1,68 @@
+{{- if $.Values.singleWildcardIngress.enabled -}}
+{{- $fullName := include "docker-template.fullname" $ -}}
+{{- $svcPort := $.Values.service.port -}}
+{{- range $v, $hostDetails := $.Values.singleWildcardIngress.hosts }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: '{{ include "docker-template.fullname" $ }}-{{ $hostDetails.hostName | replace "." "-" | replace "*" "wc" }}'
+  labels:
+    {{- include "docker-template.labels" $ | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    {{- if $.Values.singleWildcardIngress.rewriteCustomPathsEnabled }}
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    {{- end }}
+    # provider-agnostic default annotations
+    # if value is provided as "null" or null, it is unset
+    # adding a fix for scenarios where ingress annotations are inside ingress.annotations.normal
+    {{- if not (hasKey $.Values.singleWildcardIngress.annotations "normal")}} 
+    {{- if gt (len $.Values.singleWildcardIngress.annotations) 0}}
+    {{- range $k, $v := $.Values.singleWildcardIngress.annotations }}
+    {{- if $v}}
+    {{- if and (not (eq $v "null")) $v}}
+    {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- if hasKey $.Values.singleWildcardIngress.annotations "normal"}}
+    {{- if gt (len $.Values.singleWildcardIngress.annotations.normal) 0}}
+    {{- range $k, $v := $.Values.singleWildcardIngress.annotations.normal }}
+    {{- if $v}}
+    {{- if and (not (eq $v "null")) $v}}
+    {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+spec:
+{{- if hasKey $.Values.singleWildcardIngress.annotations "kubernetes.io/ingress.class" }}
+  ingressClassName: {{ index $.Values.singleWildcardIngress.annotations "kubernetes.io/ingress.class" }}
+{{- else }}
+  ingressClassName: {{ $.Values.singleWildcardIngress.ingressClass }}
+{{- end }}
+  tls:
+    - hosts:
+        - {{ $hostDetails.hostName | quote }}
+      secretName: '{{ include "docker-template.fullname" $ }}-{{ $hostDetails.hostName | replace "." "-" | replace "*" "wc" }}-tls'
+  rules:
+      - host: {{ $hostDetails.hostName | quote }}
+        http:
+          paths:
+            - pathType: ImplementationSpecific
+              backend:
+                service:
+                  name: {{ $fullName }}
+                  port:
+                    number: {{ $svcPort }}
+{{- if not (eq $v (sub (len $.Values.singleWildcardIngress.hosts) 1) ) }}
+---
+{{- end }}
+{{- end }}
+{{- end }}

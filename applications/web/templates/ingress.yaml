@@ -26,8 +26,6 @@ spec:
       {{- if not $.Values.ingress.useDefaultIngressTLSSecret }}
       {{ if $.Values.ingress.wildcard }}
       secretName: wildcard-cert-tls
-      {{ else if and $.Values.ingress.wildcard $.Values.ingress.setUniqueWildcardName }}
-      secretName: '{{ include "docker-template.fullname" $ }}-{{ . | replace "." "-" }}'
       {{ else if $.Values.ingress.customTls.enabled }}
       secretName: {{ $.Values.ingress.customTls.customTlsSecret }}
       {{ else }}

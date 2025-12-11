@@ -57,13 +57,21 @@ ingress:
   rewriteCustomPathsEnabled: true
   annotations: {}
   wildcard: false
-  setUniqueWildcardName: false
   tls: true
   useDefaultIngressTLSSecret: false
   separateTlsPerCustomDomain: true
   customTls:
     enabled: false
     customTlsSecret:
+
+singleWildcardIngress:
+  enabled: false
+  ingressClass: nginx
+  # hosts contains a list of domain names, each object contains a hostName.
+  hosts: []
+  custom_domain: true
+  rewriteCustomPathsEnabled: true
+  annotations: {}
 
 multipleWildcardIngress:
   enabled: false
