@@ -1,4 +1,55 @@
 {
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "prometheus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    },
+    {
+      "name": "DS_LOKI",
+      "label": "loki",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "loki",
+      "pluginName": "Loki"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.3.0"
+    },
+    {
+      "type": "panel",
+      "id": "logs",
+      "name": "Logs",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "loki",
+      "name": "Loki",
+      "version": "12.3.0"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
   "annotations": {
     "list": [
       {
@@ -15,22 +66,23 @@
       }
     ]
   },
-  "description": "This dashboard allows you to check basically everything that can be seen in Porter dashboard, but with more details and control:\n- App's CPU usage;\n- App's Memory usage;\n- App's number of instances;\n- App's amount of network data received;\n- App's number (and response status) of requests received;\n- App's logs\n- NGINX logs\n- Cluster's number of nodes",
+  "description": "This dashboard allows you to check basically everything that can be seen in Porter dashboard, but if more details and control, being it:\n- App's CPU usage;\n- App's Memory usage;\n- App's number of instances;\n- App's amount of network data received;\n- App's number (and response status) of requests received;\n- App's logs\n- NGINX logs\n- Cluster's number of nodes",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 6,
+  "id": null,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-GrYlRd",
+            "seriesBy": "last"
           },
           "custom": {
             "axisBorderShow": false,
@@ -40,9 +92,10 @@
             "axisPlacement": "auto",
             "axisSoftMin": 0,
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -50,12 +103,13 @@
             },
             "insertNulls": false,
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -71,7 +125,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -84,13 +138,42 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "Autoscaling threshold"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
               "options": "Maximum"
             },
             "properties": [
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "orange",
+                  "fixedColor": "#FF6B6B",
                   "mode": "fixed"
                 }
               }
@@ -105,9 +188,53 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "green",
+                  "fixedColor": "#51CF66",
                   "mode": "fixed"
                 }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Minimum"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#339AF0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Request"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#9775FA",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    5,
+                    5
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 10
               }
             ]
           }
@@ -122,10 +249,13 @@
       "id": 1,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "width": 120
         },
         "tooltip": {
           "hideZeros": false,
@@ -133,15 +263,15 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-pre",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "(avg by (horizontalpodautoscaler) (label_replace(kube_pod_container_resource_requests{pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",namespace=\"default\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\",resource=\"cpu\",unit=\"core\"},\"horizontalpodautoscaler\", \"${App}-${Service}\", \"\", \"\")) * on(horizontalpodautoscaler) group_left() avg by (horizontalpodautoscaler) (kube_horizontalpodautoscaler_spec_target_metric{horizontalpodautoscaler=\"${App}-${Service}\",namespace=\"default\",metric_name=\"cpu\",metric_target_type=\"utilization\"}) / 100) or (avg by (horizontalpodautoscaler) (label_replace(kube_pod_container_resource_requests{pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",exported_namespace=\"default\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\",resource=\"cpu\",unit=\"core\"},\"horizontalpodautoscaler\", \"${App}-${Service}\", \"\", \"\")) * on(horizontalpodautoscaler) group_left() avg by (horizontalpodautoscaler) (kube_horizontalpodautoscaler_spec_target_metric{horizontalpodautoscaler=\"${App}-${Service}\",exported_namespace=\"default\",metric_name=\"cpu\",metric_target_type=\"utilization\"}) / 100)",
+          "expr": "(avg by (horizontalpodautoscaler) (label_replace(kube_pod_container_resource_requests{pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",namespace=\"${Target}\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\",resource=\"cpu\",unit=\"core\"},\"horizontalpodautoscaler\", \"${App}-${Service}\", \"\", \"\")) * on(horizontalpodautoscaler) group_left() avg by (horizontalpodautoscaler) (kube_horizontalpodautoscaler_spec_target_metric{horizontalpodautoscaler=\"${App}-${Service}\",namespace=\"${Target}\",metric_name=\"cpu\",metric_target_type=\"utilization\"}) / 100) or (avg by (horizontalpodautoscaler) (label_replace(kube_pod_container_resource_requests{pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",exported_namespace=\"default\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\",resource=\"cpu\",unit=\"core\"},\"horizontalpodautoscaler\", \"${App}-${Service}\", \"\", \"\")) * on(horizontalpodautoscaler) group_left() avg by (horizontalpodautoscaler) (kube_horizontalpodautoscaler_spec_target_metric{horizontalpodautoscaler=\"${App}-${Service}\",exported_namespace=\"default\",metric_name=\"cpu\",metric_target_type=\"utilization\"}) / 100)",
           "hide": false,
           "instant": false,
           "legendFormat": "Autoscaling threshold",
@@ -151,10 +281,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "max(rate(container_cpu_usage_seconds_total{namespace=\"default\",pod=~`${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*`,container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"}[3m]))",
+          "expr": "max(rate(container_cpu_usage_seconds_total{namespace=\"${Target}\",pod=~`${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*`,container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"}[3m]))",
           "hide": false,
           "instant": false,
           "legendFormat": "Maximum",
@@ -164,10 +294,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg(rate(container_cpu_usage_seconds_total{namespace=\"default\",pod=~`${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*`,container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"}[3m]))",
+          "expr": "avg(rate(container_cpu_usage_seconds_total{namespace=\"${Target}\",pod=~`${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*`,container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"}[3m]))",
           "legendFormat": "Average",
           "range": true,
           "refId": "A"
@@ -175,15 +305,28 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "min(rate(container_cpu_usage_seconds_total{namespace=\"default\",pod=~`${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*`,container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"}[3m]))",
+          "expr": "min(rate(container_cpu_usage_seconds_total{namespace=\"${Target}\",pod=~`${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*`,container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"}[3m]))",
           "hide": false,
           "instant": false,
           "legendFormat": "Minimum",
           "range": true,
           "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "avg(kube_pod_container_resource_requests{pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",namespace=\"${Target}\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\",resource=\"cpu\",unit=\"core\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Request",
+          "range": true,
+          "refId": "E"
         }
       ],
       "title": "CPU Usage",
@@ -192,7 +335,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "P982945308D3682D1"
+        "uid": "${DS_LOKI}"
       },
       "gridPos": {
         "h": 20,
@@ -205,39 +348,41 @@
         "dedupStrategy": "exact",
         "enableInfiniteScrolling": true,
         "enableLogDetails": true,
-        "prettifyLogMessage": false,
+        "prettifyLogMessage": true,
         "showCommonLabels": false,
+        "showControls": false,
         "showLabels": false,
         "showTime": true,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
-      "pluginVersion": "11.6.0-pre",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "loki",
-            "uid": "P982945308D3682D1"
+            "uid": "${DS_LOKI}"
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{porter_run_app_name=\"${App}\",porter_run_service_name=\"${Service}\"}",
+          "expr": "{namespace=\"${Target}\", porter_run_app_name=\"${App}\",porter_run_service_name=\"${Service}\"}",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Logs - ${App}-${Service}",
+      "title": "Application Logs - ${App}/${Service}",
       "type": "logs"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-GrYlRd",
+            "seriesBy": "last"
           },
           "custom": {
             "axisBorderShow": false,
@@ -247,9 +392,10 @@
             "axisPlacement": "auto",
             "axisSoftMin": 0,
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -257,12 +403,13 @@
             },
             "insertNulls": false,
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -278,7 +425,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -291,15 +438,29 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Average"
+              "options": "Autoscaling threshold"
             },
             "properties": [
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "green",
+                  "fixedColor": "red",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
               }
             ]
           },
@@ -312,9 +473,68 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "orange",
+                  "fixedColor": "#FF6B6B",
                   "mode": "fixed"
                 }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Average"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#51CF66",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Minimum"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#339AF0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Request"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#9775FA",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    5,
+                    5
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 10
               }
             ]
           }
@@ -329,10 +549,13 @@
       "id": 2,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "width": 120
         },
         "tooltip": {
           "hideZeros": false,
@@ -340,15 +563,15 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-pre",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "(avg by (horizontalpodautoscaler) (label_replace(kube_pod_container_resource_requests{pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",namespace=\"default\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\",resource=\"memory\",unit=\"byte\"},\"horizontalpodautoscaler\", \"${App}-${Service}\", \"\", \"\")) * on(horizontalpodautoscaler) group_left() avg by (horizontalpodautoscaler) (kube_horizontalpodautoscaler_spec_target_metric{horizontalpodautoscaler=\"${App}-${Service}\",namespace=\"default\",metric_name=\"memory\",metric_target_type=\"utilization\"}) / 100 / 1000 / 1000) or (avg by (horizontalpodautoscaler) (label_replace(kube_pod_container_resource_requests{pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",exported_namespace=\"default\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\",resource=\"memory\",unit=\"byte\"},\"horizontalpodautoscaler\", \"${App}-${Service}\", \"\", \"\")) * on(horizontalpodautoscaler) group_left() avg by (horizontalpodautoscaler) (kube_horizontalpodautoscaler_spec_target_metric{horizontalpodautoscaler=\"${App}-${Service}\",exported_namespace=\"default\",metric_name=\"memory\",metric_target_type=\"utilization\"}) / 100 / 1000 / 1000)",
+          "expr": "(avg by (horizontalpodautoscaler) (label_replace(kube_pod_container_resource_requests{pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",namespace=\"${Target}\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\",resource=\"memory\",unit=\"byte\"},\"horizontalpodautoscaler\", \"${App}-${Service}\", \"\", \"\")) * on(horizontalpodautoscaler) group_left() avg by (horizontalpodautoscaler) (kube_horizontalpodautoscaler_spec_target_metric{horizontalpodautoscaler=\"${App}-${Service}\",namespace=\"${Target}\",metric_name=\"memory\",metric_target_type=\"utilization\"}) / 100 / 1000 / 1000) or (avg by (horizontalpodautoscaler) (label_replace(kube_pod_container_resource_requests{pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",exported_namespace=\"default\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\",resource=\"memory\",unit=\"byte\"},\"horizontalpodautoscaler\", \"${App}-${Service}\", \"\", \"\")) * on(horizontalpodautoscaler) group_left() avg by (horizontalpodautoscaler) (kube_horizontalpodautoscaler_spec_target_metric{horizontalpodautoscaler=\"${App}-${Service}\",exported_namespace=\"default\",metric_name=\"memory\",metric_target_type=\"utilization\"}) / 100 / 1000 / 1000)",
           "hide": false,
           "instant": false,
           "legendFormat": "Autoscaling threshold",
@@ -358,10 +581,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "max(container_memory_usage_bytes{namespace=\"default\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"} / 1000 / 1000)",
+          "expr": "max(container_memory_usage_bytes{namespace=\"${Target}\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"} / 1000 / 1000)",
           "hide": false,
           "instant": false,
           "legendFormat": "Maximum",
@@ -369,28 +592,41 @@
           "refId": "B"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
-          },
           "editorMode": "code",
-          "expr": "avg(container_memory_usage_bytes{namespace=\"default\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"} / 1000 / 1000)",
+          "expr": "avg(container_memory_usage_bytes{namespace=\"${Target}\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"} / 1000 / 1000)",
           "legendFormat": "Average",
           "range": true,
-          "refId": "A"
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          }
         },
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "min(container_memory_usage_bytes{namespace=\"default\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"} / 1000 / 1000)",
+          "expr": "min(container_memory_usage_bytes{namespace=\"${Target}\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\"} / 1000 / 1000)",
           "hide": false,
           "instant": false,
           "legendFormat": "Minimum",
           "range": true,
           "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "avg(kube_pod_container_resource_requests{pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\",namespace=\"${Target}\",container!=\"POD\",container!=\"cloud-sql-proxy\",container!=\"\",resource=\"memory\",unit=\"byte\"} / 1000 / 1000)",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Request",
+          "range": true,
+          "refId": "E"
         }
       ],
       "title": "Memory Usage (MiB)",
@@ -399,7 +635,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -414,9 +650,10 @@
             "axisPlacement": "auto",
             "axisSoftMin": 0,
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
+            "fillOpacity": 15,
+            "gradientMode": "hue",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -424,12 +661,13 @@
             },
             "insertNulls": false,
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -445,7 +683,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -458,43 +696,13 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "{__name__=\"k8s_hpa_max_replicas\", __replica__=\"10.78.207.46\", cluster=\"3238\", k8s_hpa_name=\"keda-hpa-transit-api-stage-api\", k8s_hpa_uid=\"47aa14be-c2fa-4f58-9327-1114894ce76c\", k8s_namespace_name=\"default\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "{__name__=\"kube_deployment_status_replicas\", __replica__=\"10.78.207.46\", cluster=\"3238\", deployment=\"transit-api-stage-api\", http_scheme=\"http\", instance=\"10.78.100.226:8080\", job=\"otel-porter-kube-state-metrics\", k8s_container_name=\"kube-state-metrics\", k8s_deployment_name=\"prometheus-kube-state-metrics\", k8s_namespace_name=\"monitoring\", k8s_node_name=\"ip-10-78-76-132.ec2.internal\", k8s_pod_name=\"prometheus-kube-state-metrics-5fbc96956f-rt8mf\", k8s_pod_start_time=\"2025-01-28T21:49:12Z\", k8s_pod_uid=\"dc0777a1-dc4c-4d7b-b577-58378fbf0e54\", k8s_replicaset_name=\"prometheus-kube-state-metrics-5fbc96956f\", namespace=\"default\", net_host_name=\"10.78.100.226\", net_host_port=\"8080\", service_instance_id=\"10.78.100.226:8080\", service_name=\"otel-porter-kube-state-metrics\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Maximum"
             },
             "properties": [
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "orange",
+                  "fixedColor": "#FF6B35",
                   "mode": "fixed"
                 }
               }
@@ -509,7 +717,67 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "green",
+                  "fixedColor": "#06FFA5",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Minimum"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#FFE66D",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*880f1cd6.*/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*767dd0e2.*/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#F2495C",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*e3abf29e.*/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5794F2",
                   "mode": "fixed"
                 }
               }
@@ -526,8 +794,11 @@
       "id": 11,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
@@ -537,36 +808,36 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-pre",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
-          },
           "editorMode": "code",
-          "expr": "k8s_hpa_max_replicas{k8s_hpa_name=\"keda-hpa-${App}-${Service}\"}",
+          "expr": "k8s_hpa_max_replicas{k8s_hpa_name=\"keda-hpa-${App}-${Service}\", k8s_namespace_name=`${Target}`}",
           "legendFormat": "Maximum",
           "range": true,
-          "refId": "A"
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          }
         },
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "kube_deployment_status_replicas{deployment=\"${App}-${Service}\"}",
+          "expr": "max by(deployment, namespace) (kube_deployment_status_replicas{deployment=\"${App}-${Service}\", namespace=\"${Target}\"}) * on(deployment, namespace) group_left(label_porter_run_app_revision_id) topk by(deployment, namespace) (1, last_over_time(kube_deployment_labels{deployment=\"${App}-${Service}\", namespace=\"${Target}\"}[5m]))",
           "hide": false,
           "instant": false,
-          "legendFormat": "Current",
+          "legendFormat": "Current - Rev: {{label_porter_run_app_revision_id}}",
           "range": true,
           "refId": "B"
         },
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "k8s_hpa_min_replicas{k8s_hpa_name=\"keda-hpa-${App}-${Service}\"}",
@@ -583,7 +854,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "P982945308D3682D1"
+        "uid": "${DS_LOKI}"
       },
       "gridPos": {
         "h": 21,
@@ -596,39 +867,40 @@
         "dedupStrategy": "exact",
         "enableInfiniteScrolling": false,
         "enableLogDetails": true,
-        "prettifyLogMessage": false,
+        "prettifyLogMessage": true,
         "showCommonLabels": false,
+        "showControls": false,
         "showLabels": false,
-        "showTime": false,
+        "showTime": true,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
-      "pluginVersion": "11.6.0-pre",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "loki",
-            "uid": "P982945308D3682D1"
+            "uid": "${DS_LOKI}"
           },
+          "direction": "backward",
           "editorMode": "code",
-          "expr": "{app=\"ingress-nginx\"}",
+          "expr": "{app=\"ingress-nginx\"} |~ \"(${Target}-${App}-${Service}|too big header)\"",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Logs - NGINX Ingress",
+      "title": "NGINX Ingress Logs",
       "type": "logs"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "blue",
-            "mode": "palette-classic"
+            "mode": "continuous-BlYlRd"
           },
           "custom": {
             "axisBorderShow": false,
@@ -638,9 +910,10 @@
             "axisPlacement": "auto",
             "axisSoftMin": 0,
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
+            "fillOpacity": 30,
+            "gradientMode": "scheme",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -648,12 +921,13 @@
             },
             "insertNulls": false,
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -668,7 +942,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -681,73 +956,13 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "max(rate(container_network_receive_bytes_total{namespace=\"default\",pod=~\"transit-api-stage-api-[a-z0-9]+(-[a-z0-9]+)*\"}[2m])) / 1000 / 1000"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "avg(rate(container_network_receive_bytes_total{namespace=\"default\",pod=~\"transit-api-stage-api-[a-z0-9]+(-[a-z0-9]+)*\"}[2m])) / 1000 / 1000"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "max(rate(container_network_receive_bytes_total{namespace=\"default\",pod=~\"transit-api-production-api-[a-z0-9]+(-[a-z0-9]+)*\"}[2m])) / 1000 / 1000"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "avg(rate(container_network_receive_bytes_total{namespace=\"default\",pod=~\"transit-api-production-api-[a-z0-9]+(-[a-z0-9]+)*\"}[2m])) / 1000 / 1000"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Maximum"
             },
             "properties": [
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "orange",
+                  "fixedColor": "#FF4757",
                   "mode": "fixed"
                 }
               }
@@ -762,7 +977,22 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "green",
+                  "fixedColor": "#00D2D3",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Minimum"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#FFA502",
                   "mode": "fixed"
                 }
               }
@@ -780,8 +1010,11 @@
       "interval": "15s",
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
@@ -791,15 +1024,15 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-pre",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "max(rate(container_network_receive_bytes_total{namespace=\"default\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\"}[2m])) / 1000 / 1000",
+          "expr": "max(rate(container_network_receive_bytes_total{namespace=\"${Target}\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\"}[2m])) / 1000 / 1000",
           "hide": false,
           "instant": false,
           "legendFormat": "Maximum",
@@ -807,23 +1040,23 @@
           "refId": "B"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
-          },
           "editorMode": "code",
-          "expr": "avg(rate(container_network_receive_bytes_total{namespace=\"default\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\"}[2m])) / 1000 / 1000",
+          "expr": "avg(rate(container_network_receive_bytes_total{namespace=\"${Target}\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\"}[2m])) / 1000 / 1000",
           "legendFormat": "Average",
           "range": true,
-          "refId": "A"
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          }
         },
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "min(rate(container_network_receive_bytes_total{namespace=\"default\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\"}[2m])) / 1000 / 1000",
+          "expr": "min(rate(container_network_receive_bytes_total{namespace=\"${Target}\",pod=~\"${App}-${Service}-[a-z0-9]+(-[a-z0-9]+)*\"}[2m])) / 1000 / 1000",
           "hide": false,
           "instant": false,
           "legendFormat": "Minimum",
@@ -831,13 +1064,13 @@
           "refId": "C"
         }
       ],
-      "title": "Received MiB per Interval",
+      "title": "Network Received (MiB/interval)",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -853,9 +1086,10 @@
             "axisPlacement": "auto",
             "axisSoftMin": 0,
             "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "hue",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -863,16 +1097,17 @@
             },
             "insertNulls": false,
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 0,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
-              "mode": "none"
+              "mode": "normal"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -883,7 +1118,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -896,148 +1132,13 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "{ingress=\"transit-api-stage-api\", status_code=\"3xx\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "{ingress=\"transit-api-stage-api\", status_code=\"2xx\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "{ingress=\"transit-api-stage-api\", status_code=\"1xx\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "{ingress=\"transit-api-stage-api\", status_code=\"4xx\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "{ingress=\"bgv3-prod-live-web\", status_code=\"4xx\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "{ingress=\"bgv3-prod-live-web\", status_code=\"5xx\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "{ingress=\"bgv3-prod-live-web\", status_code=\"3xx\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "{ingress=\"bgv3-prod-live-web\", status_code=\"2xx\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "{ingress=\"transit-api-stage-api\", status_code=\"5xx\"}"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "2xx"
             },
             "properties": [
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "green",
+                  "fixedColor": "#52C41A",
                   "mode": "fixed"
                 }
               }
@@ -1052,7 +1153,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "blue",
+                  "fixedColor": "#1890FF",
                   "mode": "fixed"
                 }
               }
@@ -1067,7 +1168,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "orange",
+                  "fixedColor": "#FAAD14",
                   "mode": "fixed"
                 }
               }
@@ -1082,7 +1183,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "red",
+                  "fixedColor": "#F5222D",
                   "mode": "fixed"
                 }
               }
@@ -1099,8 +1200,10 @@
       "id": 9,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
@@ -1110,120 +1213,27 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-pre",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
-          },
           "editorMode": "code",
-          "expr": "round(sum by (status_code, ingress)(label_replace(increase(nginx_ingress_controller_requests_total{exported_namespace=~\"default\",ingress=\"${App}-${Service}\",service=\"${App}-${Service}\"}[2m]), \"status_code\", \"${1}xx\", \"status\", \"(.)..\")), 0.001) or round(sum by (status_code, ingress)(label_replace(increase(nginx_ingress_controller_requests_total{namespace=~\"default\",ingress=\"${App}-${Service}\",service=\"${App}-${Service}\"}[2m]), \"status_code\", \"${1}xx\", \"status\", \"(.)..\")), 0.001)",
+          "expr": "round(sum by (status_code, ingress)(label_replace(increase(nginx_ingress_controller_requests_total{exported_namespace=~`${Target}`,ingress=\"${App}-${Service}\",service=\"${App}-${Service}\"}[2m]), \"status_code\", \"${1}xx\", \"status\", \"(.)..\")), 0.001) or round(sum by (status_code, ingress)(label_replace(increase(nginx_ingress_controller_requests_total{namespace=~`${Target}`,ingress=\"${App}-${Service}\",service=\"${App}-${Service}\"}[2m]), \"status_code\", \"${1}xx\", \"status\", \"(.)..\")), 0.001)",
           "legendFormat": "{{status_code}}",
           "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Number of requests per interval",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "axisSoftMin": 0,
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 24,
-        "x": 0,
-        "y": 41
-      },
-      "id": 8,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "orientation": "auto",
-        "showValue": "auto",
-        "stacking": "none",
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
-      },
-      "pluginVersion": "11.6.0-pre",
-      "targets": [
-        {
+          "refId": "A",
           "datasource": {
             "type": "prometheus",
-            "uid": "P1809F7CD0C75ACF3"
-          },
-          "editorMode": "code",
-          "expr": "sum(k8s_node_condition_ready{})",
-          "legendFormat": "Ready Nodes",
-          "range": true,
-          "refId": "A"
+            "uid": "${DS_PROMETHEUS}"
+          }
         }
       ],
-      "title": "Number of nodes in the cluster",
-      "type": "barchart"
+      "title": "Request Status Distribution",
+      "type": "timeseries"
     }
   ],
+  "preload": false,
   "refresh": "",
-  "schemaVersion": 39,
+  "schemaVersion": 42,
   "tags": [
     "porter",
     "metrics",
@@ -1239,46 +1249,58 @@
   "templating": {
     "list": [
       {
-        "current": {
-          "selected": false,
-          "text": "cowsay",
-          "value": "cowsay"
+        "allowCustomValue": false,
+        "current": {},
+        "definition": "label_values(namespace)",
+        "includeAll": true,
+        "name": "Target",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(namespace)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "P1809F7CD0C75ACF3"
+        "refresh": 1,
+        "regex": "/^(?!(?:ack-system|cert-manager|external-secrets|infisical|ingress-nginx|kube-system|monitoring|porter-agent-system|telemetry)$)[A-Za-z0-9-]+$/",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {},
+        "definition": "label_values({namespace=\"$Target\"},label_porter_run_deployment_target_id)",
+        "hide": 2,
+        "name": "deployment_target_id",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values({namespace=\"$Target\"},label_porter_run_deployment_target_id)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "definition": "label_values(porter_run_app_name)",
-        "hide": 0,
-        "includeAll": false,
-        "multi": false,
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {},
+        "definition": "label_values({label_porter_run_deployment_target_id=\"$deployment_target_id\"},label_porter_run_app_name)",
         "name": "App",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(porter_run_app_name)",
+          "query": "label_values({label_porter_run_deployment_target_id=\"$deployment_target_id\"},label_porter_run_app_name)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
+        "sort": 1,
         "type": "query"
       },
       {
-        "current": {
-          "selected": false,
-          "text": "job",
-          "value": "job"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "P1809F7CD0C75ACF3"
-        },
+        "allowCustomValue": false,
+        "current": {},
         "definition": "label_values({label_porter_run_app_name=\"$App\"},label_porter_run_service_name)",
-        "hide": 0,
-        "includeAll": false,
-        "multi": false,
         "name": "Service",
         "options": [],
         "query": {
@@ -1286,10 +1308,9 @@
           "query": "label_values({label_porter_run_app_name=\"$App\"},label_porter_run_service_name)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
+        "sort": 1,
         "type": "query"
       }
     ]
@@ -1310,6 +1331,6 @@
   "timezone": "utc",
   "title": "General Visualization",
   "uid": "ae521e9iouadcc",
-  "version": 1,
+  "version": 144,
   "weekStart": "sunday"
 }
