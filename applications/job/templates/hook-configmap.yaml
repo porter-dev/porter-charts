@@ -13,7 +13,7 @@ data:
       name: "{{ .Release.Name | trunc 47 }}-{{ randAlphaNum 10 | lower }}-hook"
       namespace: {{ .Release.Namespace | quote }}
       labels:
-        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        app.kubernetes.io/instance: {{ include "docker-template.instance" . | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         helm.sh/revision: "{{ .Release.Revision }}"
         meta.helm.sh/release-name: "{{ .Release.Name }}"
@@ -29,7 +29,7 @@ data:
         metadata:
           name: "{{ .Release.Name }}"
           labels:
-            app.kubernetes.io/instance: {{ .Release.Name | quote }}
+            app.kubernetes.io/instance: {{ include "docker-template.instance" . | quote }}
             helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
             helm.sh/revision: "{{ .Release.Revision }}"
             meta.helm.sh/release-name: "{{ .Release.Name }}"

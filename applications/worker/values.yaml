@@ -2,6 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# Optional: overrides the `app.kubernetes.io/instance` label (defaults to `.Release.Name`)
+instanceOverride: ''
+
 replicaCount: 1
 
 topology:
@@ -20,7 +23,7 @@ image:
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
-  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank. 
+  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank.
   imagePullSecret:
 
 downwardAPIInit:
@@ -35,7 +38,7 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: ''
 
 container:
   port: 80
@@ -100,14 +103,15 @@ keda:
         value: 50
         periodSeconds: 300
   trigger:
-    metricName: ""
-    metricQuery: ""
-    metricThreshold: ""
-  
-  # Porter-managed triggers: Porter will create TriggerAuthentication resources with the 
+    metricName: ''
+    metricQuery: ''
+    metricThreshold: ''
+
+  # Porter-managed triggers: Porter will create TriggerAuthentication resources with the
   # release name prefix (e.g., {release-name}-temporal-auth) to avoid ownership conflicts.
   # Use this for triggers configured through the Porter app create flow.
-  porterTriggers: []
+  porterTriggers:
+    []
     # Example Temporal trigger with authentication:
     # - type: temporal
     #   authenticationRef:
@@ -132,7 +136,8 @@ keda:
   # Raw KEDA triggers: These are passed through as-is without any modifications.
   # Use this when you create and manage TriggerAuthentication resources yourself via helm overrides.
   # The authenticationRef.name must exactly match your pre-created TriggerAuthentication resource.
-  triggers: []
+  triggers:
+    []
     # Example with user-managed authentication:
     # - type: temporal
     #   authenticationRef:
@@ -146,7 +151,8 @@ keda:
 
   # Named authentication configurations that can be referenced by porterTriggers.
   # Porter will create TriggerAuthentication resources with the release name prefix.
-  authentications: {}
+  authentications:
+    {}
     # Example for Temporal Cloud API key:
     # temporal-auth:
     #   apiKey:
@@ -165,26 +171,26 @@ keda:
 
 health:
   enabled: false
-  command: "ls -l"
+  command: 'ls -l'
   periodSeconds: 5
   failureThreshold: 3
   livenessProbe:
     enabled: false
-    command: "ls -l"
+    command: 'ls -l'
     failureThreshold: 3
     periodSeconds: 5
     initialDelaySeconds: 5
     timeoutSeconds: 1
   readinessProbe:
     enabled: false
-    command: "ls -l"
+    command: 'ls -l'
     failureThreshold: 3
     periodSeconds: 5
     initialDelaySeconds: 5
     timeoutSeconds: 1
   startupProbe:
     enabled: false
-    command: "ls -l"
+    command: 'ls -l'
     failureThreshold: 3
     periodSeconds: 5
     initialDelaySeconds: 5
@@ -196,29 +202,30 @@ pvc:
   enabled: false
   storage: 20Gi
   mountPath: /mypath
-  existingVolume: ""
+  existingVolume: ''
 
 multiplePvc:
   enabled: false
   volumes:
-    - name: ""
+    - name: ''
       storage: 20Gi
       mountPath: /mypath
-      existingVolume: ""
+      existingVolume: ''
 
 cloudsql:
   enabled: false
-  connections: []
+  connections:
+    []
     # - name: "abcdedfg"
     #   port: 34343
-  connectionName: "" # deprecated, keeping for backwards compatibility. use connections instead.
+  connectionName: '' # deprecated, keeping for backwards compatibility. use connections instead.
   dbPort: 5432
-  serviceAccountJSON: ""
-  serviceAccountJSONSecret: ""
-  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead. 
+  serviceAccountJSON: ''
+  serviceAccountJSONSecret: ''
+  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead.
     enabled: false
     dbPort: 5432
-    connectionName: ""
+    connectionName: ''
 
 # Set this to add entries to the /etc/hosts file
 # Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
@@ -234,15 +241,15 @@ tolerations: []
 
 stack:
   enabled: false
-  name: ""
+  name: ''
   revision: 0
 
 emptyDir:
   enabled: false
   mountPath: /mypath
   volumeOptions: {}
-  
-priorityClassName: ""
+
+priorityClassName: ''
 
 nodeGroups: []
 

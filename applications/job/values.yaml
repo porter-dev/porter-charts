@@ -2,6 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# Optional: overrides the `app.kubernetes.io/instance` label (defaults to `.Release.Name`)
+instanceOverride: ''
+
 auto_deploy: true
 
 replicaCount: 1
@@ -14,7 +17,7 @@ image:
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
-  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank. 
+  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank.
   imagePullSecret:
 
 serviceAccount:
@@ -24,18 +27,18 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: ''
 
 container:
   port: 80
-  command: ""
+  command: ''
   args: []
   env:
     normal:
 
 schedule:
   enabled: false
-  value: "*/5 * * * *"
+  value: '*/5 * * * *'
   successfulHistory: 20
   failedHistory: 20
 
@@ -50,17 +53,18 @@ paused: false
 
 cloudsql:
   enabled: false
-  connections: []
+  connections:
+    []
     # - name: "abcdedfg"
     #   port: 34343
-  connectionName: "" # deprecated, keeping for backwards compatibility. use connections instead.
+  connectionName: '' # deprecated, keeping for backwards compatibility. use connections instead.
   dbPort: 5432
-  serviceAccountJSON: ""
-  serviceAccountJSONSecret: ""
-  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead. 
+  serviceAccountJSON: ''
+  serviceAccountJSONSecret: ''
+  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead.
     enabled: false
     dbPort: 5432
-    connectionName: ""
+    connectionName: ''
 
 # Set this for enabling DNS extensions over TCP
 # We enable this by default.
@@ -85,12 +89,12 @@ tolerations: []
 
 stack:
   enabled: false
-  name: ""
+  name: ''
   revision: 0
 
 podLabels: {}
 
-priorityClassName: ""
+priorityClassName: ''
 
 nodeGroups: []
 
@@ -123,15 +127,15 @@ pvc:
   enabled: false
   storage: 20Gi
   mountPath: /mypath
-  existingVolume: ""
+  existingVolume: ''
 
 multiplePvc:
   enabled: false
   volumes:
-    - name: ""
+    - name: ''
       storage: 20Gi
       mountPath: /mypath
-      existingVolume: ""
+      existingVolume: ''
 
 # job timeout configuration
 activeDeadlineSeconds: # Optional - if not set, will use sidecar.timeout

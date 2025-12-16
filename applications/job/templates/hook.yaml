@@ -18,7 +18,7 @@ spec:
       name: "{{ .Release.Name }}"
       labels:
         app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
-        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        app.kubernetes.io/instance: {{ include "docker-template.instance" . | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
       serviceAccountName: {{ include "docker-template.fullname" . }}
