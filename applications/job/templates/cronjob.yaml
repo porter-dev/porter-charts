@@ -133,6 +133,33 @@ spec:
             {{ end }}
             {{ end }}
               env:
+                # Porter default environment variables
+                - name: PORTER_RESOURCES_RAM
+                  value: "{{ .Values.resources.requests.memory }}"
+                - name: PORTER_RESOURCES_CPU
+                  value: "{{ .Values.resources.requests.cpu }}"
+                - name: PORTER_RESOURCES_REPLICAS
+                  value: "{{ .Values.replicaCount }}"
+                - name: PORTER_POD_REVISION
+                  value: "{{ .Release.Revision }}"
+                - name: PORTER_NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: spec.nodeName
+                - name: PORTER_POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: PORTER_POD_IP
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: status.podIP
+                - name: PORTER_NODE_IP
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: status.hostIP
+                - name: PORTER_POD_IMAGE_TAG
+                  value: "{{ .Values.image.tag }}"
               {{- if .Values.global }}
               {{- if .Values.global.image }}
               {{- if .Values.global.image.tag }}
@@ -140,6 +167,14 @@ spec:
                   value: "{{ .Values.global.image.tag }}"
               {{- end }}
               {{- end }}
+              {{- end }}
+                - name: PORTER_APP_SERVICE_NAME
+                  value: "{{ include "docker-template.fullname" . }}"
+              {{- if .Values.stack.enabled }}
+                - name: PORTER_STACK_NAME
+                  value: "{{ .Values.stack.name }}"
+                - name: PORTER_STACK_REVISION
+                  value: "{{ .Values.stack.revision }}"
               {{- end }}
               {{- range $key, $val := .Values.container.env.normal }}
                 - name: {{ $key }}
