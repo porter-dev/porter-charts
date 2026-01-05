@@ -75,6 +75,17 @@ multipleWildcardIngress:
   rewriteCustomPathsEnabled: true
   annotations: {}
 
+# This section is meant for scenarios where nested wildcards are necessary
+# Enabling this will allow for creating ClusterIssuers for this specific wildcard
+# It will always be disabled by default
+dynamicClusterIssuer:
+  enabled: false
+  name:
+  email:
+  # At the moment we only support Cloudflare
+  cloudflare:
+    api_token_secret: 
+
 albIngress:
   enabled: false
   external_dns: false

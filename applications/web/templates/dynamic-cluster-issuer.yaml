@@ -1,0 +1,19 @@
+{{- if .Values.dynamicClusterIssuer.enabled -}}
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-cloudflare-{{ .Values.dynamicClusterIssuer.name }}
+spec:
+  acme:
+    email: {{ .Values.dynamicClusterIssuer.email }}
+    preferredChain: ""
+    privateKeySecretRef:
+      name: letsencrypt-cloudflare-{{ .Values.dynamicClusterIssuer.name }}
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+    - dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            key: api-token
+            name: {{ .Values.dynamicClusterIssuer.cloudflare.api_token_secret }}
+{{- end }}
