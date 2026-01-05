@@ -2,7 +2,7 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-cloudflare-{{ .Values.dynamicClusterIssuer.name }}
+  name: {{ .Values.dynamicClusterIssuer.name }}
 spec:
   acme:
     email: {{ .Values.dynamicClusterIssuer.email }}
