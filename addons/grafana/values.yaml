@@ -752,14 +752,16 @@ dashboardProviders:
 ##
 dashboards:
   default:
-    nginx:
-      file: dashboards/nginx.json
-    gpu-metrics:
-      file: dashboards/dcgm_metrics.json
     application-logs:
       file: dashboards/application_logs.json
     general-visualization:
       file: dashboards/general_visualization.json
+    gpu-metrics:
+      file: dashboards/dcgm_metrics.json
+    nginx:
+      file: dashboards/nginx.json
+    node-visualization:
+      file: dashboards/node_visualization.json
   # default:
   #   some-dashboard:
   #     json: |

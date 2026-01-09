@@ -1,47 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_PROMETHEUS",
-      "label": "prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
-  "__elements": {},
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "12.3.0"
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "table",
-      "name": "Table",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "timeseries",
-      "name": "Time series",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -61,13 +18,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 15,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "P1809F7CD0C75ACF3"
       },
       "fieldConfig": {
         "defaults": {
@@ -117,16 +74,12 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "expr": "count(kube_node_labels{label_porter_run_workload_kind=~\"$workload_type\"})",
           "legendFormat": "Total Nodes",
-          "refId": "B",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          }
+          "refId": "B"
         }
       ],
       "title": "Stats",
@@ -135,7 +88,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "P1809F7CD0C75ACF3"
       },
       "fieldConfig": {
         "defaults": {
@@ -177,17 +130,13 @@
         "cellHeight": "sm",
         "showHeader": true
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "expr": "kube_node_labels{node=~\"$node\", label_porter_run_workload_kind=~\"$workload_type\"}",
           "format": "table",
           "instant": true,
-          "refId": "A",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          }
+          "refId": "A"
         }
       ],
       "title": "Nodes by Labels",
@@ -235,7 +184,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "P1809F7CD0C75ACF3"
       },
       "fieldConfig": {
         "defaults": {
@@ -316,16 +265,12 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "expr": "count by (label_porter_run_workload_kind) (kube_node_labels{node=~\"$node\", label_porter_run_workload_kind=~\"$workload_type\"})",
           "legendFormat": "{{label_porter_run_workload_kind}}",
-          "refId": "A",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          }
+          "refId": "A"
         }
       ],
       "title": "Nodes by Workload Type Over Time",
@@ -334,7 +279,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "P1809F7CD0C75ACF3"
       },
       "fieldConfig": {
         "defaults": {
@@ -418,18 +363,14 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "editorMode": "code",
           "expr": "sum by (node) (\n  kube_pod_container_resource_requests{resource=\"cpu\", node=~\"$node\"}\n  * on(node) group_left() \n  (max by (node) (kube_node_labels{node=~\"$node\", label_porter_run_workload_kind=~\"$workload_type\"}) > 0)\n)",
           "legendFormat": "{{node}}",
           "range": true,
-          "refId": "A",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          }
+          "refId": "A"
         }
       ],
       "title": "Node CPU Requests",
@@ -438,7 +379,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "P1809F7CD0C75ACF3"
       },
       "fieldConfig": {
         "defaults": {
@@ -518,18 +459,14 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "editorMode": "code",
           "expr": "sum by (node) (\n  kube_pod_container_resource_requests{resource=\"memory\", node=~\"$node\"}\n  * on(node) group_left() \n  (max by (node) (kube_node_labels{node=~\"$node\", label_porter_run_workload_kind=~\"$workload_type\"}) > 0)\n)",
           "legendFormat": "{{node}}",
           "range": true,
-          "refId": "A",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          }
+          "refId": "A"
         }
       ],
       "title": "Node Memory Requests",
@@ -537,8 +474,7 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -622,7 +558,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "P1809F7CD0C75ACF3"
           },
           "editorMode": "code",
           "expr": "avg by (namespace, pod, node) (\n  kube_pod_container_resource_requests{resource=\"cpu\", node=~\"$node\"}\n  * on(node) group_left() \n  (max by (node) (kube_node_labels{node=~\"$node\", label_porter_run_workload_kind=~\"$workload_type\"}) > 0)\n)",
@@ -634,7 +570,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "P1809F7CD0C75ACF3"
           },
           "editorMode": "code",
           "expr": "avg by (namespace, pod, node) (\n  kube_pod_container_resource_requests{resource=\"memory\", node=~\"$node\"}\n  * on(node) group_left() \n  (max by (node) (kube_node_labels{node=~\"$node\", label_porter_run_workload_kind=~\"$workload_type\"}) > 0)\n)",
@@ -699,7 +635,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "P1809F7CD0C75ACF3"
       },
       "fieldConfig": {
         "defaults": {
@@ -788,11 +724,7 @@
           "expr": "sum by (instance) (\n  (rate(container_network_transmit_bytes_total[2m]) + rate(container_network_receive_bytes_total[2m]))\n  * on(instance) group_left(node) \n  max by (instance) (label_replace(kube_node_labels{node=~\"$node\", label_porter_run_workload_kind=~\"$workload_type\"}, \"instance\", \"$1\", \"node\", \"(.*)\"))\n)",
           "legendFormat": "{{instance}} - RX + TX",
           "range": true,
-          "refId": "A",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          }
+          "refId": "A"
         }
       ],
       "title": "Node Network Usage",
@@ -812,10 +744,13 @@
     "list": [
       {
         "allValue": ".*",
-        "current": {},
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "uid": "P1809F7CD0C75ACF3"
         },
         "definition": "label_values(kube_node_labels, label_porter_run_workload_kind)",
         "includeAll": true,
@@ -829,10 +764,13 @@
         "type": "query"
       },
       {
-        "current": {},
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "uid": "P1809F7CD0C75ACF3"
         },
         "definition": "label_values(kube_node_labels{label_porter_run_workload_kind=~\"$workload_type\"}, node)",
         "includeAll": true,
@@ -855,6 +793,5 @@
   "timezone": "utc",
   "title": "Node Visualization",
   "uid": "fcc4ca30-2bc6-4e79-a4d7-c0ab3d3d85fd",
-  "version": 39,
-  "weekStart": ""
+  "version": 39
 }
