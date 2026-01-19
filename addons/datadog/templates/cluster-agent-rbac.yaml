@@ -29,6 +29,14 @@ rules:
   - list
   - watch
   - create
+- apiGroups:
+  - "discovery.k8s.io"
+  resources:
+  - endpointslices
+  verbs:
+  - get
+  - list
+  - watch
 - apiGroups: ["quota.openshift.io"]
   resources:
   - clusterresourcequotas
@@ -104,6 +112,7 @@ rules:
 - nonResourceURLs:
   - "/version"
   - "/healthz"
+  - "/metrics"
   verbs:
   - get
 {{- if and .Values.clusterAgent.metricsProvider.enabled .Values.clusterAgent.metricsProvider.wpaController }}
@@ -249,7 +258,7 @@ rules:
   - mutatingwebhookconfigurations
   resourceNames:
     - {{ .Values.clusterAgent.admissionController.webhookName | quote }}
-  verbs: ["get", "list", "watch", "update"]
+  verbs: ["get", "list", "watch", "update", "delete"]
 - apiGroups:
   - admissionregistration.k8s.io
   resources:
@@ -262,6 +271,14 @@ rules:
 - apiGroups: ["apps"]
   resources: ["statefulsets", "replicasets", "deployments", "daemonsets"]
   verbs: ["get"]
+- apiGroups: [""]
+  resources: ["replicationcontrollers"]
+  verbs: ["get"]
+{{- if and .Values.clusterAgent.admissionController.cwsInstrumentation.enabled (eq .Values.clusterAgent.admissionController.cwsInstrumentation.mode "remote_copy") }}
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+{{- end }}
 {{- end }}
 {{- if eq  (include "should-enable-security-agent" .) "true" }}
 {{- if .Values.datadog.securityAgent.compliance.enabled }}
@@ -290,6 +307,7 @@ rules:
   - rolebindings
   verbs:
   - list
+  - watch
 - apiGroups:
   - networking.k8s.io
   resources:
@@ -323,8 +341,70 @@ rules:
   verbs: ["get"]
 {{- end }}
 {{- if .Values.datadog.orchestratorExplorer.enabled }}
+- apiGroups:
+  - "policy"
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - "datadoghq.com"
+  - karpenter.azure.com
+  - karpenter.k8s.aws
+  - karpenter.sh
+  resources:
+  - "*"
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - argoproj.io
+  resources:
+  - rollouts
+  verbs:
+  - list
+  - watch
+  - get
 {{- include "orchestratorExplorer-config-crs" . }}
 {{- end }}
+# Used by datadog.appsec.injector feature
+- apiGroups:
+    - "gateway.networking.k8s.io"
+  resources:
+    - gateways
+    - gatewayclasses
+  verbs:
+    - get
+    - list
+    - watch
+    - patch
+- apiGroups:
+    - "gateway.networking.k8s.io"
+  resources:
+    - referencegrants
+  verbs:
+    - get
+    - delete
+    - create
+    - patch
+- apiGroups:
+    - "gateway.envoyproxy.io"
+  resources:
+    - envoyextensionpolicies
+  verbs:
+    - get
+    - delete
+    - create
+- apiGroups:
+    - "networking.istio.io"
+  resources:
+    - envoyfilters
+  verbs:
+    - get
+    - create
+    - delete
 ---
 apiVersion: {{ template "rbac.apiVersion" . }}
 kind: ClusterRoleBinding
@@ -351,6 +431,9 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
 {{ include "datadog.labels" . | indent 4 }}
+{{- if .Values.clusterAgent.rbac.serviceAccountAdditionalLabels -}}
+{{ tpl (toYaml .Values.clusterAgent.rbac.serviceAccountAdditionalLabels) . | nindent 4 -}}
+{{ end }}
 {{- if .Values.clusterAgent.rbac.serviceAccountAnnotations }}
   annotations: {{ tpl (toYaml .Values.clusterAgent.rbac.serviceAccountAnnotations) . | nindent 4}}
 {{- end }}
@@ -426,7 +509,7 @@ subjects:
     namespace: {{ .Release.Namespace }}
 {{- end -}}
 
-{{- if (((.Values.datadog.autoscaling).workload).enabled) }}
+{{- if or (((.Values.datadog.autoscaling).workload).enabled) (((.Values.datadog.autoscaling).cluster).enabled) }}
 ---
 apiVersion: {{ template "rbac.apiVersion" . }}
 kind: ClusterRole
@@ -436,6 +519,15 @@ metadata:
   name: {{ template "datadog.fullname" . }}-cluster-agent-autoscaling
   namespace: {{ .Release.Namespace }}
 rules:
+# Ability to generate events
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+{{- if (((.Values.datadog.autoscaling).workload).enabled) }}
 # Access to own CRD
 - apiGroups:
   - "datadoghq.com"
@@ -452,14 +544,6 @@ rules:
   verbs:
   - 'update'
   - 'get'
-# Ability to generate events
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
 # Patching POD to add annotations. TODO: Remove when we have a better way to generate single event
 - apiGroups:
   - ""
@@ -474,6 +558,33 @@ rules:
   - deployments
   verbs:
   - patch
+- apiGroups:
+  - argoproj.io
+  resources:
+  - rollouts
+  verbs:
+  - patch
+{{- end}}
+{{- if (((.Values.datadog.autoscaling).cluster).enabled) }}
+- apiGroups:
+  - karpenter.sh
+  resources:
+  - '*'
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+- apiGroups:
+  - karpenter.k8s.aws
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+{{- end}}
+
 ---
 apiVersion: {{ template "rbac.apiVersion" . }}
 kind: ClusterRoleBinding
@@ -502,14 +613,13 @@ metadata:
   namespace: {{ .Release.Namespace }}
 
 {{- $groupedResources := dict }}
-{{- $mergedResources := merge (default dict .Values.datadog.kubernetesResourcesAnnotationsAsTags) (default dict .Values.datadog.kubernetesResourcesLabelsAsTags)}}
+{{- $mergedResources := mergeOverwrite (deepCopy (default dict .Values.datadog.kubernetesResourcesAnnotationsAsTags)) (deepCopy (default dict .Values.datadog.kubernetesResourcesLabelsAsTags))}}
 {{- range $resource, $labels := $mergedResources }}
-  {{- $parts := split "." $resource }}
+  {{- $parts := splitList "." $resource }}
   {{- $apiGroup := "" }}
-  {{- $resourceName := $resource }}
-  {{- if eq (len $parts) 2 }}
-    {{- $apiGroup = index $parts "_1" }}
-    {{- $resourceName = index $parts "_0" }}
+  {{- $resourceName := mustFirst $parts }}
+  {{- if gt (len $parts) 1 }}
+    {{- $apiGroup = join "." (mustRest $parts) }}
   {{- end }}
   {{- $existing := index $groupedResources $apiGroup | default (list) }}
   {{- $groupedResources = set $groupedResources $apiGroup (append $existing $resourceName) }}
