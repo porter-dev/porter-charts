@@ -390,7 +390,7 @@ datadog:
     socketPath: /var/run/datadog/dsd.socket
 
     # datadog.dogstatsd.hostSocketPath -- Host path to the DogStatsD socket
-    hostSocketPath: /var/run/datadog
+    hostSocketPath: /var/run/datadog/
 
     # datadog.dogstatsd.useHostPort -- Sets the hostPort to the same value of the container port
 
@@ -399,14 +399,14 @@ datadog:
     ##
     ## WARNING: Make sure that hosts using this are properly firewalled otherwise
     ## metrics and traces are accepted from any host able to connect to this host.
-    useHostPort: false
+    useHostPort: true
 
     # datadog.dogstatsd.useHostPID -- Run the agent in the host's PID namespace
     ## DEPRECATED: use datadog.useHostPID instead.
 
     ## This is required for Dogstatsd origin detection to work.
     ## See https://docs.datadoghq.com/developers/dogstatsd/unix_socket/
-    useHostPID: false
+    useHostPID: true
 
     # datadog.dogstatsd.nonLocalTraffic -- Enable this to make each node accept non-local statsd traffic (from outside of the pod)
 
@@ -465,7 +465,7 @@ datadog:
 
   clusterTagger:
     # datadog.clusterTagger.collectKubernetesTags -- Enables Kubernetes resources tags collection.
-    collectKubernetesTags: false
+    collectKubernetesTags: true
 
   # datadog.leaderElection -- Enables leader election mechanism for event collection
   leaderElection: true
@@ -495,13 +495,13 @@ datadog:
     # datadog.logs.containerCollectAll -- Enable this to allow log collection for all containers
 
     ## ref: https://docs.datadoghq.com/agent/basic_agent_usage/kubernetes/#log-collection-setup
-    containerCollectAll: false
+    containerCollectAll: true
 
     # datadog.logs.containerCollectUsingFiles -- Collect logs from files in /var/log/pods instead of using container runtime API
 
     ## It's usually the most efficient way of collecting logs.
     ## ref: https://docs.datadoghq.com/agent/basic_agent_usage/kubernetes/#log-collection-setup
-    containerCollectUsingFiles: true
+    containerCollectUsingFiles: false
 
     # datadog.logs.autoMultiLineDetection -- Allows the Agent to detect common multi-line patterns automatically.
 
@@ -515,12 +515,12 @@ datadog:
     # datadog.apm.socketEnabled -- Enable APM over Socket (Unix Socket or windows named pipe)
 
     ## ref: https://docs.datadoghq.com/agent/kubernetes/apm/
-    socketEnabled: true
+    socketEnabled: false
 
     # datadog.apm.portEnabled -- Enable APM over TCP communication (hostPort 8126 by default)
 
     ## ref: https://docs.datadoghq.com/agent/kubernetes/apm/
-    portEnabled: false
+    portEnabled: true
 
     # datadog.apm.useLocalService -- Enable APM over TCP communication to use the local service only (requires Kubernetes v1.22+)
     # Note: The hostPort 8126 is disabled when this is enabled.
@@ -549,7 +549,7 @@ datadog:
     socketPath: /var/run/datadog/apm.socket
 
     # datadog.apm.hostSocketPath -- Host path to the trace-agent socket
-    hostSocketPath: /var/run/datadog
+    hostSocketPath: /var/run/datadog/
 
     # Error Tracking backend
     errorTrackingStandalone:
@@ -1236,22 +1236,22 @@ datadog:
   # datadog.containerExclude -- Exclude containers from Agent Autodiscovery, as a space-separated list
 
   ## ref: https://docs.datadoghq.com/agent/guide/autodiscovery-management/?tab=containerizedagent#exclude-containers
-  containerExclude:  # "image:datadog/agent"
+  containerExclude: 'kube_namespace:^cert-manager$ kube_namespace:^ingress-nginx$ kube_namespace:^kube-system$ kube_namespace:^monitoring$ kube_namespace:^porter-agent-system$ kube_namespace:^telemetry$ image:^gcr.io/datadoghq/agent:.*'
 
   # datadog.containerInclude -- Include containers in Agent Autodiscovery, as a space-separated list.
   # If a container matches an include rule, it’s always included in Autodiscovery
 
   ## ref: https://docs.datadoghq.com/agent/guide/autodiscovery-management/?tab=containerizedagent#include-containers
-  containerInclude:
+  containerInclude: 
 
   # datadog.containerExcludeLogs -- Exclude logs from Agent Autodiscovery, as a space-separated list
-  containerExcludeLogs:
+  containerExcludeLogs: 'kube_namespace:^cert-manager$ kube_namespace:^ingress-nginx$ kube_namespace:^kube-system$ kube_namespace:^monitoring$ kube_namespace:^porter-agent-system$ kube_namespace:^telemetry$ image:^gcr.io/datadoghq/agent:.*'
 
   # datadog.containerIncludeLogs -- Include logs in Agent Autodiscovery, as a space-separated list
   containerIncludeLogs:
 
   # datadog.containerExcludeMetrics -- Exclude metrics from Agent Autodiscovery, as a space-separated list
-  containerExcludeMetrics:
+  containerExcludeMetrics: 'kube_namespace:^cert-manager$ kube_namespace:^ingress-nginx$ kube_namespace:^kube-system$ kube_namespace:^monitoring$ kube_namespace:^porter-agent-system$ kube_namespace:^telemetry$ image:^gcr.io/datadoghq/agent:.*'
 
   # datadog.containerIncludeMetrics -- Include metrics in Agent Autodiscovery, as a space-separated list
   containerIncludeMetrics:
@@ -1498,7 +1498,7 @@ clusterAgent:
     webhookName: datadog-webhook
 
     # clusterAgent.admissionController.mutateUnlabelled -- Enable injecting config without having the pod label 'admission.datadoghq.com/enabled="true"'
-    mutateUnlabelled: false
+    mutateUnlabelled: true
 
     # clusterAgent.admissionController.configMode -- The kind of configuration to be injected, it can be "hostip", "service", "socket" or "csi".
 
