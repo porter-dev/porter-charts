@@ -1643,7 +1643,7 @@ clusterAgent:
   #   memory: 256Mi
 
   # clusterAgent.priorityClassName -- Name of the priorityClass to apply to the Cluster Agent
-  priorityClassName: system-cluster-critical
+  priorityClassName: # system-cluster-critical
 
   # clusterAgent.nodeSelector -- Allow the Cluster Agent Deployment to be scheduled on selected nodes
 
