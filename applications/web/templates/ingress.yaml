@@ -60,7 +60,7 @@ spec:
             {{ if gt (len $customPaths) 0 }}
             {{- range $customPaths }}
             - path: {{ .path }}
-              pathType: ImplementationSpecific
+              pathType: {{ .pathType | default "ImplementationSpecific" }}
               backend:
                 service:
                   name: {{ .serviceName }}
