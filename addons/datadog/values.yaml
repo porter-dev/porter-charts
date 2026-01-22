@@ -1599,7 +1599,13 @@ clusterAgent:
   # clusterAgent.confd -- Provide additional cluster check configurations. Each key will become a file in /conf.d.
 
   ## ref: https://docs.datadoghq.com/agent/autodiscovery/
-  confd: {}
+  confd:
+    nginx.yaml: |-
+      ad_identifiers:
+        - nginx_ingress_controller
+      logs:
+        - source: nginx-ingress-controller
+          service: controller
   #   mysql.yaml: |-
   #     cluster_check: true
   #     instances:
@@ -2385,7 +2391,11 @@ agents:
   #   key: "value"
 
   # agents.tolerations -- Allow the DaemonSet to schedule on tainted nodes (requires Kubernetes >= 1.6)
-  tolerations: []
+  tolerations:
+    - key: porter.run/workload-kind
+      value: "system"
+      effect: NoSchedule
+      operator: Equal
 
   # agents.nodeSelector -- Allow the DaemonSet to schedule on selected nodes
 
