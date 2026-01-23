@@ -97,10 +97,16 @@ spec:
         {{- toYaml .Values.hostAliases | nindent 8 }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- if .Values.enableEDNS0 }}
+      {{- if or .Values.enableEDNS0 .Values.ndots }}
       dnsConfig:
         options:
+          {{- if .Values.enableEDNS0 }}
           - name: edns0
+          {{- end }}
+          {{- if .Values.ndots }}
+          - name: ndots
+            value: {{ .Values.ndots | quote }}
+          {{- end }}
       {{- end }}
       {{- if and .Values.image .Values.image.imagePullSecret }}
       imagePullSecrets:
