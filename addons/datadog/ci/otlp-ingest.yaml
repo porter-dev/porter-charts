@@ -1,10 +1,8 @@
 datadog:
-  kubelet:
-    tlsVerify: false
   otlp:
     receiver:
       protocols:
         grpc:
-          enabled: true
+         enabled: true
         http:
           enabled: true

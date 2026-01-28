@@ -1,8 +1,0 @@
-datadog:
-  apiKey: "00000000000000000000000000000000"
-agents:
-  enabled: true
-  lifecycle:
-    preStop:
-      exec:
-        command: ["/bin/sh", "-c", "sleep 70"]
