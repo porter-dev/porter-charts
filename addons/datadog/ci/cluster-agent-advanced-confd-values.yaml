@@ -1,22 +1,10 @@
 datadog:
   apiKey: "00000000000000000000000000000000"
   appKey: "0000000000000000000000000000000000000000"
-  kubelet:
-    tlsVerify: false
-  clusterName: kubernetes-cluster.example.comkubernetes-cluster.example.com.kube.rnetes-80chars
-
   kubeStateMetricsCore:
     enabled: true
-
-  helmCheck:
-    enabled: true
-    collectEvents: true
-
-  collectEvents: true
-
   orchestratorExplorer:
     enabled: true
-
 clusterAgent:
   enabled: true
   confd:
@@ -24,7 +12,7 @@ clusterAgent:
       cluster_check: true
       init_config:
       instances:
-        - host: "redis.default.svc.cluster.local"
+        - host: "name"
           port: "6379"
   advancedConfd:
     orchestrator.d:
@@ -42,7 +30,3 @@ clusterAgent:
           - collectors:
             - deployments
             skip_leader_election: true
-
-providers:
-  eks:
-    controlPlaneMonitoring: true

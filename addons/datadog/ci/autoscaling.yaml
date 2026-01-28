@@ -1,11 +1,14 @@
 datadog:
   apiKey: "00000000000000000000000000000000"
   appKey: "0000000000000000000000000000000000000000"
-  clusterName: kubernetes-cluster.example.comkubernetes-cluster.example.com.kube.rnetes-80chars
-  kubelet:
-    tlsVerify: false
+  orchestratorExplorer:
+    customResources:
+    - datadoghq.com/v1alpha1/datadogpodautoscalers
   autoscaling:
     workload:
       enabled: true
   kubernetesEvents:
     unbundleEvents: true
+clusterAgent:
+  image:
+    tag: beta
