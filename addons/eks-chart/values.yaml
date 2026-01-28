@@ -4,7 +4,7 @@
 
 image:
   repository: public.ecr.aws/aws-controllers-k8s/eks-controller
-  tag: 1.1.3
+  tag: 1.11.1
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -41,6 +41,9 @@ deployment:
   # To have DNS options set along with hostNetwork, you have to specify DNS policy
   # explicitly to 'ClusterFirstWithHostNet'.
   dnsPolicy: ClusterFirst
+  # Set rollout strategy for deployment.
+  # See: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  strategy: {}
   extraVolumes: []
   extraVolumeMounts: []
 
@@ -87,6 +90,8 @@ aws:
   # If specified, use the AWS region for AWS API calls
   region: ""
   endpoint_url: ""
+  identity_endpoint_url: ""
+  allow_unsafe_aws_endpoint_urls: false
   credentials:
     # If specified, Secret with shared credentials file to use.
     secretName: ""
@@ -107,13 +112,21 @@ installScope: cluster
 
 # Set the value of the "namespace" to be watched by the controller
 # This value is only used when the `installScope` is set to "namespace". If left empty, the default value is the release namespace for the chart.
+# You can set multiple namespaces by providing a comma separated list of namespaces. e.g "namespace1,namespace2"
 watchNamespace: ""
+
+# Set the value of labelsSelectors to be used by the controller to filter the resources to watch.
+# You can set multiple labelsSelectors by providing a comma separated list of a=b arguments. e.g "label1=value1,label2=value2" 
+watchSelectors: ""
 
 resourceTags:
   # Configures the ACK service controller to always set key/value pairs tags on
   # resources that it manages.
+  # Note: Tags with empty values are automatically skipped to keep resources clean.
   - services.k8s.aws/controller-version=%CONTROLLER_SERVICE%-%CONTROLLER_VERSION%
   - services.k8s.aws/namespace=%K8S_NAMESPACE%
+  - app.kubernetes.io/managed-by=%MANAGED_BY%
+  - kro.run/kro-version=%KRO_VERSION%
 
 # Set to "retain" to keep all AWS resources intact even after the K8s resources
 # have been deleted. By default, the ACK controller will delete the AWS resource
@@ -126,6 +139,25 @@ reconcile:
   defaultResyncPeriod: 36000 # 10 Hours
   # An object representing the reconcile resync configuration for each specific resource.
   resourceResyncPeriods: {}
+
+  # The default number of concurrent syncs that a reconciler can perform.
+  defaultMaxConcurrentSyncs: 1
+  # An object representing the reconcile max concurrent syncs configuration for each specific
+  # resource.
+  resourceMaxConcurrentSyncs: {}
+  
+  # Set the value of resources to specify which resource kinds to reconcile.
+  # If empty, all resources will be reconciled.
+  # If specified, only the listed resource kinds will be reconciled.
+  resources:
+    - AccessEntry
+    - Addon
+    - Capability
+    - Cluster
+    - FargateProfile
+    - IdentityProviderConfig
+    - Nodegroup
+    - PodIdentityAssociation
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -146,3 +178,21 @@ leaderElection:
   # will attempt to use the namespace of the service account mounted to the Controller
   # pod.
   namespace: ""
+
+# Enable Cross Account Resource Management (default = true). Set this to false to disable cross account resource management.
+enableCARM: true
+
+# Configuration for feature gates.  These are optional controller features that
+# can be individually enabled ("true") or disabled ("false") by adding key/value
+# pairs below.
+featureGates:
+  # Enables the Service level granularity for CARM. See https://github.com/aws-controllers-k8s/community/issues/2031
+  ServiceLevelCARM: false
+  # Enables the Team level granularity for CARM. See https://github.com/aws-controllers-k8s/community/issues/2031
+  TeamLevelCARM: false
+  # Enable ReadOnlyResources feature/annotation. 
+  ReadOnlyResources: true
+  # Enable ResourceAdoption feature/annotation. 
+  ResourceAdoption: true
+  # Enable IAMRoleSelector, a multirole feature, replacing CARM. See https://github.com/aws-controllers-k8s/community/pull/2628
+  IAMRoleSelector: false
