@@ -3,8 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.9.2
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: rules.eventbridge.services.k8s.aws
 spec:
   group: eventbridge.services.k8s.aws
@@ -34,85 +33,118 @@ spec:
         description: Rule is the Schema for the Rules API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
           spec:
-            description: "RuleSpec defines the desired state of Rule. \n Contains
-              information about a rule in Amazon EventBridge."
+            description: |-
+              RuleSpec defines the desired state of Rule.
+
+              Contains information about a rule in Amazon EventBridge.
             properties:
               description:
                 description: A description of the rule.
                 type: string
               eventBusName:
-                description: The name or ARN of the event bus to associate with this
-                  rule. If you omit this, the default event bus is used.
+                description: |-
+                  The name or ARN of the event bus to associate with this rule. If you omit
+                  this, the default event bus is used.
+
+                  Regex Pattern: `^(arn:aws[\w-]*:events:[a-z]{2}-[a-z]+-[\w-]+:[0-9]{12}:event-bus\/)?[/\.\-_A-Za-z0-9]+$`
                 type: string
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
               eventBusRef:
                 description: "AWSResourceReferenceWrapper provides a wrapper around
-                  *AWSResourceReference type to provide more user friendly syntax
-                  for references using 'from' field Ex: APIIDRef: \n from: name: my-api"
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
                 properties:
                   from:
-                    description: AWSResourceReference provides all the values necessary
-                      to reference another k8s resource for finding the identifier(Id/ARN/Name)
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
                     properties:
                       name:
+                        type: string
+                      namespace:
                         type: string
                     type: object
                 type: object
               eventPattern:
-                description: The event pattern. For more information, see Amazon EventBridge
-                  event patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html)
-                  in the Amazon EventBridge User Guide.
+                description: |-
+                  The event pattern. For more information, see Amazon EventBridge event patterns
+                  (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html)
+                  in the Amazon EventBridge User Guide .
                 type: string
               name:
-                description: The name of the rule that you are creating or updating.
+                description: |-
+                  The name of the rule that you are creating or updating.
+
+                  Regex Pattern: `^[\.\-_A-Za-z0-9]+$`
                 type: string
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
               roleARN:
-                description: "The Amazon Resource Name (ARN) of the IAM role associated
-                  with the rule. \n If you're setting an event bus in another account
-                  as the target and that account granted permission to your account
-                  through an organization instead of directly by the account ID, you
-                  must specify a RoleArn with proper permissions in the Target structure,
-                  instead of here in this parameter."
+                description: |-
+                  The Amazon Resource Name (ARN) of the IAM role associated with the rule.
+
+                  If you're setting an event bus in another account as the target and that
+                  account granted permission to your account through an organization instead
+                  of directly by the account ID, you must specify a RoleArn with proper permissions
+                  in the Target structure, instead of here in this parameter.
                 type: string
               scheduleExpression:
                 description: The scheduling expression. For example, "cron(0 20 *
                   * ? *)" or "rate(5 minutes)".
                 type: string
               state:
-                description: "The state of the rule. \n Valid values include: \n -
-                  DISABLED: The rule is disabled. EventBridge does not match any events
-                  against the rule. \n - ENABLED: The rule is enabled. EventBridge
-                  matches events against the rule, except for Amazon Web Services
-                  management events delivered through CloudTrail. \n - ENABLED_WITH_ALL_CLOUDTRAIL_MANAGEMENT_EVENTS:
-                  The rule is enabled for all events, including Amazon Web Services
-                  management events delivered through CloudTrail. Management events
-                  provide visibility into management operations that are performed
-                  on resources in your Amazon Web Services account. These are also
-                  known as control plane operations. For more information, see Logging
-                  management events (https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-management-events-with-cloudtrail.html#logging-management-events)
-                  in the CloudTrail User Guide, and Filtering management events from
-                  Amazon Web Services services (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-service-event.html#eb-service-event-cloudtrail)
-                  in the Amazon EventBridge User Guide. This value is only valid for
-                  rules on the default (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is-how-it-works-concepts.html#eb-bus-concepts-buses)
-                  event bus or custom event buses (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-event-bus.html).
-                  It does not apply to partner event buses (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas.html)."
+                description: |-
+                  The state of the rule.
+
+                  Valid values include:
+
+                    - DISABLED: The rule is disabled. EventBridge does not match any events
+                      against the rule.
+
+                    - ENABLED: The rule is enabled. EventBridge matches events against the
+                      rule, except for Amazon Web Services management events delivered through
+                      CloudTrail.
+
+                    - ENABLED_WITH_ALL_CLOUDTRAIL_MANAGEMENT_EVENTS: The rule is enabled for
+                      all events, including Amazon Web Services management events delivered
+                      through CloudTrail. Management events provide visibility into management
+                      operations that are performed on resources in your Amazon Web Services
+                      account. These are also known as control plane operations. For more information,
+                      see Logging management events (https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-management-events-with-cloudtrail.html#logging-management-events)
+                      in the CloudTrail User Guide, and Filtering management events from Amazon
+                      Web Services services (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-service-event.html#eb-service-event-cloudtrail)
+                      in the Amazon EventBridge User Guide . This value is only valid for rules
+                      on the default (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is-how-it-works-concepts.html#eb-bus-concepts-buses)
+                      event bus or custom event buses (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-event-bus.html).
+                      It does not apply to partner event buses (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas.html).
                 type: string
               tags:
                 description: The list of key-value pairs to associate with the rule.
                 items:
-                  description: A key-value pair associated with an Amazon Web Services
-                    resource. In EventBridge, rules and event buses support tagging.
+                  description: |-
+                    A key-value pair associated with an Amazon Web Services resource. In EventBridge,
+                    rules and event buses support tagging.
                   properties:
                     key:
                       type: string
@@ -122,16 +154,17 @@ spec:
                 type: array
               targets:
                 items:
-                  description: "Targets are the resources to be invoked when a rule
-                    is triggered. For a complete list of services and resources that
-                    can be set as a target, see PutTargets (https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutTargets.html).
-                    \n If you are setting the event bus of another account as the
-                    target, and that account granted permission to your account through
-                    an organization instead of directly by the account ID, then you
-                    must specify a RoleArn with proper permissions in the Target structure.
-                    For more information, see Sending and Receiving Events Between
-                    Amazon Web Services Accounts (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-cross-account-event-delivery.html)
-                    in the Amazon EventBridge User Guide."
+                  description: |-
+                    Targets are the resources to be invoked when a rule is triggered. For a complete
+                    list of services and resources that can be set as a target, see PutTargets
+                    (https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutTargets.html).
+
+                    If you are setting the event bus of another account as the target, and that
+                    account granted permission to your account through an organization instead
+                    of directly by the account ID, then you must specify a RoleArn with proper
+                    permissions in the Target structure. For more information, see Sending and
+                    Receiving Events Between Amazon Web Services Accounts (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-cross-account-event-delivery.html)
+                    in the Amazon EventBridge User Guide.
                   properties:
                     arn:
                       type: string
@@ -140,11 +173,11 @@ spec:
                         is an Batch job.
                       properties:
                         arrayProperties:
-                          description: The array properties for the submitted job,
-                            such as the size of the array. The array size can be between
-                            2 and 10,000. If you specify array properties for a job,
-                            it becomes an array job. This parameter is used only if
-                            the target is an Batch job.
+                          description: |-
+                            The array properties for the submitted job, such as the size of the array.
+                            The array size can be between 2 and 10,000. If you specify array properties
+                            for a job, it becomes an array job. This parameter is used only if the target
+                            is an Batch job.
                           properties:
                             size:
                               format: int64
@@ -155,9 +188,9 @@ spec:
                         jobName:
                           type: string
                         retryStrategy:
-                          description: The retry strategy to use for failed jobs,
-                            if the target is an Batch job. If you specify a retry
-                            strategy here, it overrides the retry strategy defined
+                          description: |-
+                            The retry strategy to use for failed jobs, if the target is an Batch job.
+                            If you specify a retry strategy here, it overrides the retry strategy defined
                             in the job definition.
                           properties:
                             attempts:
@@ -166,8 +199,13 @@ spec:
                           type: object
                       type: object
                     deadLetterConfig:
-                      description: A DeadLetterConfig object that contains information
-                        about a dead-letter queue configuration.
+                      description: |-
+                        Configuration details of the Amazon SQS queue for EventBridge to use as a
+                        dead-letter queue (DLQ).
+
+                        For more information, see Using dead-letter queues to process undelivered
+                        events (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rule-event-delivery.html#eb-rule-dlq)
+                        in the EventBridge User Guide.
                       properties:
                         arn:
                           type: string
@@ -178,8 +216,9 @@ spec:
                       properties:
                         capacityProviderStrategy:
                           items:
-                            description: The details of a capacity provider strategy.
-                              To learn more, see CapacityProviderStrategyItem (https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CapacityProviderStrategyItem.html)
+                            description: |-
+                              The details of a capacity provider strategy. To learn more, see CapacityProviderStrategyItem
+                              (https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CapacityProviderStrategyItem.html)
                               in the Amazon ECS API Reference.
                             properties:
                               base:
@@ -205,9 +244,9 @@ spec:
                             for an ECS task.
                           properties:
                             awsVPCConfiguration:
-                              description: This structure specifies the VPC subnets
-                                and security groups for the task, and whether a public
-                                IP address is to be used. This structure is relevant
+                              description: |-
+                                This structure specifies the VPC subnets and security groups for the task,
+                                and whether a public IP address is to be used. This structure is relevant
                                 only for ECS tasks that use the awsvpc network mode.
                               properties:
                                 assignPublicIP:
@@ -224,9 +263,9 @@ spec:
                           type: object
                         placementConstraints:
                           items:
-                            description: An object representing a constraint on task
-                              placement. To learn more, see Task Placement Constraints
-                              (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html)
+                            description: |-
+                              An object representing a constraint on task placement. To learn more, see
+                              Task Placement Constraints (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html)
                               in the Amazon Elastic Container Service Developer Guide.
                             properties:
                               expression:
@@ -237,11 +276,10 @@ spec:
                           type: array
                         placementStrategy:
                           items:
-                            description: The task placement strategy for a task or
-                              service. To learn more, see Task Placement Strategies
-                              (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html)
-                              in the Amazon Elastic Container Service Service Developer
-                              Guide.
+                            description: |-
+                              The task placement strategy for a task or service. To learn more, see Task
+                              Placement Strategies (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html)
+                              in the Amazon Elastic Container Service Service Developer Guide.
                             properties:
                               field:
                                 type: string
@@ -257,9 +295,9 @@ spec:
                           type: string
                         tags:
                           items:
-                            description: A key-value pair associated with an Amazon
-                              Web Services resource. In EventBridge, rules and event
-                              buses support tagging.
+                            description: |-
+                              A key-value pair associated with an Amazon Web Services resource. In EventBridge,
+                              rules and event buses support tagging.
                             properties:
                               key:
                                 type: string
@@ -274,11 +312,11 @@ spec:
                           type: string
                       type: object
                     httpParameters:
-                      description: These are custom parameter to be used when the
-                        target is an API Gateway APIs or EventBridge ApiDestinations.
-                        In the latter case, these are merged with any InvocationParameters
-                        specified on the Connection, with any values from the Connection
-                        taking precedence.
+                      description: |-
+                        These are custom parameter to be used when the target is an API Gateway APIs
+                        or EventBridge ApiDestinations. In the latter case, these are merged with
+                        any InvocationParameters specified on the Connection, with any values from
+                        the Connection taking precedence.
                       properties:
                         headerParameters:
                           additionalProperties:
@@ -300,9 +338,9 @@ spec:
                     inputPath:
                       type: string
                     inputTransformer:
-                      description: Contains the parameters needed for you to provide
-                        custom input to a target based on one or more pieces of data
-                        extracted from the event.
+                      description: |-
+                        Contains the parameters needed for you to provide custom input to a target
+                        based on one or more pieces of data extracted from the event.
                       properties:
                         inputPathsMap:
                           additionalProperties:
@@ -312,20 +350,20 @@ spec:
                           type: string
                       type: object
                     kinesisParameters:
-                      description: This object enables you to specify a JSON path
-                        to extract from the event and use as the partition key for
-                        the Amazon Kinesis data stream, so that you can control the
-                        shard to which the event goes. If you do not include this
-                        parameter, the default is to use the eventId as the partition
-                        key.
+                      description: |-
+                        This object enables you to specify a JSON path to extract from the event
+                        and use as the partition key for the Amazon Kinesis data stream, so that
+                        you can control the shard to which the event goes. If you do not include
+                        this parameter, the default is to use the eventId as the partition key.
                       properties:
                         partitionKeyPath:
                           type: string
                       type: object
                     redshiftDataParameters:
-                      description: These are custom parameters to be used when the
-                        target is a Amazon Redshift cluster to invoke the Amazon Redshift
-                        Data API ExecuteStatement based on EventBridge events.
+                      description: |-
+                        These are custom parameters to be used when the target is a Amazon Redshift
+                        cluster to invoke the Amazon Redshift Data API ExecuteStatement based on
+                        EventBridge events.
                       properties:
                         database:
                           description: Redshift Database
@@ -366,15 +404,15 @@ spec:
                     roleARN:
                       type: string
                     runCommandParameters:
-                      description: This parameter contains the criteria (either InstanceIds
-                        or a tag) used to specify which EC2 instances are to be sent
-                        the command.
+                      description: |-
+                        This parameter contains the criteria (either InstanceIds or a tag) used to
+                        specify which EC2 instances are to be sent the command.
                       properties:
                         runCommandTargets:
                           items:
-                            description: Information about the EC2 instances that
-                              are to be sent the command, specified as key-value pairs.
-                              Each RunCommandTarget block can include only one key,
+                            description: |-
+                              Information about the EC2 instances that are to be sent the command, specified
+                              as key-value pairs. Each RunCommandTarget block can include only one key,
                               but this key may specify multiple values.
                             properties:
                               key:
@@ -387,14 +425,15 @@ spec:
                           type: array
                       type: object
                     sageMakerPipelineParameters:
-                      description: These are custom parameters to use when the target
-                        is a SageMaker Model Building Pipeline that starts based on
-                        EventBridge events.
+                      description: |-
+                        These are custom parameters to use when the target is a SageMaker Model Building
+                        Pipeline that starts based on EventBridge events.
                       properties:
                         pipelineParameterList:
                           items:
-                            description: Name/Value pair of a parameter to start execution
-                              of a SageMaker Model Building Pipeline.
+                            description: |-
+                              Name/Value pair of a parameter to start execution of a SageMaker Model Building
+                              Pipeline.
                             properties:
                               name:
                                 type: string
@@ -404,8 +443,9 @@ spec:
                           type: array
                       type: object
                     sqsParameters:
-                      description: This structure includes the custom parameter to
-                        be used when the target is an SQS FIFO queue.
+                      description: |-
+                        This structure includes the custom parameter to be used when the target is
+                        an SQS FIFO queue.
                       properties:
                         messageGroupID:
                           type: string
@@ -419,24 +459,25 @@ spec:
             description: RuleStatus defines the observed state of Rule
             properties:
               ackResourceMetadata:
-                description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
-                  member that is used to contain resource sync state, account ownership,
+                description: |-
+                  All CRs managed by ACK have a common `Status.ACKResourceMetadata` member
+                  that is used to contain resource sync state, account ownership,
                   constructed ARN for the resource
                 properties:
                   arn:
-                    description: 'ARN is the Amazon Resource Name for the resource.
-                      This is a globally-unique identifier and is set only by the
-                      ACK service controller once the controller has orchestrated
-                      the creation of the resource OR when it has verified that an
-                      "adopted" resource (a resource where the ARN annotation was
-                      set by the Kubernetes user on the CR) exists and matches the
-                      supplied CR''s Spec field values. TODO(vijat@): Find a better
-                      strategy for resources that do not have ARN in CreateOutputResponse
-                      https://github.com/aws/aws-controllers-k8s/issues/270'
+                    description: |-
+                      ARN is the Amazon Resource Name for the resource. This is a
+                      globally-unique identifier and is set only by the ACK service controller
+                      once the controller has orchestrated the creation of the resource OR
+                      when it has verified that an "adopted" resource (a resource where the
+                      ARN annotation was set by the Kubernetes user on the CR) exists and
+                      matches the supplied CR's Spec field values.
+                      https://github.com/aws/aws-controllers-k8s/issues/270
                     type: string
                   ownerAccountID:
-                    description: OwnerAccountID is the AWS Account ID of the account
-                      that owns the backend AWS service API resource.
+                    description: |-
+                      OwnerAccountID is the AWS Account ID of the account that owns the
+                      backend AWS service API resource.
                     type: string
                   region:
                     description: Region is the AWS region in which the resource exists
@@ -447,14 +488,16 @@ spec:
                 - region
                 type: object
               conditions:
-                description: All CRS managed by ACK have a common `Status.Conditions`
-                  member that contains a collection of `ackv1alpha1.Condition` objects
-                  that describe the various terminal states of the CR and its backend
-                  AWS service API resource
+                description: |-
+                  All CRs managed by ACK have a common `Status.Conditions` member that
+                  contains a collection of `ackv1alpha1.Condition` objects that describe
+                  the various terminal states of the CR and its backend AWS service API
+                  resource
                 items:
-                  description: Condition is the common struct used by all CRDs managed
-                    by ACK service controllers to indicate terminal states  of the
-                    CR and its backend AWS service API resource
+                  description: |-
+                    Condition is the common struct used by all CRDs managed by ACK service
+                    controllers to indicate terminal states  of the CR and its backend AWS
+                    service API resource
                   properties:
                     lastTransitionTime:
                       description: Last time the condition transitioned from one status
