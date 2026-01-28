@@ -1,13 +1,13 @@
 {{- define "linux-container-host-release-volumemounts" -}}
-{{- if eq (include "should-add-host-path-for-os-release-file" .) "true" }}
-    {{- if eq (include "should-enable-system-probe" .) "true" }}
+{{- if not .Values.providers.gke.gdc }}
+{{- if eq (include "should-enable-system-probe" .) "true" }}
 - name: os-release-file
   mountPath: /host{{ .Values.datadog.systemProbe.osReleasePath | default .Values.datadog.osReleasePath }}
   readOnly: true
-    {{- else if .Values.datadog.osReleasePath }}
+{{- else if not .Values.providers.gke.autopilot}}
 - name: os-release-file
   mountPath: /host{{ .Values.datadog.osReleasePath }}
   readOnly: true
-    {{- end }}
-  {{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
