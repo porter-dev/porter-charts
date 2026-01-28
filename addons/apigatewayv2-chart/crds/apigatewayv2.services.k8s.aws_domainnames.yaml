@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: vpclinks.apigatewayv2.services.k8s.aws
+  name: domainnames.apigatewayv2.services.k8s.aws
 spec:
   group: apigatewayv2.services.k8s.aws
   names:
-    kind: VPCLink
-    listKind: VPCLinkList
-    plural: vpclinks
-    singular: vpclink
+    kind: DomainName
+    listKind: DomainNameList
+    plural: domainnames
+    singular: domainname
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: VPCLink is the Schema for the VPCLinks API
+        description: DomainName is the Schema for the DomainNames API
         properties:
           apiVersion:
             description: |-
@@ -38,34 +38,59 @@ spec:
             type: object
           spec:
             description: |-
-              VpcLinkSpec defines the desired state of VpcLink.
+              DomainNameSpec defines the desired state of DomainName.
 
-              Represents a VPC link.
+              Represents a domain name.
             properties:
-              name:
-                description: The name of the VPC link.
+              domainName:
+                description: The domain name.
                 type: string
-              securityGroupIDs:
-                description: A list of security group IDs for the VPC link.
+              domainNameConfigurations:
+                description: The domain name configurations.
                 items:
-                  type: string
+                  description: The domain name configuration.
+                  properties:
+                    certificateARN:
+                      description: Represents an Amazon Resource Name (ARN).
+                      type: string
+                    certificateName:
+                      description: A string with a length between [1-128].
+                      type: string
+                    endpointType:
+                      description: Represents an endpoint type.
+                      type: string
+                    ownershipVerificationCertificateARN:
+                      description: Represents an Amazon Resource Name (ARN).
+                      type: string
+                    securityPolicy:
+                      description: |-
+                        The Transport Layer Security (TLS) version of the security policy for this
+                        domain name. The valid values are TLS_1_0 and TLS_1_2.
+                      type: string
+                  type: object
                 type: array
-              subnetIDs:
-                description: A list of subnet IDs to include in the VPC link.
-                items:
-                  type: string
-                type: array
+              mutualTLSAuthentication:
+                description: The mutual TLS authentication configuration for a custom
+                  domain name.
+                properties:
+                  truststoreURI:
+                    description: A string representation of a URI with a length between
+                      [1-2048].
+                    type: string
+                  truststoreVersion:
+                    description: A string with a length between [1-64].
+                    type: string
+                type: object
               tags:
                 additionalProperties:
                   type: string
-                description: A list of tags.
+                description: The collection of tags associated with a domain name.
                 type: object
             required:
-            - name
-            - subnetIDs
+            - domainName
             type: object
           status:
-            description: VPCLinkStatus defines the observed state of VPCLink
+            description: DomainNameStatus defines the observed state of DomainName
             properties:
               ackResourceMetadata:
                 description: |-
@@ -96,6 +121,9 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
+              apiMappingSelectionExpression:
+                description: The API mapping selection expression.
+                type: string
               conditions:
                 description: |-
                   All CRs managed by ACK have a common `Status.Conditions` member that
@@ -131,23 +159,6 @@ spec:
                   - type
                   type: object
                 type: array
-              createdDate:
-                description: The timestamp when the VPC link was created.
-                format: date-time
-                type: string
-              vpcLinkID:
-                description: The ID of the VPC link.
-                type: string
-              vpcLinkStatus:
-                description: The status of the VPC link.
-                type: string
-              vpcLinkStatusMessage:
-                description: A message summarizing the cause of the status of the
-                  VPC link.
-                type: string
-              vpcLinkVersion:
-                description: The version of the VPC link.
-                type: string
             type: object
         type: object
     served: true
