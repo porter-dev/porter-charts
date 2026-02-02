@@ -72,11 +72,7 @@ spec:
             options:
               - name: edns0
           {{- end }}
-          {{- if .Values.serviceAccount.create }}
-          serviceAccountName: cronjob-{{ include "docker-template.serviceAccountName" . }}
-          {{ else }}
           serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
-          {{- end }}
           {{- if and .Values.image .Values.image.imagePullSecret }}
           imagePullSecrets:
             - name: {{ .Values.image.imagePullSecret }}
