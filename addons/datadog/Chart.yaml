@@ -14,4 +14,4 @@ name: datadog
 sources:
 - https://app.datadoghq.com/account/settings#agent/kubernetes
 - https://github.com/DataDog/datadog-agent
-version: 3.151.2
+version: 0.37.0
