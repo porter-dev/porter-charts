@@ -20,7 +20,7 @@ image:
 serviceAccount:
   # Specifies whether a service account should be created. Setting this to true makes the resources in the chart use the service account
   # created by the chart. If set to false, resources will use the default service account.
-  create: true
+  create: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
