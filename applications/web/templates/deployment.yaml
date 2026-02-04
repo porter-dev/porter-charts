@@ -217,26 +217,7 @@ spec:
             {{- end }}
           {{ if .Values.health.livenessProbe.enabled }}
           livenessProbe:
-            httpGet:
-              path: {{ .Values.health.livenessProbe.path }}
-              scheme: {{ .Values.health.livenessProbe.scheme }}
-              port: {{ .Values.health.livenessProbe.port | default "http" }}
-              {{ if or (.Values.health.livenessProbe.httpHeaders) (.Values.health.livenessProbe.auth.enabled) }}
-              httpHeaders:
-                {{ if .Values.health.livenessProbe.auth.enabled }}
-                - name: Authorization
-                  value: Basic {{ printf "%s:%s" .Values.health.livenessProbe.auth.username .Values.health.livenessProbe.auth.password | b64enc }}
-                {{ end }}
-                {{- range .Values.health.livenessProbe.httpHeaders }}
-                - name: {{ .name }}
-                  value: {{ .value }}
-                {{- end }}
-              {{ end }}
-            initialDelaySeconds: {{ .Values.health.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.health.livenessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.health.livenessProbe.successThreshold }}
-            failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
+            {{- include "docker-template.healthProbe" .Values.health.livenessProbe | nindent 12 }}
           {{ end }}
           {{ if .Values.health.livenessCommand.enabled }}
           livenessProbe:
@@ -253,49 +234,11 @@ spec:
           {{ end }}
           {{ if .Values.health.readinessProbe.enabled }}
           readinessProbe:
-            httpGet:
-              path: {{ .Values.health.readinessProbe.path }}
-              scheme: {{ .Values.health.readinessProbe.scheme }}
-              port: {{ .Values.health.readinessProbe.port | default "http" }}
-              {{ if or (.Values.health.readinessProbe.httpHeaders) (.Values.health.readinessProbe.auth.enabled) }}
-              httpHeaders:
-                {{ if .Values.health.readinessProbe.auth.enabled }}
-                - name: Authorization
-                  value: Basic {{ printf "%s:%s" .Values.health.readinessProbe.auth.username .Values.health.readinessProbe.auth.password | b64enc }}
-                {{ end }}
-                {{- range .Values.health.readinessProbe.httpHeaders }}
-                - name: {{ .name }}
-                  value: {{ .value }}
-                {{- end }}
-              {{ end }}
-            initialDelaySeconds: {{ .Values.health.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.health.readinessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.health.readinessProbe.successThreshold }}
-            failureThreshold: {{ .Values.health.readinessProbe.failureThreshold }}
+            {{- include "docker-template.healthProbe" .Values.health.readinessProbe | nindent 12 }}
           {{ end }}
           {{ if .Values.health.startupProbe.enabled }}
           startupProbe:
-            httpGet:
-              path: {{ .Values.health.startupProbe.path }}
-              scheme: {{ .Values.health.startupProbe.scheme }}
-              port: {{ .Values.health.startupProbe.port | default "http" }}
-              {{ if or (.Values.health.startupProbe.httpHeaders) (.Values.health.startupProbe.auth.enabled) }}
-              httpHeaders:
-                {{ if .Values.health.startupProbe.auth.enabled }}
-                - name: Authorization
-                  value: Basic {{ printf "%s:%s" .Values.health.startupProbe.auth.username .Values.health.startupProbe.auth.password | b64enc }}
-                {{ end }}
-                {{- range .Values.health.startupProbe.httpHeaders }}
-                - name: {{ .name }}
-                  value: {{ .value }}
-                {{- end }}
-              {{ end }}
-            initialDelaySeconds: {{ .Values.health.startupProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.health.startupProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.health.startupProbe.successThreshold }}
-            failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
+            {{- include "docker-template.healthProbe" .Values.health.startupProbe | nindent 12 }}
           {{ end }}
           {{ if .Values.health.overrides }}
             {{- toYaml .Values.health.overrides.probes | nindent 10 }}
