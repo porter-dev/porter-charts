@@ -190,7 +190,8 @@ spec:
               fieldRef:
                 fieldPath: spec.nodeName
           - name: DD_OTELCOLLECTOR_CONVERTER_FEATURES
-            value: "health_check,zpages,pprof,datadog" # exclude infra attribute, prometheus and DD flare
+            # TODO(songy23): add datadog extension once it is included in otel-agent
+            value: "health_check,zpages,pprof" # exclude infra attribute, prometheus and DD flare
 
           # A subset of components-common-env that makes sense to otel agent in gateway
           {{- if .Values.datadog.site }}

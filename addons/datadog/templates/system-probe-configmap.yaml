@@ -128,8 +128,6 @@ data:
         auto_suppression:
           enabled: {{ $.Values.datadog.securityAgent.runtime.securityProfile.autoSuppression.enabled }}
         dir: /var/run/sysprobe/runtime-security/profiles
-      enforcement:
-        enabled: {{ $.Values.datadog.securityAgent.runtime.enforcement.enabled }}
     dynamic_instrumentation:
       enabled: {{ $.Values.datadog.dynamicInstrumentationGo.enabled }}
 
@@ -200,10 +198,6 @@ data:
             "fstat64",
             "fstatfs",
             "fsync",
-            {{- if (and .Values.datadog.gpuMonitoring.enabled .Values.datadog.gpuMonitoring.privilegedMode .Values.datadog.gpuMonitoring.configureCgroupPerms) }}
-            "ftruncate",
-            "ftruncate64",
-            {{- end }}
             "futex",
             "futimens",
             "getcwd",
@@ -238,9 +232,6 @@ data:
             "inotify_rm_watch",
             "ioctl",
             "ipc",
-            {{- if .Values.datadog.securityAgent.runtime.enforcement.enabled }}
-            "kill",
-            {{- end }}
             "listen",
             "lseek",
             "lstat",
@@ -331,9 +322,6 @@ data:
             "sysinfo",
             "tgkill",
             "tkill",
-            {{- if (and .Values.datadog.gpuMonitoring.enabled .Values.datadog.gpuMonitoring.privilegedMode .Values.datadog.gpuMonitoring.configureCgroupPerms) }}
-            "truncate",
-            {{- end }}
             "umask",
             "uname",
             "unlink",

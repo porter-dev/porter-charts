@@ -50,26 +50,6 @@ false
 {{- end -}}
 
 {{/*
-Check if HorizontalPodAutoscaler v2 is supported (requires Kubernetes >= 1.23.0).
-This helper supports FluxCD and other GitOps tools by allowing kubeVersionOverride.
-
-Note: kubeVersionOverride can be used as a workaround when the Helm capabilities API
-doesn't reflect the actual cluster version (e.g., in FluxCD helm-controller).
-Set it to your cluster's version: --set kubeVersionOverride="1.28.0"
-*/}}
-{{- define "hpa-autoscaling-v2-supported" -}}
-{{- $kubeVersion := .Capabilities.KubeVersion.Version -}}
-{{- if .Values.kubeVersionOverride -}}
-{{- $kubeVersion = .Values.kubeVersionOverride -}}
-{{- end -}}
-{{- if semverCompare ">=1.23.0" $kubeVersion -}}
-true
-{{- else -}}
-false
-{{- end -}}
-{{- end -}}
-
-{{/*
 Check if target cluster supports GKE Autopilot WorkloadAllowlists.
 GKE Autopilot WorkloadAllowlists are supported in GKE versions >= 1.32.1-gke.1729000.
 
@@ -471,12 +451,8 @@ Return a remote otel-agent based on `.Values` (passed as .)
 Return the image for the otel-agent in gateway based on `.Values` (passed as .)
 */}}
 {{- define "ddot-collector-gateway-image" -}}
-  {{- $imageTag := .Values.otelAgentGateway.image.tag -}}
-  {{- if not $imageTag -}}
-    {{- $imageTag = include "get-agent-version" . -}}
-  {{- end -}}
   {{- if not .Values.otelAgentGateway.image.doNotCheckTag -}}
-    {{- $imageTag = $imageTag | toString -}}
+    {{- $imageTag := .Values.otelAgentGateway.image.tag | toString -}}
     {{- if or (hasSuffix "-full" $imageTag) (eq .Values.otelAgentGateway.image.tagSuffix "full") -}}
       {{- fail "`-full` image is not supported in otel agent gateway" -}}
     {{- end -}}
@@ -484,8 +460,7 @@ Return the image for the otel-agent in gateway based on `.Values` (passed as .)
       {{- fail "Agent version 7.67.0 and before are not supported in otel agent gateway" -}}
     {{- end -}}
   {{- end -}}
-  {{- $image := merge (dict "tag" $imageTag) .Values.otelAgentGateway.image -}}
-  {{ include "image-path" (dict "root" .Values "image" $image) }}
+  {{ include "image-path" (dict "root" .Values "image" .Values.otelAgentGateway.image) }}
 {{- end -}}
 
 {{/*
@@ -699,23 +674,6 @@ false
 {{- end -}}
 
 {{/*
-Return true if trace-loader should be used for the trace-agent container.
-trace-loader is available in agent versions >= 7.75.0.
-*/}}
-{{- define "use-trace-loader" -}}
-{{- if not .Values.agents.image.doNotCheckTag -}}
-{{- $version := (include "get-agent-version" .) -}}
-{{- if semverCompare ">=7.75.0-0" $version -}}
-true
-{{- else -}}
-false
-{{- end -}}
-{{- else -}}
-false
-{{- end -}}
-{{- end -}}
-
-{{/*
 Return true if a traffic over TCP is configured for APM.
 */}}
 {{- define "trace-agent-use-tcp-port" -}}
@@ -822,23 +780,12 @@ datadog-agent-fips-config
 {{- end -}}
 
 {{/*
-Recursively trim all trailing hyphens from a string
-*/}}
-{{- define "trim-trailing-hyphens" -}}
-{{- if hasSuffix "-" . -}}
-{{- include "trim-trailing-hyphens" (trimSuffix "-" .) -}}
-{{- else -}}
-{{- . -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Build part-of label
 */}}
 {{- define "part-of-label" -}}
 {{- $ns := .Release.Namespace | replace "-" "--" -}}
-{{- $name := include "datadog.fullname" . | replace "-" "--" -}}
-{{- include "trim-trailing-hyphens" (printf "%s-%s" $ns $name | trunc 63) -}}
+{{- $name := include "datadog.fullname" . | replace "-" "--" | trimSuffix "-" -}}
+{{ printf "%s-%s" $ns $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
@@ -1078,9 +1025,6 @@ securityContext:
   {{- end -}}
   {{- if .mknod -}}
     {{- $addedCapabilities = append $addedCapabilities "MKNOD" -}}
-  {{- end -}}
-  {{- if .kill -}}
-    {{- $addedCapabilities = append $addedCapabilities "KILL" -}}
   {{- end -}}
   {{- /* Merge the added capabilities with the securityContext, only if we have something to add */ -}}
   {{- if $addedCapabilities -}}
@@ -1325,7 +1269,7 @@ Create RBACs for custom resources
     false
   {{- else if (ne (include "get-process-checks-in-core-agent-envvar" .) "") -}}
     {{- include "get-process-checks-in-core-agent-envvar" . -}}
-  {{- else if and (not .Values.agents.image.doNotCheckTag) (semverCompare ">=7.60.0-0" (include "get-agent-version" .)) -}}
+  {{- else if and (not .Values.agents.image.doNotCheckTag) .Values.datadog.processAgent.runInCoreAgent (semverCompare ">=7.60.0-0" (include "get-agent-version" .)) -}}
       true
   {{- else -}}
     false
@@ -1426,105 +1370,4 @@ false
   {{- else -}}
     true
   {{- end -}}
-{{- end -}}
-
-{{/*
-  Returns the check config for the EKS control plane monitoring.
-*/}}
-{{- define "eks-control-plane-monitoring-config" -}}
-kube_apiserver_metrics.yaml: |-
-  advanced_ad_identifiers:
-  - kube_endpoints:
-      name: "kubernetes"
-      namespace: "default"
-  cluster_check: true
-  init_config: {}
-  instances:
-    - prometheus_url: "https://%%host%%:%%port%%/metrics"
-      bearer_token_auth: true
-
-kube_controller_manager.yaml: |-
-  advanced_ad_identifiers:
-    - kube_endpoints:
-        name: "kubernetes"
-        namespace: "default"
-  cluster_check: true
-  init_config: {}
-  instances:
-    - prometheus_url: "https://%%host%%:%%port%%/apis/metrics.eks.amazonaws.com/v1/kcm/container/metrics"
-      extra_headers:
-          accept: "*/*"
-      bearer_token_auth: true
-      tls_ca_cert: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-
-kube_scheduler.yaml: |-
-  advanced_ad_identifiers:
-    - kube_endpoints:
-        name: "kubernetes"
-        namespace: "default"
-  cluster_check: true
-  init_config: {}
-  instances:
-    - prometheus_url: "https://%%host%%:%%port%%/apis/metrics.eks.amazonaws.com/v1/ksh/container/metrics"
-      extra_headers:
-          accept: "*/*"
-      bearer_token_auth: true
-      tls_ca_cert: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-{{- end -}}
-
-{{/*
-  Returns the configuration for the OpenShift control plane monitoring.
-*/}}
-{{- define "openshift-control-plane-monitoring-config" -}}
-kube_apiserver_metrics.yaml: |-
-  advanced_ad_identifiers:
-  - kube_endpoints:
-      name: "kubernetes"
-      namespace: "default"
-      resolve: "ip"
-  cluster_check: true
-  init_config: {}
-  instances:
-    - prometheus_url: "https://%%host%%:%%port%%/metrics"
-      bearer_token_auth: true
-
-kube_controller_manager.yaml: |-
-  advanced_ad_identifiers:
-    - kube_endpoints:
-        name: "kube-controller-manager"
-        namespace: "openshift-kube-controller-manager"
-        resolve: "ip"
-  cluster_check: true
-  init_config: {}
-  instances:
-    - prometheus_url: "https://%%host%%:%%port%%/metrics"
-      ssl_verify: false
-      bearer_token_auth: true
-
-kube_scheduler.yaml: |-
-  advanced_ad_identifiers:
-    - kube_endpoints:
-        name: "scheduler"
-        namespace: "openshift-kube-scheduler"
-        resolve: "ip"
-  cluster_check: true
-  init_config: {}
-  instances:
-    - prometheus_url: "https://%%host%%:%%port%%/metrics"
-      ssl_verify: false
-      bearer_token_auth: true
-
-etcd.yaml: |-
-  advanced_ad_identifiers:
-    - kube_endpoints:
-        name: "etcd"
-        namespace: "openshift-etcd"
-        resolve: "ip"
-  cluster_check: true
-  init_config: {}
-  instances:
-    - prometheus_url: "https://%%host%%:%%port%%/metrics"
-      ssl_verify: false
-      tls_cert: "/etc/etcd-certs/tls.crt"
-      tls_private_key: "/etc/etcd-certs/tls.key"
 {{- end -}}
