@@ -62,10 +62,16 @@ data:
           {{ else }}
           serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
           {{- end }}
-          {{- if .Values.enableEDNS0 }}
+          {{- if or .Values.enableEDNS0 .Values.ndots }}
           dnsConfig:
             options:
+              {{- if .Values.enableEDNS0 }}
               - name: edns0
+              {{- end }}
+              {{- if .Values.ndots }}
+              - name: ndots
+                value: {{ .Values.ndots | quote }}
+              {{- end }}
           {{- end }}
           {{- if and .Values.image .Values.image.imagePullSecret }}
           imagePullSecrets:

@@ -66,6 +66,10 @@ cloudsql:
 # We enable this by default.
 enableEDNS0: true
 
+# Set this to configure the ndots DNS option
+# Leave empty to use cluster default
+ndots:
+
 sidecar:
   signalChildProcesses: true
   # The timeout value in seconds for the job run
