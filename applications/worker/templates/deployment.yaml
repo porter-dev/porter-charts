@@ -7,6 +7,8 @@ metadata:
     {{- if .Values.labels }}
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
+  annotations:
+    helm.sh/revision: {{ .Release.Revision | quote }}
 spec:
   {{- if and (not .Values.keda.enabled) (not .Values.autoscaling.enabled) }}
   replicas: {{ .Values.replicaCount }}
@@ -22,7 +24,6 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: {{ .Chart.Name }}
-        helm.sh/revision: {{ .Release.Revision | quote }}
         {{- with .Values.podAnnotations }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -233,8 +234,9 @@ spec:
               {{- if .Values.resources.limits.nvidiaGpu }}
               nvidia.com/gpu: {{ .Values.resources.limits.nvidiaGpu }}
               {{- end }}
-          {{ if or .Values.configMapRefs .Values.secretRefs }}
           envFrom:
+            - configMapRef:
+                name: {{ include "docker-template.fullname" . }}-porter-env
           {{ range $configMapName := .Values.configMapRefs }}
             - configMapRef:
                 name: {{ $configMapName }}
@@ -243,17 +245,8 @@ spec:
             - secretRef:
                 name: {{ $secretName }}
           {{ end }}
-          {{ end }}
           env:
-            # Porter default environment variables
-            - name: PORTER_RESOURCES_RAM
-              value: "{{ .Values.resources.requests.memory }}"
-            - name: PORTER_RESOURCES_CPU
-              value: "{{ .Values.resources.requests.cpu }}"
-            - name: PORTER_RESOURCES_REPLICAS
-              value: "{{ .Values.replicaCount }}"      
-            - name: PORTER_POD_REVISION
-              value: "{{ .Release.Revision }}"
+            # Porter default environment variables (dynamic values from downward API)
             - name: PORTER_NODE_NAME
               valueFrom:
                 fieldRef:
@@ -271,24 +264,6 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: status.hostIP
-            - name: PORTER_POD_IMAGE_TAG
-              value: "{{ .Values.image.tag }}"
-            {{- if .Values.global }}
-            {{- if .Values.global.image }}
-            {{- if .Values.global.image.tag }}
-            - name: PORTER_IMAGE_TAG
-              value: "{{ .Values.global.image.tag }}"
-            {{- end }}
-            {{- end }}
-            {{- end }}
-            - name: PORTER_APP_SERVICE_NAME
-              value: "{{ include "docker-template.fullname" . }}"
-            {{- if .Values.stack.enabled }}
-            - name: PORTER_STACK_NAME
-              value: "{{ .Values.stack.name }}"
-            - name: PORTER_STACK_REVISION
-              value: "{{ .Values.stack.revision }}"
-            {{- end }}
             {{- range $key, $val := .Values.container.env.normal }}
             - name: {{ $key }}
             {{- $splVal := split "_" $val -}}
