@@ -7,12 +7,12 @@ spec:
     hosts:
     - {{ .Release.Name }}.porter.llm
     scaleTargetRef:
-        deployment: {{ .Release.Name }}-hf-llm 
+        name: {{ .Release.Name }}-hf-llm 
         service: {{ .Release.Name }}-hf-llm
         port: 8000
     replicas:
-        min: {{ .Values.autoscaling.min }} 
-        max: {{ .Values.autoscaling.max }}
+        min: {{ .Values.autoscaling.minReplicas }} 
+        max: {{ .Values.autoscaling.maxReplicas }}
     scaledownPeriod: {{ .Values.autoscaling.scaledownPeriod }}
     scalingMetric:
         concurrency:
