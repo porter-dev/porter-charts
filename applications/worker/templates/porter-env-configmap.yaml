@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "docker-template.fullname" . }}-porter-env
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+data:
+  PORTER_RESOURCES_RAM: "{{ .Values.resources.requests.memory }}"
+  PORTER_RESOURCES_CPU: "{{ .Values.resources.requests.cpu }}"
+  PORTER_RESOURCES_REPLICAS: "{{ .Values.replicaCount }}"
+  PORTER_POD_IMAGE_TAG: "{{ .Values.image.tag }}"
+  {{- if .Values.global }}
+  {{- if .Values.global.image }}
+  {{- if .Values.global.image.tag }}
+  PORTER_IMAGE_TAG: "{{ .Values.global.image.tag }}"
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  PORTER_POD_REVISION: "{{ .Release.Revision }}"
+  PORTER_APP_SERVICE_NAME: "{{ include "docker-template.fullname" . }}"
+  {{- if .Values.stack.enabled }}
+  PORTER_STACK_NAME: "{{ .Values.stack.name }}"
+  PORTER_STACK_REVISION: "{{ .Values.stack.revision }}"
+  {{- end }}
