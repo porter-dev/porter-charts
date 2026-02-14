@@ -85,6 +85,7 @@ local_resource(
   helm cm-push addons/karpenter local && \
   helm cm-push addons/tailscale-operator local && \
   helm cm-push addons/persistent-disk local && \
+  helm cm-push addons/nvme-manager local && \
   helm repo update local
   ''',
   deps=[

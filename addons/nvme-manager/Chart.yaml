@@ -1,0 +1,11 @@
+apiVersion: v2
+name: nvme-manager
+description: NVMe storage manager for Kubernetes nodes
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+- name: Porter
+  email: support@porter.run
+sources:
+- https://github.com/porter-dev/cluster-services
