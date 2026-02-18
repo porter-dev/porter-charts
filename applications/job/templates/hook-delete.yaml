@@ -17,7 +17,7 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
-      serviceAccountName: {{ include "docker-template.fullname" . }}
+      serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
       restartPolicy: Never
       containers:
       - name: job-manager
