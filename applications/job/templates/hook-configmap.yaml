@@ -57,11 +57,7 @@ data:
               operator: "Equal"
               value: "true"
               effect: "NoSchedule"
-          {{- if .Values.serviceAccount.create }}
-          serviceAccountName: cronjob-{{ include "docker-template.serviceAccountName" . }}
-          {{ else }}
           serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
-          {{- end }}
           {{- if or .Values.enableEDNS0 .Values.ndots }}
           dnsConfig:
             options:
