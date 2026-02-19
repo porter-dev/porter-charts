@@ -9,6 +9,6 @@ roleRef:
   name: {{ include "docker-template.fullname" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "docker-template.fullname" . }}
+    name: {{ include "docker-template.serviceAccountName" . }}
     namespace: {{ .Release.Namespace | quote }}
 {{- end }}
