@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: dbsubnetgroups.rds.services.k8s.aws
+  name: dbclusterendpoints.rds.services.k8s.aws
 spec:
   group: rds.services.k8s.aws
   names:
-    kind: DBSubnetGroup
-    listKind: DBSubnetGroupList
-    plural: dbsubnetgroups
-    singular: dbsubnetgroup
+    kind: DBClusterEndpoint
+    listKind: DBClusterEndpointList
+    plural: dbclusterendpoints
+    singular: dbclusterendpoint
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: DBSubnetGroup is the Schema for the DBSubnetGroups API
+        description: DBClusterEndpoint is the Schema for the DBClusterEndpoints API
         properties:
           apiVersion:
             description: |-
@@ -38,57 +38,69 @@ spec:
             type: object
           spec:
             description: |-
-              DBSubnetGroupSpec defines the desired state of DBSubnetGroup.
+              DBClusterEndpointSpec defines the desired state of DBClusterEndpoint.
 
-              Contains the details of an Amazon RDS DB subnet group.
+              This data type represents the information you need to connect to an Amazon
+              Aurora DB cluster. This data type is used as a response element in the following
+              actions:
 
-              This data type is used as a response element in the DescribeDBSubnetGroups
-              action.
+                - CreateDBClusterEndpoint
+
+                - DescribeDBClusterEndpoints
+
+                - ModifyDBClusterEndpoint
+
+                - DeleteDBClusterEndpoint
+
+              For the data structure that represents Amazon RDS DB instance endpoints,
+              see Endpoint.
             properties:
-              description:
-                description: The description for the DB subnet group.
-                type: string
-              name:
+              dbClusterEndpointIdentifier:
                 description: |-
-                  The name for the DB subnet group. This value is stored as a lowercase string.
-
-                  Constraints:
-
-                    - Must contain no more than 255 letters, numbers, periods, underscores,
-                      spaces, or hyphens.
-
-                    - Must not be default.
-
-                    - First character must be a letter.
-
-                  Example: mydbsubnetgroup
+                  The identifier to use for the new endpoint. This parameter is stored as a
+                  lowercase string.
                 type: string
-              subnetIDs:
-                description: The EC2 Subnet IDs for the DB subnet group.
+              dbClusterIdentifier:
+                description: |-
+                  The DB cluster identifier of the DB cluster associated with the endpoint.
+                  This parameter is stored as a lowercase string.
+                type: string
+              dbClusterIdentifierRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
+              endpointType:
+                description: 'The type of the endpoint, one of: READER, WRITER, ANY.'
+                type: string
+              excludedMembers:
+                description: |-
+                  List of DB instance identifiers that aren't part of the custom endpoint group.
+                  All other eligible instances are reachable through the custom endpoint. This
+                  parameter is relevant only if the list of static members is empty.
                 items:
                   type: string
                 type: array
-              subnetRefs:
+              staticMembers:
+                description: List of DB instance identifiers that are part of the
+                  custom endpoint group.
                 items:
-                  description: "AWSResourceReferenceWrapper provides a wrapper around
-                    *AWSResourceReference\ntype to provide more user friendly syntax
-                    for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
-                    \ name: my-api"
-                  properties:
-                    from:
-                      description: |-
-                        AWSResourceReference provides all the values necessary to reference another
-                        k8s resource for finding the identifier(Id/ARN/Name)
-                      properties:
-                        name:
-                          type: string
-                        namespace:
-                          type: string
-                      type: object
-                  type: object
+                  type: string
                 type: array
               tags:
-                description: Tags to assign to the DB subnet group.
+                description: The tags to be assigned to the Amazon RDS resource.
                 items:
                   description: |-
                     Metadata assigned to an Amazon RDS resource consisting of a key-value pair.
@@ -105,11 +117,10 @@ spec:
                   type: object
                 type: array
             required:
-            - description
-            - name
+            - dbClusterEndpointIdentifier
             type: object
           status:
-            description: DBSubnetGroupStatus defines the observed state of DBSubnetGroup
+            description: DBClusterEndpointStatus defines the observed state of DBClusterEndpoint
             properties:
               ackResourceMetadata:
                 description: |-
@@ -175,63 +186,20 @@ spec:
                   - type
                   type: object
                 type: array
-              subnetGroupStatus:
-                description: Provides the status of the DB subnet group.
-                type: string
-              subnets:
-                description: Contains a list of Subnet elements.
-                items:
-                  description: |-
-                    This data type is used as a response element for the DescribeDBSubnetGroups
-                    operation.
-                  properties:
-                    subnetAvailabilityZone:
-                      description: |-
-                        Contains Availability Zone information.
-
-                        This data type is used as an element in the OrderableDBInstanceOption data
-                        type.
-                      properties:
-                        name:
-                          type: string
-                      type: object
-                    subnetIdentifier:
-                      type: string
-                    subnetOutpost:
-                      description: |-
-                        A data type that represents an Outpost.
-
-                        For more information about RDS on Outposts, see Amazon RDS on Amazon Web
-                        Services Outposts (https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-on-outposts.html)
-                        in the Amazon RDS User Guide.
-                      properties:
-                        arn:
-                          type: string
-                      type: object
-                    subnetStatus:
-                      type: string
-                  type: object
-                type: array
-              supportedNetworkTypes:
+              dbClusterEndpointResourceIdentifier:
                 description: |-
-                  The network type of the DB subnet group.
-
-                  Valid values:
-
-                     * IPV4
-
-                     * DUAL
-
-                  A DBSubnetGroup can support only the IPv4 protocol or the IPv4 and the IPv6
-                  protocols (DUAL).
-
-                  For more information, see Working with a DB instance in a VPC (https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html)
-                  in the Amazon RDS User Guide.
-                items:
-                  type: string
-                type: array
-              vpcID:
-                description: Provides the VpcId of the DB subnet group.
+                  A unique system-generated identifier for an endpoint. It remains the same
+                  for the whole life of the endpoint.
+                type: string
+              endpoint:
+                description: The DNS address of the endpoint.
+                type: string
+              status:
+                description: |-
+                  The current status of the endpoint. One of: creating, available, deleting,
+                  inactive, modifying. The inactive state applies to an endpoint that can't
+                  be used for a certain kind of cluster, such as a writer endpoint for a read-only
+                  secondary cluster in a global database.
                 type: string
             type: object
         type: object
