@@ -4,14 +4,14 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: networkacls.ec2.services.k8s.aws
+  name: transitgatewayvpcattachments.ec2.services.k8s.aws
 spec:
   group: ec2.services.k8s.aws
   names:
-    kind: NetworkACL
-    listKind: NetworkACLList
-    plural: networkacls
-    singular: networkacl
+    kind: TransitGatewayVPCAttachment
+    listKind: TransitGatewayVPCAttachmentList
+    plural: transitgatewayvpcattachments
+    singular: transitgatewayvpcattachment
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -21,7 +21,8 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: NetworkACL is the Schema for the NetworkACLS API
+        description: TransitGatewayVPCAttachment is the Schema for the TransitGatewayVPCAttachments
+          API
         properties:
           apiVersion:
             description: |-
@@ -42,74 +43,48 @@ spec:
             type: object
           spec:
             description: |-
-              NetworkAclSpec defines the desired state of NetworkAcl.
+              TransitGatewayVpcAttachmentSpec defines the desired state of TransitGatewayVpcAttachment.
 
-              Describes a network ACL.
+              Describes a VPC attachment.
             properties:
-              associations:
+              options:
+                description: The VPC attachment options.
+                properties:
+                  applianceModeSupport:
+                    type: string
+                  dnsSupport:
+                    type: string
+                  ipv6Support:
+                    type: string
+                  securityGroupReferencingSupport:
+                    type: string
+                type: object
+              subnetIDs:
+                description: |-
+                  The IDs of one or more subnets. You can specify only one subnet per Availability
+                  Zone. You must specify at least one subnet, but we recommend that you specify
+                  two subnets for better availability. The transit gateway uses one IP address
+                  from each specified subnet.
                 items:
-                  description: Describes an association between a network ACL and
-                    a subnet.
-                  properties:
-                    networkACLAssociationID:
-                      type: string
-                    networkACLID:
-                      type: string
-                    subnetID:
-                      type: string
-                    subnetRef:
-                      description: Reference field for SubnetID
-                      properties:
-                        from:
-                          description: |-
-                            AWSResourceReference provides all the values necessary to reference another
-                            k8s resource for finding the identifier(Id/ARN/Name)
-                          properties:
-                            name:
-                              type: string
-                            namespace:
-                              type: string
-                          type: object
-                      type: object
-                  type: object
+                  type: string
                 type: array
-              entries:
+              subnetRefs:
                 items:
-                  description: Describes an entry in a network ACL.
+                  description: "AWSResourceReferenceWrapper provides a wrapper around
+                    *AWSResourceReference\ntype to provide more user friendly syntax
+                    for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                    \ name: my-api"
                   properties:
-                    cidrBlock:
-                      type: string
-                    egress:
-                      type: boolean
-                    icmpTypeCode:
-                      description: Describes the ICMP type and code.
+                    from:
+                      description: |-
+                        AWSResourceReference provides all the values necessary to reference another
+                        k8s resource for finding the identifier(Id/ARN/Name)
                       properties:
-                        code:
-                          format: int64
-                          type: integer
-                        type_:
-                          format: int64
-                          type: integer
+                        name:
+                          type: string
+                        namespace:
+                          type: string
                       type: object
-                    ipv6CIDRBlock:
-                      type: string
-                    portRange:
-                      description: Describes a range of ports.
-                      properties:
-                        from:
-                          format: int64
-                          type: integer
-                        to:
-                          format: int64
-                          type: integer
-                      type: object
-                    protocol:
-                      type: string
-                    ruleAction:
-                      type: string
-                    ruleNumber:
-                      format: int64
-                      type: integer
                   type: object
                 type: array
               tags:
@@ -126,6 +101,26 @@ spec:
                       type: string
                   type: object
                 type: array
+              transitGatewayID:
+                description: The ID of the transit gateway.
+                type: string
+              transitGatewayRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
               vpcID:
                 description: The ID of the VPC.
                 type: string
@@ -148,7 +143,8 @@ spec:
                 type: object
             type: object
           status:
-            description: NetworkACLStatus defines the observed state of NetworkACL
+            description: TransitGatewayVPCAttachmentStatus defines the observed state
+              of TransitGatewayVPCAttachment
             properties:
               ackResourceMetadata:
                 description: |-
@@ -214,16 +210,21 @@ spec:
                   - type
                   type: object
                 type: array
-              id:
-                description: The ID of the network ACL.
+              creationTime:
+                description: The creation time.
+                format: date-time
                 type: string
-              isDefault:
-                description: Indicates whether this is the default network ACL for
-                  the VPC.
-                type: boolean
-              ownerID:
+              id:
+                description: The ID of the attachment.
+                type: string
+              state:
+                description: |-
+                  The state of the VPC attachment. Note that the initiating state has been
+                  deprecated.
+                type: string
+              vpcOwnerID:
                 description: The ID of the Amazon Web Services account that owns the
-                  network ACL.
+                  VPC.
                 type: string
             type: object
         type: object

@@ -4,24 +4,30 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: networkacls.ec2.services.k8s.aws
+  name: managedprefixlists.ec2.services.k8s.aws
 spec:
   group: ec2.services.k8s.aws
   names:
-    kind: NetworkACL
-    listKind: NetworkACLList
-    plural: networkacls
-    singular: networkacl
+    kind: ManagedPrefixList
+    listKind: ManagedPrefixListList
+    plural: managedprefixlists
+    singular: managedprefixlist
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
     - jsonPath: .status.id
       name: ID
       type: string
+    - jsonPath: .status.state
+      name: STATE
+      type: string
+    - jsonPath: .status.version
+      name: VERSION
+      type: integer
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: NetworkACL is the Schema for the NetworkACLS API
+        description: ManagedPrefixList is the Schema for the ManagedPrefixLists API
         properties:
           apiVersion:
             description: |-
@@ -42,76 +48,36 @@ spec:
             type: object
           spec:
             description: |-
-              NetworkAclSpec defines the desired state of NetworkAcl.
+              ManagedPrefixListSpec defines the desired state of ManagedPrefixList.
 
-              Describes a network ACL.
+              Describes a managed prefix list.
             properties:
-              associations:
-                items:
-                  description: Describes an association between a network ACL and
-                    a subnet.
-                  properties:
-                    networkACLAssociationID:
-                      type: string
-                    networkACLID:
-                      type: string
-                    subnetID:
-                      type: string
-                    subnetRef:
-                      description: Reference field for SubnetID
-                      properties:
-                        from:
-                          description: |-
-                            AWSResourceReference provides all the values necessary to reference another
-                            k8s resource for finding the identifier(Id/ARN/Name)
-                          properties:
-                            name:
-                              type: string
-                            namespace:
-                              type: string
-                          type: object
-                      type: object
-                  type: object
-                type: array
+              addressFamily:
+                description: |-
+                  The IP address type.
+
+                  Valid Values: IPv4 | IPv6
+                type: string
               entries:
                 items:
-                  description: Describes an entry in a network ACL.
+                  description: An entry for a prefix list.
                   properties:
-                    cidrBlock:
+                    cidr:
                       type: string
-                    egress:
-                      type: boolean
-                    icmpTypeCode:
-                      description: Describes the ICMP type and code.
-                      properties:
-                        code:
-                          format: int64
-                          type: integer
-                        type_:
-                          format: int64
-                          type: integer
-                      type: object
-                    ipv6CIDRBlock:
+                    description:
                       type: string
-                    portRange:
-                      description: Describes a range of ports.
-                      properties:
-                        from:
-                          format: int64
-                          type: integer
-                        to:
-                          format: int64
-                          type: integer
-                      type: object
-                    protocol:
-                      type: string
-                    ruleAction:
-                      type: string
-                    ruleNumber:
-                      format: int64
-                      type: integer
                   type: object
                 type: array
+              maxEntries:
+                description: The maximum number of entries for the prefix list.
+                format: int64
+                type: integer
+              name:
+                description: |-
+                  A name for the prefix list.
+
+                  Constraints: Up to 255 characters in length. The name cannot start with com.amazonaws.
+                type: string
               tags:
                 description: |-
                   The tags. The value parameter is required, but if you don't want the tag
@@ -126,29 +92,13 @@ spec:
                       type: string
                   type: object
                 type: array
-              vpcID:
-                description: The ID of the VPC.
-                type: string
-              vpcRef:
-                description: "AWSResourceReferenceWrapper provides a wrapper around
-                  *AWSResourceReference\ntype to provide more user friendly syntax
-                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
-                  \ name: my-api"
-                properties:
-                  from:
-                    description: |-
-                      AWSResourceReference provides all the values necessary to reference another
-                      k8s resource for finding the identifier(Id/ARN/Name)
-                    properties:
-                      name:
-                        type: string
-                      namespace:
-                        type: string
-                    type: object
-                type: object
+            required:
+            - addressFamily
+            - maxEntries
+            - name
             type: object
           status:
-            description: NetworkACLStatus defines the observed state of NetworkACL
+            description: ManagedPrefixListStatus defines the observed state of ManagedPrefixList
             properties:
               ackResourceMetadata:
                 description: |-
@@ -215,16 +165,21 @@ spec:
                   type: object
                 type: array
               id:
-                description: The ID of the network ACL.
+                description: The ID of the prefix list.
                 type: string
-              isDefault:
-                description: Indicates whether this is the default network ACL for
-                  the VPC.
-                type: boolean
               ownerID:
-                description: The ID of the Amazon Web Services account that owns the
-                  network ACL.
+                description: The ID of the owner of the prefix list.
                 type: string
+              state:
+                description: The current state of the prefix list.
+                type: string
+              stateMessage:
+                description: The state message.
+                type: string
+              version:
+                description: The version of the prefix list.
+                format: int64
+                type: integer
             type: object
         type: object
     served: true
