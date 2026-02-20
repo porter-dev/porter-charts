@@ -2,17 +2,24 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: applicationautoscaling-leader-election-rolebinding
+  name: {{ include "ack-applicationautoscaling-controller.app.fullname" . }}-leaderelection
 {{ if .Values.leaderElection.namespace }}
   namespace: {{ .Values.leaderElection.namespace }}
 {{ else }}
   namespace: {{ .Release.Namespace }}
 {{ end }}
+  labels:
+    app.kubernetes.io/name: {{ include "ack-applicationautoscaling-controller.app.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    k8s-app: {{ include "ack-applicationautoscaling-controller.app.name" . }}
+    helm.sh/chart: {{ include "ack-applicationautoscaling-controller.chart.name-version" . }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: applicationautoscaling-leader-election-role
+  name: {{ include "ack-applicationautoscaling-controller.app.fullname" . }}-leaderelection
 subjects:
 - kind: ServiceAccount
-  name: {{ include "service-account.name" . }}
+  name: {{ include "ack-applicationautoscaling-controller.service-account.name" . }}
   namespace: {{ .Release.Namespace }}{{- end }}
