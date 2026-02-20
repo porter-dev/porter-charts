@@ -1,21 +1,52 @@
-apiVersion: rbac.authorization.k8s.io/v1
 {{ if eq .Values.installScope "cluster" }}
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "app.fullname" . }}
+  name: {{ include "ack-sqs-controller.app.fullname" . }}-rolebinding
+  labels:
+    app.kubernetes.io/name: {{ include "ack-sqs-controller.app.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    k8s-app: {{ include "ack-sqs-controller.app.name" . }}
+    helm.sh/chart: {{ include "ack-sqs-controller.chart.name-version" . }}
 roleRef:
   kind: ClusterRole
-{{ else }}
-kind: RoleBinding
-metadata:
-  name: {{ include "app.fullname" . }}
-  namespace: {{ .Release.Namespace }}
-roleRef:
-  kind: Role
-{{ end }}
   apiGroup: rbac.authorization.k8s.io
-  name: ack-sqs-controller
+  name: {{ include "ack-sqs-controller.app.fullname" . }}
 subjects:
 - kind: ServiceAccount
-  name: {{ include "service-account.name" . }}
+  name: {{ include "ack-sqs-controller.service-account.name" . }}
   namespace: {{ .Release.Namespace }}
+{{ else if eq .Values.installScope "namespace" }}
+{{ $wn := include "ack-sqs-controller.watch-namespace" . }}
+{{ $namespaces := split "," $wn }}
+{{ $fullname := include "ack-sqs-controller.app.fullname" . }}
+{{ $releaseNamespace := .Release.Namespace }}
+{{ $serviceAccountName := include "ack-sqs-controller.service-account.name" . }}
+{{ $chartVersion := include "ack-sqs-controller.chart.name-version" . }}
+{{ $appVersion := .Chart.AppVersion | quote }}
+{{ range $namespaces }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $fullname }}-{{ . }}
+  namespace: {{ . }}
+  labels:
+    app.kubernetes.io/name: {{ $fullname }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: {{ $appVersion }}
+    k8s-app: {{ $fullname }}
+    helm.sh/chart: {{ $chartVersion }}
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: {{ $fullname }}-{{ . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ $serviceAccountName }}
+  namespace: {{ $releaseNamespace }}
+{{ end }}
+{{ end }}
