@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: vpclinks.apigatewayv2.services.k8s.aws
+  name: apimappings.apigatewayv2.services.k8s.aws
 spec:
   group: apigatewayv2.services.k8s.aws
   names:
-    kind: VPCLink
-    listKind: VPCLinkList
-    plural: vpclinks
-    singular: vpclink
+    kind: APIMapping
+    listKind: APIMappingList
+    plural: apimappings
+    singular: apimapping
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: VPCLink is the Schema for the VPCLinks API
+        description: APIMapping is the Schema for the APIMappings API
         properties:
           apiVersion:
             description: |-
@@ -38,34 +38,61 @@ spec:
             type: object
           spec:
             description: |-
-              VpcLinkSpec defines the desired state of VpcLink.
+              ApiMappingSpec defines the desired state of ApiMapping.
 
-              Represents a VPC link.
+              Represents an API mapping.
             properties:
-              name:
-                description: The name of the VPC link.
+              apiID:
+                description: The API identifier.
                 type: string
-              securityGroupIDs:
-                description: A list of security group IDs for the VPC link.
-                items:
-                  type: string
-                type: array
-              subnetIDs:
-                description: A list of subnet IDs to include in the VPC link.
-                items:
-                  type: string
-                type: array
-              tags:
-                additionalProperties:
-                  type: string
-                description: A list of tags.
+              apiMappingKey:
+                description: The API mapping key.
+                type: string
+              apiRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
                 type: object
+              domainName:
+                description: The domain name.
+                type: string
+              domainRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
+              stage:
+                description: The API stage.
+                type: string
             required:
-            - name
-            - subnetIDs
+            - stage
             type: object
           status:
-            description: VPCLinkStatus defines the observed state of VPCLink
+            description: APIMappingStatus defines the observed state of APIMapping
             properties:
               ackResourceMetadata:
                 description: |-
@@ -96,6 +123,9 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
+              apiMappingID:
+                description: The API mapping identifier.
+                type: string
               conditions:
                 description: |-
                   All CRs managed by ACK have a common `Status.Conditions` member that
@@ -131,23 +161,6 @@ spec:
                   - type
                   type: object
                 type: array
-              createdDate:
-                description: The timestamp when the VPC link was created.
-                format: date-time
-                type: string
-              vpcLinkID:
-                description: The ID of the VPC link.
-                type: string
-              vpcLinkStatus:
-                description: The status of the VPC link.
-                type: string
-              vpcLinkStatusMessage:
-                description: A message summarizing the cause of the status of the
-                  VPC link.
-                type: string
-              vpcLinkVersion:
-                description: The version of the VPC link.
-                type: string
             type: object
         type: object
     served: true
