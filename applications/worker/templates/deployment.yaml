@@ -235,13 +235,11 @@ spec:
               {{- end }}
           {{ if or .Values.configMapRefs .Values.secretRefs }}
           envFrom:
-          {{ range $configMapName := .Values.configMapRefs }}
+          {{ range $index, $configMapName := .Values.configMapRefs }}
             - configMapRef:
                 name: {{ $configMapName }}
-          {{ end }}
-          {{ range $secretName := .Values.secretRefs }}
             - secretRef:
-                name: {{ $secretName }}
+                name: {{ index $.Values.secretRefs $index }}
           {{ end }}
           {{ end }}
           env:
