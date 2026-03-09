@@ -326,6 +326,9 @@ spec:
               nvidia.com/gpu: {{ .Values.resources.limits.nvidiaGpu }}
               {{- end }}
           {{ if or .Values.configMapRefs .Values.secretRefs }}
+          {{ if ne (len .Values.configMapRefs) (len .Values.secretRefs) }}
+          {{ fail "configMapRefs and secretRefs must be the same length" }}
+          {{ end }}
           envFrom:
           {{ range $index, $configMapName := .Values.configMapRefs }}
             - configMapRef:

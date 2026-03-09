@@ -106,6 +106,9 @@ data:
             - {{ $arg | quote }}
             {{- end }}
             {{- end }}
+            {{ if ne (len .Values.configMapRefs) (len .Values.secretRefs) }}
+            {{ fail "configMapRefs and secretRefs must be the same length" }}
+            {{ end }}
             envFrom:
             {{ range $index, $configMapName := .Values.configMapRefs }}
               - configMapRef:
