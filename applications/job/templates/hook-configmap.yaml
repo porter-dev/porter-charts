@@ -106,6 +106,7 @@ data:
             - {{ $arg | quote }}
             {{- end }}
             {{- end }}
+            {{ if or .Values.configMapRefs .Values.secretRefs }}
             {{ if ne (len .Values.configMapRefs) (len .Values.secretRefs) }}
             {{ fail "configMapRefs and secretRefs must be the same length" }}
             {{ end }}
@@ -115,6 +116,7 @@ data:
                   name: {{ $configMapName }}
               - secretRef:
                   name: {{ index $.Values.secretRefs $index }}
+            {{ end }}
             {{ end }}
             env:
             {{- range $key, $val := .Values.container.env.normal }}
