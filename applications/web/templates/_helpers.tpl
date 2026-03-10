@@ -89,17 +89,17 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
 {{- if $hasConnections -}}
     
     {{- if $singleConnection -}}
-        {{- $singleConnection -}}=tcp:{{.Values.cloudsql.dbPort }}
+        {{- $singleConnection -}}
     {{- end -}}
 
     {{- if $additionalConnection.enabled -}}
         {{- if $singleConnection }},{{ end -}}
-        {{ $additionalConnection.connectionName }}=tcp:{{ $additionalConnection.dbPort }}
+        {{ $additionalConnection.connectionName }}
     {{- end -}}
 
     {{- range $index, $conn := $connections -}} 
         {{- if or $index $singleConnection $additionalConnection.enabled }},{{ end -}}
-        {{ $conn.name }}=tcp:{{ $conn.port }}
+        {{ $conn.name }}
     {{- end -}}
 
 {{- end }}
