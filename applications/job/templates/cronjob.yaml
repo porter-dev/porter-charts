@@ -286,13 +286,13 @@ spec:
             {{- end }}
           {{- if .Values.cloudsql.enabled }}
             - name: cloud-sql-proxy
-              image: gcr.io/cloudsql-docker/gce-proxy:1.17
+              image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.21.1
               command:
-                - "/cloud_sql_proxy"
-                - "-instances={{- include "cloudsql.connectionString" . -}}"
-                - "-credential_file=/secrets/service_account.json"
+                - "/cloud-sql-proxy"
+                - "{{- include "cloudsql.connectionString" . -}}"
+                - "--credentials-file=/secrets/service_account.json"
               {{ if .Values.terminationGracePeriodSeconds }}
-                - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
+                - "--max-sigterm-delay={{ .Values.terminationGracePeriodSeconds }}s"
               {{ end }}
               securityContext:
                 runAsNonRoot: true
