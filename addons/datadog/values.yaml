@@ -1339,7 +1339,7 @@ clusterAgent:
   tokenExistingSecret: ""
 
   # clusterAgent.replicas -- Specify the of cluster agent replicas, if > 1 it allow the cluster agent to work in HA mode.
-  replicas: 1
+  replicas: 2
 
   # clusterAgent.revisionHistoryLimit -- The number of old ReplicaSets to keep in this Deployment.
   revisionHistoryLimit: 10
