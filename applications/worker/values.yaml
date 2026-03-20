@@ -40,6 +40,7 @@ serviceAccount:
 container:
   port: 80
   command:
+  shellForm: false
   args: []
   env:
     normal:

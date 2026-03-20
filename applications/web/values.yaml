@@ -122,6 +122,7 @@ privateIngress:
 container:
   port: 80
   command:
+  shellForm: false
   # Deprecated: use argList instead
   args:
   argList: []
