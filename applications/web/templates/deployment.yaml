@@ -148,16 +148,28 @@ spec:
           {{- if .Values.global.image }}
           {{- if and .Values.container.command (not (eq .Values.global.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")) }}
           command:
+          {{- if .Values.container.shellForm }}
+          - "/bin/sh"
+          - "-c"
+          - {{ .Values.container.command | quote }}
+          {{- else }}
           {{- range $command := trim .Values.container.command | splitList " " }}
           - {{ $command | quote }}
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- end }}
           {{- else }}
           {{- if (and .Values.container.command (not (or (eq .Values.image.repository "porterdev/hello-porter") (eq .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter")))) }}
           command:
+          {{- if .Values.container.shellForm }}
+          - "/bin/sh"
+          - "-c"
+          - {{ .Values.container.command | quote }}
+          {{- else }}
           {{- range $command := trim .Values.container.command | splitList " " }}
           - {{ $command | quote }}
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- end }}
