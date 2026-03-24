@@ -124,6 +124,7 @@ spec:
       annotations:
         prometheus.io/port: "9253"
         prometheus.io/scrape: "true"
+        checksum/config: {{ toYaml .Values | sha256sum }}
     spec:
       priorityClassName: system-node-critical
       serviceAccountName: node-local-dns
