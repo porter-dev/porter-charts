@@ -3,21 +3,22 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
-  name: parametergroups.memorydb.services.k8s.aws
+    controller-gen.kubebuilder.io/version: v0.16.2
+  name: multiregionclusters.memorydb.services.k8s.aws
 spec:
   group: memorydb.services.k8s.aws
   names:
-    kind: ParameterGroup
-    listKind: ParameterGroupList
-    plural: parametergroups
-    singular: parametergroup
+    kind: MultiRegionCluster
+    listKind: MultiRegionClusterList
+    plural: multiregionclusters
+    singular: multiregioncluster
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: ParameterGroup is the Schema for the ParameterGroups API
+        description: MultiRegionCluster is the Schema for the MultiRegionClusters
+          API
         properties:
           apiVersion:
             description: |-
@@ -38,42 +39,37 @@ spec:
             type: object
           spec:
             description: |-
-              ParameterGroupSpec defines the desired state of ParameterGroup.
+              MultiRegionClusterSpec defines the desired state of MultiRegionCluster.
 
-              Represents the output of a CreateParameterGroup operation. A parameter group
-              represents a combination of specific values for the parameters that are passed
-              to the engine software during startup.
+              Represents a multi-Region cluster.
             properties:
               description:
-                description: An optional description of the parameter group.
+                description: A description for the multi-Region cluster.
                 type: string
-              family:
-                description: |-
-                  The name of the parameter group family that the parameter group can be used
-                  with.
+              engine:
+                description: The name of the engine to be used for the multi-Region
+                  cluster.
                 type: string
-              name:
-                description: The name of the parameter group.
+              engineVersion:
+                description: The version of the engine to be used for the multi-Region
+                  cluster.
                 type: string
-              parameterNameValues:
-                description: |-
-                  An array of parameter names and values for the parameter update. You must
-                  supply at least one parameter name and value; subsequent arguments are optional.
-                  A maximum of 20 parameters may be updated per request.
-                items:
-                  description: Describes a name-value pair that is used to update
-                    the value of a parameter.
-                  properties:
-                    parameterName:
-                      type: string
-                    parameterValue:
-                      type: string
-                  type: object
-                type: array
+              multiRegionClusterNameSuffix:
+                description: A suffix to be added to the multi-Region cluster name.
+                type: string
+              multiRegionParameterGroupName:
+                description: The name of the multi-Region parameter group to be associated
+                  with the cluster.
+                type: string
+              nodeType:
+                description: The node type to be used for the multi-Region cluster.
+                type: string
+              numShards:
+                description: The number of shards for the multi-Region cluster.
+                format: int64
+                type: integer
               tags:
-                description: |-
-                  A list of tags to be added to this resource. A tag is a key-value pair. A
-                  tag key must be accompanied by a tag value, although null is accepted.
+                description: A list of tags to be applied to the multi-Region cluster.
                 items:
                   description: |-
                     A tag that can be added to an MemoryDB resource. Tags are composed of a Key/Value
@@ -88,12 +84,16 @@ spec:
                       type: string
                   type: object
                 type: array
+              tlsEnabled:
+                description: Whether to enable TLS encryption for the multi-Region
+                  cluster.
+                type: boolean
             required:
-            - family
-            - name
+            - multiRegionClusterNameSuffix
+            - nodeType
             type: object
           status:
-            description: ParameterGroupStatus defines the observed state of ParameterGroup
+            description: MultiRegionClusterStatus defines the observed state of MultiRegionCluster
             properties:
               ackResourceMetadata:
                 description: |-
@@ -124,9 +124,24 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
+              clusters:
+                description: The clusters in this multi-Region cluster.
+                items:
+                  description: Represents a Regional cluster
+                  properties:
+                    arn:
+                      type: string
+                    clusterName:
+                      type: string
+                    region:
+                      type: string
+                    status:
+                      type: string
+                  type: object
+                type: array
               conditions:
                 description: |-
-                  All CRs managed by ACK have a common `Status.Conditions` member that
+                  All CRS managed by ACK have a common `Status.Conditions` member that
                   contains a collection of `ackv1alpha1.Condition` objects that describe
                   the various terminal states of the CR and its backend AWS service API
                   resource
@@ -159,28 +174,16 @@ spec:
                   - type
                   type: object
                 type: array
-              parameters:
-                description: |-
-                  A list of parameters specific to a particular parameter group. Each element
-                  in the list contains detailed information about one parameter.
-                items:
-                  description: Describes an individual setting that controls some
-                    aspect of MemoryDB behavior.
-                  properties:
-                    allowedValues:
-                      type: string
-                    dataType:
-                      type: string
-                    description:
-                      type: string
-                    minimumEngineVersion:
-                      type: string
-                    name:
-                      type: string
-                    value:
-                      type: string
-                  type: object
-                type: array
+              multiRegionClusterName:
+                description: The name of the multi-Region cluster.
+                type: string
+              numberOfShards:
+                description: The number of shards in the multi-Region cluster.
+                format: int64
+                type: integer
+              status:
+                description: The current status of the multi-Region cluster.
+                type: string
             type: object
         type: object
     served: true
