@@ -305,10 +305,11 @@ cloudsql:
   dbPort: 5432
   serviceAccountJSON: ""
   serviceAccountJSONSecret: ""
-  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead. 
+  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead.
     enabled: false
     dbPort: 5432
     connectionName: ""
+  proxyVersion: "v1" # set to "v2" to upgrade to the new proxy image
 
 datadog:
   enabled: false

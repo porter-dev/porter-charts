@@ -78,24 +78,43 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
 {{- $additionalConnection := .Values.cloudsql.additionalConnection -}}
 {{- $connections := default (list) .Values.cloudsql.connections -}}
 {{- $hasConnections := or $singleConnection (gt (len $connections) 0) $additionalConnection.enabled -}}
+{{- $v1 := eq .Values.cloudsql.proxyVersion "v1" -}}
 {{- if $hasConnections -}}
-    
+
     {{- if $singleConnection -}}
-        {{- $singleConnection -}}=tcp:{{.Values.cloudsql.dbPort }}
+        {{- $singleConnection -}}{{- if $v1 -}}=tcp:{{- .Values.cloudsql.dbPort -}}{{- end -}}
     {{- end -}}
 
     {{- if $additionalConnection.enabled -}}
-        {{- if $singleConnection }},{{ end -}}
-        {{ $additionalConnection.connectionName }}=tcp:{{ $additionalConnection.dbPort }}
+        {{- if $singleConnection -}}{{- if $v1 -}},{{- else -}} {{- end -}}{{- end -}}
+        {{- $additionalConnection.connectionName -}}{{- if $v1 -}}=tcp:{{- $additionalConnection.dbPort -}}{{- end -}}
     {{- end -}}
 
-    {{- range $index, $conn := $connections -}} 
-        {{- if or $index $singleConnection $additionalConnection.enabled }},{{ end -}}
-        {{ $conn.name }}=tcp:{{ $conn.port }}
+    {{- range $index, $conn := $connections -}}
+        {{- if or $index $singleConnection $additionalConnection.enabled -}}{{- if $v1 -}},{{- else -}} {{- end -}}{{- end -}}
+        {{- $conn.name -}}{{- if $v1 -}}=tcp:{{- $conn.port -}}{{- end -}}
     {{- end -}}
 
-{{- end }}
-{{- end }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Build a YAML list of Cloud SQL instance names for the v2 proxy.
+Each instance is emitted as a separate positional argument.
+*/}}
+{{- define "cloudsql.v2InstanceList" -}}
+{{- $items := list -}}
+{{- if .Values.cloudsql.connectionName -}}
+{{- $items = append $items (printf "%s?port=%v" .Values.cloudsql.connectionName .Values.cloudsql.dbPort) -}}
+{{- end -}}
+{{- if .Values.cloudsql.additionalConnection.enabled -}}
+{{- $items = append $items (printf "%s?port=%v" .Values.cloudsql.additionalConnection.connectionName .Values.cloudsql.additionalConnection.dbPort) -}}
+{{- end -}}
+{{- range $conn := (default (list) .Values.cloudsql.connections) -}}
+{{- $items = append $items (printf "%s?port=%v" $conn.name $conn.port) -}}
+{{- end -}}
+{{- toYaml $items -}}
+{{- end -}}
 
 {{/*
 Return true if volumeMounts should be rendered in the main container
