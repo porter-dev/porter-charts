@@ -315,7 +315,7 @@ spec:
               image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.21.1
               command:
                 - "/cloud-sql-proxy"
-                - "{{- include "cloudsql.connectionString" . -}}"
+                {{- include "cloudsql.v2InstanceList" . | nindent 16 }}
                 - "--credentials-file=/secrets/service_account.json"
               {{ if .Values.terminationGracePeriodSeconds }}
                 - "--max-sigterm-delay={{ .Values.terminationGracePeriodSeconds }}s"

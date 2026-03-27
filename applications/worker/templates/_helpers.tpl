@@ -99,6 +99,24 @@ For backwards compatibility, this concatenates targets from cloudsql.connectionN
 {{- end -}}
 
 {{/*
+Build a YAML list of Cloud SQL instance names for the v2 proxy.
+Each instance is emitted as a separate positional argument.
+*/}}
+{{- define "cloudsql.v2InstanceList" -}}
+{{- $items := list -}}
+{{- if .Values.cloudsql.connectionName -}}
+{{- $items = append $items (printf "%s?port=%v" .Values.cloudsql.connectionName .Values.cloudsql.dbPort) -}}
+{{- end -}}
+{{- if .Values.cloudsql.additionalConnection.enabled -}}
+{{- $items = append $items (printf "%s?port=%v" .Values.cloudsql.additionalConnection.connectionName .Values.cloudsql.additionalConnection.dbPort) -}}
+{{- end -}}
+{{- range $conn := (default (list) .Values.cloudsql.connections) -}}
+{{- $items = append $items (printf "%s?port=%v" $conn.name $conn.port) -}}
+{{- end -}}
+{{- toYaml $items -}}
+{{- end -}}
+
+{{/*
 Return true if volumeMounts should be rendered in the main container
 */}}
 {{- define "worker.shouldRenderVolumeMounts" -}}
