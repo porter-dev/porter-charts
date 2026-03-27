@@ -216,10 +216,11 @@ cloudsql:
   dbPort: 5432
   serviceAccountJSON: ""
   serviceAccountJSONSecret: ""
-  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead. 
+  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead.
     enabled: false
     dbPort: 5432
     connectionName: ""
+  proxyVersion: "v2" # set to "v1" to pin to the legacy proxy image
 
 # Set this to add entries to the /etc/hosts file
 # Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]
