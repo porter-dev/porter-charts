@@ -1,0 +1,6 @@
+cloudsql:
+  enabled: true
+  instances:
+    - connectionName: "test-project:us-central1:test-instance"
+      dbPort: 5432
+      serviceAccountJSONSecret: "test-sa"
