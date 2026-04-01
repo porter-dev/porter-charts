@@ -216,10 +216,14 @@ cloudsql:
   dbPort: 5432
   serviceAccountJSON: ""
   serviceAccountJSONSecret: ""
-  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead. 
+  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead.
     enabled: false
     dbPort: 5432
     connectionName: ""
+  instances: []
+    # - connectionName: "project:region:instance"
+    #   dbPort: 5432
+    #   serviceAccountJSONSecret: "my-secret"
 
 # Set this to add entries to the /etc/hosts file
 # Format: hostAliases: [{ip: <IP>, hostnames: [<HOSTNAME>,..]},..]

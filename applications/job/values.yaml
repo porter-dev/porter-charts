@@ -59,10 +59,14 @@ cloudsql:
   dbPort: 5432
   serviceAccountJSON: ""
   serviceAccountJSONSecret: ""
-  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead. 
+  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead.
     enabled: false
     dbPort: 5432
     connectionName: ""
+  instances: []
+    # - connectionName: "project:region:instance"
+    #   dbPort: 5432
+    #   serviceAccountJSONSecret: "my-secret"
 
 # Set this for enabling DNS extensions over TCP
 # We enable this by default.
