@@ -229,6 +229,7 @@ cloudsql:
     enabled: false
     dbPort: 5432
     connectionName: ""
+  proxyVersion: "v1" # set to "v2" to upgrade to the new proxy image
 
   # serviceAccountJSONSecret is the name of the Kubernetes secret containing the
   # Cloud SQL proxy service account key. When using connections[], this is pre-created
