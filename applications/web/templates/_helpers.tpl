@@ -71,15 +71,12 @@ Create the name of the service account to use
 
 {{/*
 Name of the service account json secret to use with the CloudSQL proxy.
-When using the new instances format, the secret is pre-created by Porter's backend.
+All instances share a single service account — the proxy connects to multiple instances
+under one SA. When using instances[], the secret is pre-created by Porter's backend
+and referenced via cloudsql.serviceAccountJSONSecret.
 */}}
 {{- define "cloudsql.serviceAccountJSONSecret" -}}
-{{- $instances := default (list) .Values.cloudsql.instances -}}
-{{- if and (gt (len $instances) 0) (index $instances 0).serviceAccountJSONSecret -}}
-{{- (index $instances 0).serviceAccountJSONSecret -}}
-{{- else -}}
 {{- default (printf "cloudsql-secret-%s" (include "docker-template.fullname" .)) .Values.cloudsql.serviceAccountJSONSecret -}}
-{{- end -}}
 {{- end }}
 
 

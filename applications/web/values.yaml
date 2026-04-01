@@ -298,21 +298,42 @@ multiplePvc:
 
 cloudsql:
   enabled: false
-  connections: []
-    # - name: "abcdedfg"
-    #   port: 34343
-  connectionName: "" # deprecated, keeping for backwards compatibility. use connections instead.
-  dbPort: 5432
-  serviceAccountJSON: ""
-  serviceAccountJSONSecret: ""
-  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead.
-    enabled: false
-    dbPort: 5432
-    connectionName: ""
+
+  # instances is the current way to configure CloudSQL connections.
+  # Each entry maps to one Cloud SQL instance managed via Porter's service connections.
+  # All instances share the same service account (see serviceAccountJSONSecret below) —
+  # the proxy connects to multiple instances under one SA.
   instances: []
     # - connectionName: "project:region:instance"
     #   dbPort: 5432
-    #   serviceAccountJSONSecret: "my-secret"
+
+  # --- Legacy fields (deprecated) ---
+  # Use instances[] instead. All fields below were workarounds before Porter had
+  # native CloudSQL support via service connections.
+
+  # connections was added to support multiple instances via helm overrides before
+  # the instances field existed.
+  connections: [] # deprecated: use instances[]
+    # - name: "project:region:instance"
+    #   port: 5432
+
+  # connectionName/dbPort were the original single-instance helm override.
+  connectionName: "" # deprecated: use instances[]
+  dbPort: 5432 # deprecated: used only with connectionName
+
+  # additionalConnection was a second single-instance override added before connections[].
+  additionalConnection: # deprecated: use instances[]
+    enabled: false
+    dbPort: 5432
+    connectionName: ""
+
+  # serviceAccountJSONSecret is the name of the Kubernetes secret containing the
+  # Cloud SQL proxy service account key. When using instances[], this is pre-created
+  # by Porter's backend. All instances share this single service account.
+  # When empty, a secret is created from serviceAccountJSON (legacy path).
+  serviceAccountJSONSecret: ""
+
+  serviceAccountJSON: "" # deprecated: used only with the legacy secret-creation path
 
 datadog:
   enabled: false
