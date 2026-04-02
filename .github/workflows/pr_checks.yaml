@@ -144,6 +144,42 @@ jobs:
           [ "$COUNT_NEW" -eq 2 ] || (echo "Expected test-instance twice (hook-configmap + cronjob), got ${COUNT_NEW}" && exit 1)
           [ "$COUNT_LEGACY" -eq 2 ] || (echo "Expected legacy-instance twice (hook-configmap + cronjob), got ${COUNT_LEGACY}" && exit 1)
 
+      - name: CloudSQL multiple connections - all connection strings present (worker)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template applications/worker \
+            -f applications/testdata/worker.yaml \
+            -f applications/testdata/worker-cloudsql-multi-connections.yaml)
+          COUNT_PRIMARY=$(echo "$OUT" | grep -c "test-project:us-central1:primary-instance")
+          COUNT_SECONDARY=$(echo "$OUT" | grep -c "test-project:us-central1:secondary-instance")
+          [ "$COUNT_PRIMARY" -eq 1 ] || (echo "Expected primary-instance once in proxy args, got ${COUNT_PRIMARY}" && exit 1)
+          [ "$COUNT_SECONDARY" -eq 1 ] || (echo "Expected secondary-instance once in proxy args, got ${COUNT_SECONDARY}" && exit 1)
+
+      - name: CloudSQL multiple connections - all connection strings present (web)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template applications/web \
+            -f applications/testdata/web.yaml \
+            -f applications/testdata/web-cloudsql-multi-connections.yaml)
+          COUNT_PRIMARY=$(echo "$OUT" | grep -c "test-project:us-central1:primary-instance")
+          COUNT_SECONDARY=$(echo "$OUT" | grep -c "test-project:us-central1:secondary-instance")
+          [ "$COUNT_PRIMARY" -eq 1 ] || (echo "Expected primary-instance once in proxy args, got ${COUNT_PRIMARY}" && exit 1)
+          [ "$COUNT_SECONDARY" -eq 1 ] || (echo "Expected secondary-instance once in proxy args, got ${COUNT_SECONDARY}" && exit 1)
+
+      - name: CloudSQL multiple connections - all connection strings present (job)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template applications/job \
+            -f applications/testdata/job.yaml \
+            -f applications/testdata/job-cloudsql-multi-connections.yaml)
+          COUNT_PRIMARY=$(echo "$OUT" | grep -c "test-project:us-central1:primary-instance")
+          COUNT_SECONDARY=$(echo "$OUT" | grep -c "test-project:us-central1:secondary-instance")
+          [ "$COUNT_PRIMARY" -eq 2 ] || (echo "Expected primary-instance twice (hook-configmap + cronjob), got ${COUNT_PRIMARY}" && exit 1)
+          [ "$COUNT_SECONDARY" -eq 2 ] || (echo "Expected secondary-instance twice (hook-configmap + cronjob), got ${COUNT_SECONDARY}" && exit 1)
+
       - name: CloudSQL additionalConnection - connection string present (worker)
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
