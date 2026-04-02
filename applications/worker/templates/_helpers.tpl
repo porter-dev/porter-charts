@@ -65,8 +65,8 @@ Create the name of the service account to use
 {{/*
 Name of the service account json secret to use with the CloudSQL proxy.
 All instances share a single service account — the proxy connects to multiple instances
-under one SA. When using instances[], the secret is pre-created by Porter's backend
-and referenced via cloudsql.serviceAccountJSONSecret.
+under one SA. The secret is pre-created by Porter's backend and referenced via
+cloudsql.serviceAccountJSONSecret. When empty, a secret is created from serviceAccountJSON (legacy path).
 */}}
 {{- define "cloudsql.serviceAccountJSONSecret" -}}
 {{- default (printf "cloudsql-secret-%s" (include "docker-template.fullname" .)) .Values.cloudsql.serviceAccountJSONSecret -}}
@@ -74,18 +74,16 @@ and referenced via cloudsql.serviceAccountJSONSecret.
 
 {{/*
 The connection string to be passed to the CloudSQL proxy.
-For backwards compatibility, this concatenates targets from cloudsql.connectionName/dbPort, cloudsql.additionalConnection.connectionName/dbPort and cloudsql.connections.
-Also supports the new cloudsql.instances format populated from the service connections field.
+For backwards compatibility, this concatenates targets from cloudsql.connectionName/dbPort,
+cloudsql.additionalConnection.connectionName/dbPort, and cloudsql.connections.
 */}}
 {{- define "cloudsql.connectionString" -}}
 {{- $singleConnection := .Values.cloudsql.connectionName -}}
 {{- $additionalConnection := .Values.cloudsql.additionalConnection -}}
 {{- $connections := default (list) .Values.cloudsql.connections -}}
-{{- $instances := default (list) .Values.cloudsql.instances -}}
-{{- $hasConnections := or $singleConnection (gt (len $connections) 0) $additionalConnection.enabled (gt (len $instances) 0) -}}
+{{- $hasConnections := or $singleConnection (gt (len $connections) 0) $additionalConnection.enabled -}}
 {{- if $hasConnections -}}
 
-    {{- if not (gt (len $instances) 0) -}}
     {{- if $singleConnection -}}
         {{- $singleConnection -}}=tcp:{{.Values.cloudsql.dbPort }}
     {{- end -}}
@@ -94,16 +92,10 @@ Also supports the new cloudsql.instances format populated from the service conne
         {{- if $singleConnection }},{{ end -}}
         {{ $additionalConnection.connectionName }}=tcp:{{ $additionalConnection.dbPort }}
     {{- end -}}
-    {{- end -}}
 
     {{- range $index, $conn := $connections -}}
         {{- if or $index $singleConnection $additionalConnection.enabled }},{{ end -}}
         {{ $conn.name }}=tcp:{{ $conn.port }}
-    {{- end -}}
-
-    {{- range $index, $inst := $instances -}}
-        {{- if or $index (gt (len $connections) 0) $singleConnection $additionalConnection.enabled }},{{ end -}}
-        {{ $inst.connectionName }}=tcp:{{ $inst.dbPort }}
     {{- end -}}
 
 {{- end }}

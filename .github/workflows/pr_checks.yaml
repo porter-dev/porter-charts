@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: helm template applications/job -f applications/testdata/job.yaml
 
-      - name: CloudSQL instances - no duplicate connections (worker)
+      - name: CloudSQL connections - connection string present (worker)
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: |
@@ -58,7 +58,7 @@ jobs:
             | grep -c "test-project:us-central1:test-instance")
           [ "$COUNT" -eq 1 ] || (echo "Expected connection string once in proxy args, got ${COUNT}" && exit 1)
 
-      - name: CloudSQL instances - no duplicate connections (web)
+      - name: CloudSQL connections - connection string present (web)
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: |
@@ -68,7 +68,7 @@ jobs:
             | grep -c "test-project:us-central1:test-instance")
           [ "$COUNT" -eq 1 ] || (echo "Expected connection string once in proxy args, got ${COUNT}" && exit 1)
 
-      - name: CloudSQL instances - no duplicate connections (job)
+      - name: CloudSQL connections - connection string present (job)
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: |

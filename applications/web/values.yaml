@@ -299,24 +299,16 @@ multiplePvc:
 cloudsql:
   enabled: false
 
-  # instances is the current way to configure CloudSQL connections.
-  # Each entry maps to one Cloud SQL instance managed via Porter's service connections.
-  # All instances share the same service account (see serviceAccountJSONSecret below) —
-  # the proxy connects to multiple instances under one SA.
-  instances: []
-    # - connectionName: "project:region:instance"
-    #   dbPort: 5432
-
-  # --- Legacy fields (deprecated) ---
-  # Use instances[] instead. All fields below were workarounds before Porter had
-  # native CloudSQL support via service connections.
-
-  # connections was added to support multiple instances via helm overrides before
-  # the instances field existed.
-  connections: [] # deprecated: use instances[]
+  # connections is the current way to configure cloudsql instances in the chart.
+  # Both the first-class yaml porter yaml fields, and the helm overrides will use
+  # this to configure cloudsql.
+  connections: []
     # - name: "project:region:instance"
     #   port: 5432
 
+  # --- Legacy fields (deprecated) ---
+  # Use connections[] instead. These fields only support a single instance and will
+  # be removed eventually.
   # connectionName/dbPort were the original single-instance helm override.
   connectionName: "" # deprecated: use instances[]
   dbPort: 5432 # deprecated: used only with connectionName
