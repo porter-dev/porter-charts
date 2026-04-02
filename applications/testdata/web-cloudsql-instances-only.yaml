@@ -1,6 +1,8 @@
 cloudsql:
   enabled: true
   serviceAccountJSONSecret: "test-sa"
+  connectionName: "test-project:us-central1:legacy-instance"
+  dbPort: 5432
   connections:
     - name: "test-project:us-central1:test-instance"
       port: 5432
