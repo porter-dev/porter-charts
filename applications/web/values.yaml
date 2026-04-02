@@ -298,17 +298,34 @@ multiplePvc:
 
 cloudsql:
   enabled: false
+
+  # connections is the current way to configure cloudsql instances in the chart.
+  # Both the first-class yaml porter yaml fields, and the helm overrides will use
+  # this to configure cloudsql.
   connections: []
-    # - name: "abcdedfg"
-    #   port: 34343
-  connectionName: "" # deprecated, keeping for backwards compatibility. use connections instead.
-  dbPort: 5432
-  serviceAccountJSON: ""
-  serviceAccountJSONSecret: ""
-  additionalConnection: # deprecated, keeping for backwards compatibility. use connections instead. 
+    # - name: "project:region:instance"
+    #   port: 5432
+
+  # --- Legacy fields (deprecated) ---
+  # Use connections[] instead. These fields only support a single instance and will
+  # be removed eventually.
+  # connectionName/dbPort were the original single-instance helm override.
+  connectionName: "" # deprecated: use connections[]
+  dbPort: 5432 # deprecated: used only with connectionName
+
+  # additionalConnection was a second single-instance override added before connections[].
+  additionalConnection: # deprecated: use connections[]
     enabled: false
     dbPort: 5432
     connectionName: ""
+
+  # serviceAccountJSONSecret is the name of the Kubernetes secret containing the
+  # Cloud SQL proxy service account key. When using connections[], this is pre-created
+  # by Porter's backend. All instances share this single service account.
+  # When empty, a secret is created from serviceAccountJSON (legacy path).
+  serviceAccountJSONSecret: ""
+
+  serviceAccountJSON: "" # deprecated: used only with the legacy secret-creation path
 
 datadog:
   enabled: false

@@ -1,0 +1,8 @@
+cloudsql:
+  enabled: true
+  serviceAccountJSONSecret: "test-sa"
+  connections:
+    - name: "test-project:us-central1:primary-instance"
+      port: 5432
+    - name: "test-project:us-central1:secondary-instance"
+      port: 5433

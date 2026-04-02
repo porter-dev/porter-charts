@@ -47,3 +47,165 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: helm template applications/job -f applications/testdata/job.yaml
+
+      - name: CloudSQL connections - connection string present (worker)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          COUNT=$(helm template applications/worker \
+            -f applications/testdata/worker.yaml \
+            -f applications/testdata/worker-cloudsql-instances.yaml \
+            | grep -c "test-project:us-central1:test-instance")
+          [ "$COUNT" -eq 1 ] || (echo "Expected connection string once in proxy args, got ${COUNT}" && exit 1)
+
+      - name: CloudSQL connections - connection string present (web)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          COUNT=$(helm template applications/web \
+            -f applications/testdata/web.yaml \
+            -f applications/testdata/web-cloudsql-instances.yaml \
+            | grep -c "test-project:us-central1:test-instance")
+          [ "$COUNT" -eq 1 ] || (echo "Expected connection string once in proxy args, got ${COUNT}" && exit 1)
+
+      - name: CloudSQL connections - connection string present (job)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          COUNT=$(helm template applications/job \
+            -f applications/testdata/job.yaml \
+            -f applications/testdata/job-cloudsql-instances.yaml \
+            | grep -c "test-project:us-central1:test-instance")
+          [ "$COUNT" -eq 2 ] || (echo "Expected connection string twice (hook-configmap + cronjob), got ${COUNT}" && exit 1)
+
+      - name: CloudSQL legacy fields - connection string present (worker)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          COUNT=$(helm template applications/worker \
+            -f applications/testdata/worker.yaml \
+            -f applications/testdata/worker-cloudsql-legacy.yaml \
+            | grep -c "test-project:us-central1:test-instance")
+          [ "$COUNT" -eq 1 ] || (echo "Expected connection string once in proxy args, got ${COUNT}" && exit 1)
+
+      - name: CloudSQL legacy fields - connection string present (web)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          COUNT=$(helm template applications/web \
+            -f applications/testdata/web.yaml \
+            -f applications/testdata/web-cloudsql-legacy.yaml \
+            | grep -c "test-project:us-central1:test-instance")
+          [ "$COUNT" -eq 1 ] || (echo "Expected connection string once in proxy args, got ${COUNT}" && exit 1)
+
+      - name: CloudSQL legacy fields - connection string present (job)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          COUNT=$(helm template applications/job \
+            -f applications/testdata/job.yaml \
+            -f applications/testdata/job-cloudsql-legacy.yaml \
+            | grep -c "test-project:us-central1:test-instance")
+          [ "$COUNT" -eq 2 ] || (echo "Expected connection string twice (hook-configmap + cronjob), got ${COUNT}" && exit 1)
+
+      - name: CloudSQL mixed legacy+connections - connection string present (worker)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template applications/worker \
+            -f applications/testdata/worker.yaml \
+            -f applications/testdata/worker-cloudsql-instances-only.yaml)
+          COUNT_NEW=$(echo "$OUT" | grep -c "test-project:us-central1:test-instance")
+          COUNT_LEGACY=$(echo "$OUT" | grep -c "test-project:us-central1:legacy-instance")
+          [ "$COUNT_NEW" -eq 1 ] || (echo "Expected test-instance once, got ${COUNT_NEW}" && exit 1)
+          [ "$COUNT_LEGACY" -eq 1 ] || (echo "Expected legacy-instance once, got ${COUNT_LEGACY}" && exit 1)
+
+      - name: CloudSQL mixed legacy+connections - connection string present (web)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template applications/web \
+            -f applications/testdata/web.yaml \
+            -f applications/testdata/web-cloudsql-instances-only.yaml)
+          COUNT_NEW=$(echo "$OUT" | grep -c "test-project:us-central1:test-instance")
+          COUNT_LEGACY=$(echo "$OUT" | grep -c "test-project:us-central1:legacy-instance")
+          [ "$COUNT_NEW" -eq 1 ] || (echo "Expected test-instance once, got ${COUNT_NEW}" && exit 1)
+          [ "$COUNT_LEGACY" -eq 1 ] || (echo "Expected legacy-instance once, got ${COUNT_LEGACY}" && exit 1)
+
+      - name: CloudSQL mixed legacy+connections - connection string present (job)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template applications/job \
+            -f applications/testdata/job.yaml \
+            -f applications/testdata/job-cloudsql-instances-only.yaml)
+          COUNT_NEW=$(echo "$OUT" | grep -c "test-project:us-central1:test-instance")
+          COUNT_LEGACY=$(echo "$OUT" | grep -c "test-project:us-central1:legacy-instance")
+          [ "$COUNT_NEW" -eq 2 ] || (echo "Expected test-instance twice (hook-configmap + cronjob), got ${COUNT_NEW}" && exit 1)
+          [ "$COUNT_LEGACY" -eq 2 ] || (echo "Expected legacy-instance twice (hook-configmap + cronjob), got ${COUNT_LEGACY}" && exit 1)
+
+      - name: CloudSQL multiple connections - all connection strings present (worker)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template applications/worker \
+            -f applications/testdata/worker.yaml \
+            -f applications/testdata/worker-cloudsql-multi-connections.yaml)
+          COUNT_PRIMARY=$(echo "$OUT" | grep -c "test-project:us-central1:primary-instance")
+          COUNT_SECONDARY=$(echo "$OUT" | grep -c "test-project:us-central1:secondary-instance")
+          [ "$COUNT_PRIMARY" -eq 1 ] || (echo "Expected primary-instance once in proxy args, got ${COUNT_PRIMARY}" && exit 1)
+          [ "$COUNT_SECONDARY" -eq 1 ] || (echo "Expected secondary-instance once in proxy args, got ${COUNT_SECONDARY}" && exit 1)
+
+      - name: CloudSQL multiple connections - all connection strings present (web)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template applications/web \
+            -f applications/testdata/web.yaml \
+            -f applications/testdata/web-cloudsql-multi-connections.yaml)
+          COUNT_PRIMARY=$(echo "$OUT" | grep -c "test-project:us-central1:primary-instance")
+          COUNT_SECONDARY=$(echo "$OUT" | grep -c "test-project:us-central1:secondary-instance")
+          [ "$COUNT_PRIMARY" -eq 1 ] || (echo "Expected primary-instance once in proxy args, got ${COUNT_PRIMARY}" && exit 1)
+          [ "$COUNT_SECONDARY" -eq 1 ] || (echo "Expected secondary-instance once in proxy args, got ${COUNT_SECONDARY}" && exit 1)
+
+      - name: CloudSQL multiple connections - all connection strings present (job)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template applications/job \
+            -f applications/testdata/job.yaml \
+            -f applications/testdata/job-cloudsql-multi-connections.yaml)
+          COUNT_PRIMARY=$(echo "$OUT" | grep -c "test-project:us-central1:primary-instance")
+          COUNT_SECONDARY=$(echo "$OUT" | grep -c "test-project:us-central1:secondary-instance")
+          [ "$COUNT_PRIMARY" -eq 2 ] || (echo "Expected primary-instance twice (hook-configmap + cronjob), got ${COUNT_PRIMARY}" && exit 1)
+          [ "$COUNT_SECONDARY" -eq 2 ] || (echo "Expected secondary-instance twice (hook-configmap + cronjob), got ${COUNT_SECONDARY}" && exit 1)
+
+      - name: CloudSQL additionalConnection - connection string present (worker)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          COUNT=$(helm template applications/worker \
+            -f applications/testdata/worker.yaml \
+            -f applications/testdata/worker-cloudsql-additionalconnection.yaml \
+            | grep -c "test-project:us-central1:test-instance")
+          [ "$COUNT" -eq 1 ] || (echo "Expected connection string once in proxy args, got ${COUNT}" && exit 1)
+
+      - name: CloudSQL additionalConnection - connection string present (web)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          COUNT=$(helm template applications/web \
+            -f applications/testdata/web.yaml \
+            -f applications/testdata/web-cloudsql-additionalconnection.yaml \
+            | grep -c "test-project:us-central1:test-instance")
+          [ "$COUNT" -eq 1 ] || (echo "Expected connection string once in proxy args, got ${COUNT}" && exit 1)
+
+      - name: CloudSQL additionalConnection - connection string present (job)
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          COUNT=$(helm template applications/job \
+            -f applications/testdata/job.yaml \
+            -f applications/testdata/job-cloudsql-additionalconnection.yaml \
+            | grep -c "test-project:us-central1:test-instance")
+          [ "$COUNT" -eq 2 ] || (echo "Expected connection string twice (hook-configmap + cronjob), got ${COUNT}" && exit 1)
