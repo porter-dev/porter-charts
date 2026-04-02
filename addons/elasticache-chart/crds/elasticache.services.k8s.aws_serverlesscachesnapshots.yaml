@@ -4,20 +4,31 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: users.elasticache.services.k8s.aws
+  name: serverlesscachesnapshots.elasticache.services.k8s.aws
 spec:
   group: elasticache.services.k8s.aws
   names:
-    kind: User
-    listKind: UserList
-    plural: users
-    singular: user
+    kind: ServerlessCacheSnapshot
+    listKind: ServerlessCacheSnapshotList
+    plural: serverlesscachesnapshots
+    singular: serverlesscachesnapshot
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.status
+      name: STATUS
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="ACK.ResourceSynced")].status
+      name: Synced
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: User is the Schema for the Users API
+        description: ServerlessCacheSnapshot is the Schema for the ServerlessCacheSnapshots
+          API
         properties:
           apiVersion:
             description: |-
@@ -37,51 +48,75 @@ spec:
           metadata:
             type: object
           spec:
+            description: |-
+              ServerlessCacheSnapshotSpec defines the desired state of ServerlessCacheSnapshot.
+
+              The resource representing a serverless cache snapshot. Available for Valkey,
+              Redis OSS and Serverless Memcached only.
             properties:
-              accessString:
+              kmsKeyID:
                 description: |-
-                  Access permissions string used for this user.
-
-                  Regex Pattern: `\S`
+                  The ID of the KMS key used to encrypt the snapshot. Available for Valkey,
+                  Redis OSS and Serverless Memcached only. Default: NULL
                 type: string
-              engine:
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
+              kmsKeyRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
+              serverlessCacheName:
                 description: |-
-                  The options are valkey or redis.
-
-                  Regex Pattern: `^[a-zA-Z]*$`
+                  The name of an existing serverless cache. The snapshot is created from this
+                  cache. Available for Valkey, Redis OSS and Serverless Memcached only.
                 type: string
-              noPasswordRequired:
-                description: Indicates a password is not required for this user.
-                type: boolean
-              passwords:
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
+              serverlessCacheRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
+              serverlessCacheSnapshotName:
                 description: |-
-                  Passwords used for this user. You can create up to two passwords for each
-                  user.
-                items:
-                  description: |-
-                    SecretKeyReference combines a k8s corev1.SecretReference with a
-                    specific key within the referred-to Secret
-                  properties:
-                    key:
-                      description: Key is the key within the secret
-                      type: string
-                    name:
-                      description: name is unique within a namespace to reference
-                        a secret resource.
-                      type: string
-                    namespace:
-                      description: namespace defines the space within which the secret
-                        name must be unique.
-                      type: string
-                  required:
-                  - key
-                  type: object
-                  x-kubernetes-map-type: atomic
-                type: array
+                  The name for the snapshot being created. Must be unique for the customer
+                  account. Available for Valkey, Redis OSS and Serverless Memcached only. Must
+                  be between 1 and 255 characters.
+                type: string
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
               tags:
                 description: |-
-                  A list of tags to be added to this resource. A tag is a key-value pair. A
-                  tag key must be accompanied by a tag value, although null is accepted.
+                  A list of tags to be added to the snapshot resource. A tag is a key-value
+                  pair. Available for Valkey, Redis OSS and Serverless Memcached only.
                 items:
                   description: |-
                     A tag that can be added to an ElastiCache cluster or replication group. Tags
@@ -97,23 +132,12 @@ spec:
                       type: string
                   type: object
                 type: array
-              userID:
-                description: |-
-                  The ID of the user.
-
-                  Regex Pattern: `^[a-zA-Z][a-zA-Z0-9\-]*$`
-                type: string
-              userName:
-                description: The username of the user.
-                type: string
             required:
-            - accessString
-            - engine
-            - userID
-            - userName
+            - serverlessCacheSnapshotName
             type: object
           status:
-            description: UserStatus defines the observed state of User
+            description: ServerlessCacheSnapshotStatus defines the observed state
+              of ServerlessCacheSnapshot
             properties:
               ackResourceMetadata:
                 description: |-
@@ -144,15 +168,11 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
-              authentication:
-                description: Denotes whether the user requires a password to authenticate.
-                properties:
-                  passwordCount:
-                    format: int64
-                    type: integer
-                  type_:
-                    type: string
-                type: object
+              bytesUsedForCache:
+                description: |-
+                  The total size of a serverless cache snapshot, in bytes. Available for Valkey,
+                  Redis OSS and Serverless Memcached only.
+                type: string
               conditions:
                 description: |-
                   All CRs managed by ACK have a common `Status.Conditions` member that
@@ -188,26 +208,41 @@ spec:
                   - type
                   type: object
                 type: array
-              expandedAccessString:
-                description: Access permissions string used for this user.
+              createTime:
+                description: |-
+                  The date and time that the source serverless cache's metadata and cache data
+                  set was obtained for the snapshot. Available for Valkey, Redis OSS and Serverless
+                  Memcached only.
+                format: date-time
                 type: string
-              lastRequestedAccessString:
-                description: Access permissions string used for this user.
+              expiryTime:
+                description: |-
+                  The time that the serverless cache snapshot will expire. Available for Valkey,
+                  Redis OSS and Serverless Memcached only.
+                format: date-time
                 type: string
-              minimumEngineVersion:
-                description: The minimum engine version required, which is Redis OSS
-                  6.0
+              serverlessCacheConfiguration:
+                description: |-
+                  The configuration of the serverless cache, at the time the snapshot was taken.
+                  Available for Valkey, Redis OSS and Serverless Memcached only.
+                properties:
+                  engine:
+                    type: string
+                  majorEngineVersion:
+                    type: string
+                  serverlessCacheName:
+                    type: string
+                type: object
+              snapshotType:
+                description: |-
+                  The type of snapshot of serverless cache. Available for Valkey, Redis OSS
+                  and Serverless Memcached only.
                 type: string
               status:
-                description: Indicates the user status. Can be "active", "modifying"
-                  or "deleting".
+                description: |-
+                  The current status of the serverless cache. Available for Valkey, Redis OSS
+                  and Serverless Memcached only.
                 type: string
-              userGroupIDs:
-                description: Returns a list of the user group IDs the user belongs
-                  to.
-                items:
-                  type: string
-                type: array
             type: object
         type: object
     served: true
