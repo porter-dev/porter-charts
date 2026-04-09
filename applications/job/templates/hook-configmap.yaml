@@ -190,24 +190,15 @@ data:
             {{- $cmdSpl := trim .Values.container.command | splitList " " }}
             - {{ $cmdSpl| first | quote }}
             {{- if .Values.cloudsql.enabled }}
-            {{- if ne .Values.cloudsql.proxyVersion "v2" }}
-            - "cloud_sql_proxy"
-            {{- else }}
+            {{- if eq .Values.cloudsql.proxyVersion "v2" }}
             - "cloud-sql-proxy"
+            {{- else }}
+            - "cloud_sql_proxy"
             {{- end }}
             {{- end }}
           {{- if .Values.cloudsql.enabled }}
           - name: cloud-sql-proxy
-            {{- if ne .Values.cloudsql.proxyVersion "v2" }}
-            image: gcr.io/cloudsql-docker/gce-proxy:1.17
-            command:
-              - "/cloud_sql_proxy"
-              - "-instances={{- include "cloudsql.connectionString" . -}}"
-              - "-credential_file=/secrets/service_account.json"
-              {{ if .Values.terminationGracePeriodSeconds }}
-              - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
-              {{ end }}
-            {{- else }}
+            {{- if eq .Values.cloudsql.proxyVersion "v2" }}
             image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.21.1
             command:
               - "/cloud-sql-proxy"
@@ -215,6 +206,15 @@ data:
               - "--credentials-file=/secrets/service_account.json"
               {{ if .Values.terminationGracePeriodSeconds }}
               - "--max-sigterm-delay={{ .Values.terminationGracePeriodSeconds }}s"
+              {{ end }}
+            {{- else }}
+            image: gcr.io/cloudsql-docker/gce-proxy:1.17
+            command:
+              - "/cloud_sql_proxy"
+              - "-instances={{- include "cloudsql.connectionString" . -}}"
+              - "-credential_file=/secrets/service_account.json"
+              {{ if .Values.terminationGracePeriodSeconds }}
+              - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
               {{ end }}
             {{- end }}
             securityContext:
