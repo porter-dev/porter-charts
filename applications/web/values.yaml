@@ -6,12 +6,12 @@ auto_deploy: true
 
 replicaCount: 1
 
-topology: 
+topology:
   enabled: false
   maxSkew:
   topologyKey:
   whenUnsatisfiable:
-  labelSelector: 
+  labelSelector:
     enabled: false
     matchLabels: {}
 
@@ -22,7 +22,7 @@ image:
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
-  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank. 
+  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank.
   imagePullSecret:
 
 downwardAPIInit:
@@ -84,7 +84,7 @@ dynamicClusterIssuer:
   email:
   # At the moment we only support Cloudflare
   cloudflare:
-    api_token_secret: 
+    api_token_secret:
 
 albIngress:
   enabled: false
@@ -319,14 +319,6 @@ cloudsql:
     dbPort: 5432
     connectionName: ""
   version: "v1" # set to "v2" to upgrade to the new proxy image
-
-  # serviceAccountJSONSecret is the name of the Kubernetes secret containing the
-  # Cloud SQL proxy service account key. When using connections[], this is pre-created
-  # by Porter's backend. All instances share this single service account.
-  # When empty, a secret is created from serviceAccountJSON (legacy path).
-  serviceAccountJSONSecret: ""
-
-  serviceAccountJSON: "" # deprecated: used only with the legacy secret-creation path
 
   # serviceAccountJSONSecret is the name of the Kubernetes secret containing the
   # Cloud SQL proxy service account key. When using connections[], this is pre-created
