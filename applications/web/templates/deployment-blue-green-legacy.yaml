@@ -258,7 +258,7 @@ spec:
           {{ end }}
         {{- if $.Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
-          {{- if eq $.Values.cloudsql.proxyVersion "v2" }}
+          {{- if eq $.Values.cloudsql.version "v2" }}
           image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.21.1
           command:
             - "/cloud-sql-proxy"

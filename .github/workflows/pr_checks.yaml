@@ -212,7 +212,7 @@ jobs:
 
       # --- v1 default: image, arg format, credential flag, job sidecar binary ---
 
-      - name: CloudSQL proxyVersion default - v1 image and arg format (web)
+      - name: CloudSQL version default - v1 image and arg format (web)
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: |
@@ -230,7 +230,7 @@ jobs:
           echo "$OUT" | grep -q -- "--credentials-file" \
             && (echo "Unexpected v2 --credentials-file flag in default config" && exit 1) || true
 
-      - name: CloudSQL proxyVersion default - v1 image and arg format (worker)
+      - name: CloudSQL version default - v1 image and arg format (worker)
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: |
@@ -248,7 +248,7 @@ jobs:
           echo "$OUT" | grep -q -- "--credentials-file" \
             && (echo "Unexpected v2 --credentials-file flag in default config" && exit 1) || true
 
-      - name: CloudSQL proxyVersion default - v1 image, arg format, and sidecar binary (job)
+      - name: CloudSQL version default - v1 image, arg format, and sidecar binary (job)
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: |
@@ -272,18 +272,18 @@ jobs:
 
       # --- v2 opt-in: image, arg format, job sidecar binary ---
 
-      - name: CloudSQL proxyVersion v2 - image and arg format (web)
+      - name: CloudSQL version v2 - image and arg format (web)
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: |
           OUT=$(helm template applications/web \
             -f applications/testdata/web.yaml \
             -f applications/testdata/web-cloudsql-instances.yaml \
-            --set cloudsql.proxyVersion=v2)
+            --set cloudsql.version=v2)
           echo "$OUT" | grep -q "gcr.io/cloud-sql-connectors/cloud-sql-proxy" \
-            || (echo "Expected v2 proxy image when proxyVersion=v2" && exit 1)
+            || (echo "Expected v2 proxy image when version=v2" && exit 1)
           echo "$OUT" | grep -q "cloudsql-docker/gce-proxy" \
-            && (echo "Unexpected v1 proxy image when proxyVersion=v2" && exit 1) || true
+            && (echo "Unexpected v1 proxy image when version=v2" && exit 1) || true
           echo "$OUT" | grep -q "test-project:us-central1:test-instance?port=5432" \
             || (echo "Expected v2 NAME?port=PORT positional arg format" && exit 1)
           echo "$OUT" | grep -q -- "--credentials-file=/secrets/service_account.json" \
@@ -291,18 +291,18 @@ jobs:
           echo "$OUT" | grep -q -- "-instances=" \
             && (echo "Unexpected v1 -instances= flag in v2 config" && exit 1) || true
 
-      - name: CloudSQL proxyVersion v2 - image and arg format (worker)
+      - name: CloudSQL version v2 - image and arg format (worker)
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: |
           OUT=$(helm template applications/worker \
             -f applications/testdata/worker.yaml \
             -f applications/testdata/worker-cloudsql-instances.yaml \
-            --set cloudsql.proxyVersion=v2)
+            --set cloudsql.version=v2)
           echo "$OUT" | grep -q "gcr.io/cloud-sql-connectors/cloud-sql-proxy" \
-            || (echo "Expected v2 proxy image when proxyVersion=v2" && exit 1)
+            || (echo "Expected v2 proxy image when version=v2" && exit 1)
           echo "$OUT" | grep -q "cloudsql-docker/gce-proxy" \
-            && (echo "Unexpected v1 proxy image when proxyVersion=v2" && exit 1) || true
+            && (echo "Unexpected v1 proxy image when version=v2" && exit 1) || true
           echo "$OUT" | grep -q "test-project:us-central1:test-instance?port=5432" \
             || (echo "Expected v2 NAME?port=PORT positional arg format" && exit 1)
           echo "$OUT" | grep -q -- "--credentials-file=/secrets/service_account.json" \
@@ -310,18 +310,18 @@ jobs:
           echo "$OUT" | grep -q -- "-instances=" \
             && (echo "Unexpected v1 -instances= flag in v2 config" && exit 1) || true
 
-      - name: CloudSQL proxyVersion v2 - image, arg format, and sidecar binary (job)
+      - name: CloudSQL version v2 - image, arg format, and sidecar binary (job)
         if: steps.changed-files.outputs.any_changed == 'true'
         shell: bash
         run: |
           OUT=$(helm template applications/job \
             -f applications/testdata/job.yaml \
             -f applications/testdata/job-cloudsql-instances.yaml \
-            --set cloudsql.proxyVersion=v2)
+            --set cloudsql.version=v2)
           echo "$OUT" | grep -q "gcr.io/cloud-sql-connectors/cloud-sql-proxy" \
-            || (echo "Expected v2 proxy image when proxyVersion=v2" && exit 1)
+            || (echo "Expected v2 proxy image when version=v2" && exit 1)
           echo "$OUT" | grep -q "cloudsql-docker/gce-proxy" \
-            && (echo "Unexpected v1 proxy image when proxyVersion=v2" && exit 1) || true
+            && (echo "Unexpected v1 proxy image when version=v2" && exit 1) || true
           echo "$OUT" | grep -q "test-project:us-central1:test-instance?port=5432" \
             || (echo "Expected v2 NAME?port=PORT positional arg format" && exit 1)
           echo "$OUT" | grep -q -- "--credentials-file=/secrets/service_account.json" \
@@ -329,9 +329,9 @@ jobs:
           echo "$OUT" | grep -q -- "-instances=" \
             && (echo "Unexpected v1 -instances= flag in v2 config" && exit 1) || true
           echo "$OUT" | grep -q '"cloud-sql-proxy"' \
-            || (echo "Expected sidecar to reference cloud-sql-proxy (v2 binary) when proxyVersion=v2" && exit 1)
+            || (echo "Expected sidecar to reference cloud-sql-proxy (v2 binary) when version=v2" && exit 1)
           echo "$OUT" | grep -q '"cloud_sql_proxy"' \
-            && (echo "Unexpected v1 binary name in sidecar for proxyVersion=v2" && exit 1) || true
+            && (echo "Unexpected v1 binary name in sidecar for version=v2" && exit 1) || true
 
       # --- Multi-instance format: v1=comma-joined in one flag, v2=separate positional args ---
 
@@ -372,7 +372,7 @@ jobs:
           OUT=$(helm template applications/web \
             -f applications/testdata/web.yaml \
             -f applications/testdata/web-cloudsql-multi-connections.yaml \
-            --set cloudsql.proxyVersion=v2)
+            --set cloudsql.version=v2)
           echo "$OUT" | grep -q "test-project:us-central1:primary-instance?port=5432" \
             || (echo "Expected primary-instance as separate positional arg in v2" && exit 1)
           echo "$OUT" | grep -q "test-project:us-central1:secondary-instance?port=5433" \
@@ -387,7 +387,7 @@ jobs:
           OUT=$(helm template applications/worker \
             -f applications/testdata/worker.yaml \
             -f applications/testdata/worker-cloudsql-multi-connections.yaml \
-            --set cloudsql.proxyVersion=v2)
+            --set cloudsql.version=v2)
           echo "$OUT" | grep -q "test-project:us-central1:primary-instance?port=5432" \
             || (echo "Expected primary-instance as separate positional arg in v2" && exit 1)
           echo "$OUT" | grep -q "test-project:us-central1:secondary-instance?port=5433" \
@@ -402,7 +402,7 @@ jobs:
           OUT=$(helm template applications/job \
             -f applications/testdata/job.yaml \
             -f applications/testdata/job-cloudsql-multi-connections.yaml \
-            --set cloudsql.proxyVersion=v2)
+            --set cloudsql.version=v2)
           echo "$OUT" | grep -q "test-project:us-central1:primary-instance?port=5432" \
             || (echo "Expected primary-instance as separate positional arg in v2" && exit 1)
           echo "$OUT" | grep -q "test-project:us-central1:secondary-instance?port=5433" \
