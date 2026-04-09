@@ -487,6 +487,16 @@ spec:
         {{ end }}
         {{- if .Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
+          {{- if eq .Values.cloudsql.version "v2" }}
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.21.1
+          command:
+            - "/cloud-sql-proxy"
+            {{- include "cloudsql.v2InstanceList" . | nindent 12 }}
+            - "--credentials-file=/secrets/service_account.json"
+            {{- if .Values.terminationGracePeriodSeconds }}
+            - "--max-sigterm-delay={{ .Values.terminationGracePeriodSeconds }}s"
+            {{- end }}
+          {{- else }}
           image: gcr.io/cloudsql-docker/gce-proxy:1.17
           command:
             - "/cloud_sql_proxy"
@@ -495,6 +505,7 @@ spec:
             {{ if .Values.terminationGracePeriodSeconds }}
             - "-term_timeout={{ .Values.terminationGracePeriodSeconds }}s"
             {{ end }}
+          {{- end }}
           securityContext:
             runAsNonRoot: true
           resources:

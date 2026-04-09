@@ -110,6 +110,24 @@ cloudsql.additionalConnection.connectionName/dbPort, and cloudsql.connections.
 {{- end }}
 
 {{/*
+Build a YAML list of Cloud SQL instance names for the v2 proxy.
+Each instance is emitted as a separate positional argument.
+*/}}
+{{- define "cloudsql.v2InstanceList" -}}
+{{- $items := list -}}
+{{- if .Values.cloudsql.connectionName -}}
+{{- $items = append $items (printf "%s?port=%v" .Values.cloudsql.connectionName .Values.cloudsql.dbPort) -}}
+{{- end -}}
+{{- if .Values.cloudsql.additionalConnection.enabled -}}
+{{- $items = append $items (printf "%s?port=%v" .Values.cloudsql.additionalConnection.connectionName .Values.cloudsql.additionalConnection.dbPort) -}}
+{{- end -}}
+{{- range $conn := (default (list) .Values.cloudsql.connections) -}}
+{{- $items = append $items (printf "%s?port=%v" $conn.name $conn.port) -}}
+{{- end -}}
+{{- toYaml $items -}}
+{{- end -}}
+
+{{/*
 Get the EFS mount path for a given volume. If an override is provided, use that.
 Otherwise, use the default path /data/efs/<fullname>
 */}}
