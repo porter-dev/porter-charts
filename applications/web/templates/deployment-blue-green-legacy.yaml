@@ -273,9 +273,9 @@ spec:
             - "/cloud_sql_proxy"
             - "-instances={{- include "cloudsql.connectionString" . -}}"
             - "-credential_file=/secrets/service_account.json"
-            {{- if $.Values.terminationGracePeriodSeconds }}
+            {{ if $.Values.terminationGracePeriodSeconds }}
             - "-term_timeout={{ $.Values.terminationGracePeriodSeconds }}s"
-            {{- end }}
+            {{ end }}
           {{- end }}
           securityContext:
             runAsNonRoot: true
