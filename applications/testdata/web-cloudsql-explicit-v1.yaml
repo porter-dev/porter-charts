@@ -1,7 +1,0 @@
-cloudsql:
-  enabled: true
-  serviceAccountJSONSecret: "test-sa"
-  proxyVersion: "v1"
-  connections:
-    - name: "test-project:us-central1:test-instance"
-      port: 5432
