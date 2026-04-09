@@ -82,7 +82,7 @@ cloudsql.additionalConnection.connectionName/dbPort, and cloudsql.connections.
 {{- $additionalConnection := .Values.cloudsql.additionalConnection -}}
 {{- $connections := default (list) .Values.cloudsql.connections -}}
 {{- $hasConnections := or $singleConnection (gt (len $connections) 0) $additionalConnection.enabled -}}
-{{- $v1 := eq .Values.cloudsql.proxyVersion "v1" -}}
+{{- $v1 := ne .Values.cloudsql.proxyVersion "v2" -}}
 {{- if $hasConnections -}}
 
     {{- if $singleConnection -}}
