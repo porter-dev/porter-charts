@@ -328,6 +328,14 @@ cloudsql:
 
   serviceAccountJSON: "" # deprecated: used only with the legacy secret-creation path
 
+  # serviceAccountJSONSecret is the name of the Kubernetes secret containing the
+  # Cloud SQL proxy service account key. When using connections[], this is pre-created
+  # by Porter's backend. All instances share this single service account.
+  # When empty, a secret is created from serviceAccountJSON (legacy path).
+  serviceAccountJSONSecret: ""
+
+  serviceAccountJSON: "" # deprecated: used only with the legacy secret-creation path
+
 datadog:
   enabled: false
 
