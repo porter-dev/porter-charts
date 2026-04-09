@@ -90,25 +90,24 @@ cloudsql.additionalConnection.connectionName/dbPort, and cloudsql.connections.
 {{- $additionalConnection := .Values.cloudsql.additionalConnection -}}
 {{- $connections := default (list) .Values.cloudsql.connections -}}
 {{- $hasConnections := or $singleConnection (gt (len $connections) 0) $additionalConnection.enabled -}}
-{{- $v1 := ne .Values.cloudsql.proxyVersion "v2" -}}
 {{- if $hasConnections -}}
 
     {{- if $singleConnection -}}
-        {{- $singleConnection -}}{{- if $v1 -}}=tcp:{{- .Values.cloudsql.dbPort -}}{{- end -}}
+        {{- $singleConnection -}}=tcp:{{.Values.cloudsql.dbPort }}
     {{- end -}}
 
     {{- if $additionalConnection.enabled -}}
-        {{- if $singleConnection -}}{{- if $v1 -}},{{- else -}} {{- end -}}{{- end -}}
-        {{- $additionalConnection.connectionName -}}{{- if $v1 -}}=tcp:{{- $additionalConnection.dbPort -}}{{- end -}}
+        {{- if $singleConnection }},{{ end -}}
+        {{ $additionalConnection.connectionName }}=tcp:{{ $additionalConnection.dbPort }}
     {{- end -}}
 
     {{- range $index, $conn := $connections -}}
-        {{- if or $index $singleConnection $additionalConnection.enabled -}}{{- if $v1 -}},{{- else -}} {{- end -}}{{- end -}}
-        {{- $conn.name -}}{{- if $v1 -}}=tcp:{{- $conn.port -}}{{- end -}}
+        {{- if or $index $singleConnection $additionalConnection.enabled }},{{ end -}}
+        {{ $conn.name }}=tcp:{{ $conn.port }}
     {{- end -}}
 
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{/*
 Build a YAML list of Cloud SQL instance names for the v2 proxy.
