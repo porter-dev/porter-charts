@@ -16,6 +16,8 @@ spec:
         spec:
           template:
             metadata:
+              annotations:
+                karpenter.sh/do-not-disrupt: "true"
               labels:
                 porter.run/app-name: {{ .Release.Name }}
                 porter.run/service-name: {{ include "docker-template.fullname" . }}
