@@ -20,7 +20,7 @@ image:
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
-  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank. 
+  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank.
   imagePullSecret:
 
 downwardAPIInit:
@@ -104,8 +104,8 @@ keda:
     metricName: ""
     metricQuery: ""
     metricThreshold: ""
-  
-  # Porter-managed triggers: Porter will create TriggerAuthentication resources with the 
+
+  # Porter-managed triggers: Porter will create TriggerAuthentication resources with the
   # release name prefix (e.g., {release-name}-temporal-auth) to avoid ownership conflicts.
   # Use this for triggers configured through the Porter app create flow.
   porterTriggers: []
@@ -264,7 +264,7 @@ emptyDir:
   enabled: false
   mountPath: /mypath
   volumeOptions: {}
-  
+
 priorityClassName: ""
 
 nodeGroups: []
