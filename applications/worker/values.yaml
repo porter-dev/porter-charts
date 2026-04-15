@@ -275,6 +275,31 @@ fileSecretMounts:
   enabled: false
   mounts: []
 
+networkPolicy:
+  enabled: false
+  # policyTypes defaults to the types implied by the rules below.
+  # Explicitly set to ["Ingress"], ["Egress"], or ["Ingress", "Egress"] to override.
+  policyTypes: []
+  ingress: []
+    # - from:
+    #     - podSelector:
+    #         matchLabels:
+    #           app: frontend
+    #     - namespaceSelector:
+    #         matchLabels:
+    #           name: monitoring
+    #   ports:
+    #     - protocol: TCP
+    #       port: 80
+  egress: []
+    # - to:
+    #     - podSelector:
+    #         matchLabels:
+    #           app: database
+    #   ports:
+    #     - protocol: TCP
+    #       port: 5432
+
 # Host volume mounts for mounting host directories into containers
 # Format: hostVolumeMounts: [{name: <NAME>, hostPath: <HOST_PATH>, mountPath: <CONTAINER_PATH>, type: <HOSTPATH_TYPE>},..]
 hostVolumeMounts: []
