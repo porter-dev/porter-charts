@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "nvme-manager.fullname" . }}
+  labels:
+    {{- include "nvme-manager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nvme-manager
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "nvme-manager.fullname" . }}
+  labels:
+    {{- include "nvme-manager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nvme-manager
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "nvme-manager.fullname" . }}
+  labels:
+    {{- include "nvme-manager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nvme-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "nvme-manager.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "nvme-manager.fullname" . }}
+  namespace: {{ .Release.Namespace }}
