@@ -79,6 +79,8 @@ spec:
               {{- end }}
           {{- end }}
           serviceAccountName: {{ include "docker-template.serviceAccountName" . }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
           {{- if and .Values.image .Values.image.imagePullSecret }}
           imagePullSecrets:
             - name: {{ .Values.image.imagePullSecret }}
@@ -91,6 +93,8 @@ spec:
           {{- end }}
           containers:
             - name: {{ .Chart.Name }}
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
             {{- if .Values.global }}
             {{- if .Values.global.image }}
               image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag }}"
