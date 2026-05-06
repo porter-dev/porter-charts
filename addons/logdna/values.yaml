@@ -1,6 +1,7 @@
 image:
   name: logdna/logdna-agent
   # tag is defined by the appVersion in the Chart file
+  sha: "6c06867bd1a70bc048637a9fc3b98e385511bb7e8056c7f4102fa9797f56f0d0"
   pullPolicy: IfNotPresent
 
 logdna:

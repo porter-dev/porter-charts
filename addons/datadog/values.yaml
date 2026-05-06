@@ -1252,7 +1252,7 @@ datadog:
       tag: 0.1.11
 
       # datadog.agentDataPlane.image.digest -- Define Agent Data Plane image digest to use, takes precedence over tag if specified
-      digest: ""
+      digest: "sha256:1a2993ec3b12935660ee73b23ebe991726040be9a43c70e03058e061f2ac10e0"
 
       # datadog.agentDataPlane.image.repository -- Override default registry + image.name for Agent Data Plane
       repository:
@@ -1285,7 +1285,7 @@ clusterAgent:
     tag: 7.72.4
 
     # clusterAgent.image.digest -- Cluster Agent image digest to use, takes precedence over tag if specified
-    digest: ""
+    digest: "sha256:755d3ea885ee9bf2b134e417f2e05502425a5bfcfef7fff218e04f0eb089ad90"
 
     # clusterAgent.image.repository -- Override default registry + image.name for Cluster Agent
     repository:
@@ -1804,7 +1804,7 @@ fips:
     pullPolicy: IfNotPresent
 
     # fips.image.digest -- Define the FIPS sidecar image digest to use, takes precedence over `fips.image.tag` if specified.
-    digest: ""
+    digest: "sha256:f44fa24cee53ecafe7ef7eb75b93b256127addf76445973ba7fab5932abc191e"
 
     # fips.image.repository -- Override default registry + image.name for the FIPS sidecar container.
     repository:
@@ -1844,7 +1844,7 @@ agents:
     tag: 7.72.4
 
     # agents.image.digest -- Define Agent image digest to use, takes precedence over tag if specified
-    digest: ""
+    digest: "sha256:560db1ed6d4ec31199af2cf697eff9373977ebc82e6800a555a9a01a3a243179"
 
     # agents.image.tagSuffix -- Suffix to append to Agent tag
 
@@ -2452,7 +2452,7 @@ clusterChecksRunner:
     tag: 7.72.4
 
     # clusterChecksRunner.image.digest -- Define Agent image digest to use, takes precedence over tag if specified
-    digest: ""
+    digest: "sha256:560db1ed6d4ec31199af2cf697eff9373977ebc82e6800a555a9a01a3a243179"
 
     # clusterChecksRunner.image.tagSuffix -- Suffix to append to Agent tag
 
@@ -2921,7 +2921,7 @@ otelAgentGateway:
     tagSuffix: ""
 
     # otelAgentGateway.image.digest -- Override the image digest of otel agent, takes precedence over tag if specified
-    digest: ""
+    digest: "sha256:cbdbee9593535d3382173e3621aaa61a823a8dd7121668517fa00791c604ed51"
 
     # otelAgentGateway.image.repository -- Override the image repository to override default registry
     repository:
