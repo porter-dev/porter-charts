@@ -1,7 +1,7 @@
-name: Push to production Helm chart repo
+name: Publish Helm charts
 on:
   push:
-    branches: [ production ]
+    branches: [ main ]
 jobs:
   build:
     environment: production
