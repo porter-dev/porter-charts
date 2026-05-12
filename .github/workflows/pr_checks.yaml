@@ -429,7 +429,7 @@ jobs:
         shell: bash
         run: |
           OUT=$(helm template addons/redis)
-          echo "$OUT" | grep -qE "porterhub/redis-managed.*@sha256:" \
+          grep -qE "porterhub/redis-managed.*@sha256:" <<< "$OUT" \
             || (echo "redis image is not digest-pinned" && exit 1)
 
       - name: Addon digest pinning - logdna
@@ -437,7 +437,7 @@ jobs:
         shell: bash
         run: |
           OUT=$(helm template addons/logdna --set logdna.key=test-key)
-          echo "$OUT" | grep -qE "logdna/logdna-agent.*@sha256:" \
+          grep -qE "logdna/logdna-agent.*@sha256:" <<< "$OUT" \
             || (echo "logdna image is not digest-pinned" && exit 1)
 
       - name: Addon digest pinning - grafana
@@ -449,7 +449,7 @@ jobs:
             --set sidecar.dashboards.enabled=true \
             --set initChownData.enabled=true)
           for img in "grafana/grafana" "curlimages/curl" "library/busybox" "kiwigrid/k8s-sidecar"; do
-            echo "$OUT" | grep -qE "${img}.*@sha256:" \
+            grep -qE "${img}.*@sha256:" <<< "$OUT" \
               || (echo "grafana: ${img} image is not digest-pinned" && exit 1)
           done
 
@@ -462,7 +462,7 @@ jobs:
             --set clusterChecksRunner.enabled=true \
             --set fips.enabled=true)
           for img in "datadoghq/cluster-agent" "datadoghq/agent" "datadoghq/fips-proxy"; do
-            echo "$OUT" | grep -qE "${img}.*@sha256:" \
+            grep -qE "${img}.*@sha256:" <<< "$OUT" \
               || (echo "datadog: ${img} image is not digest-pinned" && exit 1)
           done
 
@@ -472,7 +472,7 @@ jobs:
         run: |
           OUT=$(helm template addons/tailscale-operator \
             --set oauth.clientId=test --set oauth.clientSecret=test)
-          echo "$OUT" | grep -qE "tailscale/k8s-operator.*@sha256:" \
+          grep -qE "tailscale/k8s-operator.*@sha256:" <<< "$OUT" \
             || (echo "tailscale-operator: operator image is not digest-pinned" && exit 1)
-          echo "$OUT" | grep -qE "tailscale/tailscale.*@sha256:" \
+          grep -qE "tailscale/tailscale.*@sha256:" <<< "$OUT" \
             || (echo "tailscale-operator: proxy image is not digest-pinned" && exit 1)
