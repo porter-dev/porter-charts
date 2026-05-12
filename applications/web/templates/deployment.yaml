@@ -121,6 +121,8 @@ spec:
       initContainers:
         # this is used for ensuring the kubelet is ready on new nodes, and can injected any downward API keys
         - name: downward-api
+          securityContext:
+            {{- toYaml .Values.initContainerSecurityContext | nindent 12 }}
           env:
           - name: DOWNWARD_API_ENV_KEY
             value: DOWNWARD_HOST_IP

@@ -45,7 +45,7 @@ operatorConfig:
     # Digest will be prioritized over tag. If neither are set appVersion will be
     # used.
     tag: "v1.84.0"
-    digest: ""
+    digest: "sha256:e6a4645bc1e0f073d9739ee260ff298c856f367e436dd55fe2633fbc92900ff7"
     pullPolicy: Always
   logging: "info" # info, debug, dev
   hostname: "tailscale-operator"
@@ -93,7 +93,7 @@ proxyConfig:
     # Digest will be prioritized over tag. If neither are set appVersion will be
     # used.
     tag: "v1.84.0"
-    digest: ""
+    digest: "sha256:25cadf045d992b7c82f1a006ccda781a67c47ba5d9ee35ce1f9d25319d1bcbc4"
   # ACL tag that operator will tag proxies with. Operator must be made owner of
   # these tags
   # https://tailscale.com/kb/1236/kubernetes-operator/?q=operator#setting-up-the-kubernetes-operator
