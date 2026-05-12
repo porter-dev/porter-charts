@@ -83,7 +83,7 @@ image:
   registry: docker.io
   repository: porterhub/redis-managed
   tag: 7.2.3-debian-11-r2
-  digest: ""
+  digest: "sha256:cae4e1e12b52166698ba032f919bc21c63fc9250cac060cd6fdcf8f92d86fe8b"
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images

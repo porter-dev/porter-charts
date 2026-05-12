@@ -101,7 +101,7 @@ image:
   repository: grafana/grafana
   # Overrides the Grafana image tag whose default is the chart appVersion
   tag: ""
-  sha: ""
+  sha: "35c41e0fd0295f5d0ee5db7e780cf33506abfaf47686196f825364889dee878b"
   pullPolicy: IfNotPresent
 
   ## Optionally specify an array of imagePullSecrets.
@@ -183,7 +183,7 @@ downloadDashboardsImage:
   registry: docker.io
   repository: curlimages/curl
   tag: 7.85.0
-  sha: ""
+  sha: "9fab1b73f45e06df9506d947616062d7e8319009257d3a05d970b0de80a41ec5"
   pullPolicy: IfNotPresent
 
 downloadDashboards:
@@ -426,7 +426,7 @@ initChownData:
     registry: docker.io
     repository: library/busybox
     tag: "1.31.1"
-    sha: ""
+    sha: "95cf004f559831017cdf4628aaf1bb30133677be8702a8c5f2994629f637a209"
     pullPolicy: IfNotPresent
 
   ## initChownData resource requests and limits
@@ -883,7 +883,7 @@ sidecar:
     registry: quay.io
     repository: kiwigrid/k8s-sidecar
     tag: 1.27.4
-    sha: ""
+    sha: "f6ed71d0f9f1175df8c4b8c674b339a74785384d25fdad21b3c3dc0554109286"
   imagePullPolicy: IfNotPresent
   resources: {}
 #   limits:
