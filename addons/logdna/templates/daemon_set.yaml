@@ -42,7 +42,7 @@ spec:
       {{- end }}
       containers:
       - name: {{ .Values.logdna.name }}
-        image: "{{ .Values.image.name }}:{{ .Chart.AppVersion }}"
+        image: "{{ .Values.image.name }}:{{ .Chart.AppVersion }}{{- if .Values.image.sha }}@sha256:{{ .Values.image.sha }}{{- end }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         securityContext:
           {{- toYaml .Values.podSecurityContext | nindent 10 }}
