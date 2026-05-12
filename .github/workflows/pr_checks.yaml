@@ -22,14 +22,24 @@ jobs:
         with:
           files: |
             applications/**
+      - name: Get changed addon files
+        id: changed-files-addons
+        uses: tj-actions/changed-files@v41
+        with:
+          files: |
+            addons/grafana/**
+            addons/redis/**
+            addons/datadog/**
+            addons/tailscale-operator/**
+            addons/logdna/**
       - name: List all changed files
         run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          for file in ${{ steps.changed-files.outputs.all_changed_files }} ${{ steps.changed-files-addons.outputs.all_changed_files }}; do
             echo "$file was changed"
           done
 
       - name: Setup Helm
-        if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.any_changed == 'true' || steps.changed-files-addons.outputs.any_changed == 'true'
         uses: azure/setup-helm@v4.2.0
         id: install-helm
 
@@ -409,3 +419,60 @@ jobs:
             || (echo "Expected secondary-instance as separate positional arg in v2" && exit 1)
           echo "$OUT" | grep -q "primary-instance.*secondary-instance\|secondary-instance.*primary-instance" \
             && (echo "v2 instances must be separate args, not comma-joined on one line" && exit 1) || true
+
+      # --- Addon image digest pinning ---
+      # Verifies each pinned image still renders with an @sha256: digest.
+      # Loose check (no hardcoded hashes) so legitimate digest bumps don't require CI updates.
+
+      - name: Addon digest pinning - redis
+        if: steps.changed-files-addons.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template addons/redis)
+          echo "$OUT" | grep -qE "porterhub/redis-managed.*@sha256:" \
+            || (echo "redis image is not digest-pinned" && exit 1)
+
+      - name: Addon digest pinning - logdna
+        if: steps.changed-files-addons.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template addons/logdna --set logdna.key=test-key)
+          echo "$OUT" | grep -qE "logdna/logdna-agent.*@sha256:" \
+            || (echo "logdna image is not digest-pinned" && exit 1)
+
+      - name: Addon digest pinning - grafana
+        if: steps.changed-files-addons.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template addons/grafana \
+            --set persistence.enabled=true \
+            --set sidecar.dashboards.enabled=true \
+            --set initChownData.enabled=true)
+          for img in "grafana/grafana" "curlimages/curl" "library/busybox" "kiwigrid/k8s-sidecar"; do
+            echo "$OUT" | grep -qE "${img}.*@sha256:" \
+              || (echo "grafana: ${img} image is not digest-pinned" && exit 1)
+          done
+
+      - name: Addon digest pinning - datadog
+        if: steps.changed-files-addons.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template addons/datadog \
+            --set datadog.apiKey=test \
+            --set clusterChecksRunner.enabled=true \
+            --set fips.enabled=true)
+          for img in "datadoghq/cluster-agent" "datadoghq/agent" "datadoghq/fips-proxy"; do
+            echo "$OUT" | grep -qE "${img}.*@sha256:" \
+              || (echo "datadog: ${img} image is not digest-pinned" && exit 1)
+          done
+
+      - name: Addon digest pinning - tailscale-operator
+        if: steps.changed-files-addons.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          OUT=$(helm template addons/tailscale-operator \
+            --set oauth.clientId=test --set oauth.clientSecret=test)
+          echo "$OUT" | grep -qE "tailscale/k8s-operator.*@sha256:" \
+            || (echo "tailscale-operator: operator image is not digest-pinned" && exit 1)
+          echo "$OUT" | grep -qE "tailscale/tailscale.*@sha256:" \
+            || (echo "tailscale-operator: proxy image is not digest-pinned" && exit 1)
