@@ -189,8 +189,14 @@ spec:
           startupProbe:
             exec:
               command:
+              {{- if .Values.health.startupProbe.shellForm }}
+              - "/bin/sh"
+              - "-c"
+              - {{ .Values.health.startupProbe.command | quote }}
+              {{- else }}
               {{- range $command := trim .Values.health.startupProbe.command | splitList " " }}
               - {{ $command | quote }}
+              {{- end }}
               {{- end }}
             periodSeconds: {{ .Values.health.startupProbe.periodSeconds }}
             failureThreshold: {{ .Values.health.startupProbe.failureThreshold }}
@@ -200,8 +206,14 @@ spec:
           readinessProbe:
             exec:
               command:
+              {{- if .Values.health.readinessProbe.shellForm }}
+              - "/bin/sh"
+              - "-c"
+              - {{ .Values.health.readinessProbe.command | quote }}
+              {{- else }}
               {{- range $command := trim .Values.health.readinessProbe.command | splitList " " }}
               - {{ $command | quote }}
+              {{- end }}
               {{- end }}
             periodSeconds: {{ .Values.health.readinessProbe.periodSeconds }}
             failureThreshold: {{ .Values.health.readinessProbe.failureThreshold }}
@@ -212,8 +224,14 @@ spec:
           livenessProbe:
             exec:
               command:
+              {{- if .Values.health.livenessProbe.shellForm }}
+              - "/bin/sh"
+              - "-c"
+              - {{ .Values.health.livenessProbe.command | quote }}
+              {{- else }}
               {{- range $command := trim .Values.health.livenessProbe.command | splitList " " }}
               - {{ $command | quote }}
+              {{- end }}
               {{- end }}
             periodSeconds: {{ .Values.health.livenessProbe.periodSeconds }}
             failureThreshold: {{ .Values.health.livenessProbe.failureThreshold }}
