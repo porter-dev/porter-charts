@@ -40,6 +40,11 @@ serviceMonitor:
   # Not to be used to add additional endpoints.
   # See the Prometheus operator documentation for configurable fields https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#endpoint
   endpointConfig: {}
+  # -- Specifies the sampleLimit for prometheus scrapes.
+  # Per-scrape limit on the number of scraped samples that will be accepted.
+  # If more than this number of samples are present after metric relabeling
+  # the entire scrape will be treated as failed. 0 means no limit.
+  sampleLimit: null
 # -- Number of replicas.
 replicas: 2
 # -- The number of old ReplicaSets to retain to allow rollback.
@@ -121,9 +126,9 @@ controller:
     # -- Repository path to the controller image.
     repository: public.ecr.aws/karpenter/controller
     # -- Tag of the controller image.
-    tag: 1.8.2
+    tag: 1.12.1
     # -- SHA256 digest of the controller image.
-    digest: sha256:ec27ec5b66f313d89174e3d59eee766caff99a746f36f74f156fd186b5baf407
+    digest: sha256:61c1872a00f6eb4ba89d830d359d4c61757d0239a89ecfb748d609a9a81ea1f2
   # -- Additional environment variables for the controller pod.
   env: []
   # - name: AWS_REGION
@@ -202,6 +207,9 @@ settings:
   # Interruption handling is disabled if not specified. Enabling interruption handling may
   # require additional permissions on the controller service account. Additional permissions are outlined in the docs.
   interruptionQueue: ""
+  # -- Marking this true signals Karpenter to respect zonal shifts when making node claims.
+  # More information about Zonal Shift here: https://docs.aws.amazon.com/eks/latest/userguide/zone-shift-enable.html#zone-shift-enable-steps
+  enableZonalShift: false
   # -- Reserved ENIs are not included in the calculations for max-pods or kube-reserved.
   # This is most often used in the VPC CNI custom networking setup https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html.
   reservedENIs: "0"
@@ -218,7 +226,7 @@ settings:
     # Setting this to true will enable node repair.
     nodeRepair: false
     # -- nodeOverlay is ALPHA and is disabled by default.
-    # Setting this will allow the use of node overlay to impact scheduling decisions 
+    # Setting this will allow the use of node overlay to impact scheduling decisions
     nodeOverlay: false
     # -- reservedCapacity is BETA and is enabled by default.
     # Setting this will enable native on-demand capacity reservation support.
