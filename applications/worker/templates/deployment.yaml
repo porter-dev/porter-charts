@@ -152,16 +152,28 @@ spec:
             postStart:
               exec:
                 command:
+                {{- if .Values.container.lifecycle.postStartShellForm }}
+                - "/bin/sh"
+                - "-c"
+                - {{ .Values.container.lifecycle.postStart | quote }}
+                {{- else }}
                 {{- range $command := trim .Values.container.lifecycle.postStart | splitList " " }}
                 - {{ $command | quote }}
+                {{- end }}
                 {{- end }}
             {{- end }}
             {{- if .Values.container.lifecycle.preStop }}
             preStop:
               exec:
                 command:
+                {{- if .Values.container.lifecycle.preStopShellForm }}
+                - "/bin/sh"
+                - "-c"
+                - {{ .Values.container.lifecycle.preStop | quote }}
+                {{- else }}
                 {{- range $command := trim .Values.container.lifecycle.preStop | splitList " " }}
                 - {{ $command | quote }}
+                {{- end }}
                 {{- end }}
             {{- end }}
           {{- end }}
