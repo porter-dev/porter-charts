@@ -130,7 +130,9 @@ container:
     normal:
   lifecycle:
     postStart:
+    postStartShellForm: false
     preStop:
+    preStopShellForm: false
 
 resources:
   requests:
