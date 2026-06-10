@@ -12,6 +12,12 @@ storageClass:
     fileSystemId: ""
     provisioningMode: "efs-ap"
     provisioner: efs.csi.aws.com
+    # posixUser pins the POSIX identity (uid/gid) every dynamically provisioned
+    # access point enforces on file operations, e.g. {uid: "0", gid: "0"}.
+    # Unset keeps the driver default: a unique generated identity per access
+    # point. Note this is part of the access point, so changing it only affects
+    # newly provisioned volumes.
+    posixUser: {}
 
 persistentVolumeClaim:
   requestStorage: "5Gi"

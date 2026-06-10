@@ -22,4 +22,8 @@ parameters:
   reuseAccessPoint: {{ .Values.storageClass.reuseAccessPoint | quote }}
   fileSystemId: {{ .Values.storageClass.efs.fileSystemId | quote }}
   provisioningMode: {{ .Values.storageClass.efs.provisioningMode | quote }}
+  {{- with .Values.storageClass.efs.posixUser }}
+  uid: {{ .uid | quote }}
+  gid: {{ .gid | quote }}
+  {{- end }}
 {{- end }}
