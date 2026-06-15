@@ -12,6 +12,11 @@ storageClass:
     fileSystemId: ""
     provisioningMode: "efs-ap"
     provisioner: efs.csi.aws.com
+    # Pins the enforced POSIX identity on every provisioned access point. Left
+    # unset, the driver generates a per-access-point identity that rejects root
+    # writes with EPERM, so set uid/gid to "0" for workloads that write as root
+    # (e.g. gVisor sandboxes).
+    posixUser: {}
 
 persistentVolumeClaim:
   requestStorage: "5Gi"
