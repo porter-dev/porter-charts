@@ -17,6 +17,14 @@ storageClass:
     # writes with EPERM, so set uid/gid to "0" for workloads that write as root
     # (e.g. gVisor sandboxes).
     posixUser: {}
+    # basePath is the directory under the filesystem root that access points are
+    # provisioned beneath. subPathPattern templates each access point's root
+    # directory from the claim (.PVC.name, .PVC.namespace, .PV.name). Left unset,
+    # the driver uses its defaults. ensureUniqueDirectory, when set to "false",
+    # keeps the path exactly as subPathPattern renders it with no appended uid -
+    # only safe when subPathPattern already yields a unique path per claim.
+    basePath: ""
+    subPathPattern: ""
 
 persistentVolumeClaim:
   requestStorage: "5Gi"

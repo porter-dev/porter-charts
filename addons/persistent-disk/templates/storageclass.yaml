@@ -1,3 +1,6 @@
+{{- /* A static access point binds the PVC to an existing access point via a
+       static PV, so the dynamic StorageClass is not needed in that mode. */ -}}
+{{- if not .Values.storageClass.efs.accessPointId }}
 {{- $scName := .Values.storageClass.name | default (printf "pd-sc-%s" .Release.Name) -}}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -22,6 +25,15 @@ parameters:
   reuseAccessPoint: {{ .Values.storageClass.reuseAccessPoint | quote }}
   fileSystemId: {{ .Values.storageClass.efs.fileSystemId | quote }}
   provisioningMode: {{ .Values.storageClass.efs.provisioningMode | quote }}
+  {{- with .Values.storageClass.efs.basePath }}
+  basePath: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.storageClass.efs.subPathPattern }}
+  subPathPattern: {{ . | quote }}
+  {{- end }}
+  {{- if hasKey .Values.storageClass.efs "ensureUniqueDirectory" }}
+  ensureUniqueDirectory: {{ .Values.storageClass.efs.ensureUniqueDirectory | quote }}
+  {{- end }}
   {{- with .Values.storageClass.efs.posixUser }}
   {{- if hasKey . "uid" }}
   uid: {{ .uid | quote }}
@@ -30,4 +42,5 @@ parameters:
   gid: {{ .gid | quote }}
   {{- end }}
   {{- end }}
+{{- end }}
 {{- end }}
