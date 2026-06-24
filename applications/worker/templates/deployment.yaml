@@ -414,6 +414,7 @@ spec:
             - "/cloud-sql-proxy"
             {{- include "cloudsql.v2InstanceList" . | nindent 12 }}
             - "--credentials-file=/secrets/service_account.json"
+            - "--exit-zero-on-sigterm"
             {{- if .Values.terminationGracePeriodSeconds }}
             - "--max-sigterm-delay={{ .Values.terminationGracePeriodSeconds }}s"
             {{- end }}
