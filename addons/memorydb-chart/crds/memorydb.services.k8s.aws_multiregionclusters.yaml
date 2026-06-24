@@ -3,21 +3,22 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
-  name: acls.memorydb.services.k8s.aws
+    controller-gen.kubebuilder.io/version: v0.16.2
+  name: multiregionclusters.memorydb.services.k8s.aws
 spec:
   group: memorydb.services.k8s.aws
   names:
-    kind: ACL
-    listKind: ACLList
-    plural: acls
-    singular: acl
+    kind: MultiRegionCluster
+    listKind: MultiRegionClusterList
+    plural: multiregionclusters
+    singular: multiregioncluster
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: ACL is the Schema for the ACLS API
+        description: MultiRegionCluster is the Schema for the MultiRegionClusters
+          API
         properties:
           apiVersion:
             description: |-
@@ -38,19 +39,37 @@ spec:
             type: object
           spec:
             description: |-
-              ACLSpec defines the desired state of ACL.
+              MultiRegionClusterSpec defines the desired state of MultiRegionCluster.
 
-              An Access Control List. You can authenticate users with Access Contol Lists.
-              ACLs enable you to control cluster access by grouping users. These Access
-              control lists are designed as a way to organize access to clusters.
+              Represents a multi-Region cluster.
             properties:
-              name:
-                description: The name of the Access Control List.
+              description:
+                description: A description for the multi-Region cluster.
                 type: string
+              engine:
+                description: The name of the engine to be used for the multi-Region
+                  cluster.
+                type: string
+              engineVersion:
+                description: The version of the engine to be used for the multi-Region
+                  cluster.
+                type: string
+              multiRegionClusterNameSuffix:
+                description: A suffix to be added to the multi-Region cluster name.
+                type: string
+              multiRegionParameterGroupName:
+                description: The name of the multi-Region parameter group to be associated
+                  with the cluster.
+                type: string
+              nodeType:
+                description: The node type to be used for the multi-Region cluster.
+                type: string
+              numShards:
+                description: The number of shards for the multi-Region cluster.
+                format: int64
+                type: integer
               tags:
-                description: |-
-                  A list of tags to be added to this resource. A tag is a key-value pair. A
-                  tag key must be accompanied by a tag value, although null is accepted.
+                description: A list of tags to be applied to the multi-Region cluster.
                 items:
                   description: |-
                     A tag that can be added to an MemoryDB resource. Tags are composed of a Key/Value
@@ -65,35 +84,16 @@ spec:
                       type: string
                   type: object
                 type: array
-              userNames:
-                description: The list of users that belong to the Access Control List.
-                items:
-                  type: string
-                type: array
-              userRefs:
-                items:
-                  description: "AWSResourceReferenceWrapper provides a wrapper around
-                    *AWSResourceReference\ntype to provide more user friendly syntax
-                    for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
-                    \ name: my-api"
-                  properties:
-                    from:
-                      description: |-
-                        AWSResourceReference provides all the values necessary to reference another
-                        k8s resource for finding the identifier(Id/ARN/Name)
-                      properties:
-                        name:
-                          type: string
-                        namespace:
-                          type: string
-                      type: object
-                  type: object
-                type: array
+              tlsEnabled:
+                description: Whether to enable TLS encryption for the multi-Region
+                  cluster.
+                type: boolean
             required:
-            - name
+            - multiRegionClusterNameSuffix
+            - nodeType
             type: object
           status:
-            description: ACLStatus defines the observed state of ACL
+            description: MultiRegionClusterStatus defines the observed state of MultiRegionCluster
             properties:
               ackResourceMetadata:
                 description: |-
@@ -116,10 +116,6 @@ spec:
                       OwnerAccountID is the AWS Account ID of the account that owns the
                       backend AWS service API resource.
                     type: string
-                  partition:
-                    description: Partition is the AWS partition in which the resource
-                      exists or will exist
-                    type: string
                   region:
                     description: Region is the AWS region in which the resource exists
                       or will exist.
@@ -129,13 +125,23 @@ spec:
                 - region
                 type: object
               clusters:
-                description: A list of clusters associated with the ACL.
+                description: The clusters in this multi-Region cluster.
                 items:
-                  type: string
+                  description: Represents a Regional cluster
+                  properties:
+                    arn:
+                      type: string
+                    clusterName:
+                      type: string
+                    region:
+                      type: string
+                    status:
+                      type: string
+                  type: object
                 type: array
               conditions:
                 description: |-
-                  All CRs managed by ACK have a common `Status.Conditions` member that
+                  All CRS managed by ACK have a common `Status.Conditions` member that
                   contains a collection of `ackv1alpha1.Condition` objects that describe
                   the various terminal states of the CR and its backend AWS service API
                   resource
@@ -168,44 +174,15 @@ spec:
                   - type
                   type: object
                 type: array
-              events:
-                description: |-
-                  A list of events. Each element in the list contains detailed information
-                  about one event.
-                items:
-                  description: |-
-                    Represents a single occurrence of something interesting within the system.
-                    Some examples of events are creating a cluster or adding or removing a node.
-                  properties:
-                    date:
-                      format: date-time
-                      type: string
-                    message:
-                      type: string
-                    sourceName:
-                      type: string
-                    sourceType:
-                      type: string
-                  type: object
-                type: array
-              minimumEngineVersion:
-                description: The minimum engine version supported for the ACL
+              multiRegionClusterName:
+                description: The name of the multi-Region cluster.
                 type: string
-              pendingChanges:
-                description: A list of updates being applied to the ACL.
-                properties:
-                  userNamesToAdd:
-                    items:
-                      type: string
-                    type: array
-                  userNamesToRemove:
-                    items:
-                      type: string
-                    type: array
-                type: object
+              numberOfShards:
+                description: The number of shards in the multi-Region cluster.
+                format: int64
+                type: integer
               status:
-                description: Indicates ACL status. Can be "creating", "active", "modifying",
-                  "deleting".
+                description: The current status of the multi-Region cluster.
                 type: string
             type: object
         type: object
