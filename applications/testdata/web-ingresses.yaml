@@ -1,0 +1,44 @@
+# Exercises every semantic of the generic ingresses interface; assertions live in
+# scripts/test-web-ingresses.sh.
+ingresses:
+  # No TLS anywhere (the GKE ALB shape), a default-backend host, and a per-host paths override
+  # with several paths, an explicit service/port, a pathType override, and a port default.
+  - name: alb
+    className: nginx-alb
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    hosts:
+      - host: api.alb.example.com
+      - host: admin.alb.example.com
+        paths:
+          - path: /admin
+            serviceName: custom-admin-svc
+            servicePort: 9000
+          - path: /metrics
+            pathType: Prefix
+            serviceName: custom-admin-svc
+  # Entry-level TLS and path defaults; shared-secret grouping; per-host TLS replacement; explicit
+  # empty TLS override (host stays out of spec.tls); explicit empty paths override (host renders
+  # the default-backend path while inheriting the entry TLS).
+  - name: public
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod-wildcard
+    tlsSecretName: wildcard-cert-tls
+    paths:
+      - path: /api
+        servicePort: 8080
+    hosts:
+      - host: api.example.com
+      - host: app.example.com
+      - host: solo.example.com
+        tlsSecretName: solo-cert-tls
+      - host: plain.example.com
+        tlsSecretName: ""
+      - host: nopath.example.com
+        paths: []
+  # Bare minimum: no className, no annotations, no TLS, no paths, a wildcard host.
+  - name: minimal
+    hosts:
+      - host: "*.wild.example.com"

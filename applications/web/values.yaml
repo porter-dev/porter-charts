@@ -110,6 +110,27 @@ albIngress:
   target_node_labels:
   annotations:
 
+# ingresses renders one Ingress per entry. Entries are policy-free projections of the Kubernetes
+# Ingress spec: annotations, class, and TLS secret names arrive as data.
+#
+# ingresses:
+#   - name: public                    # required; resource is named {fullname}-{name}
+#     className: nginx                # spec.ingressClassName, omitted when empty
+#     annotations: {}                 # emitted verbatim
+#     tlsSecretName: shared-cert-tls  # default TLS secret for every host; empty -> host not in spec.tls
+#     paths: []                       # default paths for every host; empty -> single default-backend path
+#     hosts:
+#       - host: api.example.com
+#         tlsSecretName: ""           # per-host override; explicit empty opts out of the entry default
+#         paths: []                   # per-host override (replaces, not merges); explicit empty renders
+#                                     # the default-backend path
+#
+# Hosts resolving to the same TLS secret are grouped into one spec.tls entry, so a shared certificate
+# is expressed by naming the same secret. Path entries are {path, pathType, serviceName, servicePort};
+# pathType defaults to ImplementationSpecific, serviceName to the chart's fullname, and servicePort
+# to the chart's service port.
+ingresses: []
+
 privateIngress:
   enabled: false
   privateIngressClass:

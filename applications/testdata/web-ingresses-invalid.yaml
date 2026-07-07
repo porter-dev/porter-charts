@@ -1,0 +1,5 @@
+# An entry without a name must fail rendering; see scripts/test-web-ingresses.sh.
+ingresses:
+  - className: nginx
+    hosts:
+      - host: unnamed.example.com

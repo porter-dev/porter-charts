@@ -1,0 +1,76 @@
+{{- /*
+Renders one Ingress per entry in .Values.ingresses; the field reference lives on the values.yaml
+entry. Entries are policy-free projections of the Kubernetes Ingress spec — this template must
+stay free of policy (cert-manager, secret naming, rewrite rules), which always arrives as data.
+*/}}
+{{- $fullName := include "docker-template.fullname" . -}}
+{{- $defaultServicePort := .Values.service.port -}}
+{{- range $ingress := .Values.ingresses }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-{{ required "ingresses[].name is required" $ingress.name }}
+  labels:
+    {{- include "docker-template.labels" $ | nindent 4 }}
+  {{- with $ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with $ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- $tlsSecrets := list }}
+  {{- $tlsHostsBySecret := dict }}
+  {{- range $host := $ingress.hosts }}
+  {{- $secret := $ingress.tlsSecretName | default "" }}
+  {{- if hasKey $host "tlsSecretName" }}
+  {{- $secret = $host.tlsSecretName | default "" }}
+  {{- end }}
+  {{- if $secret }}
+  {{- if not (hasKey $tlsHostsBySecret $secret) }}{{- $tlsSecrets = append $tlsSecrets $secret }}{{- end }}
+  {{- $_ := set $tlsHostsBySecret $secret (append (get $tlsHostsBySecret $secret | default list) $host.host) }}
+  {{- end }}
+  {{- end }}
+  {{- if $tlsSecrets }}
+  tls:
+    {{- range $secret := $tlsSecrets }}
+    - hosts:
+        {{- range get $tlsHostsBySecret $secret }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ $secret }}
+    {{- end }}
+  {{- end }}
+  {{- if $ingress.hosts }}
+  rules:
+    {{- range $host := $ingress.hosts }}
+    - host: {{ $host.host | quote }}
+      http:
+        paths:
+          {{- $paths := $ingress.paths | default list }}
+          {{- if hasKey $host "paths" }}
+          {{- $paths = $host.paths | default list }}
+          {{- end }}
+          {{- if $paths }}
+          {{- range $path := $paths }}
+          - path: {{ $path.path }}
+            pathType: {{ $path.pathType | default "ImplementationSpecific" }}
+            backend:
+              service:
+                name: {{ $path.serviceName | default $fullName }}
+                port:
+                  number: {{ $path.servicePort | default $defaultServicePort }}
+          {{- end }}
+          {{- else }}
+          - pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $defaultServicePort }}
+          {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
