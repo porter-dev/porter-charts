@@ -14,7 +14,7 @@ image:
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
-  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank. 
+  # A single imagePullSecret that will be injected into the deployment; only use in extreme cases, else it must be left blank.
   imagePullSecret:
 
 serviceAccount:
@@ -40,6 +40,7 @@ schedule:
   value: "*/5 * * * *"
   successfulHistory: 20
   failedHistory: 20
+  timeZone:
 
 resources:
   requests:

@@ -19,6 +19,9 @@ spec:
   startingDeadlineSeconds: 20
   suspend: {{ not .Values.schedule.enabled }}
   schedule: "{{ .Values.schedule.value }}"
+  {{- if .Values.schedule.timeZone }}
+  timeZone: {{ .Values.schedule.timeZone | quote }}
+  {{- end }}
   jobTemplate:
     metadata:
       labels:
