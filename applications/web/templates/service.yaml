@@ -84,6 +84,12 @@ metadata:
   {{- end }}
 spec:
   type: {{ $service.type }}
+  {{- if eq $service.type "ExternalName" }}
+  externalName: {{ required "additionalServices[].externalName is required for ExternalName services" $service.externalName }}
+  ports:
+    - port: {{ $service.port }}
+      protocol: TCP
+  {{- else }}
   ports:
     - port: {{ $service.port }}
       targetPort: http
@@ -91,4 +97,5 @@ spec:
       name: https
   selector:
     {{- include "docker-template.selectorLabels" $ | nindent 4 }}
+  {{- end }}
 {{- end }}
