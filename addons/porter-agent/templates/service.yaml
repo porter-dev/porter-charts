@@ -20,6 +20,11 @@ metadata:
     control-plane: controller-manager
   name: porter-agent-controller-manager
   namespace: porter-agent-system
+  annotations:
+    porter.managed.prometheus/scrape: 'true'
+    porter.managed.prometheus/scheme: 'http'
+    porter.managed.prometheus/path: '/metrics'
+    porter.managed.prometheus/port: '10001'
 spec:
   ports:
     - name: http
