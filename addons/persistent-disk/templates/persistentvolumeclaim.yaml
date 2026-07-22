@@ -20,5 +20,10 @@ spec:
   resources:
     requests:
       storage: {{ .Values.persistentVolumeClaim.requestStorage }}
+{{- if .Values.storageClass.efs.accessPointId }}
+  storageClassName: ""
+  volumeName: {{ .Release.Name }}-{{ .Release.Namespace }}
+{{- else }}
   storageClassName: {{ .Release.Name }}
+{{- end }}
 {{- end }}

@@ -1,0 +1,28 @@
+{{- /* In static access point mode the PVC binds to this pre-created PV, whose
+       CSI handle points at an existing EFS access point. Reclaim policy is
+       Retain so deleting the addon never deletes the shared access point. */ -}}
+{{- if and .Values.storageClass.efs.enabled .Values.storageClass.efs.accessPointId }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Release.Name }}-{{ .Release.Namespace }}
+  labels:
+    porter.run/addon-name: {{ .Release.Name }}
+    porter.run/addon-type: persistent-disk
+    {{- with .Values.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolumeClaim.requestStorage }}
+  accessModes:
+    {{- toYaml .Values.persistentVolumeClaim.accessModes | nindent 4 }}
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    name: {{ .Release.Name }}
+    namespace: {{ .Release.Namespace }}
+  csi:
+    driver: {{ .Values.storageClass.efs.provisioner }}
+    volumeHandle: {{ .Values.storageClass.efs.fileSystemId }}::{{ .Values.storageClass.efs.accessPointId }}
+{{- end }}
