@@ -1,0 +1,10 @@
+apiVersion: v2
+name: sandbox-cilium
+description: Cilium in aws-cni chaining mode on the sandbox node group, enforcing per-sandbox egress allowlists via CiliumNetworkPolicy
+type: application
+version: 0.1.0
+appVersion: 1.19.6
+dependencies:
+  - name: cilium
+    version: 1.19.6
+    repository: https://helm.cilium.io

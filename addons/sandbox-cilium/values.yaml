@@ -1,0 +1,63 @@
+# Everything under `cilium:` is passed to the vendored upstream chart
+# (charts/cilium). The preset runs Cilium in aws-cni chaining mode: the AWS VPC
+# CNI keeps IPAM and routing, Cilium only attaches eBPF policy enforcement to
+# pod veths. The agent DaemonSet is scoped to the sandbox node group, so no
+# other node's datapath is touched.
+#
+# IMPORTANT: a pod must have exactly one NetworkPolicy enforcer. The AWS VPC
+# CNI's network policy agent stays enabled cluster-wide, but it programs every
+# pod a Kubernetes NetworkPolicy selects regardless of node - so no
+# NetworkPolicy may select a pod on the sandbox nodes. Policies over
+# sandbox-node pods must be CiliumNetworkPolicies, which the agent ignores;
+# the sandbox-api chart switches its sandbox and daemon policies over when
+# egressCilium is on.
+cilium:
+  cni:
+    # Chain onto the aws-cni conflist instead of replacing it; exclusive: false
+    # keeps Cilium from claiming the node's primary CNI slot.
+    chainingMode: aws-cni
+    exclusive: false
+  # The VPC CNI already masquerades and routes with native VPC addressing.
+  enableIPv4Masquerade: false
+  routingMode: native
+  # Per-endpoint routes are part of upstream's aws-cni chaining preset: policy
+  # is enforced on each pod's own veth rather than through cilium_host, which
+  # chaining does not wire up.
+  endpointRoutes:
+    enabled: true
+
+  # Identity-relevant label filter. Providing any pattern switches Cilium to
+  # an inclusion list (its standard patterns - namespace, serviceaccount,
+  # app.kubernetes.io/*, reserved labels - are appended automatically), so
+  # only the egress-slot label needs naming here and every other pod label is
+  # excluded from identity computation. That exclusion is the point: a warm
+  # claim stamps sandbox-id and egress-restricted labels on the pod, and with
+  # those identity-irrelevant a claim never re-allocates the pod's Cilium
+  # identity - the identity (and its policy) settles once at warmup, keyed by
+  # the unique egress-slot label set at pod creation, and a restricted launch
+  # only waits for a policy-content swap (milliseconds), not identity
+  # allocation (tens of seconds).
+  labels: "k8s:porter\\.run/egress-slot$"
+
+  # Agent only on sandbox nodes: they all carry the workload-kind label, while
+  # the node-group-id label's value is per-cluster (it is also the taint the
+  # toleration matches by key).
+  nodeSelector:
+    porter.run/workload-kind: sandbox
+  tolerations:
+    - key: porter.run/node-group-id
+      operator: Exists
+      effect: NoSchedule
+
+  # toFQDNs enforcement runs in the agent's DNS proxy; the Envoy DaemonSet is
+  # only for L7 HTTP policy, which sandbox egress does not use.
+  envoy:
+    enabled: false
+  hubble:
+    enabled: false
+
+  operator:
+    # Empty like sandbox-api's controlPlane scheduling: local installs go
+    # anywhere, the system app pins it to the system node group via overrides.
+    nodeSelector: {}
+    tolerations: []
