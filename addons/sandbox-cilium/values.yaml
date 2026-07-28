@@ -61,3 +61,9 @@ cilium:
     # anywhere, the system app pins it to the system node group via overrides.
     nodeSelector: {}
     tolerations: []
+    # Upstream defaults to restarting kube-dns pods that lack a Cilium
+    # endpoint so they come back cilium-managed. With the agent scoped to
+    # sandbox nodes, coredns on other nodes can never become managed, so the
+    # watcher would kill it in a 15s loop.
+    unmanagedPodWatcher:
+      restart: false
