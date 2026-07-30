@@ -50,6 +50,7 @@ spec:
             "karpenter.sh/do-not-disrupt": "true"
             {{- end }}
           labels:
+            {{- include "docker-template.selectorLabels" . | nindent 12 }}
             {{- if .Values.podLabels }}
             {{- toYaml .Values.podLabels | nindent 12 }}
             {{- end }}

@@ -305,6 +305,12 @@ health:
 podDisruptionBudget:
   enabled: false
 
+# Denies pod egress to the cloud provider's instance metadata endpoint
+# (169.254.169.254) while leaving every other egress destination allowed.
+networkPolicy:
+  blockIMDS:
+    enabled: false
+
 pvc:
   enabled: false
   storage: 20Gi

@@ -1,0 +1,23 @@
+{{- if .Values.networkPolicy.blockIMDS.enabled }}
+# Denies pod egress to the cloud provider's instance metadata endpoint
+# (169.254.169.254), which otherwise lets any pod fetch the node's IAM role
+# credentials. Every other egress destination is unaffected.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "docker-template.fullname" . }}-block-imds
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "docker-template.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 169.254.169.254/32
+{{- end }}
