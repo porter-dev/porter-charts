@@ -4,24 +4,25 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: internetgateways.ec2.services.k8s.aws
+  name: egressonlyinternetgateways.ec2.services.k8s.aws
 spec:
   group: ec2.services.k8s.aws
   names:
-    kind: InternetGateway
-    listKind: InternetGatewayList
-    plural: internetgateways
-    singular: internetgateway
+    kind: EgressOnlyInternetGateway
+    listKind: EgressOnlyInternetGatewayList
+    plural: egressonlyinternetgateways
+    singular: egressonlyinternetgateway
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .status.internetGatewayID
+    - jsonPath: .status.id
       name: ID
       type: string
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: InternetGateway is the Schema for the InternetGateways API
+        description: EgressOnlyInternetGateway is the Schema for the EgressOnlyInternetGateways
+          API
         properties:
           apiVersion:
             description: |-
@@ -42,33 +43,10 @@ spec:
             type: object
           spec:
             description: |-
-              InternetGatewaySpec defines the desired state of InternetGateway.
+              EgressOnlyInternetGatewaySpec defines the desired state of EgressOnlyInternetGateway.
 
-              Describes an internet gateway.
+              Describes an egress-only internet gateway.
             properties:
-              routeTableRefs:
-                items:
-                  description: "AWSResourceReferenceWrapper provides a wrapper around
-                    *AWSResourceReference\ntype to provide more user friendly syntax
-                    for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
-                    \ name: my-api"
-                  properties:
-                    from:
-                      description: |-
-                        AWSResourceReference provides all the values necessary to reference another
-                        k8s resource for finding the identifier(Id/ARN/Name)
-                      properties:
-                        name:
-                          type: string
-                        namespace:
-                          type: string
-                      type: object
-                  type: object
-                type: array
-              routeTables:
-                items:
-                  type: string
-                type: array
               tags:
                 description: |-
                   The tags. The value parameter is required, but if you don't want the tag
@@ -83,9 +61,13 @@ spec:
                       type: string
                   type: object
                 type: array
-              vpc:
-                description: The ID of the VPC.
+              vpcID:
+                description: The ID of the VPC for which to create the egress-only
+                  internet gateway.
                 type: string
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
               vpcRef:
                 description: "AWSResourceReferenceWrapper provides a wrapper around
                   *AWSResourceReference\ntype to provide more user friendly syntax
@@ -105,7 +87,8 @@ spec:
                 type: object
             type: object
           status:
-            description: InternetGatewayStatus defines the observed state of InternetGateway
+            description: EgressOnlyInternetGatewayStatus defines the observed state
+              of EgressOnlyInternetGateway
             properties:
               ackResourceMetadata:
                 description: |-
@@ -141,7 +124,8 @@ spec:
                 - region
                 type: object
               attachments:
-                description: Any VPCs attached to the internet gateway.
+                description: Information about the attachment of the egress-only internet
+                  gateway.
                 items:
                   description: |-
                     Describes the attachment of a VPC to an internet gateway or an egress-only
@@ -188,12 +172,8 @@ spec:
                   - type
                   type: object
                 type: array
-              internetGatewayID:
-                description: The ID of the internet gateway.
-                type: string
-              ownerID:
-                description: The ID of the Amazon Web Services account that owns the
-                  internet gateway.
+              id:
+                description: The ID of the egress-only internet gateway.
                 type: string
             type: object
         type: object
