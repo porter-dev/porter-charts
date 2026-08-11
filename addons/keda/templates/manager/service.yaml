@@ -33,6 +33,14 @@ spec:
   - name: metrics
     port: {{ .Values.prometheus.operator.port }}
     targetPort: {{ .Values.prometheus.operator.port }}
+    {{- with .Values.prometheus.operator.appProtocol }}
+    appProtocol: {{ . }}
+    {{- end }}
+  {{- end }}
+  {{- if .Values.profiling.operator.enabled }}
+  - name: profiling
+    port: {{ .Values.profiling.operator.port }}
+    targetPort: {{ .Values.profiling.operator.port }}
   {{- end }}
   selector:
     app: {{ .Values.operator.name }}
