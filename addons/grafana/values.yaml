@@ -762,6 +762,8 @@ dashboards:
       file: dashboards/nginx.json
     node-visualization:
       file: dashboards/node_visualization.json
+    sandbox-controller:
+      file: dashboards/sandbox_controller.json
   # default:
   #   some-dashboard:
   #     json: |
