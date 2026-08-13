@@ -173,6 +173,8 @@ promtail:
           separator: "_"
         - action: labelmap
           regex: __meta_kubernetes_pod_label_(.+)
+  # The monolith mirrors these requests in the sandbox computeSystemOverhead
+  # sum (system_application/sandbox_compute_overhead.go); update both together.
   resources:
     limits:
       memory: 256Mi

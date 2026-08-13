@@ -39,6 +39,14 @@ cilium:
   # allocation (tens of seconds).
   labels: "k8s:porter\\.run/egress-slot$"
 
+  # Explicit agent requests: upstream ships none, and the sandbox compute
+  # model needs a deterministic per-node sum. The monolith mirrors this value
+  # in system_application/sandbox_compute_overhead.go; update both together.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+
   # Agent only on sandbox nodes: they all carry the workload-kind label, while
   # the node-group-id label's value is per-cluster (it is also the taint the
   # toleration matches by key).
