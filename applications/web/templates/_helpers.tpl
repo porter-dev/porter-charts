@@ -59,6 +59,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Maintenance page selector labels. The name label must differ from the main
+selector labels so the application's Service never selects maintenance pods.
+*/}}
+{{- define "docker-template.maintenanceSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "docker-template.name" . }}-maintenance
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "docker-template.serviceAccountName" -}}

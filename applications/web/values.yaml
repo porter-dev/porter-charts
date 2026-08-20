@@ -65,6 +65,15 @@ ingress:
     enabled: false
     customTlsSecret:
 
+# When enabled, a small maintenance page server is deployed next to the
+# application and the ingress routes all traffic to it instead of the
+# application, answering every request with a 503 and a maintenance page.
+maintenanceMode:
+  enabled: false
+  # Optional URL of a customer-hosted maintenance page to serve.
+  pageURL: ""
+  image: ghcr.io/porter-dev/maintenance-page-server:c8ff71a
+
 multipleWildcardIngress:
   enabled: false
   ingressClass: nginx

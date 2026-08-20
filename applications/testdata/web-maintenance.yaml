@@ -1,0 +1,46 @@
+maintenanceMode:
+  enabled: true
+  pageURL: https://example.com/maintenance.html
+ingress:
+  enabled: true
+  hosts:
+    - app.example.com
+  porter_hosts: []
+  rewriteCustomPathsEnabled: false
+  custom_paths:
+    - path: /
+      serviceName: test2-test2-maintenance
+      servicePort: 8080
+privateIngress:
+  enabled: true
+  privateIngressClass: private-nginx
+  hosts:
+    - private.example.com
+  custom_paths: []
+  annotations: {}
+  tls: true
+  clusterIssuer: letsencrypt-cloudflare-prod
+albIngress:
+  enabled: true
+  hosts:
+    - alb.example.com
+  scheme: internet-facing
+  ssl_policy: ELBSecurityPolicy-2016-08
+  target_type: instance
+multipleWildcardIngress:
+  enabled: true
+  hosts:
+    - hostName: "*.wild.example.com"
+      tlsSecret: wildcard-cert-tls
+ingresses:
+  - name: alb
+    className: nginx-alb
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    paths:
+      - path: /
+        pathType: Prefix
+        serviceName: test2-test2-maintenance
+        servicePort: 8080
+    hosts:
+      - host: alb.gke.example.com

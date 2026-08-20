@@ -1,0 +1,71 @@
+{{- if .Values.maintenanceMode.enabled -}}
+{{- $fullName := include "docker-template.fullname" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-maintenance
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "docker-template.maintenanceSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        helm.sh/revision: {{ .Release.Revision | quote }}
+      labels:
+        {{- include "docker-template.maintenanceSelectorLabels" . | nindent 8 }}
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: maintenance-page
+          image: {{ .Values.maintenanceMode.image }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: probes
+              containerPort: 8081
+              protocol: TCP
+          {{- if .Values.maintenanceMode.pageURL }}
+          env:
+            - name: PAGE_URL
+              value: {{ .Values.maintenanceMode.pageURL | quote }}
+          {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: probes
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: probes
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-maintenance
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+spec:
+  {{ if or .Values.ingress.enabled .Values.albIngress.enabled }}
+  type: NodePort
+  {{ else }}
+  type: ClusterIP
+  {{ end }}
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "docker-template.maintenanceSelectorLabels" . | nindent 4 }}
+{{- end }}
