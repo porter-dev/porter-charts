@@ -1,9 +1,10 @@
 {{- if .Values.maintenanceMode.enabled -}}
 {{- $fullName := include "docker-template.fullname" . -}}
+{{- $maintenanceName := .Values.maintenanceMode.serviceName | default (printf "%s-maintenance" $fullName) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $fullName }}-maintenance
+  name: {{ $maintenanceName }}
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
 spec:
@@ -52,7 +53,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ $fullName }}-maintenance
+  name: {{ $maintenanceName }}
   labels:
     {{- include "docker-template.labels" . | nindent 4 }}
 spec:

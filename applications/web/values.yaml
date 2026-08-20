@@ -72,7 +72,9 @@ maintenanceMode:
   enabled: false
   # Optional URL of a customer-hosted maintenance page to serve.
   pageURL: ""
-  image: ghcr.io/porter-dev/maintenance-page-server:c8ff71a
+  # Name for the maintenance page Deployment and Service; defaults to {fullname}-maintenance.
+  serviceName: ""
+  image: ghcr.io/porter-dev/maintenance-page-server:latest@sha256:9f765d1b595e327c57ca1f31f6ea9bbcd90afbd74322e7e21780b026fabddbbe
 
 multipleWildcardIngress:
   enabled: false
