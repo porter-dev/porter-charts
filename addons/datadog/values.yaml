@@ -1183,8 +1183,12 @@ datadog:
     kube_namespace:^monitoring$
     kube_namespace:^porter-agent-system$
     kube_namespace:^telemetry$
-    image:^gcr.io/datadoghq/agent
-    image:^gcr.io/datadoghq/cluster-agent
+    image:/datadoghq/agent
+    image:/datadoghq/cluster-agent
+    image:^datadoghq.azurecr.io/agent
+    image:^datadoghq.azurecr.io/cluster-agent
+    image:^public.ecr.aws/datadog/agent
+    image:^public.ecr.aws/datadog/cluster-agent
 
   # datadog.containerInclude -- Include containers in Agent Autodiscovery, as a space-separated list.
   # If a container matches an include rule, it’s always included in Autodiscovery
@@ -1200,8 +1204,12 @@ datadog:
     kube_namespace:^monitoring$
     kube_namespace:^porter-agent-system$
     kube_namespace:^telemetry$
-    image:^gcr.io/datadoghq/agent
-    image:^gcr.io/datadoghq/cluster-agent
+    image:/datadoghq/agent
+    image:/datadoghq/cluster-agent
+    image:^datadoghq.azurecr.io/agent
+    image:^datadoghq.azurecr.io/cluster-agent
+    image:^public.ecr.aws/datadog/agent
+    image:^public.ecr.aws/datadog/cluster-agent
 
   # datadog.containerIncludeLogs -- Include logs in Agent Autodiscovery, as a space-separated list
   containerIncludeLogs:
@@ -1214,8 +1222,12 @@ datadog:
     kube_namespace:^monitoring$
     kube_namespace:^porter-agent-system$
     kube_namespace:^telemetry$
-    image:^gcr.io/datadoghq/agent
-    image:^gcr.io/datadoghq/cluster-agent
+    image:/datadoghq/agent
+    image:/datadoghq/cluster-agent
+    image:^datadoghq.azurecr.io/agent
+    image:^datadoghq.azurecr.io/cluster-agent
+    image:^public.ecr.aws/datadog/agent
+    image:^public.ecr.aws/datadog/cluster-agent
 
 
   # datadog.containerIncludeMetrics -- Include metrics in Agent Autodiscovery, as a space-separated list
