@@ -173,6 +173,16 @@ promtail:
           separator: "_"
         - action: labelmap
           regex: __meta_kubernetes_pod_label_(.+)
+        # Any pod that has registered a log-processing profile (porter.run/log-processing.
+        # profile: "<name>" — same opt-in convention as prometheus.io/scrape) is picked up
+        # and parsed by that profile's own dedicated scrape job instead — drop it here so
+        # it isn't also ingested a second time, unparsed, by this default job. Matches any
+        # non-empty value, not a specific profile name, so a future second profile is
+        # correctly excluded here too without editing this rule again. No-op when no
+        # profile-registered pod is running.
+        - source_labels: [__meta_kubernetes_pod_annotation_porter_run_log_processing_profile]
+          regex: ".+"
+          action: drop
   # The monolith mirrors these requests in the sandbox computeSystemOverhead
   # sum (system_application/sandbox_compute_overhead.go); update both together.
   resources:
@@ -200,3 +210,13 @@ watchman:
     requests:
       cpu: 50m
       memory: 128Mi
+
+streamer:
+  enabled: false
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
