@@ -4,20 +4,31 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: cachesubnetgroups.elasticache.services.k8s.aws
+  name: serverlesscachesnapshots.elasticache.services.k8s.aws
 spec:
   group: elasticache.services.k8s.aws
   names:
-    kind: CacheSubnetGroup
-    listKind: CacheSubnetGroupList
-    plural: cachesubnetgroups
-    singular: cachesubnetgroup
+    kind: ServerlessCacheSnapshot
+    listKind: ServerlessCacheSnapshotList
+    plural: serverlesscachesnapshots
+    singular: serverlesscachesnapshot
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.status
+      name: STATUS
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="ACK.ResourceSynced")].status
+      name: Synced
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: CacheSubnetGroup is the Schema for the CacheSubnetGroups API
+        description: ServerlessCacheSnapshot is the Schema for the ServerlessCacheSnapshots
+          API
         properties:
           apiVersion:
             description: |-
@@ -38,53 +49,74 @@ spec:
             type: object
           spec:
             description: |-
-              CacheSubnetGroupSpec defines the desired state of CacheSubnetGroup.
+              ServerlessCacheSnapshotSpec defines the desired state of ServerlessCacheSnapshot.
 
-              Represents the output of one of the following operations:
-
-                - CreateCacheSubnetGroup
-
-                - ModifyCacheSubnetGroup
+              The resource representing a serverless cache snapshot. Available for Valkey,
+              Redis OSS and Serverless Memcached only.
             properties:
-              cacheSubnetGroupDescription:
-                description: A description for the cache subnet group.
-                type: string
-              cacheSubnetGroupName:
+              kmsKeyID:
                 description: |-
-                  A name for the cache subnet group. This value is stored as a lowercase string.
-
-                  Constraints: Must contain no more than 255 alphanumeric characters or hyphens.
-
-                  Example: mysubnetgroup
+                  The ID of the KMS key used to encrypt the snapshot. Available for Valkey,
+                  Redis OSS and Serverless Memcached only. Default: NULL
                 type: string
-              subnetIDs:
-                description: A list of VPC subnet IDs for the cache subnet group.
-                items:
-                  type: string
-                type: array
-              subnetRefs:
-                items:
-                  description: "AWSResourceReferenceWrapper provides a wrapper around
-                    *AWSResourceReference\ntype to provide more user friendly syntax
-                    for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
-                    \ name: my-api"
-                  properties:
-                    from:
-                      description: |-
-                        AWSResourceReference provides all the values necessary to reference another
-                        k8s resource for finding the identifier(Id/ARN/Name)
-                      properties:
-                        name:
-                          type: string
-                        namespace:
-                          type: string
-                      type: object
-                  type: object
-                type: array
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
+              kmsKeyRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
+              serverlessCacheName:
+                description: |-
+                  The name of an existing serverless cache. The snapshot is created from this
+                  cache. Available for Valkey, Redis OSS and Serverless Memcached only.
+                type: string
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
+              serverlessCacheRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
+              serverlessCacheSnapshotName:
+                description: |-
+                  The name for the snapshot being created. Must be unique for the customer
+                  account. Available for Valkey, Redis OSS and Serverless Memcached only. Must
+                  be between 1 and 255 characters.
+                type: string
+                x-kubernetes-validations:
+                - message: Value is immutable once set
+                  rule: self == oldSelf
               tags:
                 description: |-
-                  A list of tags to be added to this resource. A tag is a key-value pair. A
-                  tag key must be accompanied by a tag value, although null is accepted.
+                  A list of tags to be added to the snapshot resource. A tag is a key-value
+                  pair. Available for Valkey, Redis OSS and Serverless Memcached only.
                 items:
                   description: |-
                     A tag that can be added to an ElastiCache cluster or replication group. Tags
@@ -101,11 +133,11 @@ spec:
                   type: object
                 type: array
             required:
-            - cacheSubnetGroupDescription
-            - cacheSubnetGroupName
+            - serverlessCacheSnapshotName
             type: object
           status:
-            description: CacheSubnetGroupStatus defines the observed state of CacheSubnetGroup
+            description: ServerlessCacheSnapshotStatus defines the observed state
+              of ServerlessCacheSnapshot
             properties:
               ackResourceMetadata:
                 description: |-
@@ -140,6 +172,11 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
+              bytesUsedForCache:
+                description: |-
+                  The total size of a serverless cache snapshot, in bytes. Available for Valkey,
+                  Redis OSS and Serverless Memcached only.
+                type: string
               conditions:
                 description: |-
                   All CRs managed by ACK have a common `Status.Conditions` member that
@@ -175,56 +212,40 @@ spec:
                   - type
                   type: object
                 type: array
-              events:
+              createTime:
                 description: |-
-                  A list of events. Each element in the list contains detailed information
-                  about one event.
-                items:
-                  description: |-
-                    Represents a single occurrence of something interesting within the system.
-                    Some examples of events are creating a cluster, adding or removing a cache
-                    node, or rebooting a node.
-                  properties:
-                    date:
-                      format: date-time
-                      type: string
-                    message:
-                      type: string
-                    sourceIdentifier:
-                      type: string
-                    sourceType:
-                      type: string
-                  type: object
-                type: array
-              subnets:
-                description: A list of subnets associated with the cache subnet group.
-                items:
-                  description: |-
-                    Represents the subnet associated with a cluster. This parameter refers to
-                    subnets defined in Amazon Virtual Private Cloud (Amazon VPC) and used with
-                    ElastiCache.
-                  properties:
-                    subnetAvailabilityZone:
-                      description: Describes an Availability Zone in which the cluster
-                        is launched.
-                      properties:
-                        name:
-                          type: string
-                      type: object
-                    subnetIdentifier:
-                      type: string
-                    subnetOutpost:
-                      description: The ID of the outpost subnet.
-                      properties:
-                        subnetOutpostARN:
-                          type: string
-                      type: object
-                  type: object
-                type: array
-              vpcID:
+                  The date and time that the source serverless cache's metadata and cache data
+                  set was obtained for the snapshot. Available for Valkey, Redis OSS and Serverless
+                  Memcached only.
+                format: date-time
+                type: string
+              expiryTime:
                 description: |-
-                  The Amazon Virtual Private Cloud identifier (VPC ID) of the cache subnet
-                  group.
+                  The time that the serverless cache snapshot will expire. Available for Valkey,
+                  Redis OSS and Serverless Memcached only.
+                format: date-time
+                type: string
+              serverlessCacheConfiguration:
+                description: |-
+                  The configuration of the serverless cache, at the time the snapshot was taken.
+                  Available for Valkey, Redis OSS and Serverless Memcached only.
+                properties:
+                  engine:
+                    type: string
+                  majorEngineVersion:
+                    type: string
+                  serverlessCacheName:
+                    type: string
+                type: object
+              snapshotType:
+                description: |-
+                  The type of snapshot of serverless cache. Available for Valkey, Redis OSS
+                  and Serverless Memcached only.
+                type: string
+              status:
+                description: |-
+                  The current status of the serverless cache. Available for Valkey, Redis OSS
+                  and Serverless Memcached only.
                 type: string
             type: object
         type: object
