@@ -1,0 +1,58 @@
+---
+apiVersion: logstash.k8s.elastic.co/v1alpha1
+kind: Logstash
+metadata:
+  name: {{ include "logstash.fullname" . }}
+  labels:
+    {{- include "logstash.labels" . | nindent 4 }}
+  annotations:
+    eck.k8s.elastic.co/license: basic
+    {{- with .Values.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  version: {{ required "A Logstash version is required" .Values.version }}
+  count: {{ required "A pod count is required" .Values.count }}
+  {{- with .Values.image }}
+  image: {{ . }}
+  {{- end }}
+  {{- with .Values.serviceAccountName }}
+  serviceAccountName: {{ . }}
+  {{- end }}
+  {{- with .Values.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ . }}
+  {{- end }}
+
+  {{- if and .Values.config .Values.configRef }}
+  {{- fail "config and configRef are mutually exclusive!" }}
+  {{- end }}
+  {{- with .Values.config }}
+  config:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.configRef }}
+  configRef:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.podTemplate }}
+  podTemplate:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.monitoring }}
+  monitoring:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if and .Values.pipelines .Values.pipelinesRef }}
+  {{- fail "pipelines and pipelinesRef are mutually exclusive!" }}
+  {{- end }}
+  {{- with .Values.pipelinesRef }}
+  pipelinesRef:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.pipelines  }}
+  pipelines: {{ toYaml .Values.pipelines | nindent 4 }}
+  {{- end }}
+  volumeClaimTemplates: {{ toYaml .Values.volumeClaimTemplates | nindent 4 }}
+  elasticsearchRefs: {{ toYaml .Values.elasticsearchRefs | nindent 4 }}
+  services: {{ toYaml .Values.services | nindent 4 }}
+  secureSettings: {{ toYaml .Values.secureSettings | nindent 4 }}
