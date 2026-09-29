@@ -1,5 +1,5 @@
 {{- /*
-Copyright VMware, Inc.
+Copyright Broadcom, Inc. All Rights Reserved.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
@@ -16,25 +16,25 @@ data:
   ping_readiness_local.sh: |-
     #!/bin/bash
 
-    [[ -f $REDIS_PASSWORD_FILE ]] && export REDIS_PASSWORD="$(< "${REDIS_PASSWORD_FILE}")"
-    [[ -n "$REDIS_PASSWORD" ]] && export REDISCLI_AUTH="$REDIS_PASSWORD"
-    response=$(
-      timeout -s 15 $1 \
-      redis-cli \
-        -h localhost \
+    timeout=$1
+    run_redis_command() {
 {{- if .Values.tls.enabled }}
-        -p $REDIS_TLS_PORT \
-        --tls \
-        --cacert {{ template "redis.tlsCACert" . }} \
+        local args=("--tls" "-p" "$REDIS_TLS_PORT")
+        {{- if not (empty (include "redis.tlsCACert" .)) }}
+        args+=("--cacert" {{ template "redis.tlsCACert" . }})
+        {{- end }}
         {{- if .Values.tls.authClients }}
-          --cert {{ template "redis.tlsCert" . }} \
-          --key {{ template "redis.tlsCertKey" . }} \
+        args+=("--cert" {{ template "redis.tlsCert" . }} "--key" {{ template "redis.tlsCertKey" . }})
         {{- end }}
 {{- else }}
-        -p $REDIS_PORT \
+        local args=("-p" "$REDIS_PORT")
 {{- end }}
-        ping
-    )
+        timeout -s 15 $timeout redis-cli "${args[@]}" "$@"
+    }
+
+    [[ -f $REDIS_PASSWORD_FILE ]] && export REDIS_PASSWORD="$(< "${REDIS_PASSWORD_FILE}")"
+    [[ -n "$REDIS_PASSWORD" ]] && export REDISCLI_AUTH="$REDIS_PASSWORD"
+    response=$(run_redis_command ping)
     if [ "$?" -eq "124" ]; then
       echo "Timed out"
       exit 1
@@ -43,6 +43,28 @@ data:
       echo "$response"
       exit 1
     fi
+
+{{- if and .Values.sentinel.enabled .Values.sentinel.replicaSyncCheck }}
+    replication_info=$(run_redis_command info replication)
+    if [ "$?" -eq "124" ]; then
+      echo "Timed out"
+      exit 1
+    fi
+    role=$(echo "$replication_info" | grep role | cut -d: -f2 | tr -d '\r')
+    if [[ "$role" = "slave" ]] || [[ "$role" = "replica" ]]; then
+      master_link_status=$(echo "$replication_info" | grep master_link_status | cut -d: -f2 | tr -d '\r')
+      master_sync_in_progress=$(echo "$replication_info" | grep master_sync_in_progress | cut -d: -f2 | tr -d '\r')
+      if [[ "$master_link_status" != "up" ]]; then
+          echo "Replica link to master is DOWN"
+          exit 1
+      fi
+      if [[ "$master_sync_in_progress" != "0" ]]; then
+          echo "Replica is currently syncing data from master"
+          exit 1
+      fi
+    fi
+{{- end }}
+
   ping_liveness_local.sh: |-
     #!/bin/bash
 
@@ -55,11 +77,13 @@ data:
 {{- if .Values.tls.enabled }}
         -p $REDIS_TLS_PORT \
         --tls \
+      {{- if not (empty (include "redis.tlsCACert" .)) }}
         --cacert {{ template "redis.tlsCACert" . }} \
-        {{- if .Values.tls.authClients }}
-          --cert {{ template "redis.tlsCert" . }} \
-          --key {{ template "redis.tlsCertKey" . }} \
-        {{- end }}
+      {{- end }}
+      {{- if .Values.tls.authClients }}
+        --cert {{ template "redis.tlsCert" . }} \
+        --key {{ template "redis.tlsCertKey" . }} \
+      {{- end }}
 {{- else }}
         -p $REDIS_PORT \
 {{- end }}
@@ -89,11 +113,13 @@ data:
 {{- if .Values.tls.enabled }}
         -p $REDIS_SENTINEL_TLS_PORT_NUMBER \
         --tls \
+      {{- if not (empty (include "redis.tlsCACert" .)) }}
         --cacert "$REDIS_SENTINEL_TLS_CA_FILE" \
-        {{- if .Values.tls.authClients }}
-          --cert "$REDIS_SENTINEL_TLS_CERT_FILE" \
-          --key "$REDIS_SENTINEL_TLS_KEY_FILE" \
-        {{- end }}
+      {{- end }}
+      {{- if .Values.tls.authClients }}
+        --cert "$REDIS_SENTINEL_TLS_CERT_FILE" \
+        --key "$REDIS_SENTINEL_TLS_KEY_FILE" \
+      {{- end }}
 {{- else }}
         -p $REDIS_SENTINEL_PORT \
 {{- end }}
@@ -122,7 +148,7 @@ data:
         printf "\nsentinel known-sentinel {{ .Values.sentinel.masterSet }} %s %s %s", IP, PORT, $0; FOUND_RUNID=0;
       }
     }
-{{- end }}
+{{- else }}
   ping_readiness_master.sh: |-
     #!/bin/bash
 
@@ -135,11 +161,13 @@ data:
         -p $REDIS_MASTER_PORT_NUMBER \
 {{- if .Values.tls.enabled }}
         --tls \
+      {{- if not (empty (include "redis.tlsCACert" .)) }}
         --cacert {{ template "redis.tlsCACert" . }} \
-        {{- if .Values.tls.authClients }}
-          --cert {{ template "redis.tlsCert" . }} \
-          --key {{ template "redis.tlsCertKey" . }} \
-        {{- end }}
+      {{- end }}
+      {{- if .Values.tls.authClients }}
+        --cert {{ template "redis.tlsCert" . }} \
+        --key {{ template "redis.tlsCertKey" . }} \
+      {{- end }}
 {{- end }}
         ping
     )
@@ -163,11 +191,13 @@ data:
         -p $REDIS_MASTER_PORT_NUMBER \
 {{- if .Values.tls.enabled }}
         --tls \
+      {{- if not (empty (include "redis.tlsCACert" .)) }}
         --cacert {{ template "redis.tlsCACert" . }} \
-        {{- if .Values.tls.authClients }}
-          --cert {{ template "redis.tlsCert" . }} \
-          --key {{ template "redis.tlsCertKey" . }} \
-        {{- end }}
+      {{- end }}
+      {{- if .Values.tls.authClients }}
+        --cert {{ template "redis.tlsCert" . }} \
+        --key {{ template "redis.tlsCertKey" . }} \
+      {{- end }}
 {{- end }}
         ping
     )
@@ -192,3 +222,4 @@ data:
     "$script_dir/ping_liveness_local.sh" $1 || exit_status=$?
     "$script_dir/ping_liveness_master.sh" $1 || exit_status=$?
     exit $exit_status
+{{- end }}
