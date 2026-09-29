@@ -1,228 +1,44 @@
-apiVersion: rbac.authorization.k8s.io/v1
+{{ $labels := .Values.role.labels }}
+{{ $appVersion := .Chart.AppVersion | quote }}
+{{ $rbacRules := include "ack-apigatewayv2-controller.rbac-rules" . }}
+{{ $fullname := include "ack-apigatewayv2-controller.app.fullname" . }}
+{{ $chartVersion := include "ack-apigatewayv2-controller.chart.name-version" . }}
 {{ if eq .Values.installScope "cluster" }}
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
-  name: ack-apigatewayv2-controller
+  name: {{ include "ack-apigatewayv2-controller.app.fullname" . }}
   labels:
-  {{- range $key, $value := .Values.role.labels }}
+    app.kubernetes.io/name: {{ include "ack-apigatewayv2-controller.app.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    k8s-app: {{ include "ack-apigatewayv2-controller.app.name" . }}
+    helm.sh/chart: {{ include "ack-apigatewayv2-controller.chart.name-version" . }}
+  {{- range $key, $value := $labels }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
-{{ else }}
+{{$rbacRules }}
+{{ else if eq .Values.installScope "namespace" }}
+{{ $wn := include "ack-apigatewayv2-controller.watch-namespace" . }}
+{{ $namespaces := split "," $wn }}
+{{ range $namespaces }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  creationTimestamp: null
-  name: ack-apigatewayv2-controller
+  name: {{ $fullname }}-{{ . }}
+  namespace: {{ . }}
   labels:
-  {{- range $key, $value := .Values.role.labels }}
+    app.kubernetes.io/name: {{ $fullname }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: {{ $appVersion }}
+    k8s-app: {{ $fullname }}
+    helm.sh/chart: {{ $chartVersion }}
+  {{- range $key, $value := $labels }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
-  namespace: {{ .Release.Namespace }}
+{{ $rbacRules }}
 {{ end }}
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - apis
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - apis/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - authorizers
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - authorizers/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - deployments
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - deployments/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - integrations
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - integrations/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - routes
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - routes/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - stages
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - stages/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - vpclinks
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - apigatewayv2.services.k8s.aws
-  resources:
-  - vpclinks/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - services.k8s.aws
-  resources:
-  - adoptedresources
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - services.k8s.aws
-  resources:
-  - adoptedresources/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - services.k8s.aws
-  resources:
-  - fieldexports
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - services.k8s.aws
-  resources:
-  - fieldexports/status
-  verbs:
-  - get
-  - patch
-  - update
+{{ end }}
