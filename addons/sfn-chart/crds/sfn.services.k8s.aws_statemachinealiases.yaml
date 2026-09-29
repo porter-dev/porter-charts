@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: statemachines.sfn.services.k8s.aws
+  name: statemachinealiases.sfn.services.k8s.aws
 spec:
   group: sfn.services.k8s.aws
   names:
-    kind: StateMachine
-    listKind: StateMachineList
-    plural: statemachines
-    singular: statemachine
+    kind: StateMachineAlias
+    listKind: StateMachineAliasList
+    plural: statemachinealiases
+    singular: statemachinealias
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: StateMachine is the Schema for the StateMachines API
+        description: StateMachineAlias is the Schema for the StateMachineAliases API
         properties:
           apiVersion:
             description: |-
@@ -37,116 +37,50 @@ spec:
           metadata:
             type: object
           spec:
-            description: StateMachineSpec defines the desired state of StateMachine.
+            description: StateMachineAliasSpec defines the desired state of StateMachineAlias.
             properties:
-              definition:
-                description: |-
-                  The Amazon States Language definition of the state machine. See Amazon States
-                  Language (https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html).
+              description:
+                description: A description for the state machine alias.
                 type: string
-              loggingConfiguration:
-                description: |-
-                  Defines what execution history events are logged and where they are logged.
-
-                  By default, the level is set to OFF. For more information see Log Levels
-                  (https://docs.aws.amazon.com/step-functions/latest/dg/cloudwatch-log-level.html)
-                  in the Step Functions User Guide.
-                properties:
-                  destinations:
-                    items:
-                      properties:
-                        cloudWatchLogsLogGroup:
-                          properties:
-                            logGroupARN:
-                              type: string
-                          type: object
-                      type: object
-                    type: array
-                  includeExecutionData:
-                    type: boolean
-                  level:
-                    type: string
-                type: object
               name:
                 description: |-
-                  The name of the state machine.
+                  The name of the state machine alias.
 
-                  A name must not contain:
+                  To avoid conflict with version ARNs, don't use an integer in the name of
+                  the alias.
 
-                    - white space
+                  Regex Pattern: `^(?=.*[a-zA-Z_\-\.])[a-zA-Z0-9_\-\.]+$`
                 type: string
                 x-kubernetes-validations:
                 - message: Value is immutable once set
                   rule: self == oldSelf
-              roleARN:
-                description: The Amazon Resource Name (ARN) of the IAM role to use
-                  for this state machine.
-                type: string
-              roleRef:
-                description: "AWSResourceReferenceWrapper provides a wrapper around
-                  *AWSResourceReference\ntype to provide more user friendly syntax
-                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
-                  \ name: my-api"
-                properties:
-                  from:
-                    description: |-
-                      AWSResourceReference provides all the values necessary to reference another
-                      k8s resource for finding the identifier(Id/ARN/Name)
-                    properties:
-                      name:
-                        type: string
-                      namespace:
-                        type: string
-                    type: object
-                type: object
-              tags:
+              routingConfiguration:
                 description: |-
-                  Tags to be added when creating a state machine.
-
-                  An array of key-value pairs. For more information, see Using Cost Allocation
-                  Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
-                  in the Amazon Web Services Billing and Cost Management User Guide, and Controlling
-                  Access Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
-
-                  Tags may only contain Unicode letters, digits, white space, or these symbols:
-                  _ . : / = + - @.
+                  The routing configuration of a state machine alias. The routing configuration
+                  shifts execution traffic between two state machine versions. routingConfiguration
+                  contains an array of RoutingConfig objects that specify up to two state machine
+                  versions. Step Functions then randomly choses which version to run an execution
+                  with based on the weight assigned to each RoutingConfig.
                 items:
                   description: |-
-                    Tags are key-value pairs that can be associated with Step Functions state
-                    machines and activities.
-
-                    An array of key-value pairs. For more information, see Using Cost Allocation
-                    Tags (https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
-                    in the Amazon Web Services Billing and Cost Management User Guide, and Controlling
-                    Access Using IAM Tags (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_iam-tags.html).
-
-                    Tags may only contain Unicode letters, digits, white space, or these symbols:
-                    _ . : / = + - @.
+                    Contains details about the routing configuration of a state machine alias.
+                    In a routing configuration, you define an array of objects that specify up
+                    to two state machine versions. You also specify the percentage of traffic
+                    to be routed to each version.
                   properties:
-                    key:
+                    stateMachineVersionARN:
                       type: string
-                    value:
-                      type: string
+                    weight:
+                      format: int64
+                      type: integer
                   type: object
                 type: array
-              tracingConfiguration:
-                description: Selects whether X-Ray tracing is enabled.
-                properties:
-                  enabled:
-                    type: boolean
-                type: object
-              type_:
-                description: |-
-                  Determines whether a Standard or Express state machine is created. The default
-                  is STANDARD. You cannot update the type of a state machine once it has been
-                  created.
-                type: string
             required:
-            - definition
             - name
+            - routingConfiguration
             type: object
           status:
-            description: StateMachineStatus defines the observed state of StateMachine
+            description: StateMachineAliasStatus defines the observed state of StateMachineAlias
             properties:
               ackResourceMetadata:
                 description: |-
@@ -217,7 +151,7 @@ spec:
                   type: object
                 type: array
               creationDate:
-                description: The date the state machine is created.
+                description: The date the state machine alias was created.
                 format: date-time
                 type: string
             type: object
