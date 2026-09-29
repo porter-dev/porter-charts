@@ -171,8 +171,15 @@
         "region": {
           "type": "string"
         },
-        "endpoint": {
+        "endpoint_url": {
           "type": "string"
+        },
+        "identity_endpoint_url": {
+          "type": "string"
+        },
+        "allow_unsafe_aws_endpoint_urls": {
+          "type": "boolean",
+          "default": false
         },
         "credentials": {
           "description": "AWS credentials information",
@@ -210,7 +217,10 @@
     },
     "watchNamespace": {
       "type": "string"
-    },    
+    },
+    "watchSelectors": {
+      "type": "string"
+    },
     "resourceTags": {
       "type": "array",
       "items": {
@@ -223,13 +233,27 @@
       "enum": ["delete", "retain"]
     },
     "reconcile": {
-      "description": "Reconcile resync settings. Parameters to tune the controller's drift remediation period.",
+      "description": "Reconcile settings. This is used to configure the controller's reconciliation behavior. e.g resyncPeriod and maxConcurrentSyncs",
       "properties": {
         "defaultResyncPeriod": {
           "type": "number"
         },
         "resourceResyncPeriods": {
           "type": "object"
+        },
+        "defaultMaxConcurentSyncs": {
+          "type": "number"
+        },
+        "resourceMaxConcurrentSyncs": {
+          "type": "object"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of resource kinds to reconcile. If empty, all resources will be reconciled.",
+          "default": []
         }
       },
       "type": "object"
@@ -246,6 +270,11 @@
       },
       "type": "object"
     },
+    "enableCARM": {
+      "description": "Parameter to enable or disable cross account resource management.",
+      "type": "boolean",
+      "default": true
+   },
     "serviceAccount": {
       "description": "ServiceAccount settings",
       "properties": {
@@ -260,6 +289,13 @@
         }
       },
       "type": "object"
+    }
+  },
+  "featureGates": {
+    "description": "Feature gates settings",
+    "type": "object",
+    "additionalProperties": {
+      "type": "boolean"
     }
   },
   "required": [
