@@ -26,14 +26,25 @@ metadata:
     {{- end }}
   {{- end }}
 spec:
+  type: {{ .Values.service.type }}
   ports:
   - name: https
     port: {{ .Values.service.portHttps }}
     targetPort: {{ .Values.service.portHttpsTarget }}
     protocol: TCP
+    appProtocol: https
   - name: {{ .Values.prometheus.metricServer.portName }}
     port: {{ .Values.prometheus.metricServer.port }}
     targetPort: {{ .Values.prometheus.metricServer.port }}
     protocol: TCP
+    {{- with .Values.prometheus.metricServer.appProtocol }}
+    appProtocol: {{ . }}
+    {{- end }}
+  {{- if .Values.profiling.metricsServer.enabled }}
+  - name: profiling
+    port: {{ .Values.profiling.metricsServer.port }}
+    targetPort: {{ .Values.profiling.metricsServer.port }}
+    protocol: TCP
+  {{- end }}
   selector:
     app: {{ .Values.operator.name }}-metrics-apiserver
