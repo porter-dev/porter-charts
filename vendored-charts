@@ -15,6 +15,7 @@ addons/eventbridge-chart
 addons/external-secrets
 addons/iam-chart
 addons/karpenter
+addons/karpenter-aws
 addons/keda-http-add-on
 addons/kms-chart
 addons/lambda-chart
