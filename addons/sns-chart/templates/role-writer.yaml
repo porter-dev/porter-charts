@@ -3,20 +3,23 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   creationTimestamp: null
-  name: ack-sns-writer
+  name: {{ include "ack-sns-controller.app.fullname" . }}-writer
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "ack-sns-controller.app.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    k8s-app: {{ include "ack-sns-controller.app.name" . }}
+    helm.sh/chart: {{ include "ack-sns-controller.chart.name-version" . }}
 rules:
 - apiGroups:
   - sns.services.k8s.aws
   resources:
   - platformapplications
-
   - platformendpoints
-
   - subscriptions
-
   - topics
-
   verbs:
   - create
   - delete
