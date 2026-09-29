@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: dbproxies.rds.services.k8s.aws
+  name: dbclusterendpoints.rds.services.k8s.aws
 spec:
   group: rds.services.k8s.aws
   names:
-    kind: DBProxy
-    listKind: DBProxyList
-    plural: dbproxies
-    singular: dbproxy
+    kind: DBClusterEndpoint
+    listKind: DBClusterEndpointList
+    plural: dbclusterendpoints
+    singular: dbclusterendpoint
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: DBProxy is the Schema for the DBProxies API
+        description: DBClusterEndpoint is the Schema for the DBClusterEndpoints API
         properties:
           apiVersion:
             description: |-
@@ -38,79 +38,34 @@ spec:
             type: object
           spec:
             description: |-
-              DBProxySpec defines the desired state of DBProxy.
+              DBClusterEndpointSpec defines the desired state of DBClusterEndpoint.
 
-              The data structure representing a proxy managed by the RDS Proxy.
+              This data type represents the information you need to connect to an Amazon
+              Aurora DB cluster. This data type is used as a response element in the following
+              actions:
 
-              This data type is used as a response element in the DescribeDBProxies action.
+                - CreateDBClusterEndpoint
+
+                - DescribeDBClusterEndpoints
+
+                - ModifyDBClusterEndpoint
+
+                - DeleteDBClusterEndpoint
+
+              For the data structure that represents Amazon RDS DB instance endpoints,
+              see Endpoint.
             properties:
-              auth:
-                description: The authorization mechanism that the proxy uses.
-                items:
-                  description: |-
-                    Specifies the details of authentication used by a proxy to log in as a specific
-                    database user.
-                  properties:
-                    authScheme:
-                      type: string
-                    clientPasswordAuthType:
-                      type: string
-                    description:
-                      type: string
-                    iamAuth:
-                      type: string
-                    secretARN:
-                      type: string
-                    userName:
-                      type: string
-                  type: object
-                type: array
-              debugLogging:
+              dbClusterEndpointIdentifier:
                 description: |-
-                  Specifies whether the proxy includes detailed information about SQL statements
-                  in its logs. This information helps you to debug issues involving SQL behavior
-                  or the performance and scalability of the proxy connections. The debug information
-                  includes the text of SQL statements that you submit through the proxy. Thus,
-                  only enable this setting when needed for debugging, and only when you have
-                  security measures in place to safeguard any sensitive information that appears
-                  in the logs.
-                type: boolean
-              engineFamily:
-                description: |-
-                  The kinds of databases that the proxy can connect to. This value determines
-                  which database network protocol the proxy recognizes when it interprets network
-                  traffic to and from the database. For Aurora MySQL, RDS for MariaDB, and
-                  RDS for MySQL databases, specify MYSQL. For Aurora PostgreSQL and RDS for
-                  PostgreSQL databases, specify POSTGRESQL. For RDS for Microsoft SQL Server,
-                  specify SQLSERVER.
+                  The identifier to use for the new endpoint. This parameter is stored as a
+                  lowercase string.
                 type: string
-              idleClientTimeout:
+              dbClusterIdentifier:
                 description: |-
-                  The number of seconds that a connection to the proxy can be inactive before
-                  the proxy disconnects it. You can set this value higher or lower than the
-                  connection timeout limit for the associated database.
-                format: int64
-                type: integer
-              name:
-                description: |-
-                  The identifier for the proxy. This name must be unique for all proxies owned
-                  by your Amazon Web Services account in the specified Amazon Web Services
-                  Region. An identifier must begin with a letter and must contain only ASCII
-                  letters, digits, and hyphens; it can't end with a hyphen or contain two consecutive
-                  hyphens.
+                  The DB cluster identifier of the DB cluster associated with the endpoint.
+                  This parameter is stored as a lowercase string.
                 type: string
-              requireTLS:
-                description: |-
-                  Specifies whether Transport Layer Security (TLS) encryption is required for
-                  connections to the proxy. By enabling this setting, you can enforce encrypted
-                  TLS connections to the proxy.
-                type: boolean
-              roleARN:
-                description: |-
-                  The Amazon Resource Name (ARN) of the IAM role that the proxy uses to access
-                  secrets in Amazon Web Services Secrets Manager.
-                type: string
-              roleRef:
+              dbClusterIdentifierRef:
                 description: "AWSResourceReferenceWrapper provides a wrapper around
                   *AWSResourceReference\ntype to provide more user friendly syntax
                   for references using 'from' field\nEx:\nAPIIDRef:\n\n\tfrom:\n\t
@@ -127,10 +82,25 @@ spec:
                         type: string
                     type: object
                 type: object
-              tags:
+              endpointType:
+                description: 'The type of the endpoint, one of: READER, WRITER, ANY.'
+                type: string
+              excludedMembers:
                 description: |-
-                  An optional set of key-value pairs to associate arbitrary data of your choosing
-                  with the proxy.
+                  List of DB instance identifiers that aren't part of the custom endpoint group.
+                  All other eligible instances are reachable through the custom endpoint. This
+                  parameter is relevant only if the list of static members is empty.
+                items:
+                  type: string
+                type: array
+              staticMembers:
+                description: List of DB instance identifiers that are part of the
+                  custom endpoint group.
+                items:
+                  type: string
+                type: array
+              tags:
+                description: The tags to be assigned to the Amazon RDS resource.
                 items:
                   description: |-
                     Metadata assigned to an Amazon RDS resource consisting of a key-value pair.
@@ -146,26 +116,11 @@ spec:
                       type: string
                   type: object
                 type: array
-              vpcSecurityGroupIDs:
-                description: One or more VPC security group IDs to associate with
-                  the new proxy.
-                items:
-                  type: string
-                type: array
-              vpcSubnetIDs:
-                description: One or more VPC subnet IDs to associate with the new
-                  proxy.
-                items:
-                  type: string
-                type: array
             required:
-            - auth
-            - engineFamily
-            - name
-            - vpcSubnetIDs
+            - dbClusterEndpointIdentifier
             type: object
           status:
-            description: DBProxyStatus defines the observed state of DBProxy
+            description: DBClusterEndpointStatus defines the observed state of DBClusterEndpoint
             properties:
               ackResourceMetadata:
                 description: |-
@@ -235,27 +190,20 @@ spec:
                   - type
                   type: object
                 type: array
-              createdDate:
-                description: The date and time when the proxy was first created.
-                format: date-time
+              dbClusterEndpointResourceIdentifier:
+                description: |-
+                  A unique system-generated identifier for an endpoint. It remains the same
+                  for the whole life of the endpoint.
                 type: string
               endpoint:
-                description: |-
-                  The endpoint that you can use to connect to the DB proxy. You include the
-                  endpoint value in the connection string for a database client application.
+                description: The DNS address of the endpoint.
                 type: string
               status:
                 description: |-
-                  The current status of this proxy. A status of available means the proxy is
-                  ready to handle requests. Other values indicate that you must wait for the
-                  proxy to be ready, or take some action to resolve an issue.
-                type: string
-              updatedDate:
-                description: The date and time when the proxy was last updated.
-                format: date-time
-                type: string
-              vpcID:
-                description: Provides the VPC ID of the DB proxy.
+                  The current status of the endpoint. One of: creating, available, deleting,
+                  inactive, modifying. The inactive state applies to an endpoint that can't
+                  be used for a certain kind of cluster, such as a writer endpoint for a read-only
+                  secondary cluster in a global database.
                 type: string
             type: object
         type: object
