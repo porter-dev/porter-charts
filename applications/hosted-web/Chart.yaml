@@ -1,0 +1,13 @@
+apiVersion: v2
+appVersion: 1.25.0
+description: Web service on a Porter hosted cluster, exposed through the shared Gateway.
+home: https://getporter.dev/
+icon: https://user-images.githubusercontent.com/65516095/111255214-07d3da80-85ed-11eb-99e2-fddcbdb99bdb.png
+keywords:
+  - porter
+  - application
+  - service
+  - web
+name: hosted-web
+type: application
+version: 0.2.0

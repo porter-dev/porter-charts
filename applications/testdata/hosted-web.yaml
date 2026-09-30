@@ -1,0 +1,8 @@
+ingress:
+  enabled: true
+  hosts:
+    - app.example.com
+  porter_hosts:
+    - app.onporter.run
+  annotations: {}
+  custom_paths: []

@@ -1,0 +1,72 @@
+# Values for a worker service on a Porter hosted cluster. The Porter control plane sets these.
+
+fullnameOverride: ""
+replicaCount: 1
+terminationGracePeriodSeconds: 30
+
+# The umbrella chart sets global.image, which takes precedence over image.
+image:
+  repository: public.ecr.aws/o1j4x7p4/hello-porter
+  tag: latest
+  imagePullSecret: ""
+
+container:
+  command: ""
+  env:
+    normal: {}
+
+# configMapRefs and secretRefs are env group pairs, loaded as environment variables in order.
+configMapRefs: []
+secretRefs: []
+
+labels: {}
+podLabels: {}
+podAnnotations: {}
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: ""
+    memory: ""
+  setCPULimits: false
+
+serviceAccount:
+  create: true
+  name: ""
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+  targetMemoryUtilizationPercentage: 50
+
+podDisruptionBudget:
+  enabled: false
+  minAvailablePercentage: 50
+
+# Worker probes run their command in the container.
+health:
+  livenessProbe:
+    enabled: false
+    command: ""
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 3
+  readinessProbe:
+    enabled: false
+    command: ""
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 3
+  startupProbe:
+    enabled: false
+    command: ""
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 3

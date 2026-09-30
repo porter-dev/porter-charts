@@ -1,0 +1,49 @@
+# Values for a job on a Porter hosted cluster. The Porter control plane sets these.
+
+fullnameOverride: ""
+terminationGracePeriodSeconds: 30
+
+# The umbrella chart sets global.image, which takes precedence over image.
+image:
+  repository: public.ecr.aws/o1j4x7p4/hello-porter-job
+  tag: latest
+  imagePullSecret: ""
+
+container:
+  command: ""
+  env:
+    normal: {}
+
+# configMapRefs and secretRefs are env group pairs, loaded as environment variables in order.
+configMapRefs: []
+secretRefs: []
+
+labels: {}
+podLabels: {}
+podAnnotations: {}
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: ""
+    memory: ""
+  setCPULimits: false
+
+serviceAccount:
+  create: true
+  name: ""
+
+schedule:
+  enabled: false
+  value: "*/5 * * * *"
+
+allowConcurrency: false
+
+# activeDeadlineSeconds defaults to sidecar.timeout when unset.
+activeDeadlineSeconds: 0
+
+sidecar:
+  # The sidecar stops the job after this number of seconds.
+  timeout: 3600

@@ -1,0 +1,87 @@
+{{- /*
+Serves the ingress hosts through an HTTPRoute on the shared Gateway.
+A route without hostnames matches every host on the Gateway, so no hosts means no route.
+*/}}
+{{- $allHosts := concat (.Values.ingress.hosts | default list) (.Values.ingress.porter_hosts | default list) -}}
+{{- if and .Values.ingress.enabled $allHosts -}}
+{{- /* A wildcard hostname would take traffic for every unclaimed subdomain on the shared Gateway. */ -}}
+{{- range $allHosts -}}
+{{- if not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$" .) -}}
+{{- fail (printf "hosted-web cannot route hostname %q; hostnames must be lowercase RFC 1123 names without wildcards" .) -}}
+{{- end -}}
+{{- end -}}
+{{- $fullName := include "hosted.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- $customPaths := .Values.ingress.custom_paths -}}
+{{- $userAnnotations := .Values.ingress.annotations | default dict -}}
+{{- if hasKey $userAnnotations "normal" -}}
+{{- $userAnnotations = $userAnnotations.normal | default dict -}}
+{{- end -}}
+{{- /* An empty or "null" value disables an annotation, the same rule ingressAnnotations applies. */ -}}
+{{- $annotations := dict -}}
+{{- range $k, $v := $userAnnotations -}}
+{{- if and $v (ne (toString $v) "null") -}}
+{{- $_ := set $annotations $k $v -}}
+{{- end -}}
+{{- end -}}
+{{- if hasKey $annotations "nginx.ingress.kubernetes.io/auth-url" -}}
+{{- fail "hosted-web does not support forward auth (nginx.ingress.kubernetes.io/auth-url)" -}}
+{{- end -}}
+{{- $rewriteTarget := get $annotations "nginx.ingress.kubernetes.io/rewrite-target" | toString -}}
+{{- if and (not $rewriteTarget) (gt (len $customPaths) 0) .Values.ingress.rewriteCustomPathsEnabled -}}
+{{- $rewriteTarget = "/" -}}
+{{- end -}}
+{{- $rewritePrefix := eq $rewriteTarget "/$1" -}}
+{{- if and $rewriteTarget (not $rewritePrefix) (or (contains "$" $rewriteTarget) (not (hasPrefix "/" $rewriteTarget))) -}}
+{{- fail (printf "hosted-web cannot express rewrite-target %q; only absolute paths and /$1 are supported" $rewriteTarget) -}}
+{{- end -}}
+{{- $rewrite := dict -}}
+{{- if $rewritePrefix -}}
+{{- $rewrite = dict "type" "ReplacePrefixMatch" "replacePrefixMatch" "/" -}}
+{{- else if $rewriteTarget -}}
+{{- $rewrite = dict "type" "ReplaceFullPath" "replaceFullPath" $rewriteTarget -}}
+{{- end -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "hosted.labels" . | nindent 4 }}
+spec:
+  parentRefs:
+    {{- toYaml .Values.gateway.parentRefs | nindent 4 }}
+  hostnames:
+    {{- range $allHosts }}
+    - {{ . | quote }}
+    {{- end }}
+  rules:
+    {{- if gt (len $customPaths) 0 }}
+    {{- range $customPaths }}
+    - matches:
+        - path:
+            type: PathPrefix
+            value: {{ ternary (trimSuffix "(.*)" .path) .path $rewritePrefix | quote }}
+      {{- if $rewrite }}
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              {{- toYaml $rewrite | nindent 14 }}
+      {{- end }}
+      backendRefs:
+        - name: {{ .serviceName }}
+          port: {{ .servicePort }}
+    {{- end }}
+    {{- else }}
+    - backendRefs:
+        - name: {{ $fullName }}
+          port: {{ $svcPort }}
+      {{- if $rewrite }}
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              {{- toYaml $rewrite | nindent 14 }}
+      {{- end }}
+    {{- end }}
+{{- end }}

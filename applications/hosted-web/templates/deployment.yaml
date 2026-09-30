@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hosted.fullname" . }}
+  labels:
+    {{- include "hosted.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "hosted.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: {{ include "hosted.fullname" . }}
+        # Rolls the pods on every Porter deploy, including env-only changes.
+        helm.sh/revision: {{ .Release.Revision | quote }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "hosted.podLabels" . | nindent 8 }}
+    spec:
+      {{- include "hosted.podSpec" . | nindent 6 }}
+      containers:
+        - {{ include "hosted.container" . | indent 10 | trim }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.container.port }}
+              protocol: TCP
+          {{- include "hosted.probes" . | trim | nindent 10 }}
+          lifecycle:
+            # Gives the endpoint controller time to remove the pod before the app stops.
+            preStop:
+              exec:
+                command: ["sleep", "5"]

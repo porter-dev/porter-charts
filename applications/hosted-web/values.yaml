@@ -1,0 +1,94 @@
+# Values for a web service on a Porter hosted cluster. The Porter control plane sets these.
+
+fullnameOverride: ""
+replicaCount: 1
+terminationGracePeriodSeconds: 30
+
+# The umbrella chart sets global.image, which takes precedence over image.
+image:
+  repository: public.ecr.aws/o1j4x7p4/hello-porter
+  tag: latest
+  imagePullSecret: ""
+
+container:
+  command: ""
+  port: 80
+  env:
+    normal: {}
+
+# configMapRefs and secretRefs are env group pairs, loaded as environment variables in order.
+configMapRefs: []
+secretRefs: []
+
+labels: {}
+podLabels: {}
+podAnnotations: {}
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: ""
+    memory: ""
+  setCPULimits: false
+
+serviceAccount:
+  create: true
+  name: ""
+
+service:
+  port: 80
+
+# ingress renders an HTTPRoute on the shared Gateway for hosts and porter_hosts.
+# A rewrite-target annotation of "/$1" or an absolute path maps to a URLRewrite filter.
+ingress:
+  enabled: true
+  hosts: []
+  porter_hosts: []
+  custom_paths: []
+  rewriteCustomPathsEnabled: true
+  annotations: {}
+
+gateway:
+  parentRefs:
+    - name: edge
+      namespace: porter-edge
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+  targetMemoryUtilizationPercentage: 50
+
+podDisruptionBudget:
+  enabled: false
+  minAvailablePercentage: 50
+
+# A probe with a command runs that command. Any other probe calls path on the container port.
+health:
+  livenessProbe:
+    enabled: false
+    path: /livez
+    command: ""
+    initialDelaySeconds: 15
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 15
+  readinessProbe:
+    enabled: false
+    path: /readyz
+    command: ""
+    initialDelaySeconds: 15
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 5
+  startupProbe:
+    enabled: false
+    path: /startupz
+    command: ""
+    initialDelaySeconds: 15
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 30

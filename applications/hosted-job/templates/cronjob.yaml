@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "hosted.fullname" . }}
+  labels:
+    {{- include "hosted.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.schedule.value | quote }}
+  suspend: {{ not .Values.schedule.enabled }}
+  concurrencyPolicy: {{ ternary "Allow" "Forbid" .Values.allowConcurrency }}
+  startingDeadlineSeconds: 20
+  successfulJobsHistoryLimit: 20
+  failedJobsHistoryLimit: 20
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "hosted.labels" . | nindent 8 }}
+        helm.sh/revision: {{ .Release.Revision | quote }}
+        porter.run/application-name: {{ .Release.Name | quote }}
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds | default .Values.sidecar.timeout }}
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/default-container: {{ include "hosted.fullname" . }}
+            # A node drain must not stop a running job.
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+            karpenter.sh/do-not-disrupt: "true"
+            {{- with .Values.podAnnotations }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          labels:
+            {{- include "hosted.podLabels" . | nindent 12 }}
+        spec:
+          {{- include "hosted.podSpec" . | nindent 10 }}
+          restartPolicy: Never
+          # The sidecar must see the job process to stop it at the timeout.
+          shareProcessNamespace: true
+          containers:
+            - {{ include "hosted.container" . | indent 14 | trim }}
+            - name: sidecar
+              image: ghcr.io/porter-dev/job_sidecar_container:31e471f4d
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: TIMEOUT
+                  value: {{ .Values.sidecar.timeout | quote }}
+              command:
+                - ./job_killer.sh
+                - -c
+                - {{ .Values.terminationGracePeriodSeconds | quote }}
+                - {{ trim .Values.container.command | splitList " " | first | quote }}
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 100Mi
+                limits:
+                  memory: 100Mi
