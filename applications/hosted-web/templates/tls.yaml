@@ -1,0 +1,37 @@
+{{- /*
+Serves each public host on 443 through a ListenerSet on the shared Gateway.
+cert-manager issues a certificate for each listener, so a custom domain that does not resolve here cannot block the others.
+*/}}
+{{- $allHosts := concat (.Values.ingress.hosts | default list) (.Values.ingress.porter_hosts | default list) -}}
+{{- if and .Values.ingress.enabled $allHosts -}}
+{{- if gt (len $allHosts) 64 -}}
+{{- fail (printf "hosted-web serves at most 64 hosts over HTTPS, got %d" (len $allHosts)) -}}
+{{- end -}}
+{{- $fullName := include "hosted.fullname" . -}}
+{{- $gateway := first .Values.gateway.parentRefs -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: {{ $fullName }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.gateway.clusterIssuer }}
+  labels:
+    {{- include "hosted.labels" . | nindent 4 }}
+spec:
+  parentRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: {{ $gateway.name }}
+    namespace: {{ $gateway.namespace }}
+  listeners:
+    {{- range $allHosts }}
+    - name: {{ . }}
+      hostname: {{ . | quote }}
+      protocol: HTTPS
+      port: 443
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: {{ include "hosted-web.tlsSecretName" (list $fullName .) }}
+    {{- end }}
+{{- end }}

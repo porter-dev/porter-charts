@@ -50,10 +50,13 @@ ingress:
   rewriteCustomPathsEnabled: true
   annotations: {}
 
+# The route attaches to the first parentRef, and the ListenerSet attaches to the same Gateway.
+# clusterIssuer issues a certificate for each HTTPS listener over HTTP-01.
 gateway:
   parentRefs:
     - name: edge
       namespace: porter-edge
+  clusterIssuer: letsencrypt-http01
 
 autoscaling:
   enabled: false

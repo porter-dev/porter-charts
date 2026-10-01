@@ -1,5 +1,5 @@
 {{- /*
-Serves the ingress hosts through an HTTPRoute on the shared Gateway.
+Serves the ingress hosts through an HTTPRoute on the shared Gateway, over HTTP and through the ListenerSet in tls.yaml.
 A route without hostnames matches every host on the Gateway, so no hosts means no route.
 */}}
 {{- $allHosts := concat (.Values.ingress.hosts | default list) (.Values.ingress.porter_hosts | default list) -}}
@@ -50,6 +50,9 @@ metadata:
 spec:
   parentRefs:
     {{- toYaml .Values.gateway.parentRefs | nindent 4 }}
+    - group: gateway.networking.k8s.io
+      kind: ListenerSet
+      name: {{ $fullName }}
   hostnames:
     {{- range $allHosts }}
     - {{ . | quote }}
