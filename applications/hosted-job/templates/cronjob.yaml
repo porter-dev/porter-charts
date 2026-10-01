@@ -17,6 +17,7 @@ spec:
         {{- include "hosted.labels" . | nindent 8 }}
         helm.sh/revision: {{ .Release.Revision | quote }}
         porter.run/application-name: {{ .Release.Name | quote }}
+        meta.helm.sh/release-name: {{ .Release.Name | quote }}
     spec:
       backoffLimit: 0
       activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds | default .Values.sidecar.timeout }}
