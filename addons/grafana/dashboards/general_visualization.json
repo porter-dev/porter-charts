@@ -833,7 +833,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{app=\"ingress-nginx\"} |~ \"(${Target}-${App}-${Service}|too big header)\"",
+          "expr":  "{app=\"ingress-nginx\"} |~ \"(${App}-${Service}|too big header)\"",
           "queryType": "range",
           "refId": "A"
         }

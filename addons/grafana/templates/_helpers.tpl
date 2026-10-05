@@ -68,9 +68,8 @@ Common labels
 helm.sh/chart: {{ include "grafana.chart" . }}
 {{ include "grafana.selectorLabels" . }}
 {{- if or .Chart.AppVersion .Values.image.tag }}
-app.kubernetes.io/version: {{ mustRegexReplaceAllLiteral "@sha.*" .Values.image.tag "" | default .Chart.AppVersion | trunc 63 | trimSuffix "-" | quote }}
+app.kubernetes.io/version: {{ mustRegexReplaceAllLiteral "@sha.*" (tpl (toString .Values.image.tag) .) "" | default .Chart.AppVersion | trimSuffix "-distroless" | trunc 63 | trimSuffix "-" | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- with .Values.extraLabels }}
 {{ toYaml . }}
 {{- end }}
@@ -85,15 +84,23 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Create a fully qualified name for image-renderer resources.
+We truncate at 47 chars to reserve space for the longest suffix (-image-renderer, 16 chars)
+so the Service name stays within the 63-char DNS label limit.
+*/}}
+{{- define "grafana.imageRenderer.fullname" -}}
+{{- include "grafana.fullname" . | trunc 47 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
 Common labels
 */}}
 {{- define "grafana.imageRenderer.labels" -}}
 helm.sh/chart: {{ include "grafana.chart" . }}
 {{ include "grafana.imageRenderer.selectorLabels" . }}
 {{- if or .Chart.AppVersion .Values.image.tag }}
-app.kubernetes.io/version: {{ mustRegexReplaceAllLiteral "@sha.*" .Values.image.tag "" | default .Chart.AppVersion | trunc 63 | trimSuffix "-" | quote }}
+app.kubernetes.io/version: {{ mustRegexReplaceAllLiteral "@sha.*" (tpl (toString .Values.image.tag) .) "" | default .Chart.AppVersion | trimSuffix "-distroless" | trunc 63 | trimSuffix "-" | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
@@ -102,6 +109,19 @@ Selector labels ImageRenderer
 {{- define "grafana.imageRenderer.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "grafana.name" . }}-image-renderer
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Looks if there's an existing secret and reuse its password. If not it generates
+new password and use it.
+*/}}
+{{- define "grafana.imageRenderer.token" -}}
+{{- $secret := (lookup "v1" "Secret" (include "grafana.namespace" .) (printf "%s-image-renderer" (include "grafana.imageRenderer.fullname" .)) ) }}
+{{- if $secret }}
+{{- index $secret "data" "token" }}
+{{- else }}
+{{- (randAlphaNum 40) | b64enc | quote }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -118,73 +138,16 @@ new password and use it.
 {{- end }}
 
 {{/*
-Return the appropriate apiVersion for rbac.
-*/}}
-{{- define "grafana.rbac.apiVersion" -}}
-{{- if $.Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
-{{- print "rbac.authorization.k8s.io/v1" }}
-{{- else }}
-{{- print "rbac.authorization.k8s.io/v1beta1" }}
-{{- end }}
-{{- end }}
-
-{{/*
-Return the appropriate apiVersion for ingress.
-*/}}
-{{- define "grafana.ingress.apiVersion" -}}
-{{- if and ($.Capabilities.APIVersions.Has "networking.k8s.io/v1") (semverCompare ">= 1.19-0" .Capabilities.KubeVersion.Version) }}
-{{- print "networking.k8s.io/v1" }}
-{{- else if $.Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
-{{- print "networking.k8s.io/v1beta1" }}
-{{- else }}
-{{- print "extensions/v1beta1" }}
-{{- end }}
-{{- end }}
-
-{{/*
 Return the appropriate apiVersion for Horizontal Pod Autoscaler.
 */}}
 {{- define "grafana.hpa.apiVersion" -}}
-{{- if .Capabilities.APIVersions.Has "autoscaling/v2" }}  
-{{- print "autoscaling/v2" }}  
-{{- else }}  
-{{- print "autoscaling/v2beta2" }}  
-{{- end }} 
-{{- end }}
-
-{{/*
-Return the appropriate apiVersion for podDisruptionBudget.
-*/}}
-{{- define "grafana.podDisruptionBudget.apiVersion" -}}
-{{- if $.Values.podDisruptionBudget.apiVersion }}
-{{- print $.Values.podDisruptionBudget.apiVersion }}
-{{- else if $.Capabilities.APIVersions.Has "policy/v1/PodDisruptionBudget" }}
-{{- print "policy/v1" }}
+{{- if .Capabilities.APIVersions.Has "autoscaling/v2" }}
+{{- print "autoscaling/v2" }}
 {{- else }}
-{{- print "policy/v1beta1" }}
+{{- print "autoscaling/v2beta2" }}
 {{- end }}
 {{- end }}
 
-{{/*
-Return if ingress is stable.
-*/}}
-{{- define "grafana.ingress.isStable" -}}
-{{- eq (include "grafana.ingress.apiVersion" .) "networking.k8s.io/v1" }}
-{{- end }}
-
-{{/*
-Return if ingress supports ingressClassName.
-*/}}
-{{- define "grafana.ingress.supportsIngressClassName" -}}
-{{- or (eq (include "grafana.ingress.isStable" .) "true") (and (eq (include "grafana.ingress.apiVersion" .) "networking.k8s.io/v1beta1") (semverCompare ">= 1.18-0" .Capabilities.KubeVersion.Version)) }}
-{{- end }}
-
-{{/*
-Return if ingress supports pathType.
-*/}}
-{{- define "grafana.ingress.supportsPathType" -}}
-{{- or (eq (include "grafana.ingress.isStable" .) "true") (and (eq (include "grafana.ingress.apiVersion" .) "networking.k8s.io/v1beta1") (semverCompare ">= 1.18-0" .Capabilities.KubeVersion.Version)) }}
-{{- end }}
 
 {{/*
 Formats imagePullSecrets. Input is (dict "root" . "imagePullSecrets" .{specific imagePullSecrets})
@@ -202,8 +165,8 @@ Formats imagePullSecrets. Input is (dict "root" . "imagePullSecrets" .{specific 
 
 
 {{/*
- Checks whether or not the configSecret secret has to be created
- */}}
+  Checks whether or not the configSecret secret has to be created
+*/}}
 {{- define "grafana.shouldCreateConfigSecret" -}}
 {{- $secretFound := false -}}
 {{- range $key, $value := .Values.datasources }}
@@ -274,3 +237,107 @@ sensitiveKeys:
       {{- end -}}
   {{- end -}}
 {{- end -}}
+
+{{/*
+  Sidecars health port
+*/}}
+
+{{/*
+  Give health port for alerts sidecar
+*/}}
+{{- define "grafana.sidecar.alerts.healthPort" -}}
+{{- $healthPort := 8081 -}}
+{{- if hasKey .Values.sidecar.alerts "startupProbe" -}}
+  {{- if hasKey .Values.sidecar.alerts.startupProbe "httpGet" -}}
+    {{- if hasKey .Values.sidecar.alerts.startupProbe.httpGet "port" -}}
+      {{- $healthPort = .Values.sidecar.alerts.startupProbe.httpGet.port -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $healthPort | quote -}}
+{{- end -}}
+
+{{/*
+  Give health port for datasources sidecar
+*/}}
+{{- define "grafana.sidecar.datasources.healthPort" -}}
+{{- $healthPort := 8082 -}}
+{{- if hasKey .Values.sidecar.datasources "startupProbe" -}}
+  {{- if hasKey .Values.sidecar.datasources.startupProbe "httpGet" -}}
+    {{- if hasKey .Values.sidecar.datasources.startupProbe.httpGet "port" -}}
+      {{- $healthPort = .Values.sidecar.datasources.startupProbe.httpGet.port -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $healthPort | quote -}}
+{{- end -}}
+
+{{/*
+  Give health port for notifiers sidecar
+*/}}
+{{- define "grafana.sidecar.notifiers.healthPort" -}}
+{{- $healthPort := 8083 -}}
+{{- if hasKey .Values.sidecar.notifiers "startupProbe" -}}
+  {{- if hasKey .Values.sidecar.notifiers.startupProbe "httpGet" -}}
+    {{- if hasKey .Values.sidecar.notifiers.startupProbe.httpGet "port" -}}
+      {{- $healthPort = .Values.sidecar.notifiers.startupProbe.httpGet.port -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $healthPort | quote -}}
+{{- end -}}
+
+{{/*
+  Give health port for dashboards sidecar
+*/}}
+{{- define "grafana.sidecar.dashboards.healthPort" -}}
+{{- $healthPort := 8084 -}}
+{{- if hasKey .Values.sidecar.dashboards "startupProbe" -}}
+  {{- if hasKey .Values.sidecar.dashboards.startupProbe "httpGet" -}}
+    {{- if hasKey .Values.sidecar.dashboards.startupProbe.httpGet "port" -}}
+      {{- $healthPort = .Values.sidecar.dashboards.startupProbe.httpGet.port -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $healthPort | quote -}}
+{{- end -}}
+
+{{/*
+Convert a Kubernetes memory quantity string to MiB (integer).
+Accepts Ti, Gi, Mi, Ki binary SI and T, G, M, K decimal SI suffixes,
+as well as plain byte values.
+*/}}
+{{- define "grafana.memoryToMiB" -}}
+{{- $mem := . | toString -}}
+{{- if hasSuffix "Ti" $mem -}}
+  {{- mulf ((trimSuffix "Ti" $mem) | float64) 1048576 | int -}}
+{{- else if hasSuffix "Gi" $mem -}}
+  {{- mulf ((trimSuffix "Gi" $mem) | float64) 1024 | int -}}
+{{- else if hasSuffix "Mi" $mem -}}
+  {{- (trimSuffix "Mi" $mem) | int -}}
+{{- else if hasSuffix "Ki" $mem -}}
+  {{- divf ((trimSuffix "Ki" $mem) | float64) 1024 | int -}}
+{{- else if hasSuffix "T" $mem -}}
+  {{- mulf ((trimSuffix "T" $mem) | float64) 953674.3164 | int -}}
+{{- else if hasSuffix "G" $mem -}}
+  {{- mulf ((trimSuffix "G" $mem) | float64) 953.6743164 | int -}}
+{{- else if hasSuffix "M" $mem -}}
+  {{- mulf ((trimSuffix "M" $mem) | float64) 0.9536743164 | int -}}
+{{- else -}}
+  {{- divf ($mem | float64) 1048576 | int -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+compute a ConfigMap or Secret checksum only based on its .data content.
+This function needs to be called with a context object containing the following keys:
+- ctx: the current Helm context (what '.' is at the call site)
+- name: the file name of the ConfigMap or Secret
+*/}}
+{{- define "grafana.configMapOrSecretContentHash" -}}
+{{- $data := list -}}
+{{- range regexSplit "(?m)^---$" (include (print .ctx.Template.BasePath .name) .ctx) -1 -}}
+{{- $data = append $data (pick (fromYaml .) "data" "stringData") -}}
+{{- end -}}
+{{ $data | toYaml | sha256sum }}
+{{- end }}

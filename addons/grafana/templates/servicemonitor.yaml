@@ -10,8 +10,9 @@ metadata:
   namespace: {{ include "grafana.namespace" . }}
   {{- end }}
   labels:
+    release: {{ default $.Release.Name .Values.serviceMonitor.labels.release | quote }}
     {{- include "grafana.labels" . | nindent 4 }}
-    {{- with .Values.serviceMonitor.labels }}
+    {{- with (omit .Values.serviceMonitor.labels "release") }}
     {{- tpl (toYaml . | nindent 4) $ }}
     {{- end }}
 spec:
@@ -36,6 +37,10 @@ spec:
     {{- end }}
     {{- with .Values.serviceMonitor.metricRelabelings }}
     metricRelabelings:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.serviceMonitor.basicAuth }}
+    basicAuth:
       {{- toYaml . | nindent 6 }}
     {{- end }}
   jobLabel: "{{ .Release.Name }}"
