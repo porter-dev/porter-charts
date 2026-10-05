@@ -98,6 +98,9 @@ spec:
                 fieldPath: status.hostIP
           image: {{ .Values.downwardAPIInit.image }}
           imagePullPolicy: IfNotPresent
+      {{- if and .Values.runtimeClass.enabled .Values.runtimeClass.name }}
+      runtimeClassName: {{ .Values.runtimeClass.name | quote }}
+      {{- end}}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:

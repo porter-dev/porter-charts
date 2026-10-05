@@ -317,3 +317,9 @@ additionalVolumes:
 # this is the case for instance for pods that need to use the MPS sliced GPUs
 # enable this conservatively
 enableHostIpc: false
+
+# Workers can use a different RuntimeClass on EKS clusters, if one has been previously created.
+# This is currently NOT supported on AKS or GKE. 
+runtimeClass:
+  enabled: false
+  name:
