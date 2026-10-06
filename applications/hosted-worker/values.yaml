@@ -3,6 +3,8 @@
 fullnameOverride: ""
 replicaCount: 1
 terminationGracePeriodSeconds: 30
+# runtimeClassName runs the pods under that RuntimeClass, such as gvisor. Empty uses the node default.
+runtimeClassName: ""
 
 # The umbrella chart sets global.image, which takes precedence over image.
 image:

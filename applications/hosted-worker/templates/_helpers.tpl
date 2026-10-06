@@ -50,6 +50,9 @@ porter.run/application-name: {{ .Release.Name | quote }}
 {{- $image := include "hosted.image" . | fromJson -}}
 serviceAccountName: {{ include "hosted.serviceAccountName" . }}
 terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+{{- with .Values.runtimeClassName }}
+runtimeClassName: {{ . | quote }}
+{{- end }}
 {{- with $image.imagePullSecret }}
 imagePullSecrets:
   - name: {{ . }}
