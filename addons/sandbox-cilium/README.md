@@ -2,7 +2,7 @@
 
 Cilium in aws-cni chaining mode, scoped to the sandbox node group. This is the
 enforcement backend for sandbox egress allowlists when sandbox-api runs with
-`SANDBOX_EGRESS_ENFORCEMENT=cilium`: instead of forcing restricted sandboxes
+`SANDBOX_EGRESS_ENFORCEMENT=cilium-chained`: instead of forcing restricted sandboxes
 through the egress proxy, sandbox-api renders one CiliumNetworkPolicy per
 restricted sandbox whose `toFQDNs` rules allow the sandbox's domains directly
 at L3/L4, so non-HTTP clients (psql, ssh, raw TCP) work without proxy
