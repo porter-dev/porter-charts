@@ -10,7 +10,11 @@ metadata:
     {{- toYaml .Values.labels | nindent 4 }}
     {{- end }}
 spec:
-  maxUnavailable: "{{ .Values.podDisruptionBudget.maxUnavailablePercentage }}%"
+  {{- if .Values.podDisruptionBudget.minAvailablePercentage }}
+  minAvailable: "{{ .Values.podDisruptionBudget.minAvailablePercentage }}%"
+  {{- else }}
+  maxUnavailable: "{{ .Values.podDisruptionBudget.maxUnavailablePercentage | default 20 }}%"
+  {{- end }}
   unhealthyPodEvictionPolicy: AlwaysAllow
   selector:
     matchLabels:
