@@ -203,7 +203,8 @@ metadata:
   labels:
     {{- include "hosted.labels" . | nindent 4 }}
 spec:
-  minAvailable: {{ printf "%d%%" (int .Values.podDisruptionBudget.minAvailablePercentage) | quote }}
+  maxUnavailable: {{ printf "%d%%" (int .Values.podDisruptionBudget.maxUnavailablePercentage) | quote }}
+  unhealthyPodEvictionPolicy: AlwaysAllow
   selector:
     matchLabels:
       {{- include "hosted.selectorLabels" . | nindent 6 }}
