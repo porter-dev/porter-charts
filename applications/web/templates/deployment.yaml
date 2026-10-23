@@ -133,6 +133,36 @@ spec:
                 fieldPath: status.hostIP
           image: {{ .Values.downwardAPIInit.image }}
           imagePullPolicy: IfNotPresent
+        {{- if and .Values.cloudsql.enabled .Values.cloudsql.nativeSidecar }}
+        - name: cloud-sql-proxy
+          restartPolicy: Always
+          {{- if eq .Values.cloudsql.version "v2" }}
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.21.1
+          command:
+            - "/cloud-sql-proxy"
+            {{- include "cloudsql.v2InstanceList" . | nindent 12 }}
+            - "--credentials-file=/secrets/service_account.json"
+          {{- else }}
+          image: gcr.io/cloudsql-docker/gce-proxy:1.17
+          command:
+            - "/cloud_sql_proxy"
+            - "-instances={{- include "cloudsql.connectionString" . -}}"
+            - "-credential_file=/secrets/service_account.json"
+          {{- end }}
+          securityContext:
+            runAsNonRoot: true
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: 4
+            requests:
+              memory: 128Mi
+              cpu: 0.1
+          volumeMounts:
+          - name: "cloud-sql-proxy-service-account-secret"
+            mountPath: /secrets/
+            readOnly: true
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -499,7 +529,7 @@ spec:
               mountPath: {{ .mountPath }}
           {{- end }}
         {{ end }}
-        {{- if .Values.cloudsql.enabled }}
+        {{- if and .Values.cloudsql.enabled (not .Values.cloudsql.nativeSidecar) }}
         - name: cloud-sql-proxy
           {{- if eq .Values.cloudsql.version "v2" }}
           image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.21.1
