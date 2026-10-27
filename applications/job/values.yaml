@@ -124,6 +124,10 @@ nodeGroups: []
 networkPolicy:
   blockIMDS:
     enabled: false
+  # isolation restricts the service's pods to what ingress (NetworkPolicyIngressRules) and egress
+  # (NetworkPolicyEgressRules) allow. An unset direction stays unrestricted, and an empty list denies it entirely.
+  isolation:
+    enabled: false
 
 # set this to mount files from a secret into the container at /etc/secrets/<mountPath>
 # Format: fileSecretMounts: [{secretName: <SECRET_NAME>, mountPath: <MOUNT_PATH>},..]
