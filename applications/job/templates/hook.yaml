@@ -30,7 +30,7 @@ spec:
       {{- end }}
       containers:
       - name: job-manager
-        image: public.ecr.aws/o1j4x7p4/job-manager:latest
+        image: public.ecr.aws/n9k9w4b1/job-manager:latest
         imagePullPolicy: Always
         args:
         - "create"

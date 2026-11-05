@@ -149,8 +149,12 @@ loki:
         memory: 1024Mi
   url: http://{{(include "loki.serviceName" .)}}:{{ .Values.loki.service.port }}
 
+agentPriorityClass:
+  enabled: true
+
 promtail:
   enabled: true
+  priorityClassName: porter-agent-daemonset
   config:
     logLevel: info
     serverPort: 3101

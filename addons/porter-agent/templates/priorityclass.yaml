@@ -1,0 +1,11 @@
+{{- /* PriorityClass.value is immutable; to change priority, use a new name. */}}
+{{- if .Values.agentPriorityClass.enabled }}
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: porter-agent-daemonset
+value: 1000000
+globalDefault: false
+preemptionPolicy: PreemptLowerPriority
+description: "Porter per-node agents (e.g. promtail). Above app pods (0), below system-cluster-critical."
+{{- end }}
