@@ -31,7 +31,7 @@ spec:
               {{- include "eviction-webhook.selectorLabels" . | nindent 14 }}
       containers:
         - name: eviction-webhook
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}{{ with .Values.image.digest }}@{{ . }}{{ end }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: MODE
