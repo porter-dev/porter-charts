@@ -1,0 +1,25 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ include "eviction-webhook.fullname" . }}-selfsigned
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "eviction-webhook.labels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "eviction-webhook.fullname" . }}-serving-cert
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "eviction-webhook.labels" . | nindent 4 }}
+spec:
+  dnsNames:
+    - {{ include "eviction-webhook.fullname" . }}.{{ .Release.Namespace }}.svc
+    - {{ include "eviction-webhook.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  secretName: {{ include "eviction-webhook.fullname" . }}-serving-cert
+  issuerRef:
+    kind: Issuer
+    name: {{ include "eviction-webhook.fullname" . }}-selfsigned

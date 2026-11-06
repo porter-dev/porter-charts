@@ -1,0 +1,38 @@
+image:
+  repository: ghcr.io/porter-dev/eviction-webhook
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# One replica is enough: while it is down the webhook fails open and evictions
+# proceed as if it were not installed. Each replica records observed downtime,
+# so more than one counts every period once per replica.
+replicas: 1
+
+# maxDeferral bounds how long one pod's eviction is denied, so a replacement
+# that never becomes ready cannot block a node drain forever.
+maxDeferral: 10m
+# mode is audit or enforce. Both log every decision and record the observed
+# downtime of Porter services. Audit allows every eviction; enforce defers the
+# eviction of a service's last ready pod and starts its replacement.
+mode: audit
+# downtimePollInterval is how often the observed downtime of Porter services
+# is sampled.
+downtimePollInterval: 10s
+
+timeoutSeconds: 3
+
+# namespaces are where the webhook protects Porter services. Porter runs
+# production apps in default. The webhook can patch pods and deployments only
+# in these namespaces, and each must exist before install.
+namespaces:
+  - default
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    memory: 128Mi
+
+nodeSelector: {}
+tolerations: []

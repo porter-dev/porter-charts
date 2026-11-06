@@ -1,0 +1,34 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: {{ include "eviction-webhook.fullname" . }}
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "eviction-webhook.fullname" . }}-serving-cert
+  labels:
+    {{- include "eviction-webhook.labels" . | nindent 4 }}
+webhooks:
+  - name: eviction-webhook.porter.run
+    admissionReviewVersions: ["v1"]
+    clientConfig:
+      service:
+        name: {{ include "eviction-webhook.fullname" . }}
+        namespace: {{ .Release.Namespace }}
+        path: /validate
+    rules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["pods/eviction"]
+        scope: Namespaced
+    # The eviction body carries no pod labels, so an objectSelector cannot
+    # pick Porter pods; the webhook filters them itself.
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            {{- toYaml .Values.namespaces | nindent 12 }}
+    matchPolicy: Equivalent
+    failurePolicy: Ignore
+    sideEffects: NoneOnDryRun
+    timeoutSeconds: {{ .Values.timeoutSeconds }}

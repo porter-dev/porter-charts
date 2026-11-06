@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "eviction-webhook.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "eviction-webhook.labels" . | nindent 4 }}
+  annotations:
+    porter.managed.prometheus/scrape: 'true'
+    porter.managed.prometheus/scheme: 'http'
+    porter.managed.prometheus/path: '/metrics'
+    porter.managed.prometheus/port: '8081'
+spec:
+  selector:
+    {{- include "eviction-webhook.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: webhook
+      port: 443
+      targetPort: webhook

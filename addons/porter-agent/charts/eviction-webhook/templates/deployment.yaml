@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eviction-webhook.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "eviction-webhook.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "eviction-webhook.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "eviction-webhook.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "eviction-webhook.fullname" . }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              {{- include "eviction-webhook.selectorLabels" . | nindent 14 }}
+      containers:
+        - name: eviction-webhook
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: MODE
+              value: {{ include "eviction-webhook.mode" . }}
+            - name: MAX_DEFERRAL
+              value: {{ .Values.maxDeferral | quote }}
+            - name: NAMESPACES
+              value: {{ join "," .Values.namespaces | quote }}
+            - name: DOWNTIME_POLL_INTERVAL
+              value: {{ .Values.downtimePollInterval | quote }}
+          ports:
+            - name: webhook
+              containerPort: 8443
+            - name: probes
+              containerPort: 8081
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: probes
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: probes
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: serving-cert
+              mountPath: /tls
+              readOnly: true
+      volumes:
+        - name: serving-cert
+          secret:
+            secretName: {{ include "eviction-webhook.fullname" . }}-serving-cert
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

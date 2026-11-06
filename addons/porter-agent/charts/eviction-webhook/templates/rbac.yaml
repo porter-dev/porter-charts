@@ -1,0 +1,68 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "eviction-webhook.fullname" . }}-nodes
+  labels:
+    {{- include "eviction-webhook.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "eviction-webhook.fullname" . }}-nodes
+  labels:
+    {{- include "eviction-webhook.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "eviction-webhook.fullname" . }}-nodes
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "eviction-webhook.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+---
+# Granted only in the protected namespaces through the RoleBindings below,
+# so the webhook cannot patch workloads anywhere else.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "eviction-webhook.fullname" . }}-protected-namespaces
+  labels:
+    {{- include "eviction-webhook.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "patch"]
+  - apiGroups: ["apps"]
+    resources: ["replicasets"]
+    verbs: ["get"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch"]
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["list"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+{{- range .Values.namespaces }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "eviction-webhook.fullname" $ }}
+  namespace: {{ . }}
+  labels:
+    {{- include "eviction-webhook.labels" $ | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "eviction-webhook.fullname" $ }}-protected-namespaces
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "eviction-webhook.fullname" $ }}
+    namespace: {{ $.Release.Namespace }}
+{{- end }}

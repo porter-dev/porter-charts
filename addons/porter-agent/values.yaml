@@ -29,6 +29,13 @@ resources:
 nodeSelector: {}
 tolerations: []
 
+# evictionWebhook defers the eviction of a Porter service's last ready pod
+# until a replacement is ready, and records how long Porter services go
+# without a ready pod. mode is audit or enforce. It needs cert-manager.
+evictionWebhook:
+  enabled: false
+  mode: audit
+
 loki:
   deploymentMode: SingleBinary
   resultsCache:
