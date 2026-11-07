@@ -19,6 +19,10 @@ metadata:
 {{- if .Values.storageClass.efs.enabled }}
 reclaimPolicy: {{ .Values.storageClass.reclaimPolicy }}
 volumeBindingMode: {{ .Values.storageClass.volumeBindingMode }}
+{{- with .Values.storageClass.mountOptions }}
+mountOptions:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
 provisioner: {{ .Values.storageClass.efs.provisioner }}
 parameters:
   directoryPerms: {{ .Values.storageClass.directoryPerms | quote }}

@@ -6,6 +6,9 @@ storageClass:
   reclaimPolicy: "Retain"
   volumeBindingMode: "Immediate"
   directoryPerms: "777"
+  # NFS mount options for every volume of this disk, set on the StorageClass
+  # and on the static volume.
+  mountOptions: []
   reuseAccessPoint: "true"
   efs:
     enabled: true

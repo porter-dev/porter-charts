@@ -19,6 +19,10 @@ spec:
     {{- toYaml .Values.persistentVolumeClaim.accessModes | nindent 4 }}
   storageClassName: ""
   persistentVolumeReclaimPolicy: Retain
+  {{- with .Values.storageClass.mountOptions }}
+  mountOptions:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   claimRef:
     name: {{ .Release.Name }}
     namespace: {{ .Release.Namespace }}
