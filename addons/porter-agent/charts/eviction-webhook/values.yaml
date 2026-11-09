@@ -1,8 +1,8 @@
 image:
   repository: public.ecr.aws/n9k9w4b1/eviction-webhook
-  tag: f6708ff2dbfc4b0fb60070da3710483504412c8f
+  tag: c8226f3f0714466d65a81984b153a53b3c3ee386
   # digest pins the image. The tag only records which commit it was built from.
-  digest: sha256:339a69970e617253125e4f97a43b1387cbdf9fd24f1f4052996b77c8aedfc91e
+  digest: sha256:fb227c8cadf4bd5f7ea2fd98b9392c77879feb063decb1e43f7d179144b9249e
   pullPolicy: IfNotPresent
 
 # One replica is enough: while it is down the webhook fails open and evictions

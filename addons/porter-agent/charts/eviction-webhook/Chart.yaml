@@ -2,5 +2,5 @@ apiVersion: v2
 name: eviction-webhook
 description: Defers the eviction of a Porter service's last ready pod until a replacement is ready
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "0.1.0"
