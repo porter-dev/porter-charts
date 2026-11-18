@@ -170,6 +170,13 @@ data:
                 {{- else }}
                 memory: {{ .Values.resources.requests.memory }}
                 {{- end }}
+            {{- with .Values.additionalVolumes }}
+            volumeMounts:
+            {{- range . }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
+            {{- end }}
           - name: sidecar
             image: ghcr.io/porter-dev/job_sidecar_container:31e471f4d
             imagePullPolicy: Always
@@ -231,10 +238,17 @@ data:
               mountPath: /secrets/
               readOnly: true
           {{ end }}
-          {{ if .Values.cloudsql.enabled }}
+          {{ if or .Values.cloudsql.enabled .Values.additionalVolumes }}
           volumes:
+            {{- if .Values.cloudsql.enabled }}
             - name: "sidecar-volume-{{ include "docker-template.fullname" . }}"
               secret:
                 secretName: "{{ include "cloudsql.serviceAccountJSONSecret" . }}"
+            {{- end }}
+            {{- range .Values.additionalVolumes }}
+            - name: {{ .name }}
+              {{ .type }}:
+                {{- toYaml .volumeOptions | nindent 16 }}
+            {{- end }}
           {{ end }}
 {{- end }}

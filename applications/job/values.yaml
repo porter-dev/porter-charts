@@ -170,3 +170,10 @@ multiplePvc:
 
 # job timeout configuration
 activeDeadlineSeconds: # Optional - if not set, will use sidecar.timeout
+
+# set this to add additional volumes to the deployment
+additionalVolumes:
+  # - name: ""
+  #   type: ""
+  #   mountPath: ""
+  #   volumeOptions: {}

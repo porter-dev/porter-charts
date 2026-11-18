@@ -528,6 +528,10 @@ spec:
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
           {{- end }}
+          {{- range .Values.additionalVolumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+          {{- end }}
         {{ end }}
         {{- if and .Values.cloudsql.enabled (not .Values.cloudsql.nativeSidecar) }}
         - name: cloud-sql-proxy
@@ -607,7 +611,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled .Values.hostVolumeMounts }}
+      {{ if or .Values.pvc.enabled .Values.multiplePvc.enabled .Values.resources.requests.nvidiaGpu .Values.cloudsql.enabled .Values.emptyDir.enabled .Values.fileSecretMounts.enabled .Values.awsEfsStorage .Values.datadogSocketVolume.enabled .Values.hostVolumeMounts .Values.additionalVolumes }}
       volumes:
         {{ if .Values.datadogSocketVolume.enabled }}
         - hostPath:
@@ -670,6 +674,11 @@ spec:
           hostPath:
             path: {{ .hostPath }}
             type: {{ .type | default "DirectoryOrCreate" }}
+        {{- end }}
+        {{- range .Values.additionalVolumes }}
+        - name: {{ .name }}
+          {{ .type }}:
+            {{- toYaml .volumeOptions | nindent 12 }}
         {{- end }}
       {{ end }}
 {{- end }}

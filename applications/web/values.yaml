@@ -468,3 +468,10 @@ hostVolumeMounts: []
 #     hostPath: /var/run/docker.sock
 #     mountPath: /var/run/docker.sock
 #     type: Socket
+
+# set this to add additional volumes to the deployment
+additionalVolumes:
+  # - name: ""
+  #   type: ""
+  #   mountPath: ""
+  #   volumeOptions: {}

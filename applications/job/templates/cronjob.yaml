@@ -251,6 +251,10 @@ spec:
                   mountPath: {{ .mountPath }}
               {{ end }}
               {{ end }}
+              {{- range .Values.additionalVolumes }}
+                - name: {{ .name }}
+                  mountPath: {{ .mountPath }}
+              {{- end }}
               resources:
                 requests:
                   cpu: {{ .Values.resources.requests.cpu }}
@@ -337,7 +341,7 @@ spec:
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled .Values.hostVolumeMounts }}
+          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled .Values.hostVolumeMounts .Values.additionalVolumes }}
           volumes:
             {{ if .Values.cloudsql.enabled }}
             - name: "cloud-sql-proxy-service-account-secret"
@@ -373,6 +377,11 @@ spec:
                 path: {{ .hostPath }}
                 type: {{ .type | default "DirectoryOrCreate" }}
             {{ end }}
+            {{- range .Values.additionalVolumes }}
+            - name: {{ .name }}
+              {{ .type }}:
+                {{- toYaml .volumeOptions | nindent 16 }}
+            {{- end }}
           {{ end }}
           restartPolicy: Never
           shareProcessNamespace: true

@@ -258,16 +258,21 @@ spec:
             - name: PORT
               value: {{ $.Values.container.port | quote }}
             {{- end }}
-          {{ if $.Values.pvc.enabled }}
+          {{- if or $.Values.pvc.enabled $.Values.emptyDir.enabled $.Values.additionalVolumes }}
           volumeMounts:
+            {{- if $.Values.pvc.enabled }}
             - name: "{{ include "docker-template.fullname" $ }}-storage"
               mountPath: {{ $.Values.pvc.mountPath }}
-          {{ end }}
-          {{ if $.Values.emptyDir.enabled }}
-          volumeMounts:
-            - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
-            mountPath: {{ $.Values.emptyDir.mountPath }}
-          {{ end }}
+            {{- end }}
+            {{- if $.Values.emptyDir.enabled }}
+            - name: "{{ include "docker-template.fullname" $ }}-empty-dir-storage"
+              mountPath: {{ $.Values.emptyDir.mountPath }}
+            {{- end }}
+            {{- range $.Values.additionalVolumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
+          {{- end }}
         {{- if $.Values.cloudsql.enabled }}
         - name: cloud-sql-proxy
           {{- if eq $.Values.cloudsql.version "v2" }}
@@ -326,7 +331,7 @@ spec:
               {{- end }}
           {{- end }}
       {{ end }}
-      {{ if or $.Values.pvc.enabled $.Values.cloudsql.enabled $.Values.emptyDir.enabled }}
+      {{ if or $.Values.pvc.enabled $.Values.cloudsql.enabled $.Values.emptyDir.enabled $.Values.additionalVolumes }}
       volumes:
         {{ if $.Values.cloudsql.enabled }}
         - name: "sidecar-volume-{{ include "docker-template.fullname" $ }}"
@@ -343,9 +348,14 @@ spec:
         {{ end }}
         {{ end }}
         {{ if $.Values.emptyDir.enabled }}
-        - name: "{{ include "docker-template.fullname" . }}-empty-dir-storage"
+        - name: "{{ include "docker-template.fullname" $ }}-empty-dir-storage"
           emptyDir: {}
         {{ end }}
+        {{- range $.Values.additionalVolumes }}
+        - name: {{ .name }}
+          {{ .type }}:
+            {{- toYaml .volumeOptions | nindent 12 }}
+        {{- end }}
       {{ end }}
 {{- if not (eq $v (sub (len $.Values.bluegreen.imageTags) 1) ) }}
 ---
