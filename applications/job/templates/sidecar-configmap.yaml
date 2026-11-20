@@ -1,0 +1,14 @@
+{{- if or (ne .Values.image.repository "public.ecr.aws/o1j4x7p4/hello-porter-job") (.Values.global) }}
+{{- /*
+  The job sidecar runs these scripts, not the copies baked into its image, which is built outside this
+  repo. Edit them here; they need busybox sh, procps and coreutils from the pinned image.
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ include "docker-template.fullname" . }}.sidecar"
+  labels:
+    {{- include "docker-template.labels" . | nindent 4 }}
+data:
+  {{- (.Files.Glob "files/sidecar/*.sh").AsConfig | nindent 2 }}
+{{- end }}

@@ -49,6 +49,9 @@ spec:
             "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
             "karpenter.sh/do-not-disrupt": "true"
             {{- end }}
+            {{- with .Values.podAnnotations }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           labels:
             {{- include "docker-template.selectorLabels" . | nindent 12 }}
             {{- if .Values.podLabels }}
@@ -283,6 +286,11 @@ spec:
             - name: sidecar
               image: ghcr.io/porter-dev/job_sidecar_container:31e471f4d
               imagePullPolicy: Always
+              workingDir: /porter-sidecar
+              volumeMounts:
+                - name: porter-job-sidecar-scripts
+                  mountPath: /porter-sidecar
+                  readOnly: true
             {{- if (.Values.sidecar.timeout) }}
               env:
                 - name: TIMEOUT
@@ -305,12 +313,19 @@ spec:
                 - {{ .Values.terminationGracePeriodSeconds | quote }}
             {{- $cmdSpl := trim .Values.container.command | splitList " " }}
                 - {{ $cmdSpl| first | quote }}
+            {{- $sidecarProcesses := list }}
             {{- if .Values.cloudsql.enabled }}
-                {{- if eq .Values.cloudsql.version "v2" }}
-                - "cloud-sql-proxy"
-                {{- else }}
-                - "cloud_sql_proxy"
-                {{- end }}
+              {{- $sidecarProcesses = append $sidecarProcesses (ternary "cloud-sql-proxy" "cloud_sql_proxy" (eq .Values.cloudsql.version "v2")) }}
+            {{- end }}
+            {{- /*
+              Linkerd's proxy never exits on its own, so a meshed job pod would stay Running until
+              activeDeadlineSeconds. sidecar_killer.sh hands this pattern to pgrep ("|" is alternation)
+              and SIGTERMs every match. */}}
+            {{- if eq (get (.Values.podAnnotations | default dict) "linkerd.io/inject") "enabled" }}
+              {{- $sidecarProcesses = append $sidecarProcesses "linkerd2-proxy" }}
+            {{- end }}
+            {{- with $sidecarProcesses }}
+                - {{ join "|" . | quote }}
             {{- end }}
           {{- if .Values.cloudsql.enabled }}
             - name: cloud-sql-proxy
@@ -341,8 +356,11 @@ spec:
                   mountPath: /secrets/
                   readOnly: true
           {{ end }}
-          {{ if or .Values.cloudsql.enabled .Values.fileSecretMounts.enabled .Values.pvc.enabled .Values.multiplePvc.enabled .Values.hostVolumeMounts .Values.additionalVolumes }}
           volumes:
+            - name: porter-job-sidecar-scripts
+              configMap:
+                name: "{{ include "docker-template.fullname" . }}.sidecar"
+                defaultMode: 0555
             {{ if .Values.cloudsql.enabled }}
             - name: "cloud-sql-proxy-service-account-secret"
               secret:
@@ -382,7 +400,6 @@ spec:
               {{ .type }}:
                 {{- toYaml .volumeOptions | nindent 16 }}
             {{- end }}
-          {{ end }}
           restartPolicy: Never
           shareProcessNamespace: true
           nodeSelector: {{- toYaml .Values.nodeSelector | nindent 12 }}
